@@ -1,0 +1,17 @@
+{
+  "model": {
+    "main": {
+      "use_multiscale": false,
+      "use_router": true,
+      "share_experts": true,
+      "use_routed_branch": true,
+      "use_shared_branch": false
+    }
+  },
+  "loss": {
+    "lambda_cross": 0.0
+  },
+  "train": {
+    "epochs": 80
+  }
+}

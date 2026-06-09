@@ -1,0 +1,72 @@
+{
+  "seed": 42,
+  "output_dir": "outputs",
+  "device": "cuda:0",
+  "data": {
+    "dataset_name": "BikeNYC",
+    "batch_size": 8,
+    "num_workers": 0,
+    "pin_memory": true,
+    "drop_last": true,
+    "scales": {
+      "fine_to_mid": 2,
+      "fine_to_coarse": 4,
+      "pooling_mode": "avg"
+    },
+    "mask": {
+      "pattern": "mixed",
+      "missing_rate": 0.4,
+      "spatial_block": 6,
+      "temporal_block": 3
+    },
+    "synthetic": {
+      "num_train": 128,
+      "num_val": 32,
+      "t": 12,
+      "h": 24,
+      "w": 12
+    }
+  },
+  "model": {
+    "c_in": 2,
+    "main": {
+      "dim": 64,
+      "num_experts": 4,
+      "top_k": 2,
+      "max_t": 24,
+      "h": 24,
+      "w": 12,
+      "q_dim": 5,
+      "num_groups": 8,
+      "dropout": 0.0,
+      "use_multiscale": true,
+      "use_router": true,
+      "share_experts": true,
+      "use_routed_branch": true,
+      "use_shared_branch": true
+    },
+    "aux": {
+      "enabled": false,
+      "alpha_init": 0.0
+    }
+  },
+  "loss": {
+    "type": "smooth_l1",
+    "lambda_cross": 0.1,
+    "lambda_balance": 0.01,
+    "lambda_final": 0.0
+  },
+  "train": {
+    "epochs": 50,
+    "lr_main": 0.001,
+    "lr_aux": 0.001,
+    "weight_decay": 0.0001,
+    "grad_clip_norm": 1.0,
+    "amp": true,
+    "save_every": 10,
+    "scheduler": {
+      "type": "cosine",
+      "eta_min": 1e-6
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "model": {
+    "main": {
+      "use_routed_branch": true,
+      "use_shared_branch": false
+    }
+  },
+  "train": {
+    "epochs": 80
+  }
+}

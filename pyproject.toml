@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "stmoe-imputer-v2"
+version = "0.2.0"
+description = "Observation-aware multi-scale MoE imputer with a placeholder auxiliary branch."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "numpy>=1.24",
+    "tqdm>=4.66",
+]
+
+[project.optional-dependencies]
+taxibj = ["pandas>=2.0"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100

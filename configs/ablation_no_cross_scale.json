@@ -1,0 +1,10 @@
+{
+  "model": {
+    "main": {
+      "use_shared_branch": false
+    }
+  },
+  "train": {
+    "epochs": 80
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "model": {
+    "main": {
+      "use_router": false,
+      "share_experts": false,
+      "use_shared_branch": false
+    }
+  },
+  "loss": {
+    "lambda_cross": 0.0,
+    "lambda_balance": 0.0
+  },
+  "train": {
+    "epochs": 80
+  }
+}

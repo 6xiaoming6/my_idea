@@ -1,0 +1,13 @@
+{
+  "model": {
+    "main": {
+      "use_router": false
+    }
+  },
+  "loss": {
+    "lambda_balance": 0.0
+  },
+  "train": {
+    "epochs": 80
+  }
+}
