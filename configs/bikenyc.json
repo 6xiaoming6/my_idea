@@ -57,7 +57,7 @@
     "lambda_final": 0.0
   },
   "train": {
-    "epochs": 50,
+    "epochs": 120,
     "lr_main": 0.001,
     "lr_aux": 0.001,
     "weight_decay": 0.0001,

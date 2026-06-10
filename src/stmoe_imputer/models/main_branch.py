@@ -2,11 +2,10 @@ from __future__ import annotations
 
 import torch
 from torch import nn
-import torch.nn.functional as F
 
-from .blocks import ResidualSTBlock
 from .embedding import ScaleTokenEncoder
 from .experts import CrossScaleSharedExpert, TopKRoutedExpertPool
+from .fusion import ProgressiveScaleGatedFusion
 from .router import QualityRouter, uniform_gate
 from .stats import compute_observation_stats
 
@@ -65,10 +64,8 @@ class MultiScaleMoEBackbone(nn.Module):
         self.cross_scale_shared_expert = CrossScaleSharedExpert(
             dim, num_groups=num_groups, dropout=dropout
         )
-        self.fusion = nn.Sequential(
-            nn.Conv3d(dim * 4, dim, kernel_size=1),
-            ResidualSTBlock(dim, num_groups=num_groups, dropout=dropout),
-            ResidualSTBlock(dim, num_groups=num_groups, dropout=dropout),
+        self.progressive_fusion = ProgressiveScaleGatedFusion(
+            dim, num_groups=num_groups, dropout=dropout
         )
         self.pred_head = nn.Sequential(
             nn.Conv3d(dim, max(1, dim // 2), kernel_size=3, padding=1),
@@ -148,14 +145,6 @@ class MultiScaleMoEBackbone(nn.Module):
                 (gate_f.shape[0], self.top_k), device=gate_f.device, dtype=gate_f.dtype
             )
 
-        _, _, t, h, w = h_f.shape
-        if self.use_multiscale:
-            z_m_up = F.interpolate(z_m, size=(t, h, w), mode="trilinear", align_corners=False)
-            z_c_up = F.interpolate(z_c, size=(t, h, w), mode="trilinear", align_corners=False)
-        else:
-            z_m_up = torch.zeros_like(z_f)
-            z_c_up = torch.zeros_like(z_f)
-
         if self.use_shared_branch and self.use_multiscale:
             z_shared, h_m_up, h_c_up = self.cross_scale_shared_expert(h_f, h_m, h_c)
         else:
@@ -163,13 +152,28 @@ class MultiScaleMoEBackbone(nn.Module):
             h_m_up = torch.zeros_like(z_f)
             h_c_up = torch.zeros_like(z_f)
 
-        fusion_in = torch.cat([z_f, z_m_up, z_c_up, z_shared], dim=1)
-        h_main = self.fusion(fusion_in)
+        if not self.use_multiscale:
+            z_m = torch.zeros_like(h_m)
+            z_c = torch.zeros_like(h_c)
+
+        fusion_outputs = self.progressive_fusion(
+            z_f=z_f,
+            z_m=z_m,
+            z_c=z_c,
+            z_shared=z_shared,
+        )
+        h_main = fusion_outputs["h_main"]
         x_hat_main = self.pred_head(h_main)
         return {
             "x_hat_main": x_hat_main,
             "h_st_aux": h_main,
-            "gates": {"fine": gate_f, "mid": gate_m, "coarse": gate_c},
+            "gates": {
+                "fine": gate_f,
+                "mid": gate_m,
+                "coarse": gate_c,
+                "fusion_16": fusion_outputs["gate_16"],
+                "fusion_32": fusion_outputs["gate_32"],
+            },
             "topk": {
                 "fine_indices": top_idx_f,
                 "fine_weights": top_w_f,
@@ -182,8 +186,9 @@ class MultiScaleMoEBackbone(nn.Module):
                 "z_f": z_f,
                 "z_m": z_m,
                 "z_c": z_c,
-                "z_m_up": z_m_up,
-                "z_c_up": z_c_up,
+                "z_c_to_m": fusion_outputs["z_c_to_m"],
+                "z_mc": fusion_outputs["z_mc"],
+                "z_mc_to_f": fusion_outputs["z_mc_to_f"],
                 "z_shared": z_shared,
                 "h_m_up": h_m_up,
                 "h_c_up": h_c_up,

@@ -1,4 +1,10 @@
 from .imputer import DualBranchSTImputer, ParallelTwoBranchImputer
+from .fusion import (
+    GatedFusion2,
+    GatedFusion3,
+    LearnableUpsample3D,
+    ProgressiveScaleGatedFusion,
+)
 from .main_branch import (
     MultiScaleMoEBackbone,
     OAMSBackbone,
@@ -7,8 +13,12 @@ from .main_branch import (
 
 __all__ = [
     "DualBranchSTImputer",
+    "GatedFusion2",
+    "GatedFusion3",
+    "LearnableUpsample3D",
     "MultiScaleMoEBackbone",
     "OAMSBackbone",
     "ObservationAwareMultiScaleMoEImputer",
     "ParallelTwoBranchImputer",
+    "ProgressiveScaleGatedFusion",
 ]

@@ -6,6 +6,6 @@
     }
   },
   "train": {
-    "epochs": 80
+    "epochs": 120
   }
 }
