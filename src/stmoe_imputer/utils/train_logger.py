@@ -53,6 +53,12 @@ class TrainLogger:
         v_line = f"{epoch:>6}  {val['loss']:>11.5f}  {val['mae']:>10.4f}  {val['rmse']:>11.4f}"
         self._train_f.write(t_line + "\n")
         self._val_f.write(v_line + "\n")
+        self._train_f.write(
+            "metrics " + json.dumps({"epoch": epoch, **train}, ensure_ascii=False, sort_keys=True) + "\n"
+        )
+        self._val_f.write(
+            "metrics " + json.dumps({"epoch": epoch, **val}, ensure_ascii=False, sort_keys=True) + "\n"
+        )
 
     def log_best(self, epoch: int, val_mae: float) -> None:
         line = f"Best model at epoch {epoch} (val_mae={val_mae:.4f})"

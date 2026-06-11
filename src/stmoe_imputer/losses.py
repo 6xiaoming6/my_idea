@@ -60,7 +60,11 @@ def cross_scale_loss(
     fine_to_coarse: int = 4,
     pooling_mode: str = "avg",
     loss_type: str = "smooth_l1",
+    scale_mode: str = "fine_mid_coarse",
 ) -> torch.Tensor:
+    if scale_mode == "fine":
+        return _empty_loss_like(x_hat_main)
+
     ones_f = torch.ones(
         x_hat_main.shape[0],
         1,
@@ -73,14 +77,18 @@ def cross_scale_loss(
     x_hat_m, _ = masked_pool2d_spatial(
         x_hat_main, ones_f, kernel_size=fine_to_mid, mode=pooling_mode
     )
+    loss = observed_loss(x_hat_m, x_m_obs, m_m, loss_type)
+    if scale_mode == "fine_mid":
+        return loss
+    if scale_mode != "fine_mid_coarse":
+        raise ValueError(f"Unknown scale_mode: {scale_mode}")
+
     ones_m = torch.ones_like(m_m)
     mid_to_coarse = max(1, fine_to_coarse // fine_to_mid)
     x_hat_c, _ = masked_pool2d_spatial(
         x_hat_m, ones_m, kernel_size=mid_to_coarse, mode=pooling_mode
     )
-    return observed_loss(x_hat_m, x_m_obs, m_m, loss_type) + observed_loss(
-        x_hat_c, x_c_obs, m_c, loss_type
-    )
+    return loss + observed_loss(x_hat_c, x_c_obs, m_c, loss_type)
 
 
 def _empty_loss_like(tensor: torch.Tensor) -> torch.Tensor:
@@ -98,8 +106,9 @@ def moe_balance_loss(
     gates: dict[str, torch.Tensor],
     selected_masks: dict[str, torch.Tensor] | None,
     use_load_balance: bool = True,
+    scale_names: tuple[str, ...] = ("fine", "mid", "coarse"),
 ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
-    gate_all = torch.cat([gates["fine"], gates["mid"], gates["coarse"]], dim=0)
+    gate_all = torch.cat([gates[name] for name in scale_names], dim=0)
     num_experts = gate_all.shape[1]
 
     importance = gate_all.mean(dim=0)
@@ -109,10 +118,7 @@ def moe_balance_loss(
     if not use_load_balance or selected_masks is None:
         l_load = _empty_loss_like(l_importance)
     else:
-        mask_all = torch.cat(
-            [selected_masks["fine"], selected_masks["mid"], selected_masks["coarse"]],
-            dim=0,
-        )
+        mask_all = torch.cat([selected_masks[name] for name in scale_names], dim=0)
         load = mask_all.mean(dim=0)
         target_load = torch.ones_like(load) * load.mean().detach()
         l_load = ((load - target_load) ** 2).sum()
@@ -137,6 +143,10 @@ def compute_main_stage_loss(
     l_main = masked_loss(outputs["x_hat_main"], x_f_gt, m_f, loss_type=loss_type)
     l_final = masked_loss(outputs["x_hat_final"], x_f_gt, m_f, loss_type=loss_type)
     scale_cfg = cfg["data"]["scales"]
+    scale_mode = outputs.get(
+        "scale_mode",
+        cfg["model"]["main"].get("scale_mode", cfg["model"].get("scale_mode", "fine_mid_coarse")),
+    )
     l_cross = cross_scale_loss(
         outputs["x_hat_main"],
         batch["x_m_obs"],
@@ -147,15 +157,28 @@ def compute_main_stage_loss(
         fine_to_coarse=scale_cfg["fine_to_coarse"],
         pooling_mode=scale_cfg.get("pooling_mode", "avg"),
         loss_type=loss_type,
+        scale_mode=scale_mode,
     )
     routing_mode = outputs.get("routing_mode", "topk")
-    use_load_balance = cfg["model"]["main"].get("use_router", True) and routing_mode != "dense"
+    if scale_mode == "fine":
+        balance_scales = ("fine",)
+    elif scale_mode == "fine_mid":
+        balance_scales = ("fine", "mid")
+    elif scale_mode == "fine_mid_coarse":
+        balance_scales = ("fine", "mid", "coarse")
+    else:
+        raise ValueError(f"Unknown scale_mode: {scale_mode}")
+
+    use_routed_branch = cfg["model"]["main"].get("use_routed_branch", True)
+    use_router = cfg["model"]["main"].get("use_router", True)
+    use_load_balance = use_routed_branch and use_router and routing_mode != "dense"
     l_balance, l_importance_balance, l_load_balance = moe_balance_loss(
         outputs["gates"],
         outputs.get("selected_masks"),
         use_load_balance=use_load_balance,
+        scale_names=balance_scales,
     )
-    if routing_mode == "dense" and not cfg["model"]["main"].get("use_router", True):
+    if not use_routed_branch or (routing_mode == "dense" and not use_router):
         l_balance = _empty_loss_like(l_balance)
         l_importance_balance = _empty_loss_like(l_importance_balance)
         l_load_balance = _empty_loss_like(l_load_balance)

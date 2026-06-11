@@ -41,6 +41,8 @@ class DualBranchSTImputer(nn.Module):
             m_m=batch["m_m"],
             x_c=batch["x_c_obs"],
             m_c=batch["m_c"],
+            r_m=batch.get("r_m"),
+            r_c=batch.get("r_c"),
         )
         x_hat_main = main_outputs["x_hat_main"]
         h_st_aux = main_outputs["h_st_aux"]

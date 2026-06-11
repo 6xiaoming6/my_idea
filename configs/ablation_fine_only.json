@@ -5,7 +5,8 @@
       "use_router": true,
       "share_experts": true,
       "use_routed_branch": true,
-      "use_shared_branch": false
+      "use_shared_branch": false,
+      "scale_mode": "fine"
     }
   },
   "loss": {

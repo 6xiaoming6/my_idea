@@ -1,0 +1,12 @@
+{
+  "model": {
+    "main": {
+      "scale_mode": "fine_mid_coarse",
+      "use_scale_gate": true,
+      "use_reliability_gate": true
+    }
+  },
+  "loss": {
+    "lambda_cross": 0.1
+  }
+}

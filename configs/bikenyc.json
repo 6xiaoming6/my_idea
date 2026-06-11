@@ -49,7 +49,8 @@
       "routing_mode": "topk",
       "routing_mode_when_no_router": "dense",
       "router_granularity": "sample",
-      "use_reliability": false,
+      "use_scale_gate": true,
+      "use_reliability_gate": true,
       "scale_mode": "fine_mid_coarse"
     },
     "aux": {

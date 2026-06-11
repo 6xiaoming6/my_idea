@@ -48,6 +48,22 @@ def _mean_logs(accumulator: dict[str, list[float]]) -> dict[str, float]:
     return {key: sum(values) / max(1, len(values)) for key, values in accumulator.items()}
 
 
+def _append_model_diagnostics(logs: dict[str, list[float]], outputs: dict) -> None:
+    scale_gate = outputs.get("gates", {}).get("scale_gate")
+    if scale_gate is not None:
+        labels = ("f", "m", "c")
+        for idx, label in enumerate(labels):
+            values = scale_gate[:, idx]
+            logs[f"scale_gate_{label}_mean"].append(float(values.mean().detach().cpu()))
+            logs[f"scale_gate_{label}_std"].append(float(values.std(unbiased=False).detach().cpu()))
+
+    route_gamma = outputs.get("route_gamma")
+    if route_gamma is not None and torch.is_tensor(route_gamma):
+        gamma_value = float(route_gamma.detach().cpu())
+        logs["route_gamma"].append(gamma_value)
+        logs["effective_route_ratio"].append(gamma_value)
+
+
 def train_one_epoch(
     model: torch.nn.Module,
     loader,
@@ -78,6 +94,7 @@ def train_one_epoch(
         metrics = masked_metrics(outputs["x_hat_final"], batch["x_f_gt"], batch["m_f"])
         for key, value in {**loss_dict, **metrics}.items():
             logs[key].append(float(value.detach().cpu()))
+        _append_model_diagnostics(logs, outputs)
         progress.set_postfix(loss=logs["loss"][-1], mae=logs["mae"][-1], rmse=logs["rmse"][-1])
     return _mean_logs(logs)
 
@@ -99,4 +116,5 @@ def evaluate(
         metrics = masked_metrics(outputs["x_hat_final"], batch["x_f_gt"], batch["m_f"])
         for key, value in {**loss_dict, **metrics}.items():
             logs[key].append(float(value.detach().cpu()))
+        _append_model_diagnostics(logs, outputs)
     return _mean_logs(logs)

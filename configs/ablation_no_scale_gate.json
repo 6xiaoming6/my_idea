@@ -1,0 +1,8 @@
+{
+  "model": {
+    "main": {
+      "use_scale_gate": false,
+      "use_reliability_gate": false
+    }
+  }
+}
