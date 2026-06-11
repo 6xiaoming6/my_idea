@@ -2,7 +2,7 @@
   "model": {
     "main": {
       "use_router": false,
-      "routing_mode_when_no_router": "dense"
+      "routing_mode_when_no_router": "topk"
     }
   },
   "loss": {

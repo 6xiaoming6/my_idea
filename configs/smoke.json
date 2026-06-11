@@ -42,7 +42,14 @@
       "use_router": true,
       "share_experts": true,
       "use_routed_branch": true,
-      "use_shared_branch": true
+      "use_shared_branch": true,
+      "branch_fusion_mode": "shared_plus_routed_residual",
+      "route_gamma_init": -4.0,
+      "routing_mode": "topk",
+      "routing_mode_when_no_router": "dense",
+      "router_granularity": "sample",
+      "use_reliability": false,
+      "scale_mode": "fine_mid_coarse"
     },
     "aux": {
       "enabled": false,
@@ -53,6 +60,9 @@
     "type": "smooth_l1",
     "lambda_cross": 0.1,
     "lambda_balance": 0.01,
+    "lambda_importance_balance": 0.01,
+    "lambda_load_balance": 0.01,
+    "lambda_fusion_entropy": 0.0,
     "lambda_final": 0.0
   },
   "train": {

@@ -83,11 +83,46 @@ def cross_scale_loss(
     )
 
 
+def _empty_loss_like(tensor: torch.Tensor) -> torch.Tensor:
+    return tensor.sum() * 0.0
+
+
 def gate_balance_loss(gates: dict[str, torch.Tensor]) -> torch.Tensor:
     gate_all = torch.cat([gates["fine"], gates["mid"], gates["coarse"]], dim=0)
     usage = gate_all.mean(dim=0)
     target = torch.ones_like(usage) / gate_all.shape[1]
     return ((usage - target) ** 2).sum()
+
+
+def moe_balance_loss(
+    gates: dict[str, torch.Tensor],
+    selected_masks: dict[str, torch.Tensor] | None,
+    use_load_balance: bool = True,
+) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+    gate_all = torch.cat([gates["fine"], gates["mid"], gates["coarse"]], dim=0)
+    num_experts = gate_all.shape[1]
+
+    importance = gate_all.mean(dim=0)
+    target_importance = torch.ones_like(importance) / num_experts
+    l_importance = ((importance - target_importance) ** 2).sum()
+
+    if not use_load_balance or selected_masks is None:
+        l_load = _empty_loss_like(l_importance)
+    else:
+        mask_all = torch.cat(
+            [selected_masks["fine"], selected_masks["mid"], selected_masks["coarse"]],
+            dim=0,
+        )
+        load = mask_all.mean(dim=0)
+        target_load = torch.ones_like(load) * load.mean().detach()
+        l_load = ((load - target_load) ** 2).sum()
+
+    return l_importance + l_load, l_importance, l_load
+
+
+def fusion_entropy_loss(fusion_gate: torch.Tensor) -> torch.Tensor:
+    entropy = -(fusion_gate * fusion_gate.clamp_min(1e-8).log()).sum(dim=1).mean()
+    return entropy
 
 
 def compute_main_stage_loss(
@@ -113,9 +148,31 @@ def compute_main_stage_loss(
         pooling_mode=scale_cfg.get("pooling_mode", "avg"),
         loss_type=loss_type,
     )
-    l_balance = gate_balance_loss(outputs["gates"])
+    routing_mode = outputs.get("routing_mode", "topk")
+    use_load_balance = cfg["model"]["main"].get("use_router", True) and routing_mode != "dense"
+    l_balance, l_importance_balance, l_load_balance = moe_balance_loss(
+        outputs["gates"],
+        outputs.get("selected_masks"),
+        use_load_balance=use_load_balance,
+    )
+    if routing_mode == "dense" and not cfg["model"]["main"].get("use_router", True):
+        l_balance = _empty_loss_like(l_balance)
+        l_importance_balance = _empty_loss_like(l_importance_balance)
+        l_load_balance = _empty_loss_like(l_load_balance)
+
+    l_fusion_entropy = _empty_loss_like(l_balance)
+    if loss_cfg.get("lambda_fusion_entropy", 0.0) != 0:
+        route_gate = outputs["gates"].get("route_fusion_32")
+        if route_gate is not None:
+            l_fusion_entropy = fusion_entropy_loss(route_gate)
+
     loss = l_main + loss_cfg.get("lambda_cross", 0.1) * l_cross
-    loss = loss + loss_cfg.get("lambda_balance", 0.01) * l_balance
+    balance_weight = loss_cfg.get("lambda_balance", 0.01)
+    importance_weight = loss_cfg.get("lambda_importance_balance", balance_weight)
+    load_weight = loss_cfg.get("lambda_load_balance", balance_weight)
+    loss = loss + importance_weight * l_importance_balance
+    loss = loss + load_weight * l_load_balance
+    loss = loss + loss_cfg.get("lambda_fusion_entropy", 0.0) * l_fusion_entropy
     if loss_cfg.get("lambda_final", 0.0) > 0:
         loss = loss + loss_cfg["lambda_final"] * l_final
     return loss, {
@@ -124,4 +181,7 @@ def compute_main_stage_loss(
         "l_main": l_main.detach(),
         "l_cross": l_cross.detach(),
         "l_balance": l_balance.detach(),
+        "l_importance_balance": l_importance_balance.detach(),
+        "l_load_balance": l_load_balance.detach(),
+        "l_fusion_entropy": l_fusion_entropy.detach(),
     }

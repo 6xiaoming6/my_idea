@@ -3,7 +3,9 @@ from .fusion import (
     GatedFusion2,
     GatedFusion3,
     LearnableUpsample3D,
+    ProgressiveRouteFusion,
     ProgressiveScaleGatedFusion,
+    SharedRoutedResidualFusion,
 )
 from .main_branch import (
     MultiScaleMoEBackbone,
@@ -20,5 +22,7 @@ __all__ = [
     "OAMSBackbone",
     "ObservationAwareMultiScaleMoEImputer",
     "ParallelTwoBranchImputer",
+    "ProgressiveRouteFusion",
     "ProgressiveScaleGatedFusion",
+    "SharedRoutedResidualFusion",
 ]

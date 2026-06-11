@@ -6,7 +6,9 @@
     }
   },
   "loss": {
-    "lambda_balance": 0.0
+    "lambda_balance": 0.0,
+    "lambda_importance_balance": 0.0,
+    "lambda_load_balance": 0.0
   },
   "train": {
     "epochs": 100

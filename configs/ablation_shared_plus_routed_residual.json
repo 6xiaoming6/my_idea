@@ -1,0 +1,13 @@
+{
+  "model": {
+    "main": {
+      "use_routed_branch": true,
+      "use_shared_branch": true,
+      "branch_fusion_mode": "shared_plus_routed_residual",
+      "route_gamma_init": -4.0
+    }
+  },
+  "train": {
+    "epochs": 100
+  }
+}

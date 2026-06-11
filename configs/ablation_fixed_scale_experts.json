@@ -11,6 +11,6 @@
     "lambda_balance": 0.0
   },
   "train": {
-    "epochs": 120
+    "epochs": 100
   }
 }

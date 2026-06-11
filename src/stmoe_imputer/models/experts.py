@@ -40,20 +40,45 @@ class TopKRoutedExpertPool(nn.Module):
             [STExpert(dim, num_groups=num_groups, dropout=dropout) for _ in range(num_experts)]
         )
 
-    def forward(self, h: torch.Tensor, gate: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
-        top_values, top_indices = torch.topk(gate, k=self.top_k, dim=-1)
-        top_weights = top_values / top_values.sum(dim=-1, keepdim=True).clamp_min(1e-6)
-
-        expert_outputs = [expert(h) for expert in self.experts]
-        z = torch.zeros_like(expert_outputs[0])
+    def forward(
+        self,
+        h: torch.Tensor,
+        gate: torch.Tensor,
+        routing_mode: str = "topk",
+    ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
+        expert_outputs = torch.stack([expert(h) for expert in self.experts], dim=1)
         batch_size = h.shape[0]
-        for slot in range(self.top_k):
-            indices = top_indices[:, slot]
-            weights = top_weights[:, slot].view(batch_size, 1, 1, 1, 1)
-            for expert_idx, expert_out in enumerate(expert_outputs):
-                selected = (indices == expert_idx).to(h.dtype).view(batch_size, 1, 1, 1, 1)
-                z = z + selected * weights * expert_out
-        return z, top_indices, top_weights
+
+        if routing_mode == "dense":
+            weights = gate / gate.sum(dim=-1, keepdim=True).clamp_min(1e-6)
+            z = (weights[:, :, None, None, None, None] * expert_outputs).sum(dim=1)
+            expert_range = torch.arange(self.num_experts, device=h.device, dtype=torch.long)
+            top_indices = expert_range.view(1, -1).expand(batch_size, -1)
+            selected_mask = torch.ones_like(weights)
+            return z, top_indices, weights, selected_mask
+
+        if routing_mode in {"topk", "soft_topk"}:
+            top_values, top_indices = torch.topk(gate, k=self.top_k, dim=-1)
+            top_weights = top_values / top_values.sum(dim=-1, keepdim=True).clamp_min(1e-6)
+            selected_mask = torch.zeros_like(gate)
+            selected_mask.scatter_(1, top_indices, 1.0)
+
+            if routing_mode == "soft_topk":
+                masked_gate = gate * selected_mask
+                weights = masked_gate / masked_gate.sum(dim=-1, keepdim=True).clamp_min(1e-6)
+                z = (weights[:, :, None, None, None, None] * expert_outputs).sum(dim=1)
+                return z, top_indices, top_weights, selected_mask
+
+            z = torch.zeros_like(expert_outputs[:, 0])
+            for slot in range(self.top_k):
+                indices = top_indices[:, slot]
+                weights = top_weights[:, slot].view(batch_size, 1, 1, 1, 1)
+                for expert_idx in range(self.num_experts):
+                    selected = (indices == expert_idx).to(h.dtype).view(batch_size, 1, 1, 1, 1)
+                    z = z + selected * weights * expert_outputs[:, expert_idx]
+            return z, top_indices, top_weights, selected_mask
+
+        raise ValueError(f"Unsupported routing_mode: {routing_mode}")
 
 
 class CrossScaleSharedExpert(nn.Module):
