@@ -5,7 +5,12 @@ from torch import nn
 
 from .embedding import ScaleTokenEncoder
 from .experts import TopKRoutedExpertPool
-from .fusion import GatedCrossScaleSharedExpert, ProgressiveRouteFusion, SharedRoutedResidualFusion
+from .fusion import (
+    ExpertEnhancedSharedInput,
+    GatedCrossScaleSharedExpert,
+    ProgressiveRouteFusion,
+    SharedRoutedResidualFusion,
+)
 from .router import QualityRouter, uniform_gate
 from .scale_utils import build_scale_active_mask
 from .stats import compute_observation_stats
@@ -36,6 +41,10 @@ class MultiScaleMoEBackbone(nn.Module):
         scale_mode: str = "fine_mid_coarse",
         use_scale_gate: bool = True,
         use_reliability_gate: bool = True,
+        shared_input_mode: str = "hybrid",
+        shared_expert_beta_init: float = 0.1,
+        detach_shared_expert_input: bool = False,
+        branch_gate_init: str = "balanced",
     ) -> None:
         super().__init__()
         self.dim = dim
@@ -53,6 +62,10 @@ class MultiScaleMoEBackbone(nn.Module):
         self.scale_mode = "fine" if not use_multiscale else scale_mode
         self.use_scale_gate = use_scale_gate
         self.use_reliability_gate = use_reliability_gate
+        self.shared_input_mode = shared_input_mode
+        self.shared_expert_beta_init = shared_expert_beta_init
+        self.detach_shared_expert_input = detach_shared_expert_input
+        self.branch_gate_init = branch_gate_init
 
         self.embed_f = ScaleTokenEncoder(c_in, dim, max_t, h, w, num_groups=num_groups)
         self.embed_m = ScaleTokenEncoder(c_in, dim, max_t, h // 2, w // 2, num_groups=num_groups)
@@ -83,6 +96,11 @@ class MultiScaleMoEBackbone(nn.Module):
             dropout=dropout,
             use_scale_gate=use_scale_gate,
         )
+        self.shared_input_adapter = ExpertEnhancedSharedInput(
+            dim=dim,
+            mode=shared_input_mode,
+            beta_init=shared_expert_beta_init,
+        )
         self.route_fusion = ProgressiveRouteFusion(
             dim, num_groups=num_groups, dropout=dropout
         )
@@ -91,6 +109,9 @@ class MultiScaleMoEBackbone(nn.Module):
             num_groups=num_groups,
             dropout=dropout,
             route_gamma_init=route_gamma_init,
+            branch_fusion_mode=branch_fusion_mode,
+            branch_gate_init=branch_gate_init,
+            q_dim=q_dim,
         )
         self.pred_head = nn.Sequential(
             nn.Conv3d(dim, max(1, dim // 2), kernel_size=3, padding=1),
@@ -134,6 +155,10 @@ class MultiScaleMoEBackbone(nn.Module):
             use_reliability_gate=main_cfg.get(
                 "use_reliability_gate", model_cfg.get("use_reliability_gate", True)
             ),
+            shared_input_mode=main_cfg.get("shared_input_mode", "hybrid"),
+            shared_expert_beta_init=main_cfg.get("shared_expert_beta_init", 0.1),
+            detach_shared_expert_input=main_cfg.get("detach_shared_expert_input", False),
+            branch_gate_init=main_cfg.get("branch_gate_init", "balanced"),
         )
 
     def get_scale_embed_vec(self, embed_module: ScaleTokenEncoder, batch_size: int) -> torch.Tensor:
@@ -185,7 +210,10 @@ class MultiScaleMoEBackbone(nn.Module):
         gate_c = self._route(self.router_c, h_c, m_c, self.get_scale_embed_vec(self.embed_c, batch_size))
 
         routing_mode = self._effective_routing_mode()
-        if self.use_routed_branch:
+        need_expert_features = self.use_routed_branch or (
+            self.use_shared_branch and self.shared_input_mode != "pre"
+        )
+        if need_expert_features:
             z_f, top_idx_f, top_w_f, selected_f = self.routed_expert_pool(
                 h_f, gate_f, routing_mode=routing_mode
             )
@@ -214,10 +242,21 @@ class MultiScaleMoEBackbone(nn.Module):
         scale_gate = scale_gate / scale_gate.sum(dim=-1, keepdim=True).clamp_min(1e-6)
 
         if self.use_shared_branch:
+            z_f_for_shared = z_f.detach() if self.detach_shared_expert_input else z_f
+            z_m_for_shared = z_m.detach() if self.detach_shared_expert_input else z_m
+            z_c_for_shared = z_c.detach() if self.detach_shared_expert_input else z_c
+            h_f_shared, h_m_shared, h_c_shared = self.shared_input_adapter(
+                h_f,
+                h_m,
+                h_c,
+                z_f=z_f_for_shared,
+                z_m=z_m_for_shared,
+                z_c=z_c_for_shared,
+            )
             z_shared, h_m_up, h_c_up, scale_gate = self.cross_scale_shared_expert(
-                h_f=h_f,
-                h_m=h_m,
-                h_c=h_c,
+                h_f=h_f_shared,
+                h_m=h_m_shared,
+                h_c=h_c_shared,
                 q_f=q_f,
                 q_m=q_m,
                 q_c=q_c,
@@ -229,6 +268,9 @@ class MultiScaleMoEBackbone(nn.Module):
             z_shared = torch.zeros_like(z_f)
             h_m_up = torch.zeros_like(z_f)
             h_c_up = torch.zeros_like(z_f)
+            h_f_shared = torch.zeros_like(h_f)
+            h_m_shared = torch.zeros_like(h_m)
+            h_c_shared = torch.zeros_like(h_c)
 
         if not self.use_multiscale:
             z_m = torch.zeros_like(h_m)
@@ -265,6 +307,7 @@ class MultiScaleMoEBackbone(nn.Module):
         h_shared = torch.zeros_like(z_f)
         h_route_proj = torch.zeros_like(z_f)
         route_gamma = torch.zeros((), device=z_f.device, dtype=z_f.dtype)
+        branch_gate = torch.zeros(z_f.shape[0], 2, device=z_f.device, dtype=z_f.dtype)
 
         if self.use_routed_branch:
             route_outputs = self.route_fusion(
@@ -280,18 +323,20 @@ class MultiScaleMoEBackbone(nn.Module):
         if self.use_shared_branch and not self.use_routed_branch:
             h_main = h_shared
             branch_mode = "shared_only"
+            branch_gate[:, 0] = 1.0
         elif self.use_routed_branch and not self.use_shared_branch:
             h_main = route_outputs["h_route"]
             branch_mode = "routed_only"
+            branch_gate[:, 1] = 1.0
         else:
-            if self.branch_fusion_mode != "shared_plus_routed_residual":
-                raise ValueError(f"Unsupported branch_fusion_mode: {self.branch_fusion_mode}")
-            h_main, h_shared, h_route_proj = self.branch_fusion(
+            h_main, h_shared, h_route_proj, branch_gate = self.branch_fusion(
                 z_shared=z_shared,
                 h_route=route_outputs["h_route"],
+                q_f=q_f,
+                scale_gate=scale_gate,
             )
             route_gamma = torch.sigmoid(self.branch_fusion.route_gamma)
-            branch_mode = "shared_plus_routed_residual"
+            branch_mode = self.branch_fusion_mode
 
         x_hat_main = self.pred_head(h_main)
         return {
@@ -302,6 +347,7 @@ class MultiScaleMoEBackbone(nn.Module):
                 "mid": gate_m,
                 "coarse": gate_c,
                 "scale_gate": scale_gate,
+                "branch_gate": branch_gate,
                 "route_fusion_16": route_outputs["gate_16"],
                 "route_fusion_32": route_outputs["gate_32_route"],
             },
@@ -322,6 +368,9 @@ class MultiScaleMoEBackbone(nn.Module):
                 "h_f": h_f,
                 "h_m": h_m,
                 "h_c": h_c,
+                "h_f_shared": h_f_shared,
+                "h_m_shared": h_m_shared,
+                "h_c_shared": h_c_shared,
                 "z_f": z_f,
                 "z_m": z_m,
                 "z_c": z_c,
@@ -342,7 +391,13 @@ class MultiScaleMoEBackbone(nn.Module):
             "scale_mode": self.scale_mode,
             "use_scale_gate": self.use_scale_gate,
             "use_reliability_gate": self.use_reliability_gate,
+            "shared_input_mode": self.shared_input_mode,
+            "detach_shared_expert_input": self.detach_shared_expert_input,
             "route_gamma": route_gamma.detach(),
+            "diagnostics": {
+                "shared_input_beta": self.shared_input_adapter.beta_values().detach(),
+                "branch_gate": branch_gate.detach(),
+            },
         }
 
 

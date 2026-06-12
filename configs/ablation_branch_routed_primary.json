@@ -1,0 +1,8 @@
+{
+  "model": {
+    "main": {
+      "branch_fusion_mode": "routed_primary",
+      "route_gamma_init": -2.0
+    }
+  }
+}

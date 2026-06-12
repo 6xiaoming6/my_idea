@@ -1,1064 +1,1273 @@
-# my_idea 当前代码详细改进方案
+# v2.3 修改设计文档：scale_mode + reliability-aware scale gate
 
-> 面向当前仓库：`https://github.com/6xiaoming6/my_idea`  
-> 目标：在现有 `DualBranchSTImputer / MultiScaleMoEBackbone` 基础上，让“多尺度 + MoE 路由专家”真正站住，而不是继续被 `Shared-Only` 压制。  
-> 当前实验依据：更新后的 V2 消融报告显示，当前代码已接入 `ProgressiveScaleGatedFusion`，但 `Shared-Only` 仍是两个数据集上最稳定配置；TaxiBJ 上 `Fine-Only` 最好，BikeNYC 上 `Shared-Only` 最好，Full Model 仍未超过 Shared-Only。
-
----
-
-## 0. 总体判断
-
-当前代码已经不是早期的简单 concat 融合版本，而是：
-
-```text
-fine/mid/coarse embeddings
-    ├── Intra-scale routed expert branch
-    ├── Cross-scale shared expert branch
-    └── ProgressiveScaleGatedFusion
-            → x_hat_main
-```
-
-这个方向没有错，但当前实验说明：
-
-```text
-Shared-Only > Full Model > Routed-Only
-```
-
-尤其 TaxiBJ 上，`Routed-Only / No Router / Fixed Experts` 泛化明显崩溃，说明当前主要瓶颈已经不是“融合模块不够复杂”，而是：
-
-1. `Routed Branch` 自身泛化差；
-2. `No Router` 消融实现可能不是“所有专家均匀融合”，而是“uniform gate 后仍 top-k”，语义不干净；
-3. 消融时关闭分支后仍将 zero feature 输入同一个 `ProgressiveScaleGatedFusion`，导致消融解释不够干净；
-4. `QualityRouter` 是全局样本级 router，太粗；
-5. 缺少 reliability map，模型不知道中粗尺度信息是否可靠；
-6. 负载均衡只约束 soft gate 平均使用率，没有约束 top-k 实际选择次数；
-7. TaxiBJ 的 `32 → 16 → 8` 三尺度策略可能过度压缩，coarse 尺度可能引入噪声。
-
-因此下一步建议不是继续堆 fusion，而是把主结构改成：
-
-```text
-Shared Branch 作为主干
-+ Routed Branch 作为残差增强
-+ Reliability-aware gate
-+ 更干净的消融实现
-+ 更细粒度的 Router
-```
+> 目标：在当前 `DualBranchSTImputer + ProgressiveRouteFusion + SharedRoutedResidualFusion` 基础上，优先加入 **尺度选择机制（scale_mode）** 与 **可靠性感知尺度门控（reliability-aware scale gate）**。  
+> 适用代码结构：`models/main_branch.py`、`models/fusion.py`、`models/experts.py`、`models/stats.py`、`losses.py`、`configs/*.json`。  
+> 当前核心问题：BikeNYC 上多尺度有效，TaxiBJ 上三尺度可能引入噪声；因此需要让模型显式支持不同尺度组合，并让 shared branch 自动判断 fine/mid/coarse 的可信度。
 
 ---
 
-# 1. 当前代码中最需要优先处理的问题
+## 1. 修改动机
 
-## 1.1 `No Router` 消融语义有问题
-
-当前 `QualityRouter` 关闭时，会返回 uniform gate：
-
-```python
-if not self.use_router:
-    return uniform_gate(...)
-```
-
-但是 `TopKRoutedExpertPool.forward()` 仍然会执行：
-
-```python
-top_values, top_indices = torch.topk(gate, k=self.top_k, dim=-1)
-```
-
-如果 gate 是：
+当前实验已经说明：
 
 ```text
-[0.25, 0.25, 0.25, 0.25]
+BikeNYC:
+Full Model 最优或接近最优，多尺度有效。
+
+TaxiBJ:
+Fine-Only 仍然最强，三尺度 Full Model 不稳定，多尺度可能带来噪声。
 ```
 
-那么 `topk(k=2)` 通常会固定选其中两个专家。这意味着 `No Router` 不是：
+这说明当前固定使用：
 
 ```text
-4 个专家全部均匀融合
+fine + mid + coarse
 ```
 
-而可能变成：
+不是所有数据集都合适。
+
+尤其 TaxiBJ 是 `32×32` 网格，降采样到：
 
 ```text
-固定选 2 个专家融合
+mid:    16×16
+coarse: 8×8
 ```
 
-这会严重影响 No Router 消融，尤其可以解释 TaxiBJ 上新版 No Router 从 12.49 退化到 20.59 的异常现象。
+后可能损失较多局部细节；而 BikeNYC 是 `24×12`，本身空间分辨率更低，区域趋势更明显，因此中粗尺度更有用。
 
-### 修改建议
+所以 v2.3 的修改目标是：
 
-给 `TopKRoutedExpertPool.forward()` 增加 `routing_mode`：
-
-```python
-class TopKRoutedExpertPool(nn.Module):
-    def forward(self, h, gate, routing_mode: str = "topk"):
-        expert_outputs = torch.stack([expert(h) for expert in self.experts], dim=1)
-        # expert_outputs: [B, K, D, T, H, W]
-
-        if routing_mode == "dense":
-            weights = gate / gate.sum(dim=-1, keepdim=True).clamp_min(1e-6)
-            z = (weights[:, :, None, None, None, None] * expert_outputs).sum(dim=1)
-            top_indices = torch.arange(self.num_experts, device=h.device).view(1, -1).expand(h.shape[0], -1)
-            top_weights = weights
-            selected_mask = torch.ones_like(weights)
-            return z, top_indices, top_weights, selected_mask
-
-        if routing_mode == "topk":
-            top_values, top_indices = torch.topk(gate, k=self.top_k, dim=-1)
-            top_weights = top_values / top_values.sum(dim=-1, keepdim=True).clamp_min(1e-6)
-            selected_mask = torch.zeros_like(gate)
-            selected_mask.scatter_(1, top_indices, 1.0)
-            z = torch.zeros_like(expert_outputs[:, 0])
-            for slot in range(self.top_k):
-                idx = top_indices[:, slot]
-                w = top_weights[:, slot].view(h.shape[0], 1, 1, 1, 1)
-                for k in range(self.num_experts):
-                    mask = (idx == k).to(h.dtype).view(h.shape[0], 1, 1, 1, 1)
-                    z = z + mask * w * expert_outputs[:, k]
-            return z, top_indices, top_weights, selected_mask
+```text
+1. 支持 scale_mode，让模型可以只用 fine、fine+mid 或 fine+mid+coarse；
+2. 在 shared branch 中加入 reliability-aware scale gate；
+3. 让模型根据数据集和缺失模式自动降低低可靠尺度的权重；
+4. 减少 TaxiBJ 上 coarse 尺度噪声对 Full Model 的干扰；
+5. 保持 BikeNYC 上多尺度收益。
 ```
 
-然后配置语义改成：
+---
+
+## 2. 当前模型与 v2.3 修改位置
+
+当前模型主干可以抽象为：
+
+```text
+H_f, H_m, H_c
+   ├── Shared Branch → h_shared
+   └── Routed Branch → h_route
+
+h_main = h_shared + sigmoid(route_gamma) * h_route
+```
+
+v2.3 不推翻这个结构，只修改两个关键点。
+
+### 2.1 新增 scale_mode
+
+新增配置字段：
 
 ```json
 {
   "model": {
-    "main": {
-      "use_router": false,
-      "routing_mode_when_no_router": "dense"
-    }
+    "scale_mode": "fine_mid_coarse"
   }
 }
 ```
 
-也就是：
+可选值：
 
 ```text
-No Router = 所有专家等权参与，而不是 top-k 固定选择。
-```
-
----
-
-## 1.2 关闭分支后不应该统一用 zero feature 进同一个 fusion
-
-当前逻辑大概是：
-
-```python
-if not use_routed_branch:
-    z_f = zeros
-    z_m = zeros
-    z_c = zeros
-
-if not use_shared_branch:
-    z_shared = zeros
-
-fusion_outputs = progressive_fusion(z_f, z_m, z_c, z_shared)
-```
-
-这个实现能跑，但是消融语义不干净。
-
-例如 `Shared-Only` 本来应该是：
-
-```text
-h_main = SharedBranch 输出
-```
-
-但现在实际是：
-
-```text
-z_f/z_m/z_c = 0
-z_shared = 有效
-ProgressiveScaleGatedFusion(0,0,0,z_shared)
-```
-
-模型还要额外学习 gate 如何忽略 zero routed branch。虽然实验上 Shared-Only 仍然强，但这会让不同消融不够纯粹。
-
-### 修改建议
-
-将 forward 拆成干净路径：
-
-```python
-if use_shared_branch and not use_routed_branch:
-    h_main = self.shared_refine(z_shared)
-
-elif use_routed_branch and not use_shared_branch:
-    route_outputs = self.route_fusion(z_f, z_m, z_c)
-    h_main = route_outputs["h_route"]
-
-elif use_shared_branch and use_routed_branch:
-    h_shared = self.shared_refine(z_shared)
-    route_outputs = self.route_fusion(z_f, z_m, z_c)
-    h_route = route_outputs["h_route"]
-    gamma = torch.sigmoid(self.route_gamma)
-    h_main = h_shared + gamma * self.route_proj(h_route)
-else:
-    raise ValueError("At least one of shared/routed branch must be enabled.")
-```
-
-这样每个消融的含义更清楚：
-
-| 配置 | 实际含义 |
-|---|---|
-| Shared-Only | 只用共享分支输出 |
-| Routed-Only | 只用路由分支输出 |
-| Full | Shared 主干 + Routed 残差增强 |
-
----
-
-# 2. 最推荐的结构改动：Shared 主干 + Routed 残差增强
-
-当前 Full Model 的问题是：
-
-```text
-Shared-Only 很强，加入 Routed Branch 后反而下降。
-```
-
-所以不应该再让 Routed Branch 和 Shared Branch 并列竞争，而应该让 Shared Branch 作为主干，Routed Branch 只做残差增强。
-
-## 2.1 新主分支结构
-
-```text
-Input:
-X_f, M_f
-X_m, M_m
-X_c, M_c
-
-Embedding:
-H_f, H_m, H_c
-
-Shared Branch:
-H_shared = CrossScaleSharedExpert(H_f, H_m, H_c)
-H_shared = SharedRefine(H_shared)
-
-Routed Branch:
-Z_f = RoutedExperts(H_f, gate_f)
-Z_m = RoutedExperts(H_m, gate_m)
-Z_c = RoutedExperts(H_c, gate_c)
-H_route = ProgressiveRouteFusion(Z_f, Z_m, Z_c)
-
-Final:
-H_main = H_shared + gamma * RouteProj(H_route)
-x_hat_main = PredHead(H_main)
-```
-
-其中：
-
-```python
-self.route_gamma = nn.Parameter(torch.tensor(-4.0))
-gamma = torch.sigmoid(self.route_gamma)
-```
-
-`gamma≈0.018`，初始化时模型几乎等价于 Shared-Only。只有 Routed Branch 真的有价值时，训练才会逐渐增大 gamma。
-
-## 2.2 为什么这个改动最重要
-
-这个方案能直接解决你当前实验中的核心矛盾：
-
-```text
-Shared-Only 是最强主干，但 Full 被 Routed Branch 拖累。
-```
-
-残差式路由的好处是：
-
-1. 训练初始不破坏 Shared-Only；
-2. Routed Branch 没用时 gamma 会保持很小；
-3. Routed Branch 有用时才作为增强项加入；
-4. 可以通过 gamma 解释路由分支贡献；
-5. 消融更干净。
-
-## 2.3 推荐新增模块
-
-### SharedRefine
-
-```python
-self.shared_refine = nn.Sequential(
-    ResidualSTBlock(dim, num_groups=num_groups, dropout=dropout),
-    ResidualSTBlock(dim, num_groups=num_groups, dropout=dropout),
-)
-```
-
-### RouteFusionOnly
-
-把你现在的 `ProgressiveScaleGatedFusion` 拆成两个版本：
-
-```text
-ProgressiveScaleGatedFusion: 融合 Z_f/Z_m/Z_c/Z_shared
-ProgressiveRouteFusion: 只融合 Z_f/Z_m/Z_c
-```
-
-推荐新建：
-
-```python
-class ProgressiveRouteFusion(nn.Module):
-    def __init__(self, dim, num_groups=8, dropout=0.0):
-        super().__init__()
-        self.up_c_to_m = LearnableUpsample3D(dim, num_groups, dropout)
-        self.fuse_m_c = GatedFusion2(dim, num_groups, dropout)
-        self.up_mc_to_f = LearnableUpsample3D(dim, num_groups, dropout)
-        self.fuse_f_mc = GatedFusion2(dim, num_groups, dropout)
-
-    def forward(self, z_f, z_m, z_c):
-        _, _, t, h, w = z_f.shape
-        _, _, _, hm, wm = z_m.shape
-        z_c_to_m = self.up_c_to_m(z_c, target_size=(t, hm, wm))
-        z_mc, gate_16 = self.fuse_m_c(z_m, z_c_to_m)
-        z_mc_to_f = self.up_mc_to_f(z_mc, target_size=(t, h, w))
-        h_route, gate_32_route = self.fuse_f_mc(z_f, z_mc_to_f)
-        return {
-            "h_route": h_route,
-            "z_mc": z_mc,
-            "z_mc_to_f": z_mc_to_f,
-            "gate_16": gate_16,
-            "gate_32_route": gate_32_route,
-        }
-```
-
----
-
-# 3. Reliability-aware 多尺度建模
-
-当前中粗尺度是从缺失观测数据 masked pooling 得到的。问题是：
-
-```text
-一个 mid/coarse cell 可能由很多 observed fine cells 聚合而来；
-另一个 mid/coarse cell 可能只由 1 个 observed cell 聚合而来。
-```
-
-这两者可靠性不同，但当前模型没有显式知道。
-
-## 3.1 数据构造时保留 reliability map
-
-建议 `masked_pool2d_spatial` 返回：
-
-```text
-x_down: [B,C,T,H/k,W/k]
-m_down: [B,1,T,H/k,W/k]
-r_down: [B,1,T,H/k,W/k]
-```
-
-其中：
-
-```python
-r_down = observed_count / (kernel_size * kernel_size)
+fine
+fine_mid
+fine_mid_coarse
 ```
 
 含义：
 
-```text
-r_down = 1.0  → 该粗格子由完整观测聚合而来
-r_down = 0.25 → 该粗格子只由 25% 观测聚合而来
-r_down = 0.0  → 完全没有观测
-```
+| scale_mode | 使用尺度 | 适合场景 |
+|---|---|---|
+| `fine` | 只用 fine | TaxiBJ 等细粒度局部模式强的数据 |
+| `fine_mid` | 用 fine + mid | 高分辨率数据，避免 coarse 过粗 |
+| `fine_mid_coarse` | 用 fine + mid + coarse | BikeNYC 等多尺度区域趋势明显的数据 |
 
-## 3.2 将 reliability 输入 Shared Branch
-
-当前 `CrossScaleSharedExpert` 输入：
-
-```python
-cat([h_f, h_m_up, h_c_up], dim=1)
-```
-
-建议改成：
-
-```python
-cat([
-    h_f,
-    h_m_up,
-    h_c_up,
-    mask_embed_f,
-    mask_embed_m_up,
-    mask_embed_c_up,
-    rel_embed_m_up,
-    rel_embed_c_up,
-], dim=1)
-```
-
-第一版可以轻量实现：
-
-```python
-self.quality_proj = nn.Conv3d(5, dim, kernel_size=1)
-quality_feat = self.quality_proj(torch.cat([m_f, m_m_up, m_c_up, r_m_up, r_c_up], dim=1))
-z_shared = self.net(torch.cat([h_f, h_m_up, h_c_up, quality_feat], dim=1))
-```
-
-然后把第一层 `Conv3d(dim*3, dim)` 改成 `Conv3d(dim*4, dim)`。
-
-## 3.3 将 reliability 输入 gate
-
-对于 route fusion gate：
+后续可以扩展：
 
 ```text
-Gate_16 input:
-Concat(Z_m, Z_c_to_m, M_m, M_c_to_m, R_m, R_c_to_m)
-
-Gate_32 input:
-Concat(Z_f, Z_mc_to_f, M_f, R_m_to_f, R_c_to_f)
+auto
 ```
 
-这样模型可以学会：
+让模型通过 gate 自动学习是否使用 mid/coarse，但第一版建议先显式配置，方便做消融。
+
+### 2.2 新增 reliability-aware scale gate
+
+当前 `CrossScaleSharedExpert` 大概率是：
 
 ```text
-低可靠 coarse 少用；
-高可靠 coarse 多用；
-高缺失区域多依赖 mid/coarse；
-低缺失区域多依赖 fine。
+Concat(H_f, Up(H_m), Up(H_c))
+    → Conv1×1
+    → ResBlocks
+    → Z_shared
 ```
 
-这对 TaxiBJ 尤其重要，因为 TaxiBJ 的 `32→8` coarse 信息可能损失较大，必须让模型知道哪些 coarse 特征可信。
+v2.3 改成：
+
+```text
+ScaleGate(H_f, H_m, H_c, q_f, q_m, q_c, R_m, R_c)
+    → scale_weight: [B, 3]
+
+H_f_weighted = w_f * H_f
+H_m_weighted = w_m * Up(H_m)
+H_c_weighted = w_c * Up(H_c)
+
+Concat(H_f_weighted, H_m_weighted, H_c_weighted)
+    → CrossScaleSharedExpert
+    → Z_shared
+```
+
+其中 `R_m / R_c` 表示中粗尺度聚合可靠性。模型可以根据：
+
+```text
+missing_rate
+observed_ratio
+aggregation_reliability
+```
+
+动态决定：
+
+```text
+当前位置或当前样本应该更相信 fine、mid 还是 coarse。
+```
+
+第一版先实现 **样本级 scale gate**：
+
+```text
+scale_weight: [B, 3]
+```
+
+后续再扩展为 **位置级 scale gate**：
+
+```text
+scale_weight: [B, 3, T, H, W]
+```
 
 ---
 
-# 4. Router 改进：从 sample-level 到 patch-level
+## 3. 数据侧修改：保留多尺度 reliability map
 
-当前 `QualityRouter` 是：
-
-```python
-pooled = h.mean(dim=(2, 3, 4))
-logits = MLP([pooled, q, scale_embed])
-gate = softmax(logits)
-```
-
-也就是：
-
-```text
-gate_s: [B, K]
-```
-
-这个粒度太粗。一个样本里所有时间、所有空间位置共享同一组专家权重，不适合补全任务。
-
-## 4.1 第一阶段：Time-level Router
-
-先改成时间级：
-
-```text
-gate_s: [B, T, K]
-```
-
-实现方式：
+你现在构造多尺度数据时应该已经做了 masked pooling。建议统一输出：
 
 ```python
-pooled_t = h.mean(dim=(3, 4)).transpose(1, 2)  # [B,T,D]
-q_t = timewise_mask_stats(mask)               # [B,T,Q]
-logits = self.net(torch.cat([pooled_t, q_t, scale_embed_t], dim=-1))
-gate = torch.softmax(logits, dim=-1)
+x_m, m_m, r_m = masked_avg_pool2d_spatial(x_f_obs, m_f, scale=2)
+x_c, m_c, r_c = masked_avg_pool2d_spatial(x_m, m_m, scale=2)
 ```
 
-适合处理：
+其中：
 
 ```text
-某些时间步缺失严重，某些时间步观测充分。
+x_m: [B, C, T, H/2, W/2]
+m_m: [B, 1, T, H/2, W/2]
+r_m: [B, 1, T, H/2, W/2]
+
+x_c: [B, C, T, H/4, W/4]
+m_c: [B, 1, T, H/4, W/4]
+r_c: [B, 1, T, H/4, W/4]
 ```
 
-## 4.2 第二阶段：Patch-level Router
-
-再改成局部 patch 路由：
+`r_m` 和 `r_c` 的定义：
 
 ```text
-gate_s: [B, K, T, H_s/r, W_s/r]
+r_down = observed_count_in_pooling_window / pooling_window_size
+```
+
+例如 `2×2` pooling：
+
+```text
+r = 0.00 表示这个 coarse/mid cell 没有任何观测值；
+r = 0.25 表示只有 1/4 的细格子被观测；
+r = 1.00 表示 4/4 全部观测。
+```
+
+如果数据加载模块暂时没有返回 `r_m/r_c`，可以先用 `m_m/m_c` 作为近似：
+
+```python
+if r_m is None:
+    r_m = m_m.float()
+if r_c is None:
+    r_c = m_c.float()
+```
+
+但最终建议使用真正的 pooling reliability，而不是二值 mask。
+
+---
+
+## 4. scale_mode 详细设计
+
+### 4.1 配置字段
+
+在 `configs/taxibj.json` 和 `configs/bikenyc.json` 中加入：
+
+```json
+{
+  "model": {
+    "scale_mode": "fine_mid_coarse",
+    "use_scale_gate": true,
+    "use_reliability_gate": true
+  }
+}
+```
+
+建议默认配置：
+
+#### TaxiBJ 初始建议
+
+```json
+{
+  "model": {
+    "scale_mode": "fine_mid",
+    "use_scale_gate": true,
+    "use_reliability_gate": true
+  }
+}
+```
+
+原因：TaxiBJ 的 `8×8` coarse 可能过粗，先测试 `fine_mid`。
+
+#### BikeNYC 初始建议
+
+```json
+{
+  "model": {
+    "scale_mode": "fine_mid_coarse",
+    "use_scale_gate": true,
+    "use_reliability_gate": true
+  }
+}
+```
+
+原因：BikeNYC 上多尺度收益明显。
+
+---
+
+### 4.2 scale_mode 对各模块的影响
+
+#### `scale_mode = fine`
+
+```text
+有效尺度：
+fine
+
+禁用：
+mid
+coarse
+
+Shared Branch:
+只使用 H_f
+
+Routed Branch:
+只使用 Z_f
+
+loss:
+关闭 cross-scale loss
+关闭 mid/coarse 相关 scale consistency
+```
+
+#### `scale_mode = fine_mid`
+
+```text
+有效尺度：
+fine
+mid
+
+禁用：
+coarse
+
+Shared Branch:
+使用 H_f + H_m
+
+Routed Branch:
+使用 Z_f + Z_m
+
+ProgressiveRouteFusion:
+只执行 mid → fine
+不执行 coarse → mid
+
+loss:
+只计算 fine/mid cross-scale loss
+不计算 coarse loss
+```
+
+#### `scale_mode = fine_mid_coarse`
+
+```text
+有效尺度：
+fine
+mid
+coarse
+
+Shared Branch:
+使用 H_f + H_m + H_c
+
+Routed Branch:
+使用 Z_f + Z_m + Z_c
+
+ProgressiveRouteFusion:
+coarse → mid → fine
+
+loss:
+计算 fine/mid/coarse cross-scale loss
+```
+
+---
+
+### 4.3 scale_mode 工具函数
+
+建议新增 `models/scale_utils.py`：
+
+```python
+import torch
+
+
+def get_active_scales(scale_mode: str):
+    if scale_mode == "fine":
+        return ["fine"]
+    if scale_mode == "fine_mid":
+        return ["fine", "mid"]
+    if scale_mode == "fine_mid_coarse":
+        return ["fine", "mid", "coarse"]
+    raise ValueError(f"Unknown scale_mode: {scale_mode}")
+
+
+def is_scale_active(scale_mode: str, scale: str):
+    return scale in get_active_scales(scale_mode)
+
+
+def build_scale_active_mask(scale_mode: str, batch_size: int, device):
+    if scale_mode == "fine":
+        mask = torch.tensor([1, 0, 0], device=device, dtype=torch.bool)
+    elif scale_mode == "fine_mid":
+        mask = torch.tensor([1, 1, 0], device=device, dtype=torch.bool)
+    elif scale_mode == "fine_mid_coarse":
+        mask = torch.tensor([1, 1, 1], device=device, dtype=torch.bool)
+    else:
+        raise ValueError(f"Unknown scale_mode: {scale_mode}")
+
+    return mask.view(1, 3).expand(batch_size, 3)
+```
+
+后面所有模块都根据这个判断是否使用 mid/coarse。
+
+---
+
+## 5. ReliabilityAwareScaleGate 设计
+
+### 5.1 作用
+
+`ReliabilityAwareScaleGate` 用于 shared branch，在多尺度特征进入 `CrossScaleSharedExpert` 之前，生成每个尺度的权重。
+
+它要解决的问题：
+
+```text
+不是所有尺度在所有数据集和所有缺失模式下都可靠。
 ```
 
 例如：
 
 ```text
-fine 32×32 → router map 8×8
-mid 16×16 → router map 4×4
-coarse 8×8 → router map 2×2
-```
+TaxiBJ:
+coarse 8×8 可能过度平滑，应降低权重。
 
-推荐实现：
+BikeNYC:
+mid/coarse 区域趋势有用，应保留较高权重。
 
-```python
-class PatchQualityRouter(nn.Module):
-    def __init__(self, dim, num_experts, patch_size=4):
-        super().__init__()
-        self.pool = nn.AvgPool3d(kernel_size=(1, patch_size, patch_size), stride=(1, patch_size, patch_size))
-        self.net = nn.Sequential(
-            nn.Conv3d(dim + 2, dim, kernel_size=1),
-            nn.GELU(),
-            nn.Conv3d(dim, num_experts, kernel_size=1),
-        )
+高缺失率:
+fine 观测不足，mid/coarse 可能更有用。
 
-    def forward(self, h, mask, reliability=None):
-        h_p = self.pool(h)       # [B,D,T,Hp,Wp]
-        m_p = self.pool(mask)    # [B,1,T,Hp,Wp]
-        if reliability is None:
-            r_p = m_p
-        else:
-            r_p = self.pool(reliability)
-        logits = self.net(torch.cat([h_p, m_p, r_p], dim=1))
-        return torch.softmax(logits, dim=1)  # [B,K,T,Hp,Wp]
-```
-
-然后将 patch gate 上采样回专家输出大小，或者在 patch 分辨率上做专家加权后再上采样。
-
-## 4.3 Router warm-up
-
-不要一开始就 hard top-k。建议训练策略：
-
-```text
-0%~20% epoch: dense soft routing，所有专家参与
-20%~50% epoch: temperature softmax，tau 从 2 降到 1
-50%~100% epoch: hard top-k
-```
-
-配置示例：
-
-```json
-{
-  "model": {
-    "main": {
-      "routing_schedule": {
-        "warmup_dense_ratio": 0.2,
-        "soft_topk_ratio": 0.3,
-        "final_mode": "hard_topk"
-      }
-    }
-  }
-}
+低可靠 coarse:
+r_c 很低，应降低 coarse 权重。
 ```
 
 ---
 
-# 5. 负载均衡损失升级
+### 5.2 输入
 
-当前 `gate_balance_loss` 只做：
-
-```python
-gate_all = cat([gate_f, gate_m, gate_c], dim=0)
-usage = gate_all.mean(dim=0)
-loss = ((usage - 1/K) ** 2).sum()
-```
-
-这只是 soft gate importance balance，不是 top-k load balance。
-
-## 5.1 增加 load balance
-
-专家负载应该同时看：
+建议输入：
 
 ```text
-importance_k: 专家获得的 gate 权重总量
-load_k: 专家被 top-k 选中的次数
+h_f: [B, D, T, H, W]
+h_m: [B, D, T, H/2, W/2]
+h_c: [B, D, T, H/4, W/4]
+
+q_f: [B, Q]
+q_m: [B, Q]
+q_c: [B, Q]
+
+r_m: [B, 1, T, H/2, W/2]
+r_c: [B, 1, T, H/4, W/4]
+```
+
+其中 `q_s` 是你已有的 observation statistics：
+
+```text
+missing_rate
+observed_ratio
+temporal_missing_score
+spatial_missing_score
+aggregation_reliability
+```
+
+如果当前 `q_s` 里已经包含 `aggregation_reliability`，`r_m/r_c` 仍然建议保留，因为它能更直接反映 pooled cell 的可用观测比例。
+
+---
+
+### 5.3 输出
+
+第一版输出样本级尺度权重：
+
+```text
+scale_weight: [B, 3]
+```
+
+对应：
+
+```text
+w_f, w_m, w_c
+```
+
+如果 `scale_mode="fine_mid"`，可以统一输出 `[B, 3]`，但对 inactive scale 做 mask：
+
+```text
+fine_mid:
+w_c = 0
+
+fine:
+w_m = 0, w_c = 0
+```
+
+推荐统一输出 `[B, 3]`，这样日志和可视化更方便。
+
+---
+
+### 5.4 结构代码
+
+建议在 `models/fusion.py` 或新文件 `models/scale_gate.py` 中加入：
+
+```python
+import torch
+import torch.nn as nn
+
+
+class ReliabilityAwareScaleGate(nn.Module):
+    def __init__(self, dim: int, stat_dim: int = 5, hidden_dim: int = 128, num_scales: int = 3, dropout: float = 0.1):
+        super().__init__()
+        self.num_scales = num_scales
+        input_dim = dim * 3 + stat_dim * 3 + 2
+
+        self.mlp = nn.Sequential(
+            nn.Linear(input_dim, hidden_dim),
+            nn.GELU(),
+            nn.Dropout(dropout),
+            nn.Linear(hidden_dim, num_scales),
+        )
+
+    def forward(self, h_f, h_m, h_c, q_f, q_m, q_c, r_m=None, r_c=None, active_mask=None):
+        """
+        h_f: [B, D, T, H, W]
+        h_m: [B, D, T, H/2, W/2]
+        h_c: [B, D, T, H/4, W/4]
+        q_f/q_m/q_c: [B, Q]
+        r_m/r_c: [B,1,T,Hs,Ws]
+        active_mask: [B,3], bool, True 表示该尺度启用
+        """
+        B = h_f.size(0)
+        device = h_f.device
+
+        p_f = h_f.mean(dim=(2, 3, 4))
+        p_m = h_m.mean(dim=(2, 3, 4))
+        p_c = h_c.mean(dim=(2, 3, 4))
+
+        if r_m is None:
+            r_m_mean = torch.ones(B, 1, device=device)
+        else:
+            r_m_mean = r_m.mean(dim=(1, 2, 3, 4), keepdim=False).unsqueeze(-1)
+
+        if r_c is None:
+            r_c_mean = torch.ones(B, 1, device=device)
+        else:
+            r_c_mean = r_c.mean(dim=(1, 2, 3, 4), keepdim=False).unsqueeze(-1)
+
+        gate_input = torch.cat(
+            [p_f, p_m, p_c, q_f, q_m, q_c, r_m_mean, r_c_mean],
+            dim=-1,
+        )
+
+        logits = self.mlp(gate_input)
+
+        if active_mask is not None:
+            logits = logits.masked_fill(~active_mask, -1e9)
+
+        weight = torch.softmax(logits, dim=-1)
+        return weight
+```
+
+---
+
+## 6. 修改 CrossScaleSharedExpert
+
+### 6.1 当前版本
+
+当前逻辑大概是：
+
+```python
+h_m_up = F.interpolate(h_m, size=h_f.shape[-3:])
+h_c_up = F.interpolate(h_c, size=h_f.shape[-3:])
+
+x = torch.cat([h_f, h_m_up, h_c_up], dim=1)
+z_shared = self.net(x)
+```
+
+---
+
+### 6.2 新版本思路
+
+改为：
+
+```python
+scale_weight = self.scale_gate(
+    h_f=h_f,
+    h_m=h_m,
+    h_c=h_c,
+    q_f=q_f,
+    q_m=q_m,
+    q_c=q_c,
+    r_m=r_m,
+    r_c=r_c,
+    active_mask=active_mask,
+)
+
+w_f = scale_weight[:, 0].view(B, 1, 1, 1, 1)
+w_m = scale_weight[:, 1].view(B, 1, 1, 1, 1)
+w_c = scale_weight[:, 2].view(B, 1, 1, 1, 1)
+
+h_f_w = w_f * h_f
+h_m_w = w_m * h_m_up
+h_c_w = w_c * h_c_up
+
+x = torch.cat([h_f_w, h_m_w, h_c_w], dim=1)
+z_shared = self.net(x)
+```
+
+输出中加入：
+
+```python
+outputs["gates"]["scale_gate"] = scale_weight
+```
+
+形状：
+
+```text
+scale_gate: [B, 3]
+```
+
+---
+
+### 6.3 建议新增类：GatedCrossScaleSharedExpert
+
+为了不破坏旧代码，建议不要直接改原 `CrossScaleSharedExpert`，而是新增：
+
+```python
+class GatedCrossScaleSharedExpert(nn.Module):
+    ...
+```
+
+它内部包含：
+
+```text
+ReliabilityAwareScaleGate
+Conv3d(3D → D)
+ResidualSTBlock ×2
+```
+
+伪代码：
+
+```python
+class GatedCrossScaleSharedExpert(nn.Module):
+    def __init__(self, dim, stat_dim=5, use_scale_gate=True):
+        super().__init__()
+        self.use_scale_gate = use_scale_gate
+        self.scale_gate = ReliabilityAwareScaleGate(dim=dim, stat_dim=stat_dim)
+        self.fuse = nn.Sequential(
+            nn.Conv3d(dim * 3, dim, kernel_size=1),
+            ResidualSTBlock(dim),
+            ResidualSTBlock(dim),
+        )
+
+    def forward(self, h_f, h_m, h_c, q_f, q_m, q_c, r_m=None, r_c=None, active_mask=None):
+        B = h_f.size(0)
+        target_size = h_f.shape[-3:]
+
+        h_m_up = F.interpolate(h_m, size=target_size, mode="trilinear", align_corners=False)
+        h_c_up = F.interpolate(h_c, size=target_size, mode="trilinear", align_corners=False)
+
+        if self.use_scale_gate:
+            scale_weight = self.scale_gate(h_f, h_m, h_c, q_f, q_m, q_c, r_m, r_c, active_mask)
+        else:
+            # active scales 均匀分配
+            scale_weight = active_mask.float()
+            scale_weight = scale_weight / scale_weight.sum(dim=-1, keepdim=True).clamp_min(1e-6)
+
+        w_f = scale_weight[:, 0].view(B, 1, 1, 1, 1)
+        w_m = scale_weight[:, 1].view(B, 1, 1, 1, 1)
+        w_c = scale_weight[:, 2].view(B, 1, 1, 1, 1)
+
+        x = torch.cat([w_f * h_f, w_m * h_m_up, w_c * h_c_up], dim=1)
+        z_shared = self.fuse(x)
+
+        return z_shared, scale_weight
+```
+
+---
+
+## 7. 修改 ProgressiveRouteFusion
+
+### 7.1 当前版本
+
+当前 routed branch 是：
+
+```text
+Z_c → up to mid
+GatedFusion2(Z_m, Z_c_up) → Z_mc
+Z_mc → up to fine
+GatedFusion2(Z_f, Z_mc_up) → H_route
+```
+
+---
+
+### 7.2 新增 scale_mode 分支
+
+#### scale_mode = fine
+
+```python
+h_route = self.fine_refine(z_f)
+```
+
+不执行 mid/coarse 融合。
+
+#### scale_mode = fine_mid
+
+```python
+z_m_to_f = self.up_m_to_f(z_m, target_size=z_f.shape[-3:])
+h_route, gate_32_route = self.fuse_f_m(z_f, z_m_to_f)
+```
+
+不执行 coarse → mid。
+
+#### scale_mode = fine_mid_coarse
+
+保持当前逻辑：
+
+```python
+z_c_to_m = self.up_c_to_m(z_c, target_size=z_m.shape[-3:])
+z_mc, gate_16 = self.fuse_m_c(z_m, z_c_to_m)
+
+z_mc_to_f = self.up_mc_to_f(z_mc, target_size=z_f.shape[-3:])
+h_route, gate_32_route = self.fuse_f_mc(z_f, z_mc_to_f)
+```
+
+---
+
+### 7.3 伪代码
+
+```python
+class ProgressiveRouteFusion(nn.Module):
+    def forward(self, z_f, z_m=None, z_c=None, scale_mode="fine_mid_coarse"):
+        outputs = {}
+
+        if scale_mode == "fine":
+            h_route = self.fine_refine(z_f)
+            outputs["h_route"] = h_route
+            outputs["gate_16"] = None
+            outputs["gate_32_route"] = None
+            return outputs
+
+        if scale_mode == "fine_mid":
+            z_m_to_f = self.up_m_to_f(z_m, target_size=z_f.shape[-3:])
+            h_route, gate_32_route = self.fuse_f_m(z_f, z_m_to_f)
+            outputs["h_route"] = h_route
+            outputs["z_m_to_f"] = z_m_to_f
+            outputs["gate_16"] = None
+            outputs["gate_32_route"] = gate_32_route
+            return outputs
+
+        if scale_mode == "fine_mid_coarse":
+            z_c_to_m = self.up_c_to_m(z_c, target_size=z_m.shape[-3:])
+            z_mc, gate_16 = self.fuse_m_c(z_m, z_c_to_m)
+            z_mc_to_f = self.up_mc_to_f(z_mc, target_size=z_f.shape[-3:])
+            h_route, gate_32_route = self.fuse_f_mc(z_f, z_mc_to_f)
+            outputs["h_route"] = h_route
+            outputs["z_c_to_m"] = z_c_to_m
+            outputs["z_mc"] = z_mc
+            outputs["z_mc_to_f"] = z_mc_to_f
+            outputs["gate_16"] = gate_16
+            outputs["gate_32_route"] = gate_32_route
+            return outputs
+
+        raise ValueError(scale_mode)
+```
+
+---
+
+## 8. 修改 MultiScaleMoEBackbone forward
+
+### 8.1 初始化参数
+
+在 `models/main_branch.py`：
+
+```python
+class MultiScaleMoEBackbone(nn.Module):
+    def __init__(
+        self,
+        ...,
+        scale_mode="fine_mid_coarse",
+        use_scale_gate=True,
+        use_reliability_gate=True,
+        ...,
+    ):
+        self.scale_mode = scale_mode
+        self.use_scale_gate = use_scale_gate
+        self.use_reliability_gate = use_reliability_gate
+```
+
+---
+
+### 8.2 forward 输入增加 reliability
+
+当前可能是：
+
+```python
+forward(x_f, m_f, x_m=None, m_m=None, x_c=None, m_c=None)
+```
+
+建议改为：
+
+```python
+forward(
+    x_f, m_f,
+    x_m=None, m_m=None, r_m=None,
+    x_c=None, m_c=None, r_c=None,
+)
+```
+
+如果 `r_m/r_c` 没传，就内部用 mask 估一个：
+
+```python
+if r_m is None and m_m is not None:
+    r_m = m_m.float()
+
+if r_c is None and m_c is not None:
+    r_c = m_c.float()
+```
+
+---
+
+### 8.3 active scale 控制
+
+```python
+active_scales = get_active_scales(self.scale_mode)
+
+use_mid = "mid" in active_scales
+use_coarse = "coarse" in active_scales
+```
+
+第一版为了减少代码改动，可以仍然计算 `h_m/h_c`，但在 `active_mask` 中屏蔽 inactive scale。这样不会影响 shape。
+
+如果你希望节省计算，再进一步跳过不活跃尺度的 embedding 和 routing。
+
+---
+
+### 8.4 shared branch 调用
+
+```python
+active_mask = build_scale_active_mask(
+    self.scale_mode,
+    batch_size=x_f.size(0),
+    device=x_f.device,
+)
+
+z_shared, scale_gate = self.shared_expert(
+    h_f=h_f,
+    h_m=h_m,
+    h_c=h_c,
+    q_f=q_f,
+    q_m=q_m,
+    q_c=q_c,
+    r_m=r_m if self.use_reliability_gate else None,
+    r_c=r_c if self.use_reliability_gate else None,
+    active_mask=active_mask,
+)
+```
+
+输出：
+
+```python
+outputs["gates"]["scale_gate"] = scale_gate
+```
+
+---
+
+### 8.5 routed branch 调用
+
+```python
+route_outputs = self.route_fusion(
+    z_f=z_f,
+    z_m=z_m,
+    z_c=z_c,
+    scale_mode=self.scale_mode,
+)
+
+h_route = route_outputs["h_route"]
+```
+
+把 route fusion 中间结果加入输出：
+
+```python
+outputs["gates"]["gate_16"] = route_outputs.get("gate_16")
+outputs["gates"]["gate_32_route"] = route_outputs.get("gate_32_route")
+outputs["features"].update(route_outputs)
+```
+
+---
+
+## 9. 修改 loss
+
+### 9.1 cross-scale loss 按 scale_mode 计算
+
+当前 cross loss 可能同时算 mid/coarse：
+
+```python
+loss_mid = ...
+loss_coarse = ...
+loss_cross = loss_mid + loss_coarse
+```
+
+改成：
+
+```python
+loss_cross = 0.0
+
+if scale_mode in ["fine_mid", "fine_mid_coarse"]:
+    loss_cross = loss_cross + loss_mid
+
+if scale_mode == "fine_mid_coarse":
+    loss_cross = loss_cross + loss_coarse
+```
+
+如果 `scale_mode="fine"`：
+
+```python
+loss_cross = 0
+```
+
+---
+
+### 9.2 balance loss 按 router 是否启用计算
+
+```python
+if use_routed_branch and use_router:
+    loss += lambda_importance * loss_importance
+    loss += lambda_load * loss_load
+else:
+    loss_importance = 0
+    loss_load = 0
 ```
 
 建议：
 
-```python
-def moe_balance_loss(gates, selected_masks, top_k: int):
-    gate_all = torch.cat([gates["fine"], gates["mid"], gates["coarse"]], dim=0)
-    mask_all = torch.cat([selected_masks["fine"], selected_masks["mid"], selected_masks["coarse"]], dim=0)
+| 配置 | cross loss | balance loss |
+|---|---:|---:|
+| Fine-Only | 关闭 | 关闭或极小 |
+| Shared-Only | 可开小值 | 关闭 |
+| Routed-Only | 可开小值 | 开启 |
+| Full Model | 开启 | 开启 |
+| No Router | 开启 | 关闭 |
 
-    k = gate_all.shape[1]
-    importance = gate_all.mean(dim=0)
-    load = mask_all.mean(dim=0)
+---
 
-    target_importance = torch.full_like(importance, 1.0 / k)
-    target_load = torch.full_like(load, top_k / k)
+### 9.3 scale gate 正则
 
-    l_importance = ((importance - target_importance) ** 2).sum()
-    l_load = ((load - target_load) ** 2).sum()
-    return l_importance + l_load
-```
+第一版不要加太多正则。先观察 `scale_gate` 是否自然学出合理权重。
 
-## 5.2 注意 No Router 模式
-
-如果 `use_router=False` 且使用 dense all experts，则不应该计算 load balance，或者设为 0：
+后续可选：
 
 ```python
-if not use_router or routing_mode == "dense":
-    l_balance = 0
+L_scale_entropy = -torch.sum(w * torch.log(w + 1e-8), dim=-1).mean()
 ```
 
-否则 No Router 消融会被不必要的 balance loss 干扰。
+如果希望 gate 更明确，可以最小化 entropy：
+
+```text
+loss += lambda_scale_entropy * L_scale_entropy
+```
+
+但不建议第一版启用。
 
 ---
 
-# 6. 多尺度策略改进：不要强制所有数据集都用三尺度
+## 10. 推荐配置
 
-当前实验已经说明：
-
-```text
-TaxiBJ: Fine-Only 最好
-BikeNYC: Shared-Only 最好
-```
-
-这说明不同数据集对多尺度的需求不同。TaxiBJ 的 `32×32 → 8×8` 可能损失太多细节。
-
-## 6.1 增加 scale_mode 配置
-
-建议支持：
-
-```json
-{
-  "data": {
-    "scales": {
-      "scale_mode": "fine_mid_coarse"
-    }
-  }
-}
-```
-
-可选：
-
-```text
-fine_only
-fine_mid
-fine_mid_coarse
-```
-
-## 6.2 需要跑的关键实验
-
-TaxiBJ 必跑：
-
-```text
-Fine-Only
-Fine + Mid
-Fine + Mid + Coarse
-```
-
-BikeNYC 必跑：
-
-```text
-Fine-Only
-Fine + Mid
-Fine + Mid + Coarse
-```
-
-判断逻辑：
-
-```text
-如果 TaxiBJ: Fine + Mid > Fine + Mid + Coarse
-说明 coarse 8×8 有害。
-
-如果 TaxiBJ: Fine-Only > Fine + Mid
-说明 TaxiBJ 主要依赖细粒度局部模式。
-
-如果 BikeNYC: Fine + Mid + Coarse 最好
-说明低分辨率区域趋势对 BikeNYC 有价值。
-```
-
-## 6.3 pooling mode 消融
-
-对于交通流量数据，coarse 既可以做 average，也可以做 sum。
-
-建议实验：
-
-```text
-masked average pooling
-masked sum pooling
-masked average + reliability
-```
-
-如果你最终用 average，需要在论文中解释：
-
-> 中粗尺度作为上下文特征，而不是严格物理总流量，因此采用 masked average 保持数值稳定，并用 reliability 描述聚合可信度。
-
----
-
-# 7. CrossScaleSharedExpert 也可以升级
-
-当前 `CrossScaleSharedExpert` 内部仍是：
-
-```text
-h_m_up = interpolate(h_m)
-h_c_up = interpolate(h_c)
-cat([h_f,h_m_up,h_c_up])
-Conv3d(dim*3, dim)
-2×ResidualSTBlock
-```
-
-虽然最后 fusion 已经升级，但 shared branch 内部仍然是直接上采样拼接。
-
-## 7.1 建议升级成 HierarchicalSharedExpert
-
-```text
-h_c 8×8
-  → LearnableUpsample 8→16
-  → GatedFuse with h_m
-  → h_mc 16×16
-
-h_mc 16×16
-  → LearnableUpsample 16→32
-  → GatedFuse with h_f
-  → z_shared 32×32
-```
-
-也就是把你设计的 progressive fusion 思想也用到 shared branch 内部。
-
-不过这个优先级低于“Shared 主干 + Routed 残差”，因为现在 shared branch 已经很强，不要先动最稳定的部分。建议放到第二轮。
-
----
-
-# 8. 训练与实验流程改进
-
-## 8.1 多 seed
-
-当前 Full Model 存在随机性，建议每个关键配置至少 3 seed：
-
-```text
-42, 2024, 2026
-```
-
-报告：
-
-```text
-mean ± std
-```
-
-## 8.2 按缺失模式分别评估
-
-不要只看 mixed 40%。你的模型理论上应该在下面场景更有优势：
-
-```text
-spatial block missing
-spatiotemporal block missing
-high missing ratio
-```
-
-建议每个数据集报告：
-
-| Missing Type | Fine-Only | Shared-Only | Full | Improved Full |
-|---|---:|---:|---:|---:|
-| Random 20% |  |  |  |  |
-| Random 40% |  |  |  |  |
-| Random 60% |  |  |  |  |
-| Spatial Block 40% |  |  |  |  |
-| Spatiotemporal Block 40% |  |  |  |  |
-
-## 8.3 Gate 可视化
-
-你现在已经输出：
-
-```text
-fusion_16: [B,2,T,H/2,W/2]
-fusion_32: [B,3,T,H,W]
-```
-
-必须利用起来。
-
-建议可视化：
-
-```text
-1. gate_16 的 mid/coarse 平均权重
-2. gate_32 的 fine/mid-coarse/shared 平均权重
-3. 不同缺失模式下 gate 权重变化
-4. TaxiBJ Full 中 gate 是否错误偏向 routed 分支
-5. Shared-Only 中 gate 是否稳定给 shared 分支
-```
-
-如果发现 Full 中 gate_32 给 routed 分支高权重，而 Routed-Only 泛化差，就能解释 Full 为什么不如 Shared-Only。
-
-## 8.4 记录专家使用率
-
-每个 epoch 记录：
-
-```text
-fine expert load:   [e1,e2,e3,e4]
-mid expert load:    [e1,e2,e3,e4]
-coarse expert load: [e1,e2,e3,e4]
-importance:         [e1,e2,e3,e4]
-gamma:              scalar
-fusion_16 mean:     [mid, coarse]
-fusion_32 mean:     [fine, mc, shared]
-```
-
-这些日志后面可以直接写论文分析。
-
----
-
-# 9. 推荐下一轮实验路线
-
-不要一次改太多。建议分 5 轮。
-
-## Round 0：先修正消融语义
-
-目的：确认当前异常不是实现问题。
-
-```text
-TaxiBJ:
-1. No Router + dense all experts
-2. No Router + current top-k behavior
-3. Shared-Only clean forward
-4. Shared-Only current zero-branch fusion
-```
-
-如果 `No Router + dense all experts` 恢复到 12~14，而 current top-k 是 20，则说明之前 No Router 消融不可信。
-
-## Round 1：Shared 主干 + Routed 残差
-
-配置：
-
-```text
-1. Shared-Only
-2. Full current
-3. Shared + gamma * Routed, gamma init = 0
-4. Shared + gamma * Routed, gamma init = -4 sigmoid
-5. Shared + gamma * Routed, gamma init = 0.1
-```
-
-核心目标：
-
-```text
-Shared + gamma * Routed >= Shared-Only
-```
-
-只要不低于 Shared-Only，说明 Routed Branch 至少不会拖累。
-
-## Round 2：多尺度数量消融
-
-```text
-Fine-Only
-Fine + Mid
-Fine + Mid + Coarse
-```
-
-两个数据集都跑。
-
-目标：确定 TaxiBJ 是否应该禁用 coarse。
-
-## Round 3：Reliability-aware gate
-
-```text
-Shared-Only
-Shared-Only + reliability
-Shared + Routed Residual
-Shared + Routed Residual + reliability
-```
-
-目标：判断 reliability 是否能缓解 TaxiBJ coarse 噪声。
-
-## Round 4：Router 升级
-
-```text
-Sample-level Router
-Time-level Router
-Patch-level Router
-```
-
-建议先在 BikeNYC 上试，因为 BikeNYC 多尺度有效且训练更稳定；TaxiBJ 后续再跑。
-
----
-
-# 10. 代码修改清单
-
-## 10.1 `src/stmoe_imputer/models/experts.py`
-
-修改：
-
-- `TopKRoutedExpertPool.forward()` 增加 `routing_mode`；
-- 支持 `dense`、`topk`、`soft_topk`；
-- 返回 `selected_mask`；
-- 修正 No Router 消融。
-
-新增返回：
-
-```python
-return z, top_indices, top_weights, selected_mask
-```
-
----
-
-## 10.2 `src/stmoe_imputer/models/fusion.py`
-
-保留现有：
-
-```text
-LearnableUpsample3D
-GatedFusion2
-GatedFusion3
-ProgressiveScaleGatedFusion
-```
-
-新增：
-
-```text
-ProgressiveRouteFusion
-SharedRoutedResidualFusion
-ReliabilityAwareGatedFusion2
-ReliabilityAwareGatedFusion3
-```
-
-第一步只做 `ProgressiveRouteFusion` 和 `SharedRoutedResidualFusion`。
-
----
-
-## 10.3 `src/stmoe_imputer/models/main_branch.py`
-
-核心改动：
-
-1. 不再无条件调用 `progressive_fusion(z_f,z_m,z_c,z_shared)`；
-2. 按分支开关走不同 forward；
-3. Full 模式改为：
-
-```python
-h_shared = self.shared_refine(z_shared)
-h_route = self.route_fusion(z_f, z_m, z_c)["h_route"]
-h_main = h_shared + sigmoid(self.route_gamma) * self.route_proj(h_route)
-```
-
-4. 输出字典增加：
-
-```python
-"route_gamma": gamma.detach(),
-"selected_masks": {...},
-"routing_mode": ..., 
-"branch_mode": ...,
-```
-
----
-
-## 10.4 `src/stmoe_imputer/losses.py`
-
-修改：
-
-- `gate_balance_loss` 改为 `moe_balance_loss`；
-- 同时使用 gate importance 和 selected_mask load；
-- No Router dense 模式下禁用 balance loss；
-- 可选增加 fusion gate entropy 正则。
-
-建议新增：
-
-```python
-def fusion_entropy_loss(fusion_gate):
-    entropy = -(fusion_gate * (fusion_gate.clamp_min(1e-8)).log()).sum(dim=1).mean()
-    return entropy
-```
-
-注意：
-
-```text
-如果希望 gate 更明确，可以最小化 entropy；
-如果希望早期训练不塌缩，可以最大化 entropy 或 warm-up 后再关闭。
-```
-
----
-
-## 10.5 `src/stmoe_imputer/data/transforms.py`
-
-修改：
-
-- `masked_pool2d_spatial` 返回 reliability；
-- 数据 batch 中增加 `r_m`、`r_c`；
-- 后续传入模型。
-
----
-
-## 10.6 `configs/*.json`
-
-新增配置：
+### 10.1 TaxiBJ Full
 
 ```json
 {
   "model": {
-    "main": {
-      "branch_fusion_mode": "shared_plus_routed_residual",
-      "route_gamma_init": -4.0,
-      "routing_mode": "topk",
-      "routing_mode_when_no_router": "dense",
-      "router_granularity": "sample",
-      "use_reliability": false,
-      "scale_mode": "fine_mid_coarse"
-    }
+    "scale_mode": "fine_mid",
+    "use_scale_gate": true,
+    "use_reliability_gate": true,
+    "branch_fusion_mode": "shared_plus_routed_residual",
+    "route_gamma_init": -4.0
   },
   "loss": {
-    "lambda_importance_balance": 0.01,
-    "lambda_load_balance": 0.01,
+    "lambda_cross": 0.03,
+    "lambda_importance": 0.001,
+    "lambda_load": 0.001,
     "lambda_fusion_entropy": 0.0
   }
 }
 ```
 
-新增消融 config：
+### 10.2 BikeNYC Full
 
-```text
-ablation_shared_clean.json
-ablation_no_router_dense.json
-ablation_no_router_topk.json
-ablation_shared_plus_routed_residual.json
-ablation_fine_mid_only.json
-ablation_reliability_shared.json
-ablation_patch_router.json
+```json
+{
+  "model": {
+    "scale_mode": "fine_mid_coarse",
+    "use_scale_gate": true,
+    "use_reliability_gate": true,
+    "branch_fusion_mode": "shared_plus_routed_residual",
+    "route_gamma_init": -4.0
+  },
+  "loss": {
+    "lambda_cross": 0.1,
+    "lambda_importance": 0.01,
+    "lambda_load": 0.01,
+    "lambda_fusion_entropy": 0.0
+  }
+}
+```
+
+### 10.3 TaxiBJ scale 消融
+
+```json
+{
+  "model": {
+    "scale_mode": "fine"
+  }
+}
+```
+
+```json
+{
+  "model": {
+    "scale_mode": "fine_mid"
+  }
+}
+```
+
+```json
+{
+  "model": {
+    "scale_mode": "fine_mid_coarse"
+  }
+}
 ```
 
 ---
 
-# 11. 最终推荐模型版本
+## 11. 日志记录
 
-短期最推荐的模型不是当前 Full，而是：
-
-```text
-Reliability-Aware Shared Backbone with Residual Routed Experts
-```
-
-数据流：
+必须新增日志项：
 
 ```text
-X_f,M_f / X_m,M_m,R_m / X_c,M_c,R_c
-        ↓
-ScaleTokenEncoder
-        ↓
-H_f,H_m,H_c
-        ↓
-CrossScaleSharedExpert + reliability
-        ↓
-H_shared
-
-H_f,H_m,H_c
-        ↓
-QualityRouter / PatchRouter
-        ↓
-Top-k shared routed experts
-        ↓
-Z_f,Z_m,Z_c
-        ↓
-ProgressiveRouteFusion
-        ↓
-H_route
-
-Final:
-H_main = H_shared + gamma * H_route
-x_hat_main = PredictionHead(H_main)
+scale_mode
+use_scale_gate
+use_reliability_gate
+scale_gate_f_mean
+scale_gate_m_mean
+scale_gate_c_mean
+scale_gate_f_std
+scale_gate_m_std
+scale_gate_c_std
+route_alpha
+route_gamma
+effective_route_ratio
+lambda_cross
+lambda_importance
+lambda_load
 ```
 
-这个版本的优势：
+每个 epoch 记录：
 
-1. 保留当前最稳定的 Shared-Only 作为主干；
-2. 路由专家只做残差增强，不会强行拖累主干；
-3. gamma 可解释路由分支是否真的有贡献；
-4. reliability 解决中粗尺度可信度问题；
-5. patch/time router 后续可以逐步替换 sample router；
-6. 消融语义更干净，论文更好写。
+```python
+scale_gate = outputs["gates"]["scale_gate"]  # [B,3]
+
+log_dict["scale_gate_f"] = scale_gate[:, 0].mean().item()
+log_dict["scale_gate_m"] = scale_gate[:, 1].mean().item()
+log_dict["scale_gate_c"] = scale_gate[:, 2].mean().item()
+log_dict["scale_gate_f_std"] = scale_gate[:, 0].std().item()
+log_dict["scale_gate_m_std"] = scale_gate[:, 1].std().item()
+log_dict["scale_gate_c_std"] = scale_gate[:, 2].std().item()
+```
+
+如果 TaxiBJ 上 `scale_mode=fine_mid_coarse` 时模型自动学到：
+
+```text
+scale_gate_c 很小
+```
+
+那就说明 scale gate 起作用了。
 
 ---
 
-# 12. 论文叙事建议
+## 12. 推荐实验路线
 
-你当前最稳的论文叙事不应该是：
+### Round 1：只加 scale_mode，不加 scale_gate
 
-```text
-我提出了一个 Full MoE，它一定最好。
-```
-
-而应该是：
+目的：先确认尺度数量影响。
 
 ```text
-多尺度补全中，跨尺度共享建模是稳定有效的主干；
-但直接并联尺度内路由专家会引入噪声，尤其在高分辨率细粒度场景中容易过拟合。
-因此，我们进一步将路由专家从并列主分支改为残差增强分支，
-并通过可靠性建模和局部路由机制，使模型能够在不同缺失模式下自适应利用尺度内专家信息。
+TaxiBJ:
+fine
+fine_mid
+fine_mid_coarse
+
+BikeNYC:
+fine
+fine_mid
+fine_mid_coarse
 ```
 
-这种说法更符合你目前实验事实，也更像真实科研迭代。
+看哪个尺度组合最优。
+
+### Round 2：加入 scale_gate
+
+对比：
+
+```text
+fine_mid_coarse without scale_gate
+fine_mid_coarse with scale_gate
+```
+
+重点看 TaxiBJ：
+
+```text
+scale_gate 是否自动降低 coarse 权重？
+```
+
+### Round 3：加入 reliability-aware gate
+
+对比：
+
+```text
+scale_gate only
+scale_gate + reliability
+```
+
+重点看高缺失率或 block missing：
+
+```text
+reliability 是否让模型少用低可信 mid/coarse？
+```
+
+### Round 4：完整最佳配置
+
+最终候选：
+
+```text
+TaxiBJ:
+fine
+fine_mid + scale_gate + reliability
+fine_mid_coarse + scale_gate + reliability
+
+BikeNYC:
+fine_mid_coarse + scale_gate + reliability
+```
 
 ---
 
-# 13. 最短执行清单
+## 13. 预期结果
 
-如果只做最关键的 5 件事，建议按这个顺序：
+### TaxiBJ
+
+理想结果：
 
 ```text
-1. 修复 No Router：uniform gate 时 dense all experts，不再 top-k。
-2. 改干净 forward：Shared-Only / Routed-Only / Full 走不同路径，不再全靠 zero branch。
-3. Full 改成 H_main = H_shared + gamma * H_route。
-4. 增加 fine+mid 消融，判断 TaxiBJ 是否该禁用 coarse。
-5. 记录并可视化 fusion_16 / fusion_32 / expert load / gamma。
+fine_mid + scale_gate + reliability
+    接近或超过 Fine-Only
+
+fine_mid_coarse + scale_gate
+    不再明显劣于 Fine-Only
 ```
 
-这 5 步做完，你的下一轮实验就会清楚很多，也能直接判断路由专家还有没有继续投入的价值。
+如果 `fine_mid` 明显优于 `fine_mid_coarse`，说明 coarse 过粗。
+
+如果 `scale_gate_c` 很低，则可以证明模型自动识别 coarse 不可靠。
+
+### BikeNYC
+
+理想结果：
+
+```text
+fine_mid_coarse + scale_gate + reliability
+    保持或超过当前 Full Model
+
+scale_gate_m / scale_gate_c 不应太低
+```
+
+如果 BikeNYC 上 coarse 权重较高，说明区域趋势对 BikeNYC 有帮助。
+
+---
+
+## 14. 文件级修改清单
+
+### 14.1 `models/scale_utils.py`
+
+新增：
+
+```text
+get_active_scales
+is_scale_active
+build_scale_active_mask
+```
+
+### 14.2 `models/fusion.py`
+
+新增或修改：
+
+```text
+ReliabilityAwareScaleGate
+ProgressiveRouteFusion 支持 scale_mode
+```
+
+后续可选：
+
+```text
+ReliabilityGatedFusion2
+```
+
+### 14.3 `models/experts.py`
+
+修改：
+
+```text
+CrossScaleSharedExpert 支持 scale_gate / reliability / active_mask
+```
+
+或新增：
+
+```text
+GatedCrossScaleSharedExpert
+```
+
+建议新增新类，避免破坏旧代码。
+
+### 14.4 `models/main_branch.py`
+
+修改：
+
+```text
+读取 scale_mode
+构造 active_mask
+传递 r_m / r_c
+调用 gated shared expert
+调用 scale_mode-aware route fusion
+把 scale_gate 写入 outputs["gates"]
+```
+
+### 14.5 `losses.py`
+
+修改：
+
+```text
+cross_scale_loss 按 scale_mode 计算
+moe_balance_loss 按 use_routed_branch/use_router 启用
+```
+
+### 14.6 `configs/*.json`
+
+新增字段：
+
+```json
+{
+  "model": {
+    "scale_mode": "fine_mid_coarse",
+    "use_scale_gate": true,
+    "use_reliability_gate": true
+  }
+}
+```
+
+### 14.7 `train.py` 或 logger
+
+新增日志：
+
+```text
+scale_gate_f/m/c
+route_alpha
+effective_route_ratio
+```
+
+---
+
+## 15. 最终推荐实现顺序
+
+不要一次全改。建议按这个顺序：
+
+```text
+1. 加 scale_mode，先不加 scale_gate；
+2. 修改 loss 条件启用；
+3. 加 ReliabilityAwareScaleGate 到 shared branch；
+4. 记录 scale_gate 日志；
+5. 再考虑 reliability-aware route fusion；
+6. 最后做 gate 可视化。
+```
+
+这样每一步都能单独验证是否有效。
+
+---
+
+## 16. 总结
+
+v2.3 的重点不是继续堆更复杂的 MoE，而是让模型学会：
+
+```text
+什么时候用多尺度；
+用哪些尺度；
+这些尺度是否可靠。
+```
+
+最终目标结构是：
+
+```text
+H_f, H_m, H_c, R_m, R_c
+        ↓
+ReliabilityAwareScaleGate
+        ↓
+w_f, w_m, w_c
+
+H_shared = CrossScaleSharedExpert(
+    w_f * H_f,
+    w_m * Up(H_m),
+    w_c * Up(H_c)
+)
+
+H_route = ScaleModeAwareProgressiveRouteFusion(Z_f, Z_m, Z_c)
+
+H_main = H_shared + sigmoid(route_gamma) * H_route
+```
+
+这个方案直接针对当前实验暴露的两个核心问题：
+
+```text
+1. TaxiBJ 上 coarse/multiscale 可能有害；
+2. BikeNYC 上多尺度有效但路由分支贡献偏小。
+```
+
+通过 `scale_mode + reliability-aware scale gate`，模型可以在不同数据集和缺失模式下自适应调整尺度使用策略。

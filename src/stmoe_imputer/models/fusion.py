@@ -172,6 +172,94 @@ class GatedCrossScaleSharedExpert(nn.Module):
         return z_shared, h_m_up, h_c_up, scale_weight
 
 
+class ExpertEnhancedSharedInput(nn.Module):
+    def __init__(
+        self,
+        dim: int,
+        mode: str = "hybrid",
+        beta_init: float = 0.1,
+    ) -> None:
+        super().__init__()
+        self.mode = mode
+        beta = torch.tensor(float(beta_init)).clamp(1e-4, 1.0 - 1e-4)
+        self.beta = nn.Parameter(torch.full((3,), torch.logit(beta).item()))
+        if mode == "concat_hz":
+            self.proj_f = nn.Conv3d(dim * 2, dim, kernel_size=1)
+            self.proj_m = nn.Conv3d(dim * 2, dim, kernel_size=1)
+            self.proj_c = nn.Conv3d(dim * 2, dim, kernel_size=1)
+
+    def beta_values(self) -> torch.Tensor:
+        return torch.sigmoid(self.beta)
+
+    def forward(
+        self,
+        h_f: torch.Tensor,
+        h_m: torch.Tensor,
+        h_c: torch.Tensor,
+        z_f: torch.Tensor | None = None,
+        z_m: torch.Tensor | None = None,
+        z_c: torch.Tensor | None = None,
+    ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+        if self.mode == "pre" or z_f is None or z_m is None or z_c is None:
+            return h_f, h_m, h_c
+        if self.mode == "post":
+            return z_f, z_m, z_c
+        if self.mode == "hybrid":
+            beta = self.beta_values()
+            return h_f + beta[0] * z_f, h_m + beta[1] * z_m, h_c + beta[2] * z_c
+        if self.mode == "concat_hz":
+            return (
+                self.proj_f(torch.cat([h_f, z_f], dim=1)),
+                self.proj_m(torch.cat([h_m, z_m], dim=1)),
+                self.proj_c(torch.cat([h_c, z_c], dim=1)),
+            )
+        raise ValueError(f"Unsupported shared_input_mode: {self.mode}")
+
+
+class AdaptiveBranchGate(nn.Module):
+    def __init__(
+        self,
+        dim: int,
+        q_dim: int = 5,
+        hidden_dim: int = 128,
+        dropout: float = 0.1,
+        init_mode: str = "balanced",
+    ) -> None:
+        super().__init__()
+        self.init_mode = init_mode
+        self.mlp = nn.Sequential(
+            nn.Linear(dim * 2 + q_dim + 3, hidden_dim),
+            nn.GELU(),
+            nn.Dropout(dropout),
+            nn.Linear(hidden_dim, 2),
+        )
+        self.reset_parameters()
+
+    def reset_parameters(self) -> None:
+        last = self.mlp[-1]
+        nn.init.zeros_(last.weight)
+        if self.init_mode == "shared_bias":
+            last.bias.data = torch.tensor([1.0, -1.0], dtype=last.bias.dtype)
+        elif self.init_mode == "route_bias":
+            last.bias.data = torch.tensor([-1.0, 1.0], dtype=last.bias.dtype)
+        elif self.init_mode == "balanced":
+            nn.init.zeros_(last.bias)
+        else:
+            raise ValueError(f"Unsupported branch_gate_init: {self.init_mode}")
+
+    def forward(
+        self,
+        h_shared: torch.Tensor,
+        h_route: torch.Tensor,
+        q_f: torch.Tensor,
+        scale_gate: torch.Tensor,
+    ) -> torch.Tensor:
+        p_shared = h_shared.mean(dim=(2, 3, 4))
+        p_route = h_route.mean(dim=(2, 3, 4))
+        gate_input = torch.cat([p_shared, p_route, q_f, scale_gate], dim=-1)
+        return torch.softmax(self.mlp(gate_input), dim=-1)
+
+
 class ProgressiveScaleGatedFusion(nn.Module):
     def __init__(self, dim: int, num_groups: int = 8, dropout: float = 0.0) -> None:
         super().__init__()
@@ -292,8 +380,12 @@ class SharedRoutedResidualFusion(nn.Module):
         num_groups: int = 8,
         dropout: float = 0.0,
         route_gamma_init: float = -4.0,
+        branch_fusion_mode: str = "residual",
+        branch_gate_init: str = "balanced",
+        q_dim: int = 5,
     ) -> None:
         super().__init__()
+        self.branch_fusion_mode = branch_fusion_mode
         self.shared_refine = nn.Sequential(
             ResidualSTBlock(dim, num_groups=num_groups, dropout=dropout),
             ResidualSTBlock(dim, num_groups=num_groups, dropout=dropout),
@@ -303,6 +395,14 @@ class SharedRoutedResidualFusion(nn.Module):
             ResidualSTBlock(dim, num_groups=num_groups, dropout=dropout),
         )
         self.route_gamma = nn.Parameter(torch.tensor(float(route_gamma_init)))
+        self.shared_gamma = nn.Parameter(torch.tensor(float(route_gamma_init)))
+        self.branch_gate = AdaptiveBranchGate(
+            dim=dim,
+            q_dim=q_dim,
+            hidden_dim=max(dim * 2, 32),
+            dropout=dropout,
+            init_mode=branch_gate_init,
+        )
 
     def refine_shared(self, z_shared: torch.Tensor) -> torch.Tensor:
         return self.shared_refine(z_shared)
@@ -310,9 +410,33 @@ class SharedRoutedResidualFusion(nn.Module):
     def project_route(self, h_route: torch.Tensor) -> torch.Tensor:
         return self.route_proj(h_route)
 
-    def forward(self, z_shared: torch.Tensor, h_route: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+    def forward(
+        self,
+        z_shared: torch.Tensor,
+        h_route: torch.Tensor,
+        q_f: torch.Tensor | None = None,
+        scale_gate: torch.Tensor | None = None,
+    ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
         h_shared = self.refine_shared(z_shared)
         h_route_proj = self.project_route(h_route)
-        gamma = torch.sigmoid(self.route_gamma)
-        h_main = h_shared + gamma * h_route_proj
-        return h_main, h_shared, h_route_proj
+        if self.branch_fusion_mode in {"residual", "shared_plus_routed_residual"}:
+            gamma = torch.sigmoid(self.route_gamma)
+            h_main = h_shared + gamma * h_route_proj
+            branch_gate = torch.stack([torch.ones_like(gamma), gamma], dim=0).view(1, 2)
+            branch_gate = branch_gate.expand(h_shared.shape[0], 2)
+            return h_main, h_shared, h_route_proj, branch_gate
+        if self.branch_fusion_mode == "routed_primary":
+            gamma = torch.sigmoid(self.shared_gamma)
+            h_main = h_route_proj + gamma * h_shared
+            branch_gate = torch.stack([gamma, torch.ones_like(gamma)], dim=0).view(1, 2)
+            branch_gate = branch_gate.expand(h_shared.shape[0], 2)
+            return h_main, h_shared, h_route_proj, branch_gate
+        if self.branch_fusion_mode == "adaptive_gate":
+            if q_f is None or scale_gate is None:
+                raise ValueError("q_f and scale_gate are required for adaptive_gate")
+            branch_gate = self.branch_gate(h_shared, h_route_proj, q_f, scale_gate)
+            w_shared = branch_gate[:, 0].view(h_shared.shape[0], 1, 1, 1, 1)
+            w_route = branch_gate[:, 1].view(h_shared.shape[0], 1, 1, 1, 1)
+            h_main = w_shared * h_shared + w_route * h_route_proj
+            return h_main, h_shared, h_route_proj, branch_gate
+        raise ValueError(f"Unsupported branch_fusion_mode: {self.branch_fusion_mode}")

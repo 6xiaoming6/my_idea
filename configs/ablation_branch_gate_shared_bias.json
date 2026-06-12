@@ -1,0 +1,8 @@
+{
+  "model": {
+    "main": {
+      "branch_fusion_mode": "adaptive_gate",
+      "branch_gate_init": "shared_bias"
+    }
+  }
+}

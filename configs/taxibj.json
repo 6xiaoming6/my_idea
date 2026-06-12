@@ -38,14 +38,18 @@
       "w": 32,
       "q_dim": 5,
       "num_groups": 8,
-      "dropout": 0.1,
+      "dropout": 0.05,
       "use_multiscale": true,
       "use_router": true,
       "share_experts": true,
       "use_routed_branch": true,
       "use_shared_branch": true,
-      "branch_fusion_mode": "shared_plus_routed_residual",
-      "route_gamma_init": -4.0,
+      "shared_input_mode": "hybrid",
+      "shared_expert_beta_init": 0.1,
+      "detach_shared_expert_input": false,
+      "branch_fusion_mode": "adaptive_gate",
+      "branch_gate_init": "route_bias",
+      "route_gamma_init": -2.0,
       "routing_mode": "topk",
       "routing_mode_when_no_router": "dense",
       "router_granularity": "sample",
@@ -60,24 +64,35 @@
   },
   "loss": {
     "type": "smooth_l1",
-    "lambda_cross": 0.03,
+    "lambda_cross": 0.01,
     "lambda_balance": 0.01,
-    "lambda_importance_balance": 0.001,
-    "lambda_load_balance": 0.001,
+    "lambda_importance_balance": 0.0005,
+    "lambda_load_balance": 0.0005,
     "lambda_fusion_entropy": 0.0,
+    "lambda_branch_entropy": 0.0,
     "lambda_final": 0.0
   },
   "train": {
     "epochs": 120,
-    "lr_main": 0.001,
-    "lr_aux": 0.001,
+    "lr_main": 0.0008,
+    "lr_aux": 0.0008,
     "weight_decay": 0.0001,
+    "gate_lr_mult": 2.0,
+    "scalar_lr_mult": 5.0,
+    "aux_loss_warmup_epochs": 10,
     "grad_clip_norm": 1.0,
     "amp": true,
     "save_every": 10,
     "scheduler": {
-      "type": "cosine",
+      "type": "warmup_cosine",
+      "warmup_epochs": 5,
       "eta_min": 1e-6
+    },
+    "early_stopping": {
+      "enabled": true,
+      "monitor": "val_mae",
+      "patience": 20,
+      "mode": "min"
     }
   }
 }

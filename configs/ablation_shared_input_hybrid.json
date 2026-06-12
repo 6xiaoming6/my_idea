@@ -1,0 +1,8 @@
+{
+  "model": {
+    "main": {
+      "shared_input_mode": "hybrid",
+      "shared_expert_beta_init": 0.1
+    }
+  }
+}

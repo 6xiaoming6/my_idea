@@ -1,0 +1,7 @@
+{
+  "model": {
+    "main": {
+      "shared_input_mode": "pre"
+    }
+  }
+}

@@ -90,10 +90,14 @@ def main() -> None:
     logger.log_table_headers()
 
     best_mae = float("inf")
+    last_improved_epoch = 0
+    early_cfg = cfg["train"].get("early_stopping", {})
+    early_mode = early_cfg.get("mode", "min")
+    early_best = float("inf") if early_mode == "min" else -float("inf")
     history: dict[str, list[float]] = {"train_loss": [], "val_loss": [], "train_mae": [], "val_mae": []}
     for epoch in range(1, cfg["train"]["epochs"] + 1):
         train_logs = train_one_epoch(model, train_loader, optimizer, device, cfg, epoch)
-        val_logs = evaluate(model, val_loader, device, cfg, desc=f"val epoch {epoch}")
+        val_logs = evaluate(model, val_loader, device, cfg, desc=f"val epoch {epoch}", epoch=epoch)
         current_lr = optimizer.param_groups[0]["lr"]
         train_logs["lr"] = current_lr
         print(f"epoch={epoch} lr={current_lr:.2e} train={train_logs} val={val_logs}")
@@ -113,8 +117,22 @@ def main() -> None:
             save_checkpoint(ckpt_dir / f"epoch_{epoch}.pt", model, optimizer, epoch, metrics, cfg)
         if val_logs["mae"] < best_mae:
             best_mae = val_logs["mae"]
+            last_improved_epoch = epoch
             save_checkpoint(ckpt_dir / "best.pt", model, optimizer, epoch, metrics, cfg)
             logger.log_best(epoch, best_mae)
+
+        if early_cfg.get("enabled", False):
+            monitor = early_cfg.get("monitor", "val_mae")
+            patience = int(early_cfg.get("patience", 20))
+            metric_key = monitor[4:] if monitor.startswith("val_") else monitor
+            current = float(val_logs[metric_key])
+            improved = current < early_best if early_mode == "min" else current > early_best
+            if improved:
+                early_best = current
+                last_improved_epoch = epoch
+            elif epoch - last_improved_epoch >= patience:
+                print(f"[info] early stopping at epoch {epoch} ({monitor}={current:.6f})")
+                break
 
     logger.log_footer()
     logger.close()

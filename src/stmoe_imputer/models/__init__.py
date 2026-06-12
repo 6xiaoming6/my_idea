@@ -1,5 +1,7 @@
 from .imputer import DualBranchSTImputer, ParallelTwoBranchImputer
 from .fusion import (
+    AdaptiveBranchGate,
+    ExpertEnhancedSharedInput,
     GatedFusion2,
     GatedFusion3,
     GatedCrossScaleSharedExpert,
@@ -18,6 +20,8 @@ from .main_branch import (
 
 __all__ = [
     "DualBranchSTImputer",
+    "AdaptiveBranchGate",
+    "ExpertEnhancedSharedInput",
     "GatedFusion2",
     "GatedFusion3",
     "GatedCrossScaleSharedExpert",

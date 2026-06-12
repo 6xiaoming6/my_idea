@@ -131,10 +131,15 @@ def fusion_entropy_loss(fusion_gate: torch.Tensor) -> torch.Tensor:
     return entropy
 
 
+def categorical_entropy_loss(gate: torch.Tensor) -> torch.Tensor:
+    return -(gate * gate.clamp_min(1e-8).log()).sum(dim=1).mean()
+
+
 def compute_main_stage_loss(
     outputs: dict,
     batch: dict[str, torch.Tensor],
     cfg: dict,
+    epoch: int | None = None,
 ) -> tuple[torch.Tensor, dict[str, torch.Tensor]]:
     loss_cfg = cfg["loss"]
     loss_type = loss_cfg.get("type", "smooth_l1")
@@ -188,14 +193,23 @@ def compute_main_stage_loss(
         route_gate = outputs["gates"].get("route_fusion_32")
         if route_gate is not None:
             l_fusion_entropy = fusion_entropy_loss(route_gate)
+    l_branch_entropy = _empty_loss_like(l_balance)
+    if loss_cfg.get("lambda_branch_entropy", 0.0) != 0:
+        branch_gate = outputs["gates"].get("branch_gate")
+        if branch_gate is not None:
+            l_branch_entropy = categorical_entropy_loss(branch_gate)
 
-    loss = l_main + loss_cfg.get("lambda_cross", 0.1) * l_cross
+    warmup_epochs = max(1, cfg.get("train", {}).get("aux_loss_warmup_epochs", 1))
+    warmup_factor = 1.0 if epoch is None else min(1.0, max(0.0, epoch / warmup_epochs))
+
+    loss = l_main + loss_cfg.get("lambda_cross", 0.1) * warmup_factor * l_cross
     balance_weight = loss_cfg.get("lambda_balance", 0.01)
     importance_weight = loss_cfg.get("lambda_importance_balance", balance_weight)
     load_weight = loss_cfg.get("lambda_load_balance", balance_weight)
-    loss = loss + importance_weight * l_importance_balance
-    loss = loss + load_weight * l_load_balance
+    loss = loss + importance_weight * warmup_factor * l_importance_balance
+    loss = loss + load_weight * warmup_factor * l_load_balance
     loss = loss + loss_cfg.get("lambda_fusion_entropy", 0.0) * l_fusion_entropy
+    loss = loss + loss_cfg.get("lambda_branch_entropy", 0.0) * l_branch_entropy
     if loss_cfg.get("lambda_final", 0.0) > 0:
         loss = loss + loss_cfg["lambda_final"] * l_final
     return loss, {
@@ -207,4 +221,6 @@ def compute_main_stage_loss(
         "l_importance_balance": l_importance_balance.detach(),
         "l_load_balance": l_load_balance.detach(),
         "l_fusion_entropy": l_fusion_entropy.detach(),
+        "l_branch_entropy": l_branch_entropy.detach(),
+        "aux_loss_warmup": torch.as_tensor(warmup_factor, device=l_main.device).detach(),
     }
