@@ -15,8 +15,8 @@ def build_optimizer(model: torch.nn.Module, cfg: dict) -> torch.optim.Optimizer:
     base_lr = train_cfg["lr_main"]
     aux_lr = train_cfg.get("lr_aux", base_lr)
     weight_decay = train_cfg.get("weight_decay", 0.0)
-    gate_lr_mult = train_cfg.get("gate_lr_mult", 2.0)
-    scalar_lr_mult = train_cfg.get("scalar_lr_mult", 5.0)
+    gate_lr_mult = train_cfg.get("gate_lr_mult", 1.0)
+    scalar_lr_mult = train_cfg.get("scalar_lr_mult", 2.0)
 
     grouped: dict[str, dict] = {
         "main": {"params": [], "lr": base_lr, "weight_decay": weight_decay},
@@ -116,6 +116,7 @@ def _append_model_diagnostics(logs: dict[str, list[float]], outputs: dict) -> No
     if route_gamma is not None and torch.is_tensor(route_gamma):
         gamma_value = float(route_gamma.detach().cpu())
         logs["route_gamma"].append(gamma_value)
+        logs["route_alpha"].append(gamma_value)
 
     branch_gate = outputs.get("gates", {}).get("branch_gate")
     if branch_gate is not None:
@@ -178,6 +179,12 @@ def train_one_epoch(
         scaler.update()
 
         metrics = masked_metrics(outputs["x_hat_final"], batch["x_f_gt"], batch["m_f"])
+        if outputs.get("x_hat_shared") is not None:
+            shared_metrics = masked_metrics(outputs["x_hat_shared"], batch["x_f_gt"], batch["m_f"])
+            metrics.update({f"{key}_shared_aux": value for key, value in shared_metrics.items()})
+        if outputs.get("x_hat_route") is not None:
+            route_metrics = masked_metrics(outputs["x_hat_route"], batch["x_f_gt"], batch["m_f"])
+            metrics.update({f"{key}_route_aux": value for key, value in route_metrics.items()})
         for key, value in {**loss_dict, **metrics}.items():
             logs[key].append(float(value.detach().cpu()))
         _append_model_diagnostics(logs, outputs)
@@ -202,6 +209,12 @@ def evaluate(
         outputs = model(batch)
         _, loss_dict = compute_main_stage_loss(outputs, batch, cfg, epoch=epoch)
         metrics = masked_metrics(outputs["x_hat_final"], batch["x_f_gt"], batch["m_f"])
+        if outputs.get("x_hat_shared") is not None:
+            shared_metrics = masked_metrics(outputs["x_hat_shared"], batch["x_f_gt"], batch["m_f"])
+            metrics.update({f"{key}_shared_aux": value for key, value in shared_metrics.items()})
+        if outputs.get("x_hat_route") is not None:
+            route_metrics = masked_metrics(outputs["x_hat_route"], batch["x_f_gt"], batch["m_f"])
+            metrics.update({f"{key}_route_aux": value for key, value in route_metrics.items()})
         for key, value in {**loss_dict, **metrics}.items():
             logs[key].append(float(value.detach().cpu()))
         _append_model_diagnostics(logs, outputs)

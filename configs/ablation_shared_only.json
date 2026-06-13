@@ -2,11 +2,18 @@
   "model": {
     "main": {
       "use_routed_branch": false,
-      "use_shared_branch": true
+      "use_shared_branch": true,
+      "shared_input_mode": "pre",
+      "enable_branch_aux": false,
+      "enable_complementary_loss": false
     }
   },
   "loss": {
-    "lambda_balance": 0.0
+    "lambda_balance": 0.0,
+    "lambda_importance_balance": 0.0,
+    "lambda_load_balance": 0.0,
+    "lambda_route_aux": 0.0,
+    "lambda_complementary": 0.0
   },
   "train": {
     "epochs": 100

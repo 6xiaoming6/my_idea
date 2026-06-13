@@ -6,11 +6,16 @@
       "share_experts": true,
       "use_routed_branch": true,
       "use_shared_branch": false,
-      "scale_mode": "fine"
+      "scale_mode": "fine",
+      "enable_branch_aux": false,
+      "enable_complementary_loss": false
     }
   },
   "loss": {
-    "lambda_cross": 0.0
+    "lambda_cross": 0.0,
+    "lambda_shared_aux": 0.0,
+    "lambda_route_aux": 0.0,
+    "lambda_complementary": 0.0
   },
   "train": {
     "epochs": 100

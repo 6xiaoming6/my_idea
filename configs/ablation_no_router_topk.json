@@ -2,13 +2,16 @@
   "model": {
     "main": {
       "use_router": false,
-      "routing_mode_when_no_router": "topk"
+      "routing_mode_when_no_router": "topk",
+      "enable_branch_aux": false,
+      "enable_complementary_loss": false
     }
   },
   "loss": {
     "lambda_balance": 0.0,
     "lambda_importance_balance": 0.0,
-    "lambda_load_balance": 0.0
+    "lambda_load_balance": 0.0,
+    "lambda_complementary": 0.0
   },
   "train": {
     "epochs": 100

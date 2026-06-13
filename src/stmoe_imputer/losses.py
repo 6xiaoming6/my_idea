@@ -135,6 +135,13 @@ def categorical_entropy_loss(gate: torch.Tensor) -> torch.Tensor:
     return -(gate * gate.clamp_min(1e-8).log()).sum(dim=1).mean()
 
 
+def complementary_loss(h_shared: torch.Tensor, h_route: torch.Tensor) -> torch.Tensor:
+    h_shared_norm = F.normalize(h_shared.flatten(2), dim=1)
+    h_route_norm = F.normalize(h_route.flatten(2), dim=1)
+    cos = (h_shared_norm * h_route_norm).sum(dim=1)
+    return (cos ** 2).mean()
+
+
 def compute_main_stage_loss(
     outputs: dict,
     batch: dict[str, torch.Tensor],
@@ -147,6 +154,10 @@ def compute_main_stage_loss(
     m_f = batch["m_f"]
     l_main = masked_loss(outputs["x_hat_main"], x_f_gt, m_f, loss_type=loss_type)
     l_final = masked_loss(outputs["x_hat_final"], x_f_gt, m_f, loss_type=loss_type)
+    is_full = (
+        cfg["model"]["main"].get("use_shared_branch", True)
+        and cfg["model"]["main"].get("use_routed_branch", True)
+    )
     scale_cfg = cfg["data"]["scales"]
     scale_mode = outputs.get(
         "scale_mode",
@@ -199,6 +210,28 @@ def compute_main_stage_loss(
         if branch_gate is not None:
             l_branch_entropy = categorical_entropy_loss(branch_gate)
 
+    l_shared_aux = _empty_loss_like(l_main)
+    x_hat_shared = outputs.get("x_hat_shared")
+    if is_full and x_hat_shared is not None and cfg["model"]["main"].get("enable_branch_aux", True):
+        l_shared_aux = masked_loss(x_hat_shared, x_f_gt, m_f, loss_type=loss_type)
+
+    l_route_aux = _empty_loss_like(l_main)
+    x_hat_route = outputs.get("x_hat_route")
+    if is_full and x_hat_route is not None and cfg["model"]["main"].get("enable_branch_aux", True):
+        l_route_aux = masked_loss(x_hat_route, x_f_gt, m_f, loss_type=loss_type)
+
+    l_complementary = _empty_loss_like(l_main)
+    features = outputs.get("features", {})
+    h_shared = features.get("h_shared") if isinstance(features, dict) else None
+    h_route = features.get("h_route_proj") if isinstance(features, dict) else None
+    if (
+        is_full
+        and cfg["model"]["main"].get("enable_complementary_loss", True)
+        and h_shared is not None
+        and h_route is not None
+    ):
+        l_complementary = complementary_loss(h_shared, h_route)
+
     warmup_epochs = max(1, cfg.get("train", {}).get("aux_loss_warmup_epochs", 1))
     warmup_factor = 1.0 if epoch is None else min(1.0, max(0.0, epoch / warmup_epochs))
 
@@ -210,6 +243,9 @@ def compute_main_stage_loss(
     loss = loss + load_weight * warmup_factor * l_load_balance
     loss = loss + loss_cfg.get("lambda_fusion_entropy", 0.0) * l_fusion_entropy
     loss = loss + loss_cfg.get("lambda_branch_entropy", 0.0) * l_branch_entropy
+    loss = loss + loss_cfg.get("lambda_shared_aux", 0.0) * l_shared_aux
+    loss = loss + loss_cfg.get("lambda_route_aux", 0.0) * l_route_aux
+    loss = loss + loss_cfg.get("lambda_complementary", 0.0) * l_complementary
     if loss_cfg.get("lambda_final", 0.0) > 0:
         loss = loss + loss_cfg["lambda_final"] * l_final
     return loss, {
@@ -222,5 +258,8 @@ def compute_main_stage_loss(
         "l_load_balance": l_load_balance.detach(),
         "l_fusion_entropy": l_fusion_entropy.detach(),
         "l_branch_entropy": l_branch_entropy.detach(),
+        "l_shared_aux": l_shared_aux.detach(),
+        "l_route_aux": l_route_aux.detach(),
+        "l_complementary": l_complementary.detach(),
         "aux_loss_warmup": torch.as_tensor(warmup_factor, device=l_main.device).detach(),
     }

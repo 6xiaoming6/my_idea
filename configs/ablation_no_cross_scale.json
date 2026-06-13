@@ -1,8 +1,14 @@
 {
   "model": {
     "main": {
-      "use_shared_branch": false
+      "use_shared_branch": false,
+      "enable_branch_aux": false,
+      "enable_complementary_loss": false
     }
+  },
+  "loss": {
+    "lambda_shared_aux": 0.0,
+    "lambda_complementary": 0.0
   },
   "train": {
     "epochs": 100

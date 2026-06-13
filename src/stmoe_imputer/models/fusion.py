@@ -176,7 +176,7 @@ class ExpertEnhancedSharedInput(nn.Module):
     def __init__(
         self,
         dim: int,
-        mode: str = "hybrid",
+        mode: str = "pre",
         beta_init: float = 0.1,
     ) -> None:
         super().__init__()
@@ -383,6 +383,7 @@ class SharedRoutedResidualFusion(nn.Module):
         branch_fusion_mode: str = "residual",
         branch_gate_init: str = "balanced",
         q_dim: int = 5,
+        route_dropout: float = 0.0,
     ) -> None:
         super().__init__()
         self.branch_fusion_mode = branch_fusion_mode
@@ -394,6 +395,7 @@ class SharedRoutedResidualFusion(nn.Module):
             nn.Conv3d(dim, dim, kernel_size=1),
             ResidualSTBlock(dim, num_groups=num_groups, dropout=dropout),
         )
+        self.route_dropout = nn.Dropout3d(route_dropout) if route_dropout > 0 else nn.Identity()
         self.route_gamma = nn.Parameter(torch.tensor(float(route_gamma_init)))
         self.shared_gamma = nn.Parameter(torch.tensor(float(route_gamma_init)))
         self.branch_gate = AdaptiveBranchGate(
@@ -419,6 +421,7 @@ class SharedRoutedResidualFusion(nn.Module):
     ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
         h_shared = self.refine_shared(z_shared)
         h_route_proj = self.project_route(h_route)
+        h_route_proj = self.route_dropout(h_route_proj)
         if self.branch_fusion_mode in {"residual", "shared_plus_routed_residual"}:
             gamma = torch.sigmoid(self.route_gamma)
             h_main = h_shared + gamma * h_route_proj

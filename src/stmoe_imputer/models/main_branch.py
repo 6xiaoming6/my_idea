@@ -34,17 +34,20 @@ class MultiScaleMoEBackbone(nn.Module):
         share_experts: bool = True,
         use_routed_branch: bool = True,
         use_shared_branch: bool = True,
-        branch_fusion_mode: str = "shared_plus_routed_residual",
-        route_gamma_init: float = -4.0,
+        branch_fusion_mode: str = "residual",
+        route_gamma_init: float = -3.0,
         routing_mode: str = "topk",
         routing_mode_when_no_router: str = "dense",
         scale_mode: str = "fine_mid_coarse",
         use_scale_gate: bool = True,
         use_reliability_gate: bool = True,
-        shared_input_mode: str = "hybrid",
+        shared_input_mode: str = "pre",
         shared_expert_beta_init: float = 0.1,
         detach_shared_expert_input: bool = False,
         branch_gate_init: str = "balanced",
+        route_dropout: float = 0.0,
+        enable_branch_aux: bool = True,
+        enable_complementary_loss: bool = True,
     ) -> None:
         super().__init__()
         self.dim = dim
@@ -66,6 +69,9 @@ class MultiScaleMoEBackbone(nn.Module):
         self.shared_expert_beta_init = shared_expert_beta_init
         self.detach_shared_expert_input = detach_shared_expert_input
         self.branch_gate_init = branch_gate_init
+        self.route_dropout = route_dropout
+        self.enable_branch_aux = enable_branch_aux
+        self.enable_complementary_loss = enable_complementary_loss
 
         self.embed_f = ScaleTokenEncoder(c_in, dim, max_t, h, w, num_groups=num_groups)
         self.embed_m = ScaleTokenEncoder(c_in, dim, max_t, h // 2, w // 2, num_groups=num_groups)
@@ -112,11 +118,23 @@ class MultiScaleMoEBackbone(nn.Module):
             branch_fusion_mode=branch_fusion_mode,
             branch_gate_init=branch_gate_init,
             q_dim=q_dim,
+            route_dropout=route_dropout,
         )
+        head_hidden = max(1, dim // 2)
         self.pred_head = nn.Sequential(
             nn.Conv3d(dim, max(1, dim // 2), kernel_size=3, padding=1),
             nn.GELU(),
             nn.Conv3d(max(1, dim // 2), c_in, kernel_size=1),
+        )
+        self.shared_aux_head = nn.Sequential(
+            nn.Conv3d(dim, head_hidden, kernel_size=3, padding=1),
+            nn.GELU(),
+            nn.Conv3d(head_hidden, c_in, kernel_size=1),
+        )
+        self.route_aux_head = nn.Sequential(
+            nn.Conv3d(dim, head_hidden, kernel_size=3, padding=1),
+            nn.GELU(),
+            nn.Conv3d(head_hidden, c_in, kernel_size=1),
         )
 
     @classmethod
@@ -143,9 +161,9 @@ class MultiScaleMoEBackbone(nn.Module):
                 "use_shared_branch", main_cfg.get("use_cross_scale_expert", True)
             ),
             branch_fusion_mode=main_cfg.get(
-                "branch_fusion_mode", "shared_plus_routed_residual"
+                "branch_fusion_mode", "residual"
             ),
-            route_gamma_init=main_cfg.get("route_gamma_init", -4.0),
+            route_gamma_init=main_cfg.get("route_gamma_init", -3.0),
             routing_mode=main_cfg.get("routing_mode", "topk"),
             routing_mode_when_no_router=main_cfg.get(
                 "routing_mode_when_no_router", "dense"
@@ -155,10 +173,13 @@ class MultiScaleMoEBackbone(nn.Module):
             use_reliability_gate=main_cfg.get(
                 "use_reliability_gate", model_cfg.get("use_reliability_gate", True)
             ),
-            shared_input_mode=main_cfg.get("shared_input_mode", "hybrid"),
+            shared_input_mode=main_cfg.get("shared_input_mode", "pre"),
             shared_expert_beta_init=main_cfg.get("shared_expert_beta_init", 0.1),
             detach_shared_expert_input=main_cfg.get("detach_shared_expert_input", False),
             branch_gate_init=main_cfg.get("branch_gate_init", "balanced"),
+            route_dropout=main_cfg.get("route_dropout", 0.0),
+            enable_branch_aux=main_cfg.get("enable_branch_aux", True),
+            enable_complementary_loss=main_cfg.get("enable_complementary_loss", True),
         )
 
     def get_scale_embed_vec(self, embed_module: ScaleTokenEncoder, batch_size: int) -> torch.Tensor:
@@ -339,8 +360,17 @@ class MultiScaleMoEBackbone(nn.Module):
             branch_mode = self.branch_fusion_mode
 
         x_hat_main = self.pred_head(h_main)
+        is_full = self.use_shared_branch and self.use_routed_branch
+        if is_full and self.enable_branch_aux:
+            x_hat_shared = self.shared_aux_head(h_shared)
+            x_hat_route = self.route_aux_head(h_route_proj)
+        else:
+            x_hat_shared = None
+            x_hat_route = None
         return {
             "x_hat_main": x_hat_main,
+            "x_hat_shared": x_hat_shared,
+            "x_hat_route": x_hat_route,
             "h_st_aux": h_main,
             "gates": {
                 "fine": gate_f,
@@ -393,6 +423,8 @@ class MultiScaleMoEBackbone(nn.Module):
             "use_reliability_gate": self.use_reliability_gate,
             "shared_input_mode": self.shared_input_mode,
             "detach_shared_expert_input": self.detach_shared_expert_input,
+            "enable_branch_aux": self.enable_branch_aux,
+            "enable_complementary_loss": self.enable_complementary_loss,
             "route_gamma": route_gamma.detach(),
             "diagnostics": {
                 "shared_input_beta": self.shared_input_adapter.beta_values().detach(),
