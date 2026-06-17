@@ -31,6 +31,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--synthetic", action="store_true")
     parser.add_argument("--no_plot", action="store_true", help="Skip plotting training curves.")
     parser.add_argument("--name", "-n", default="run", help="Run name for the output directory.")
+    parser.add_argument("--quiet", "-q", action="store_true", help="Minimal console output (compact one-line per epoch).")
     return parser.parse_args()
 
 
@@ -60,8 +61,12 @@ def main() -> None:
     set_seed(cfg.get("seed", 42))
 
     dataset_name = cfg["data"].get("dataset_name", "unknown")
+    mask_cfg = cfg["data"].get("mask", {})
+    mask_pattern = mask_cfg.get("pattern", "random")
+    mask_rate = mask_cfg.get("missing_rate", mask_cfg.get("mask_rate", 0.0))
+    mask_suffix = f"{mask_pattern}{mask_rate}"
     ts = datetime.now().strftime("%Y%m%d_%H%M%S")
-    run_dir = ROOT / cfg["output_dir"] / dataset_name / f"{args.name}_{ts}"
+    run_dir = ROOT / cfg["output_dir"] / dataset_name / f"{args.name}_{mask_suffix}_{ts}"
     ckpt_dir = run_dir / "checkpoints"
     log_dir = run_dir / "logs"
     ckpt_dir.mkdir(parents=True, exist_ok=True)
@@ -100,7 +105,12 @@ def main() -> None:
         val_logs = evaluate(model, val_loader, device, cfg, desc=f"val epoch {epoch}", epoch=epoch)
         current_lr = optimizer.param_groups[0]["lr"]
         train_logs["lr"] = current_lr
-        print(f"epoch={epoch} lr={current_lr:.2e} train={train_logs} val={val_logs}")
+        if args.quiet:
+            print(f"[E {epoch:3d}/{cfg['train']['epochs']}] "
+                  f"loss={train_logs['loss']:7.2f} mae={val_logs['mae']:7.2f} "
+                  f"rmse={val_logs['rmse']:7.2f} lr={current_lr:.2e}")
+        else:
+            print(f"epoch={epoch} lr={current_lr:.2e} train={train_logs} val={val_logs}")
         if scheduler is not None:
             scheduler.step()
 
@@ -112,13 +122,14 @@ def main() -> None:
 
         metrics = {f"train_{key}": value for key, value in train_logs.items()}
         metrics.update({f"val_{key}": value for key, value in val_logs.items()})
-        save_checkpoint(ckpt_dir / "last.pt", model, optimizer, epoch, metrics, cfg)
-        if epoch % cfg["train"].get("save_every", 1) == 0:
-            save_checkpoint(ckpt_dir / f"epoch_{epoch}.pt", model, optimizer, epoch, metrics, cfg)
+        # checkpoint saving disabled — re-enable when needed:
+        # save_checkpoint(ckpt_dir / "last.pt", model, optimizer, epoch, metrics, cfg)
+        # if epoch % cfg["train"].get("save_every", 1) == 0:
+        #     save_checkpoint(ckpt_dir / f"epoch_{epoch}.pt", model, optimizer, epoch, metrics, cfg)
         if val_logs["mae"] < best_mae:
             best_mae = val_logs["mae"]
             last_improved_epoch = epoch
-            save_checkpoint(ckpt_dir / "best.pt", model, optimizer, epoch, metrics, cfg)
+            # save_checkpoint(ckpt_dir / "best.pt", model, optimizer, epoch, metrics, cfg)
             logger.log_best(epoch, best_mae)
 
         if early_cfg.get("enabled", False):

@@ -1,0 +1,19 @@
+bash scripts/run_all_ablations.sh --dataset BikeNYC --gpu 1 --mask_pattern random --mask_rate 0.4
+bash scripts/run_all_ablations.sh --dataset TaxiBJ --gpu 0 --mask_pattern random --mask_rate 0.4
+
+
+
+新增 run_all_rates.sh
+
+# fixed 模式，跑全部 4 个缺失率
+bash scripts/run_all_rates.sh --dataset TaxiBJ --gpu 0 --mask_pattern fixed
+
+# random 模式，跑全部 4 个缺失率
+bash scripts/run_all_rates.sh --dataset TaxiBJ --gpu 0 --mask_pattern random
+
+# 两个数据集都跑
+bash scripts/run_all_rates.sh --dataset all --gpu 0 --mask_pattern fixed
+
+
+# 两个数据集都跑完两个模式
+bash scripts/run_all_rates.sh --dataset all --gpu 0 --mask_pattern all
