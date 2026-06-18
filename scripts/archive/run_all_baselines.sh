@@ -24,8 +24,8 @@ echo "===== TaxiBJ baselines (remaining 4) ====="
 for abl in "${TAXIBJ_ABLATIONS[@]}"; do
   echo "--- $abl ---"
   python scripts/train.py \
-    -c configs/taxibj.json \
-    --override_config "configs/${abl}.json" \
+    -c configs/datasets/taxibj.json \
+    --override_config "configs/ablations/${abl}.json" \
     --train_npz data/TaxiBJ/taxibj_train.npz \
     --val_npz data/TaxiBJ/taxibj_val.npz \
     -n "$abl" --no_plot
@@ -35,8 +35,8 @@ echo "===== BikeNYC baselines (all 6) ====="
 for abl in "${BIKENYC_ABLATIONS[@]}"; do
   echo "--- $abl ---"
   python scripts/train.py \
-    -c configs/bikenyc.json \
-    --override_config "configs/${abl}.json" \
+    -c configs/datasets/bikenyc.json \
+    --override_config "configs/ablations/${abl}.json" \
     --train_npz data/BikeNYC/bikenyc_train.npz \
     --val_npz data/BikeNYC/bikenyc_val.npz \
     -n "$abl" --no_plot

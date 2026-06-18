@@ -100,8 +100,8 @@ declare -A ABL_DESC=(
 )
 
 declare -A DS_CONFIG=(
-  ["TaxiBJ"]="configs/taxibj.json"
-  ["BikeNYC"]="configs/bikenyc.json"
+  ["TaxiBJ"]="configs/datasets/taxibj.json"
+  ["BikeNYC"]="configs/datasets/bikenyc.json"
 )
 declare -A DS_TRAIN=(
   ["TaxiBJ"]="data/TaxiBJ/taxibj_train.npz"
@@ -203,7 +203,7 @@ print(f'[info] mask override for ${ds} → ${DS_MASK_OVERRIDE}')
 import json
 from stmoe_imputer.config import load_config, deep_update
 mask_cfg = load_config('${DS_MASK_OVERRIDE}')
-abl_cfg = load_config('configs/${abl}.json')
+abl_cfg = load_config('configs/ablations/${abl}.json')
 combined = deep_update(mask_cfg, abl_cfg)
 with open('${COMBINED_OVERRIDE}', 'w') as f:
     json.dump(combined, f, indent=2)

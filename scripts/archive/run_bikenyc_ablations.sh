@@ -1,13 +1,13 @@
 #!/bin/bash
 # ============================================================================
 # BikeNYC 消融实验一键运行脚本
-# 用法: cd v2 && bash scripts/run_bikenyc_ablations.sh
+# 用法: cd v2 && bash scripts/archive/run_bikenyc_ablations.sh
 # ============================================================================
 set -euo pipefail
 
 # ── 配置 ──────────────────────────────────────────────────────────────────
 GPU="${1:-0}"                           # 默认使用 GPU 0，可传参覆盖: bash ...sh 1
-BASE_CONFIG="configs/bikenyc.json"
+BASE_CONFIG="configs/datasets/bikenyc.json"
 TRAIN_NPZ="data/BikeNYC/bikenyc_train.npz"
 VAL_NPZ="data/BikeNYC/bikenyc_val.npz"
 
@@ -68,7 +68,7 @@ for i in "${!ABLATIONS[@]}"; do
 
   python scripts/train.py \
     -c "$BASE_CONFIG" \
-    --override_config "configs/${abl}.json" \
+    --override_config "configs/ablations/${abl}.json" \
     --train_npz "$TRAIN_NPZ" \
     --val_npz "$VAL_NPZ" \
     -n "${abl}" \

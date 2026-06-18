@@ -12,12 +12,12 @@
 #   - ablation_routed_only
 #   - ablation_shared_only
 #
-# 用法: cd v2 && bash scripts/run_taxibj_ablations.sh [GPU_ID]
+# 用法: cd v2 && bash scripts/archive/run_taxibj_ablations.sh [GPU_ID]
 # ============================================================================
 set -euo pipefail
 
 GPU="${1:-0}"
-BASE_CONFIG="configs/taxibj.json"
+BASE_CONFIG="configs/datasets/taxibj.json"
 TRAIN_NPZ="data/TaxiBJ/taxibj_train.npz"
 VAL_NPZ="data/TaxiBJ/taxibj_val.npz"
 
@@ -73,7 +73,7 @@ for i in "${!ABLATIONS[@]}"; do
 
   python scripts/train.py \
     -c "$BASE_CONFIG" \
-    --override_config "configs/${abl}.json" \
+    --override_config "configs/ablations/${abl}.json" \
     --train_npz "$TRAIN_NPZ" \
     --val_npz "$VAL_NPZ" \
     -n "${abl}" \

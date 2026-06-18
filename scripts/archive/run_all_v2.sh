@@ -4,13 +4,13 @@
 #
 #  支持双 GPU 并行:
 #    # 终端 1
-#    bash scripts/run_all_v2.sh --dataset TaxiBJ --gpu 0
+#    bash scripts/archive/run_all_v2.sh --dataset TaxiBJ --gpu 0
 #
 #    # 终端 2
-#    bash scripts/run_all_v2.sh --dataset BikeNYC --gpu 1
+#    bash scripts/archive/run_all_v2.sh --dataset BikeNYC --gpu 1
 #
 #  也支持单 GPU 全部跑:
-#    bash scripts/run_all_v2.sh --dataset all --gpu 0
+#    bash scripts/archive/run_all_v2.sh --dataset all --gpu 0
 # =============================================================================
 set -euo pipefail
 
@@ -38,7 +38,7 @@ fi
 
 export CUDA_VISIBLE_DEVICES="$GPU"
 
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/../.."
 
 # ── 数据集列表 ────────────────────────────────────────────────────────────
 if [ "$DATASET" = "all" ]; then
@@ -67,8 +67,8 @@ declare -A DESC=(
 )
 
 declare -A DS_CONFIG=(
-  ["TaxiBJ"]="configs/taxibj.json"
-  ["BikeNYC"]="configs/bikenyc.json"
+  ["TaxiBJ"]="configs/datasets/taxibj.json"
+  ["BikeNYC"]="configs/datasets/bikenyc.json"
 )
 declare -A DS_TRAIN=(
   ["TaxiBJ"]="data/TaxiBJ/taxibj_train.npz"
@@ -123,7 +123,7 @@ for ds in "${DATASETS[@]}"; do
     echo "[$(date '+%H:%M:%S')] [$idx/$TOTAL_ABL] $ds / $abl  —  ${DESC[$abl]}"
     python scripts/train.py \
       -c "$cfg" \
-      --override_config "configs/${abl}.json" \
+      --override_config "configs/ablations/${abl}.json" \
       --train_npz "$train_npz" \
       --val_npz "$val_npz" \
       -n "${abl}" \

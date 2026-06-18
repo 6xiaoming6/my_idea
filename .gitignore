@@ -44,8 +44,8 @@ Thumbs.db
 *.npy
 # Preprocessed windowed data
 *.npz
-# Data directories (entire)
-data/
+# Root dataset directory only. Do not ignore src/stmoe_imputer/data/.
+/data/
 
 # =============================================================================
 # Model checkpoints (large, regeneratable)
@@ -57,9 +57,9 @@ checkpoints/
 # =============================================================================
 # Training outputs (logs, plots, saved configs from runs)
 # =============================================================================
-outputs/
-runs/
-logs/
+/outputs/
+/runs/
+/logs/
 
 # =============================================================================
 # Matplotlib / plotting caches

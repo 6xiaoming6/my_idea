@@ -24,7 +24,7 @@ from stmoe_imputer.utils.train_logger import TrainLogger
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--config","-c", default="configs/default.json")
+    parser.add_argument("--config","-c", default="configs/presets/default.json")
     parser.add_argument("--override_config", default=None, help="Optional JSON patch for ablations.")
     parser.add_argument("--train_npz", default=None)
     parser.add_argument("--val_npz", default=None)

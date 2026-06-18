@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================================
 #  补跑 BikeNYC full_random0.4（上次仅训练了1 epoch 即中断）
-#  用法: bash scripts/continue_bikenyc.sh --gpu 1
+#  用法: bash scripts/archive/continue_bikenyc.sh --gpu 1
 # =============================================================================
 set -euo pipefail
 
@@ -17,7 +17,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-ROOT="$(dirname "$SCRIPT_DIR")"
+ROOT="$(dirname "$(dirname "$SCRIPT_DIR")")"
 export CUDA_VISIBLE_DEVICES="$GPU"
 export PYTHONPATH="${ROOT}/src:${PYTHONPATH:-}"
 export PYTHONUNBUFFERED=1
@@ -60,7 +60,7 @@ echo "  开始时间: $(date '+%Y-%m-%d %H:%M:%S')"
 echo "=============================================="
 
 $PYTHON scripts/train.py \
-  -c configs/bikenyc.json \
+  -c configs/datasets/bikenyc.json \
   --override_config "$MASK_FILE" \
   --train_npz data/BikeNYC/bikenyc_train.npz \
   --val_npz data/BikeNYC/bikenyc_val.npz \

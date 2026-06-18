@@ -15,7 +15,7 @@ from stmoe_imputer.models import DualBranchSTImputer
 
 
 def main() -> None:
-    cfg = load_config(ROOT / "configs" / "smoke.json")
+    cfg = load_config(ROOT / "configs" / "presets" / "smoke.json")
     scale_cfg = cfg["data"]["scales"]
     syn = cfg["data"]["synthetic"]
     dataset = SyntheticFlowDataset(

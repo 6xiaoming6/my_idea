@@ -17,7 +17,7 @@ from stmoe_imputer.utils.checkpoint import load_checkpoint
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--config", default="configs/default.json")
+    parser.add_argument("--config", default="configs/presets/default.json")
     parser.add_argument("--override_config", default=None)
     parser.add_argument("--checkpoint", required=True)
     parser.add_argument("--data_npz", default=None)

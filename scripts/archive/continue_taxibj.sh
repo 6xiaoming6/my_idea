@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================================
 #  续跑 TaxiBJ — fixed 模式
-#  用法: bash scripts/continue_taxibj.sh --gpu 0
+#  用法: bash scripts/archive/continue_taxibj.sh --gpu 0
 # =============================================================================
 set -euo pipefail
 
@@ -18,14 +18,14 @@ while [[ $# -gt 0 ]]; do
 done
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-ROOT="$(dirname "$SCRIPT_DIR")"
+ROOT="$(dirname "$(dirname "$SCRIPT_DIR")")"
 OUTPUT_DIR="$ROOT/outputs"
 export CUDA_VISIBLE_DEVICES="$GPU"
 export PYTHONPATH="${ROOT}/src:${PYTHONPATH:-}"
 export PYTHONUNBUFFERED=1
 
 DS="TaxiBJ"
-CFG="configs/taxibj.json"
+CFG="configs/datasets/taxibj.json"
 TRAIN_NPZ="data/TaxiBJ/taxibj_train.npz"
 VAL_NPZ="data/TaxiBJ/taxibj_val.npz"
 
@@ -68,7 +68,7 @@ make_combined() {
   $PYTHON -c "
 import json
 from stmoe_imputer.config import load_config, deep_update
-combined = deep_update(load_config('${mask_file}'), load_config('configs/${abl_name}.json'))
+combined = deep_update(load_config('${mask_file}'), load_config('configs/ablations/${abl_name}.json'))
 with open('${out}', 'w') as f:
     json.dump(combined, f, indent=2)
 "
