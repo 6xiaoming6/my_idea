@@ -159,7 +159,7 @@ Key switches live under `model.main`:
 - `use_routed_branch`
 - `use_shared_branch`
 
-Missing patterns live under `data.mask`: `random`, `spatial_block`, `spatiotemporal_block`, or `mixed`.
+Missing patterns live under `data.mask`: `fixed` or `random`. Both are generated offline as CSV files before training.
 
 ## Main Class Names
 

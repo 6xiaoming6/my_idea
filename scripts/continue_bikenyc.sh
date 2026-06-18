@@ -22,6 +22,21 @@ export CUDA_VISIBLE_DEVICES="$GPU"
 export PYTHONPATH="${ROOT}/src:${PYTHONPATH:-}"
 export PYTHONUNBUFFERED=1
 
+RATE="0.4"
+SEED="42"
+MASK_DIR="data/BikeNYC/random_mask/${RATE}"
+TRAIN_MASK="${MASK_DIR}/train.csv"
+VAL_MASK="${MASK_DIR}/val.csv"
+
+cd "$ROOT"
+$PYTHON scripts/generate_fixed_masks.py \
+  --train_npz data/BikeNYC/bikenyc_train.npz \
+  --val_npz data/BikeNYC/bikenyc_val.npz \
+  --pattern random \
+  --mask_rate "$RATE" \
+  --seed "$SEED" \
+  --output_dir "$MASK_DIR"
+
 MASK_FILE="/tmp/bikenyc_full_random0.4_$$.json"
 $PYTHON -c "
 import json
@@ -29,7 +44,9 @@ override = {
     'data': {
         'mask': {
             'pattern': 'random',
-            'missing_rate': 0.4
+            'missing_rate': 0.4,
+            'train_csv': '${TRAIN_MASK}',
+            'val_csv': '${VAL_MASK}'
         }
     }
 }
@@ -42,7 +59,6 @@ echo "  BikeNYC full_random0.4 — GPU ${GPU}"
 echo "  开始时间: $(date '+%Y-%m-%d %H:%M:%S')"
 echo "=============================================="
 
-cd "$ROOT"
 $PYTHON scripts/train.py \
   -c configs/bikenyc.json \
   --override_config "$MASK_FILE" \

@@ -63,24 +63,9 @@ TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 # ── 生成 Mask Override Config ──────────────────────────────────────────────
 MASK_OVERRIDE_FILE="/tmp/mask_override_${MASK_PATTERN}_${MASK_RATE}_${TIMESTAMP}.json"
 
-if [ "$MASK_PATTERN" = "fixed" ]; then
-  echo "[info] fixed mask: rate=${MASK_RATE}, seed=${FIXED_SEED}"
-  # CSV paths are generated per-dataset in the loop below.
-else
-  $PYTHON -c "
-import json, os
-override = {
-    'data': {
-        'mask': {
-            'pattern': '${MASK_PATTERN}',
-            'missing_rate': ${MASK_RATE}
-        }
-    }
-}
-with open('${MASK_OVERRIDE_FILE}', 'w') as f:
-    json.dump(override, f, indent=2)
-print(f'[info] mask override written to ${MASK_OVERRIDE_FILE}')
-"
+if [ "$MASK_PATTERN" != "fixed" ] && [ "$MASK_PATTERN" != "random" ]; then
+  echo "Unsupported --mask_pattern ${MASK_PATTERN}. Use fixed or random."
+  exit 1
 fi
 
 cleanup_mask_override() {
@@ -154,28 +139,38 @@ for ds in "${DATASETS[@]}"; do
   echo "##############################################"
   echo "##  $ds  (mask=${MASK_PATTERN}, rate=${MASK_RATE})"
   echo "##############################################"
-  # For fixed pattern, generate per-dataset mask override with CSV paths
+  # Generate per-dataset offline masks and mask override with CSV paths.
   DS_MASK_OVERRIDE="$MASK_OVERRIDE_FILE"
-  if [ "$MASK_PATTERN" = "fixed" ]; then
-    DS_MASK_OVERRIDE="/tmp/mask_override_fixed_${ds}_${TIMESTAMP}.json"
-    $PYTHON -c "
+  DS_MASK_OVERRIDE="/tmp/mask_override_${MASK_PATTERN}_${ds}_${TIMESTAMP}.json"
+  MASK_DIR="data/${ds}/${MASK_PATTERN}_mask/${MASK_RATE}"
+  TRAIN_MASK_CSV="${MASK_DIR}/train.csv"
+  VAL_MASK_CSV="${MASK_DIR}/val.csv"
+
+  echo "[info] generating ${MASK_PATTERN} masks for ${ds} rate=${MASK_RATE}"
+  $PYTHON scripts/generate_fixed_masks.py \
+    --train_npz "$train_npz" \
+    --val_npz "$val_npz" \
+    --pattern "$MASK_PATTERN" \
+    --mask_rate "$MASK_RATE" \
+    --seed "$FIXED_SEED" \
+    --output_dir "$MASK_DIR"
+
+  $PYTHON -c "
 import json
-rate_str = '${MASK_RATE}'.replace('.', 'p')
 override = {
     'data': {
         'mask': {
-            'pattern': 'fixed',
+            'pattern': '${MASK_PATTERN}',
             'missing_rate': ${MASK_RATE},
-            'fixed_train_csv': f'data/${ds}/fixed_mask/${MASK_RATE}/train_rate{rate_str}_seed${FIXED_SEED}.csv',
-            'fixed_val_csv': f'data/${ds}/fixed_mask/${MASK_RATE}/val_rate{rate_str}_seed${FIXED_SEED}.csv'
+            'train_csv': '${TRAIN_MASK_CSV}',
+            'val_csv': '${VAL_MASK_CSV}'
         }
     }
 }
 with open('${DS_MASK_OVERRIDE}', 'w') as f:
     json.dump(override, f, indent=2)
-print(f'[info] fixed mask override for ${ds} → ${DS_MASK_OVERRIDE}')
+print(f'[info] mask override for ${ds} → ${DS_MASK_OVERRIDE}')
 "
-  fi
 
   echo ""
 
@@ -227,10 +222,7 @@ with open('${COMBINED_OVERRIDE}', 'w') as f:
     echo ""
   done
 
-  # Cleanup per-dataset fixed override
-  if [ "$MASK_PATTERN" = "fixed" ]; then
-    rm -f "$DS_MASK_OVERRIDE"
-  fi
+  rm -f "$DS_MASK_OVERRIDE"
 done
 
 ELAPSED=$(( $(date +%s) - GLOBAL_START ))

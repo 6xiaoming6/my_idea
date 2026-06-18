@@ -13,10 +13,8 @@
       "pooling_mode": "avg"
     },
     "mask": {
-      "pattern": "mixed",
-      "missing_rate": 0.45,
-      "spatial_block": 4,
-      "temporal_block": 2
+      "pattern": "random",
+      "missing_rate": 0.45
     },
     "synthetic": {
       "num_train": 8,

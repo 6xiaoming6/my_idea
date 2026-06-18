@@ -37,13 +37,24 @@ def main() -> None:
         if args.data_npz is None:
             raise ValueError("--data_npz is required unless --synthetic is set")
         scale_cfg = cfg["data"]["scales"]
+        mask_cfg = cfg["data"]["mask"]
+        pattern = mask_cfg.get("pattern", "random")
+        mask_csv = (
+            mask_cfg.get("test_csv")
+            or mask_cfg.get("val_csv")
+            or mask_cfg.get("train_csv")
+            or mask_cfg.get(f"{pattern}_test_csv")
+            or mask_cfg.get(f"{pattern}_val_csv")
+            or mask_cfg.get(f"{pattern}_train_csv")
+        )
         dataset = FlowNPZDataset(
             args.data_npz,
-            mask_cfg=cfg["data"]["mask"],
+            mask_cfg=mask_cfg,
             fine_to_mid=scale_cfg["fine_to_mid"],
             fine_to_coarse=scale_cfg["fine_to_coarse"],
             pooling_mode=scale_cfg.get("pooling_mode", "avg"),
             seed=cfg.get("seed", 42),
+            mask_csv=mask_csv,
         )
     loader = build_loader(dataset, cfg, shuffle=False)
     model = DualBranchSTImputer.from_config(cfg).to(device)

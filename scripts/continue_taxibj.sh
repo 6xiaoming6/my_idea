@@ -36,7 +36,16 @@ already_done() {
 
 write_fixed_override() {
   local rate="$1" out="$2"
-  local rate_str=$(echo "$rate" | sed 's/\./p/g')
+  local mask_dir="data/${DS}/fixed_mask/${rate}"
+  local train_mask="${mask_dir}/train.csv"
+  local val_mask="${mask_dir}/val.csv"
+  $PYTHON scripts/generate_fixed_masks.py \
+    --train_npz "$TRAIN_NPZ" \
+    --val_npz "$VAL_NPZ" \
+    --pattern fixed \
+    --mask_rate "$rate" \
+    --seed "$FIXED_SEED" \
+    --output_dir "$mask_dir"
   $PYTHON -c "
 import json
 override = {
@@ -44,8 +53,8 @@ override = {
         'mask': {
             'pattern': 'fixed',
             'missing_rate': ${rate},
-            'fixed_train_csv': 'data/${DS}/fixed_mask/${rate}/train_rate${rate_str}_seed${FIXED_SEED}.csv',
-            'fixed_val_csv': 'data/${DS}/fixed_mask/${rate}/val_rate${rate_str}_seed${FIXED_SEED}.csv'
+            'train_csv': '${train_mask}',
+            'val_csv': '${val_mask}'
         }
     }
 }
