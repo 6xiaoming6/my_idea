@@ -58,8 +58,9 @@ checkpoints/
 # Training outputs (logs, plots, saved configs from runs)
 # =============================================================================
 /outputs/
-/runs/
-/logs/
+# /runs/
+# /logs/
+/outputs/v2_smoke
 
 # =============================================================================
 # Matplotlib / plotting caches

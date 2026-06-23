@@ -1,19 +1,32 @@
-bash scripts/run_all_ablations.sh --dataset BikeNYC --gpu 1 --mask_pattern random --mask_rate 0.4
-bash scripts/run_all_ablations.sh --dataset TaxiBJ --gpu 0 --mask_pattern random --mask_rate 0.4
+------------------------------------------------------------------------------------------------
+tmux new -s name
+tmux attach -t name
 
 
+------------------------------------------------------------------------------------------------
+统一批量训练脚本：run_experiments.py
 
-新增 run_all_rates.sh
+# 单数据集、单模式、单缺失率
+python scripts/run_experiments.py --dataset TaxiBJ --gpu 0 --mask-pattern fixed --mask-rate 0.4
 
-# fixed 模式，跑全部 4 个缺失率
-bash scripts/run_all_rates.sh --dataset TaxiBJ --gpu 0 --mask_pattern fixed
+# 单数据集、一个模式、全部 4 个缺失率
+python scripts/run_experiments.py --dataset TaxiBJ --gpu 0 --mask-pattern random --mask-rate all
 
-# random 模式，跑全部 4 个缺失率
-bash scripts/run_all_rates.sh --dataset TaxiBJ --gpu 0 --mask_pattern random
+# 一个数据集、fixed 和 random、全部缺失率
+python scripts/run_experiments.py --dataset CHAP --gpu 0 --mask-pattern all --mask-rate all
 
-# 两个数据集都跑
-bash scripts/run_all_rates.sh --dataset all --gpu 0 --mask_pattern fixed
+# 三个数据集、两种模式、全部缺失率
+python scripts/run_experiments.py --dataset all --gpu 0 --mask-pattern all --mask-rate all
 
 
-# 两个数据集都跑完两个模式
-bash scripts/run_all_rates.sh --dataset all --gpu 0 --mask_pattern all
+------------------------------------------------------------------------------------------------
+# 终端 1 — GPU 0: TaxiBJ fixed
+python scripts/run_experiments.py --dataset TaxiBJ --gpu 0 --mask-pattern fixed --mask-rate all
+
+# 终端 2 — GPU 1: TaxiBJ random
+python scripts/run_experiments.py --dataset TaxiBJ --gpu 1 --mask-pattern random --mask-rate all
+等 GPU 1 的 TaxiBJ 跑完后，同一个终端继续：
+
+
+# 终端 2 — GPU 1: BikeNYC 全部
+python scripts/run_experiments.py --dataset BikeNYC --gpu 1 --mask-pattern all --mask-rate all

@@ -106,9 +106,8 @@ data/TaxiBJ/random_mask/0.4/test.csv  -> N_test x H*W
 ├── src/stmoe_imputer/       # 核心源码
 ├── configs/                 # 训练配置
 ├── scripts/                 # 当前主脚本入口
-├── scripts/archive/         # 历史脚本和临时续跑脚本
 ├── data/                    # 本地数据集和离线 mask，不提交到 GitHub
-├── outputs/                 # 训练输出，不提交到 GitHub
+├── outputs/                 # 分层训练输出和实验索引，不提交到 GitHub
 ├── model_designs/           # 模型设计文档
 ├── changes/                 # 每次结构修改记录
 ├── experments_report/       # 实验分析报告
@@ -172,13 +171,13 @@ scripts/
 ├── evaluate.py              # checkpoint 评估入口
 ├── smoke_test.py            # 前向与 loss 快速检查
 ├── generate_fixed_masks.py  # fixed/random 离线 mask 生成
-├── run_all_ablations.sh     # 单数据集/单缺失率 Full + 6 组消融
-├── run_all_rates.sh         # 多缺失率、多 mask 模式批量训练
+├── run_experiments.py       # 统一批量训练：数据集 / mask / 缺失率 / 消融组合
 ├── prepare_taxibj_npz.py    # TaxiBJ 原始数据转 NPZ
+├── prepare_chap_npz.py      # CHAP 北京 PM2.5 原始数据转 NPZ
 └── plot_from_checkpoints.py # 从 checkpoint 恢复训练曲线
 ```
 
-`scripts/archive/` 只保留历史脚本和临时续跑脚本，新实验优先使用顶层脚本。
+训练调度统一由 `run_experiments.py` 完成，不再保留 Bash 训练脚本。
 
 ### 文档目录
 
@@ -219,28 +218,32 @@ python scripts/train.py -c configs/presets/smoke.json --synthetic
 
 ## 真实数据训练
 
-真实数据训练推荐使用批量脚本，因为它会自动生成 fixed/random 离线 mask，并把 `train_csv` / `val_csv` 写入临时 override 配置。
+真实数据训练推荐使用统一 Python 调度器，因为它会自动生成 fixed/random 离线 mask，并把 `train_csv` / `val_csv` 写入临时 override 配置。
 
 单数据集、单缺失率：
 
 ```bash
-bash scripts/run_all_ablations.sh --dataset TaxiBJ --gpu 0 --mask_pattern random --mask_rate 0.4
-bash scripts/run_all_ablations.sh --dataset BikeNYC --gpu 1 --mask_pattern fixed --mask_rate 0.4
+python scripts/run_experiments.py --dataset TaxiBJ --gpu 0 --mask-pattern random --mask-rate 0.4
+python scripts/run_experiments.py --dataset BikeNYC --gpu 1 --mask-pattern fixed --mask-rate 0.4
+python scripts/run_experiments.py --dataset CHAP --gpu 0 --mask-pattern all --mask-rate 0.4
 ```
 
-全部缺失率：
+全部数据集、模式和缺失率：
 
 ```bash
-bash scripts/run_all_rates.sh --dataset TaxiBJ --gpu 0 --mask_pattern random
-bash scripts/run_all_rates.sh --dataset BikeNYC --gpu 1 --mask_pattern fixed
-bash scripts/run_all_rates.sh --dataset all --gpu 0 --mask_pattern all
+python scripts/run_experiments.py --dataset TaxiBJ --gpu 0 --mask-pattern random --mask-rate all
+python scripts/run_experiments.py --dataset all --gpu 0 --mask-pattern all --mask-rate all
 ```
 
-`run_all_rates.sh` 默认缺失率为：
+参数 `all` 的展开规则：
 
 ```text
-0.2, 0.4, 0.6, 0.8
+--dataset all       -> TaxiBJ, BikeNYC, CHAP
+--mask-pattern all  -> fixed, random
+--mask-rate all     -> 0.2, 0.4, 0.6, 0.8
 ```
+
+CHAP 默认运行 `full`、`fine_only`、`routed_only`、`shared_only`；TaxiBJ 和 BikeNYC 默认运行 `full` 加 6 组核心消融。批量调度器默认设置每个子训练进程的 CPU 线程数为 4，以避免多个 GPU 任务同时启动时的 OpenMP/MKL 线程争用；可通过 `--cpu-threads` 调整。
 
 ## 单次训练
 
@@ -301,13 +304,41 @@ r_m, r_c
 训练输出默认保存在：
 
 ```text
-outputs/{dataset_name}/{run_name}_{mask_pattern}{rate}_{timestamp}/
+outputs/{dataset_name}/{experiment_type}/{variant}/{mask_pattern}/rate{missing_rate}/{timestamp}_seed{seed}_bs{batch_size}/
 ├── config.json
+├── checkpoints/
 ├── logs/
 │   ├── train.log
-│   └── val.log
+│   ├── val.log
+│   └── metrics.jsonl
 └── training_curves.png
 ```
+
+例如：
+
+```text
+outputs/TaxiBJ/full/model/fixed/rate0.8/20260618_105233_seed42_bs32/
+outputs/TaxiBJ/ablation/fine_only/random/rate0.4/20260618_110012_seed42_bs32/
+outputs/BikeNYC/ablation/no_router/fixed/rate0.6/20260618_111845_seed42_bs32/
+```
+
+`scripts/train.py` 会根据 `-n/--name` 自动归类：
+
+```text
+-n full                  -> full/model
+-n ablation_fine_only    -> ablation/fine_only
+-n ablation_no_router    -> ablation/no_router
+-n smoke_xxx/debug_xxx   -> debug/...
+其他名称                 -> custom/{name}
+```
+
+每次训练结束后还会追加总索引：
+
+```text
+outputs/summary/experiment_index.csv
+```
+
+索引中记录 `run_dir`、数据集、实验类型、消融变体、mask 模式、缺失率、batch size、best epoch、best val MAE、总耗时、平均 step 时间、峰值显存和运行状态。后续做多实验对比时，可以优先读这个 CSV，而不是逐个目录翻 `train.log`。
 
 当前 `train.py` 中 checkpoint 保存默认处于关闭状态，需要时可在 `scripts/train.py` 中重新启用相关代码。
 

@@ -3,8 +3,8 @@
   "output_dir": "outputs",
   "device": "cuda:0",
   "data": {
-    "dataset_name": "BikeNYC",
-    "batch_size": 16,
+    "dataset_name": "CHAP_Beijing",
+    "batch_size": 32,
     "num_workers": 0,
     "pin_memory": true,
     "drop_last": true,
@@ -15,25 +15,28 @@
     },
     "mask": {
       "pattern": "random",
-      "missing_rate": 0.4
+      "missing_rate": 0.4,
+      "train_csv": "data/CHAP/beijing/random_mask/0.4/train.csv",
+      "val_csv": "data/CHAP/beijing/random_mask/0.4/val.csv",
+      "test_csv": "data/CHAP/beijing/random_mask/0.4/test.csv"
     },
     "synthetic": {
       "num_train": 128,
       "num_val": 32,
-      "t": 12,
-      "h": 24,
-      "w": 12
+      "t": 7,
+      "h": 32,
+      "w": 32
     }
   },
   "model": {
-    "c_in": 2,
+    "c_in": 1,
     "main": {
       "dim": 64,
       "num_experts": 4,
       "top_k": 2,
       "max_t": 24,
-      "h": 24,
-      "w": 12,
+      "h": 32,
+      "w": 32,
       "q_dim": 5,
       "num_groups": 8,
       "dropout": 0.1,
@@ -47,8 +50,8 @@
       "detach_shared_expert_input": false,
       "branch_fusion_mode": "residual",
       "branch_gate_init": "balanced",
-      "route_gamma_init": -3.5,
-      "route_dropout": 0.05,
+      "route_gamma_init": -3.0,
+      "route_dropout": 0.1,
       "enable_branch_aux": true,
       "enable_complementary_loss": true,
       "routing_mode": "topk",
@@ -65,13 +68,13 @@
   },
   "loss": {
     "type": "smooth_l1",
-    "lambda_cross": 0.05,
+    "lambda_cross": 0.03,
     "lambda_balance": 0.01,
     "lambda_importance_balance": 0.001,
     "lambda_load_balance": 0.001,
-    "lambda_shared_aux": 0.03,
-    "lambda_route_aux": 0.05,
-    "lambda_complementary": 0.001,
+    "lambda_shared_aux": 0.05,
+    "lambda_route_aux": 0.1,
+    "lambda_complementary": 0.003,
     "lambda_fusion_entropy": 0.0,
     "lambda_branch_entropy": 0.0,
     "lambda_final": 0.0
@@ -94,7 +97,7 @@
     "early_stopping": {
       "enabled": false,
       "monitor": "val_mae",
-      "patience": 15,
+      "patience": 40,
       "mode": "min"
     }
   }
