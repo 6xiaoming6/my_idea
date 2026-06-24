@@ -130,6 +130,20 @@ def load_data(true_datapath,miss_datapath, distance_df_filename):
     Completed Tensor  -  numpy.array(Node, points_per_day, days)
     """
 
+    direct = np.load(true_datapath)
+    if 'train_data' in direct.files:
+        A = get_adjacency_matrix(distance_df_filename, num_of_vertices)
+        A_q, A_h = random_walk_normalize(A), random_walk_normalize(A.T)
+        loaders = []
+        for name in ('train', 'val', 'test'):
+            target = direct[f'{name}_data'].astype(np.float32).transpose(0, 2, 1)
+            mask = direct[f'{name}_mask'].astype(np.float32).transpose(0, 2, 1)
+            if target.shape[2] != time_dim:
+                raise ValueError(f'{name} window length {target.shape[2]} != time_dim {time_dim}')
+            loaders.append(data_loader(target * mask, target, mask, batch_size,
+                                       shuffle=name == 'train', drop_last=name != 'test'))
+        return (*loaders, A_q, A_h)
+
     # X, Y, mask: N x T x 1
     X, Y, mask, A_q, A_h = load_pems_data(true_datapath,miss_datapath, distance_df_filename,num_of_vertices)
 

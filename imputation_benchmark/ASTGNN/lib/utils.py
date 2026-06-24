@@ -409,15 +409,23 @@ def predict_and_save_results(net, data_loader, data_target_tensor, epoch, _std, 
         for i in range(prediction_length):
             assert data_target_tensor.shape[0] == prediction.shape[0]
             print('current epoch: %s, predict %s points' % (epoch, i))
-            mae = mean_absolute_error(data_target_tensor[:, :, i], prediction[:, :, i, 0],sample_weight=eval_points_all[:, :, i])
-            rmse = mean_squared_error(data_target_tensor[:, :, i], prediction[:, :, i, 0],sample_weight=eval_points_all[:, :, i]) ** 0.5
-            mape = masked_mape_np(data_target_tensor[:, :, i], prediction[:, :, i, 0],eval_points_all[:, :, i], 0)
+            weights = np.nan_to_num(eval_points_all[:, :, i], nan=0.0, posinf=0.0, neginf=0.0)
+            if not float(weights.sum()) > 0:
+                print('No evaluable missing values at this horizon; skip metrics.')
+                continue
+            mae = mean_absolute_error(data_target_tensor[:, :, i], prediction[:, :, i, 0],sample_weight=weights)
+            rmse = mean_squared_error(data_target_tensor[:, :, i], prediction[:, :, i, 0],sample_weight=weights) ** 0.5
+            mape = masked_mape_np(data_target_tensor[:, :, i], prediction[:, :, i, 0],weights, 0)
             print('MAE: %.2f' % (mae))
             print('RMSE: %.2f' % (rmse))
             print('MAPE: %.2f' % (mape))
             excel_list.extend([mae, rmse, mape])
 
         # print overall results
+        eval_points_all = np.nan_to_num(eval_points_all, nan=0.0, posinf=0.0, neginf=0.0)
+        if not float(eval_points_all.sum()) > 0:
+            print('No evaluable missing values in this split; test forward pass completed.')
+            return
         mae = mean_absolute_error(data_target_tensor.reshape(-1, 1), prediction.reshape(-1, 1),sample_weight=eval_points_all.reshape(-1, 1))
         rmse = mean_squared_error(data_target_tensor.reshape(-1, 1), prediction.reshape(-1, 1),sample_weight=eval_points_all.reshape(-1, 1)) ** 0.5
         mape = masked_mape_np(data_target_tensor.reshape(-1, 1), prediction.reshape(-1, 1),eval_points_all.reshape(-1, 1), 0)

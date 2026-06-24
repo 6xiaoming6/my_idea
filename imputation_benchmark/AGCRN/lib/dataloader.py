@@ -126,6 +126,34 @@ def get_dataloader(args, normalizer = 'std', tod=False, dow=False, weather=False
 
     true_datapath = os.path.join(args.data_prefix,f"true_data_{args.type}_{args.miss_rate}_v2.npz")
     miss_datapath = os.path.join(args.data_prefix,f"miss_data_{args.type}_{args.miss_rate}_v2.npz")
+    # Grid adapter format: each source window is already one complete model
+    # sample, so do not re-split or create cross-window sliding samples.
+    true_file = np.load(true_datapath)
+    if 'train_data' in true_file.files:
+        train_raw = true_file['train_data'].astype(np.float32)[..., None]
+        train_values, scaler = normalize_dataset(train_raw, normalizer, args.column_wise)
+        loaders = []
+        for name in ('train', 'val', 'test'):
+            raw = true_file[f'{name}_data'].astype(np.float32)[..., None]
+            observed_mask = true_file[f'{name}_mask'].astype(np.int32)[..., None]
+            if raw.shape[1] != args.seq_len:
+                raise ValueError(f'{name} window length {raw.shape[1]} != seq_len {args.seq_len}')
+            values = train_values if name == 'train' else scaler.transform(raw)
+            if name == 'test':
+                cond_mask = observed_mask
+                gt_mask = 1 - observed_mask
+            else:
+                # Self-supervised targets are hidden only from originally
+                # observable values; test always uses the supplied mask.
+                cond_mask = get_randmask(observed_mask).astype(np.int32)
+                gt_mask = observed_mask - cond_mask
+            x = values.copy()
+            x[cond_mask == 0] = 0
+            y = values.copy()
+            loaders.append(data_loader(x, y, gt_mask.astype(bool), args.batch_size,
+                                       shuffle=name == 'train', drop_last=name != 'test'))
+        return (*loaders, scaler)
+
     #load raw st dataset
     observed_masks,values = load_st_dataset(true_datapath,miss_datapath)        # T, N, D
     #normalize st data

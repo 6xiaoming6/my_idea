@@ -42,11 +42,53 @@ def get_sample_by_overlaped_Sliding_window(X,Y,  mask, sample_len):
 def get_dataloader(true_datapath,miss_datapath,val_ratio,test_ratio, batch_size=16,eval_length=12):
 
     miss = np.load(miss_datapath)
-    observed_masks = np.nan_to_num(miss['mask'][:1000, :, 0])
-    
-    observed_values = np.nan_to_num(miss['data'][:1000, :, 0].astype(np.float32))
+    true = np.load(true_datapath)
+    # Grid adapter format: preserve the project's original window samples
+    # instead of re-splitting a fabricated traffic timeline.  This is data
+    # handling only; CSDI_Traffic and its diffusion architecture are unchanged.
+    if "train_data" in true.files and "train_mask" in true.files:
+        split = {}
+        for name in ("train", "val", "test"):
+            values = np.nan_to_num(true[f"{name}_data"].astype(np.float32))
+            observed_mask = np.nan_to_num(true[f"{name}_mask"].astype(np.float32))
+            observed = values * observed_mask
+            if values.shape[1] != eval_length:
+                raise ValueError(
+                    f"{name} window length is {values.shape[1]}, but config sample_len is {eval_length}."
+                )
+            split[name] = (values, observed, observed_mask)
 
-    values = np.nan_to_num(np.load(true_datapath)['data'][:1000, :, 0].astype(np.float32))
+        train_values, train_observed, train_mask = split["train"]
+        mean = np.mean(train_values[train_mask == 1])
+        std = np.std(train_values[train_mask == 1])
+        if std == 0:
+            raise ValueError("Training observations have zero variance; cannot standardize CSDI input.")
+        loaders = []
+        for name in ("train", "val", "test"):
+            values, observed, observed_mask = split[name]
+            values = (values - mean) / std
+            observed = (observed - mean) / std
+            observed[observed_mask == 0] = 0
+            dataset = Traffic_Dataset(
+                observed if name != "test" else values,
+                values,
+                observed_mask if name != "test" else np.ones_like(observed_mask),
+                isTest=name == "test",
+                eval_length=eval_length,
+            )
+            # For test, Traffic_Dataset stores the actual evaluation mask as
+            # gt_mask and conditions only on observed entries, matching the
+            # original CSDI traffic protocol.
+            if name == "test":
+                dataset.gt_masks = observed_mask
+            loaders.append(DataLoader(dataset, batch_size=batch_size, shuffle=name == "train"))
+        return (*loaders, train_values.shape[-1], std, mean)
+
+    observed_masks = np.nan_to_num(miss['mask'][:, :, 0]).astype(np.float32)
+    
+    observed_values = np.nan_to_num(miss['data'][:, :, 0].astype(np.float32))
+
+    values = np.nan_to_num(true['data'][:, :, 0].astype(np.float32))
 
     mean = np.mean(values[observed_masks==1])
     std = np.std(values[observed_masks==1])
@@ -76,15 +118,15 @@ def get_dataloader(true_datapath,miss_datapath,val_ratio,test_ratio, batch_size=
     test_X, test_Y, test_mask = get_sample_by_overlaped_Sliding_window(test_X, test_Y, test_mask, eval_length)
 
     dataset = Traffic_Dataset(
-        train_X,train_Y,train_mask,isTest=False,eval_length=12
+        train_X,train_Y,train_mask,isTest=False,eval_length=eval_length
     )
     train_loader = DataLoader(dataset, batch_size=batch_size, shuffle=1)
     valid_dataset = Traffic_Dataset(
-        val_X,val_Y,val_mask,isTest=False,eval_length=12
+        val_X,val_Y,val_mask,isTest=False,eval_length=eval_length
     )
     valid_loader = DataLoader(valid_dataset, batch_size=batch_size, shuffle=0)
     test_dataset = Traffic_Dataset(
-        test_X,test_Y,test_mask,isTest=True,eval_length=12
+        test_X,test_Y,test_mask,isTest=True,eval_length=eval_length
     )
     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=0)
     return train_loader, valid_loader, test_loader,N,std,mean

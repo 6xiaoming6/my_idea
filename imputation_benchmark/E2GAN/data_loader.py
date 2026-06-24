@@ -58,6 +58,29 @@ def load_data (true_datapath,miss_datapath,val_ratio,test_ratio,batch_size,sampl
     Sample shape:[Batch,sample_len,N*F]
     input_size: N*F
     """
+    true_file = np.load(true_datapath)
+    if 'train_data' in true_file.files:
+        train_values = true_file['train_data'].astype(np.float32)
+        train_mask = true_file['train_mask'].astype(np.float32)
+        mean, std = train_values[train_mask.astype(bool)].mean(), train_values[train_mask.astype(bool)].std()
+        if std == 0:
+            raise ValueError('Training observations have zero variance.')
+        loaders = []
+        for name in ('train', 'val', 'test'):
+            target = true_file[f'{name}_data'].astype(np.float32)
+            mask = true_file[f'{name}_mask'].astype(np.float32)
+            if target.shape[1] != sample_len:
+                raise ValueError(f'{name} window length {target.shape[1]} != sample_len {sample_len}')
+            observed = target * mask
+            target = (target - mean) / std
+            observed = (observed - mean) / std
+            observed[mask == 0] = 0
+            delta = np.zeros_like(mask)
+            for i in range(1, sample_len):
+                delta[:, i] = delta[:, i - 1] * (1 - mask[:, i - 1]) + 1
+            loaders.append(data_loader(observed, target, mask, delta, batch_size, shuffle=name == 'train'))
+        return (*loaders, mean, std, train_values.shape[-1])
+
     miss = np.load(miss_datapath)
     mask = miss['mask'][:, :, :1] 
     miss_data = miss['data'][:, :, :1]

@@ -26,11 +26,31 @@ def inverse_Sliding_window(X_window):
 
 
 def load_data(true_datapath,miss_datapath,val_ratio,test_ratio,sample_len=12):
+    true_file = np.load(true_datapath, allow_pickle=True)
+    if 'train_data' in true_file.files:
+        train_values = true_file['train_data'].astype(np.float32)
+        train_mask = true_file['train_mask'].astype(np.float32)
+        mean, std = train_values[train_mask.astype(bool)].mean(), train_values[train_mask.astype(bool)].std()
+        if std == 0:
+            raise ValueError('Training observations have zero variance.')
+        sets = []
+        for name in ('train', 'val', 'test'):
+            values = (true_file[f'{name}_data'].astype(np.float32) - mean) / std
+            mask = true_file[f'{name}_mask'].astype(bool)
+            if values.shape[1] != sample_len:
+                raise ValueError(f'{name} window length {values.shape[1]} != sample_len {sample_len}')
+            masked = np.where(mask, values, np.nan)
+            item = {'X': masked}
+            if name != 'train':
+                item['X_ori'] = values
+            sets.append(item)
+        return (*sets, train_values.shape[-1], mean, std)
+
     miss = np.load(miss_datapath,allow_pickle=True)
     mask = miss['mask'][:, :, 0] 
 
 
-    true_data = np.load(true_datapath,allow_pickle=True)['data'][:, :, 0].astype(np.float32)
+    true_data = true_file['data'][:, :, 0].astype(np.float32)
 
     mean , std = true_data[mask.astype(bool)].mean(), true_data[mask.astype(bool)].std()
     true_data = (true_data - mean)/std

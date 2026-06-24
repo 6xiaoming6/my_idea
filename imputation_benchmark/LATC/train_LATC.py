@@ -231,6 +231,7 @@ points_per_day = int(data_config['points_per_day'])
 c = float(training_config['c'])
 theta = int(training_config['theta'])
 use_nni = int(training_config['use_nni'])
+maxiter = int(training_config.get('maxiter', 100))
 
 graph_signal_matrix_filename = data_config['graph_signal_matrix_filename']
 miss_signal_matrix_filename = data_config['miss_graph_signal_matrix_filename']
@@ -258,10 +259,9 @@ rho = 1e-5
 lambda0 = c * rho
 print(c)
 print(theta)
-tensor_hat = latc(dense_tensor, sparse_tensor, time_lags, alpha, rho, lambda0, theta)
+tensor_hat = latc(dense_tensor, sparse_tensor, time_lags, alpha, rho, lambda0, theta, maxiter=maxiter)
 end = time.time()
 print('Running time: %d seconds' % (end - start))
-
 
 
 

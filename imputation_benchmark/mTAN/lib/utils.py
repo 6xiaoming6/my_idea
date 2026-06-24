@@ -132,11 +132,37 @@ def get_sample_by_overlaped_Sliding_window(X, Y,  mask,num_ref_points, sample_le
 
 
 def load_data (true_datapath,miss_datapath,val_ratio,test_ratio,num_ref_points,sample_len=12):
+    true_file = np.load(true_datapath)
+    if 'train_data' in true_file.files:
+        split = {name: (true_file[f'{name}_data'].astype(np.float32), true_file[f'{name}_mask'].astype(np.float32))
+                 for name in ('train', 'val', 'test')}
+        train_values, train_mask = split['train']
+        if train_values.shape[1] != sample_len:
+            raise ValueError(f'train window length {train_values.shape[1]} != sample_len {sample_len}')
+        file_data = {
+            # mTAN uses one feature per node; scale that feature globally.
+            'max': np.array([np.max(train_values)], dtype=np.float32),
+            'min': np.array([np.min(train_values)], dtype=np.float32),
+        }
+        timestamp = np.linspace(0.0, 1.0, sample_len, dtype=np.float32)
+        query = np.linspace(0.0, 1.0, num_ref_points, dtype=np.float32)
+        for name, (target, mask) in split.items():
+            if target.shape[1] != sample_len:
+                raise ValueError(f'{name} window length {target.shape[1]} != sample_len {sample_len}')
+            observed = target * mask
+            # [B,L,N] -> [B,N,L,1], the model's original expected layout.
+            file_data[f'{name}_x'] = observed.transpose(0, 2, 1)[..., None]
+            file_data[f'{name}_target'] = target.transpose(0, 2, 1)[..., None]
+            file_data[f'{name}_mask'] = mask.transpose(0, 2, 1)[..., None]
+            file_data[f'{name}_timestamp'] = np.broadcast_to(timestamp, (target.shape[0], sample_len)).copy()
+            file_data[f'{name}_query'] = np.broadcast_to(query, (target.shape[0], num_ref_points)).copy()
+        return file_data
+
     miss = np.load(miss_datapath)
     mask = miss['mask'][:, :, :1]  #(T,N,F)
     miss_data = miss['data'][:, :, :1]
 
-    true_data = np.load(true_datapath)['data'].astype(np.float32)[:, :, :1]
+    true_data = true_file['data'].astype(np.float32)[:, :, :1]
     true_data[np.isnan(true_data)] = 0
 
     mask = np.expand_dims(mask.reshape((mask.shape[0],-1)),1) 

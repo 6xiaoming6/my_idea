@@ -1,7 +1,10 @@
 import os
 import pandas as pd
 import numpy as np
-import ujson as json
+try:
+    import ujson as json
+except ImportError:
+    import json
 from tqdm import tqdm
 import prepareData
 import argparse

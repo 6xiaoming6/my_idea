@@ -88,6 +88,24 @@ if os.path.exists(all_datapath):
 else:
     all_data = read_and_generate_dataset_encoder_decoder(all_datapath,true_datapath,miss_datapath, num_of_weeks, num_of_days, num_of_hours, num_for_predict, points_per_hour=points_per_hour, save=True)
 
+# The generator returns a nested dictionary on a first run, whereas a cached
+# NPZ exposes flat keys.  Normalise both representations at the data boundary
+# so first-run training uses exactly the same tensors as cached training.
+if isinstance(all_data, dict):
+    all_data = {
+        'train_x1': all_data['train']['x1'], 'train_x2': all_data['train']['x2'],
+        'train_target': all_data['train']['target'], 'train_mask': all_data['train']['mask'],
+        'train_timestamp': all_data['train']['timestamp'],
+        'train_delta1': all_data['train']['delta1'], 'train_delta2': all_data['train']['delta2'],
+        'val_x': all_data['val']['x'], 'val_target': all_data['val']['target'],
+        'val_mask': all_data['val']['mask'], 'val_timestamp': all_data['val']['timestamp'],
+        'val_delta': all_data['val']['delta'],
+        'test_x': all_data['test']['x'], 'test_target': all_data['test']['target'],
+        'test_mask': all_data['test']['mask'], 'test_timestamp': all_data['test']['timestamp'],
+        'test_delta': all_data['test']['delta'],
+        'mean': all_data['stats']['_max'], 'std': all_data['stats']['_min'],
+    }
+
 
 # direction = 1 means: if i connected to j, adj[i,j]=1;
 # direction = 2 means: if i connected to j, then adj[i,j]=adj[j,i]=1
@@ -344,7 +362,6 @@ if __name__ == "__main__":
 
     train_main()
     #predict_main(52, test_loader, test_target_tensor,test_mask_tensor, _max, _min, 'test')
-
 
 
 

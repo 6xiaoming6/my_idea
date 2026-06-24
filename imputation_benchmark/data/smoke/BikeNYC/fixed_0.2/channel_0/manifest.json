@@ -1,0 +1,54 @@
+{
+  "dataset": "BikeNYC",
+  "source_npz": {
+    "train": "data/BikeNYC/bikenyc_train.npz",
+    "val": "data/BikeNYC/bikenyc_val.npz",
+    "test": "data/BikeNYC/bikenyc_test.npz"
+  },
+  "source_window_shape": [
+    2,
+    12,
+    24,
+    12
+  ],
+  "source_samples": {
+    "train": 8,
+    "val": 8,
+    "test": 8
+  },
+  "stride": 1,
+  "max_windows_per_split": 8,
+  "baseline_data_shape": [
+    288,
+    288,
+    1
+  ],
+  "canonical_window_layout": "split_* arrays are [samples, time, nodes] and preserve the project's original split.",
+  "layout": "data is [time, nodes, features] where features=1 and nodes=selected_channels*H*W",
+  "selected_channels": [
+    0
+  ],
+  "nodes": 288,
+  "feature_dim": 1,
+  "grid": {
+    "height": 24,
+    "width": 12
+  },
+  "mask": "fixed",
+  "requested_missing_rate": 0.2,
+  "actual_missing_rate": 0.1979166865348816,
+  "seed": 42,
+  "split_ratios_for_baselines": {
+    "train": 0.3333333333333333,
+    "val": 0.3333333333333333,
+    "test": 0.3333333333333333
+  },
+  "files": {
+    "true": "true_data_fixed_0.2_v2.npz",
+    "missing": "miss_data_fixed_0.2_v2.npz",
+    "grid_edges": "grid_edges.csv",
+    "window_true": "window_true_data_fixed_0.2_v2.npz",
+    "window_missing": "window_miss_data_fixed_0.2_v2.npz"
+  },
+  "note": "The compatibility stream concatenates complete source windows; use split_* arrays to avoid cross-window samples."
+}

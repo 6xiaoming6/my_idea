@@ -1,0 +1,33 @@
+file:
+  data_prefix: ../../data/smoke/BikeNYC/fixed_0.2/channel_0
+  dataset: bikenyc
+  miss_rate: 0.2
+  miss_type: fixed
+train:
+  epochs: 1
+  batch_size: 1
+  lr: 0.001
+  valid_epoch_interval: 20
+  is_lr_decay: true
+  nni: false
+diffusion:
+  layers: 4
+  channels: 64
+  nheads: 8
+  diffusion_embedding_dim: 128
+  beta_start: 0.0001
+  beta_end: 0.2
+  num_steps: 50
+  schedule: quad
+  is_adp: true
+  proj_t: 64
+  is_cross_t: true
+  is_cross_s: true
+  adj_file: ../../data/PEMS04/PEMS04.csv
+model:
+  is_unconditional: 0
+  timeemb: 128
+  featureemb: 16
+  target_strategy: hybrid
+  use_guide: true
+  mask_sensor: []

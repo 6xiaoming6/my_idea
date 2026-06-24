@@ -11,7 +11,8 @@ parser = argparse.ArgumentParser(description="CSDI")
 parser.add_argument("--config", type=str, default="config/PEMS04.conf")
 parser.add_argument("--modelpath", type=str, default="")
 parser.add_argument(
-    "--targetstrategy", type=str, default="mix", choices=["mix", "random", "historical"]
+    "--targetstrategy", type=str, default=None, choices=["mix", "random", "historical"],
+    help="Override config [model] target_strategy when supplied.",
 )
 
 args = parser.parse_args()
@@ -20,7 +21,8 @@ print(args)
 config = configparser.ConfigParser()
 config.read(args.config)
 
-config["model"]["target_strategy"] = args.targetstrategy
+if args.targetstrategy is not None:
+    config["model"]["target_strategy"] = args.targetstrategy
 data_prefix = config['file']['data_prefix']
 
 true_datapath = os.path.join(data_prefix,f"true_data_{config['train']['type']}_{config['train']['miss_rate']}_v2.npz")

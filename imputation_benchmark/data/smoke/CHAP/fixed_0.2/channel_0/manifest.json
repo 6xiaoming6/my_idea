@@ -1,0 +1,54 @@
+{
+  "dataset": "CHAP",
+  "source_npz": {
+    "train": "data/CHAP/beijing/chap_beijing_train.npz",
+    "val": "data/CHAP/beijing/chap_beijing_val.npz",
+    "test": "data/CHAP/beijing/chap_beijing_test.npz"
+  },
+  "source_window_shape": [
+    1,
+    7,
+    32,
+    32
+  ],
+  "source_samples": {
+    "train": 8,
+    "val": 8,
+    "test": 8
+  },
+  "stride": 1,
+  "max_windows_per_split": 8,
+  "baseline_data_shape": [
+    168,
+    1024,
+    1
+  ],
+  "canonical_window_layout": "split_* arrays are [samples, time, nodes] and preserve the project's original split.",
+  "layout": "data is [time, nodes, features] where features=1 and nodes=selected_channels*H*W",
+  "selected_channels": [
+    0
+  ],
+  "nodes": 1024,
+  "feature_dim": 1,
+  "grid": {
+    "height": 32,
+    "width": 32
+  },
+  "mask": "fixed",
+  "requested_missing_rate": 0.2,
+  "actual_missing_rate": 0.19921875,
+  "seed": 42,
+  "split_ratios_for_baselines": {
+    "train": 0.3333333333333333,
+    "val": 0.3333333333333333,
+    "test": 0.3333333333333333
+  },
+  "files": {
+    "true": "true_data_fixed_0.2_v2.npz",
+    "missing": "miss_data_fixed_0.2_v2.npz",
+    "grid_edges": "grid_edges.csv",
+    "window_true": "window_true_data_fixed_0.2_v2.npz",
+    "window_missing": "window_miss_data_fixed_0.2_v2.npz"
+  },
+  "note": "The compatibility stream concatenates complete source windows; use split_* arrays to avoid cross-window samples."
+}

@@ -1,0 +1,128 @@
+# AGCRN
+cd AGCRN && python <train-entry> --config generated_configs/TaxiBJ/AGCRN_fixed_0.2_smoke.conf
+
+# IGNNK
+cd IGNNK && python <train-entry> --config generated_configs/TaxiBJ/IGNNK_fixed_0.2_smoke.conf
+
+# mTAN
+cd mTAN && python <train-entry> --config generated_configs/TaxiBJ/mTAN_fixed_0.2_smoke.conf
+
+# GAIN
+cd GAIN && python <train-entry> --config generated_configs/TaxiBJ/GAIN_fixed_0.2_smoke.conf
+
+# E2GAN
+cd E2GAN && python <train-entry> --config generated_configs/TaxiBJ/E2GAN_fixed_0.2_smoke.conf
+
+# ASTGNN
+cd ASTGNN && python <train-entry> --config generated_configs/TaxiBJ/ASTGNN_fixed_0.2_smoke.conf
+
+# SSTBAN
+cd SSTBAN/SSTBAN-imputation && python <train-entry> --config generated_configs/TaxiBJ/SSTBAN_fixed_0.2_smoke.conf
+
+# CSDI
+cd CSDI && python train.py --config generated_configs/CSDI_fixed_0.2_smoke.conf
+
+# BRITS (step 1: prepare JSON, step 2: train)
+cd BRITS && python input_process.py --config generated_configs/BRITS_fixed_0.2_prepare_smoke.conf
+cd BRITS && python main.py --config generated_configs/BRITS_fixed_0.2_smoke.conf
+
+# GCASTN
+cd GCASTN/GCASTN-main/code_data_paper_632/GCASTN && python train_GCASTN.py --config generated_configs/GCASTN_fixed_0.2_smoke.conf
+
+# LAST
+cd LAST && python main.py --config generated_configs/LAST_fixed_0.2_smoke.conf --miss_type fixed --miss_rate 0.2
+
+# PriSTI
+cd PriSTI/PriSTI-main && python exe_survey.py --config generated_configs/PriSTI_fixed_0.2_smoke.yaml --targetstrategy random
+
+# ImputeFormer
+cd imputeformer && python main.py --data_prefix ../data/smoke/TaxiBJ/fixed_0.2/channel_0 --dataset TaxiBJ --miss_type fixed --miss_rate 0.2 --sample_len 12 --batch_size 1 --epochs 1
+
+# LATC
+cd LATC && python train_LATC.py --config generated_configs/LATC_fixed_0.2_smoke.conf
+
+# AGCRN
+cd AGCRN && python <train-entry> --config generated_configs/BikeNYC/AGCRN_fixed_0.2_smoke.conf
+
+# IGNNK
+cd IGNNK && python <train-entry> --config generated_configs/BikeNYC/IGNNK_fixed_0.2_smoke.conf
+
+# mTAN
+cd mTAN && python <train-entry> --config generated_configs/BikeNYC/mTAN_fixed_0.2_smoke.conf
+
+# GAIN
+cd GAIN && python <train-entry> --config generated_configs/BikeNYC/GAIN_fixed_0.2_smoke.conf
+
+# E2GAN
+cd E2GAN && python <train-entry> --config generated_configs/BikeNYC/E2GAN_fixed_0.2_smoke.conf
+
+# ASTGNN
+cd ASTGNN && python <train-entry> --config generated_configs/BikeNYC/ASTGNN_fixed_0.2_smoke.conf
+
+# SSTBAN
+cd SSTBAN/SSTBAN-imputation && python <train-entry> --config generated_configs/BikeNYC/SSTBAN_fixed_0.2_smoke.conf
+
+# CSDI
+cd CSDI && python train.py --config generated_configs/CSDI_fixed_0.2_smoke.conf
+
+# BRITS (step 1: prepare JSON, step 2: train)
+cd BRITS && python input_process.py --config generated_configs/BRITS_fixed_0.2_prepare_smoke.conf
+cd BRITS && python main.py --config generated_configs/BRITS_fixed_0.2_smoke.conf
+
+# GCASTN
+cd GCASTN/GCASTN-main/code_data_paper_632/GCASTN && python train_GCASTN.py --config generated_configs/GCASTN_fixed_0.2_smoke.conf
+
+# LAST
+cd LAST && python main.py --config generated_configs/LAST_fixed_0.2_smoke.conf --miss_type fixed --miss_rate 0.2
+
+# PriSTI
+cd PriSTI/PriSTI-main && python exe_survey.py --config generated_configs/PriSTI_fixed_0.2_smoke.yaml --targetstrategy random
+
+# ImputeFormer
+cd imputeformer && python main.py --data_prefix ../data/smoke/BikeNYC/fixed_0.2/channel_0 --dataset BikeNYC --miss_type fixed --miss_rate 0.2 --sample_len 12 --batch_size 1 --epochs 1
+
+# LATC
+cd LATC && python train_LATC.py --config generated_configs/LATC_fixed_0.2_smoke.conf
+
+# AGCRN
+cd AGCRN && python <train-entry> --config generated_configs/CHAP/AGCRN_fixed_0.2_smoke.conf
+
+# IGNNK
+cd IGNNK && python <train-entry> --config generated_configs/CHAP/IGNNK_fixed_0.2_smoke.conf
+
+# mTAN
+cd mTAN && python <train-entry> --config generated_configs/CHAP/mTAN_fixed_0.2_smoke.conf
+
+# GAIN
+cd GAIN && python <train-entry> --config generated_configs/CHAP/GAIN_fixed_0.2_smoke.conf
+
+# E2GAN
+cd E2GAN && python <train-entry> --config generated_configs/CHAP/E2GAN_fixed_0.2_smoke.conf
+
+# ASTGNN
+cd ASTGNN && python <train-entry> --config generated_configs/CHAP/ASTGNN_fixed_0.2_smoke.conf
+
+# SSTBAN
+cd SSTBAN/SSTBAN-imputation && python <train-entry> --config generated_configs/CHAP/SSTBAN_fixed_0.2_smoke.conf
+
+# CSDI
+cd CSDI && python train.py --config generated_configs/CSDI_fixed_0.2_smoke.conf
+
+# BRITS (step 1: prepare JSON, step 2: train)
+cd BRITS && python input_process.py --config generated_configs/BRITS_fixed_0.2_prepare_smoke.conf
+cd BRITS && python main.py --config generated_configs/BRITS_fixed_0.2_smoke.conf
+
+# GCASTN
+cd GCASTN/GCASTN-main/code_data_paper_632/GCASTN && python train_GCASTN.py --config generated_configs/GCASTN_fixed_0.2_smoke.conf
+
+# LAST
+cd LAST && python main.py --config generated_configs/LAST_fixed_0.2_smoke.conf --miss_type fixed --miss_rate 0.2
+
+# PriSTI
+cd PriSTI/PriSTI-main && python exe_survey.py --config generated_configs/PriSTI_fixed_0.2_smoke.yaml --targetstrategy random
+
+# ImputeFormer
+cd imputeformer && python main.py --data_prefix ../data/smoke/CHAP/fixed_0.2/channel_0 --dataset CHAP --miss_type fixed --miss_rate 0.2 --sample_len 7 --batch_size 1 --epochs 1
+
+# LATC
+cd LATC && python train_LATC.py --config generated_configs/LATC_fixed_0.2_smoke.conf

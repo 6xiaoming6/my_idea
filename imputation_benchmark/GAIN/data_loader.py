@@ -45,6 +45,23 @@ def data_loader(X,  mask, batch_size, shuffle=True, drop_last=True):
 
 
 def load_data (true_datapath,miss_datapath,val_ratio,test_ratio,batch_size,sample_len=12):
+    true_file = np.load(true_datapath)
+    if 'train_data' in true_file.files:
+        """Use the grid adapter's original train/val/test windows verbatim."""
+        loaders = []
+        all_train = true_file['train_data'].astype(np.float32)
+        _, norm_parameters = normalization(all_train.reshape(all_train.shape[0], -1))
+        for name in ('train', 'val', 'test'):
+            values = true_file[f'{name}_data'].astype(np.float32)
+            mask = true_file[f'{name}_mask'].astype(np.float32)
+            if values.shape[1] != sample_len:
+                raise ValueError(f'{name} window length {values.shape[1]} != sample_len {sample_len}')
+            # Reuse training-only min/max for val and test.
+            values = normalization(values.reshape(values.shape[0], -1), norm_parameters)[0]
+            flat_mask = mask.reshape(mask.shape[0], -1)
+            loaders.append(data_loader(values, flat_mask, batch_size, shuffle=name == 'train'))
+        return (*loaders, norm_parameters, all_train.shape[1] * all_train.shape[2])
+
     miss = np.load(miss_datapath)
     mask = miss['mask'][:, :, 0] 
 

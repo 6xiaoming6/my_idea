@@ -46,6 +46,8 @@ Thumbs.db
 *.npz
 # Root dataset directory only. Do not ignore src/stmoe_imputer/data/.
 /data/
+# Regeneratable canonical files produced by imputation_benchmark/prepare_grid_dataset.py
+/imputation_benchmark/data/adapted/
 
 # =============================================================================
 # Model checkpoints (large, regeneratable)

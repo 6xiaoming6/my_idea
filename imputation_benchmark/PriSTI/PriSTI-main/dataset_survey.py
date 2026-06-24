@@ -30,7 +30,6 @@ def sample_mask(shape, p=0.0015, p_noise=0.05, max_seq=1, min_seq=1, rng=None):
     mask = mask | (rand(mask.shape) < p_noise)
     return mask.astype('uint8')
 
-
 class Survey_Dataset(Dataset):
     def __init__(self,true_data,ob_mask,gt_mask, c_data,val_start, test_start, eval_length=12, mode="train", missing_pattern='block',
                  is_interpolate=False, target_strategy='random', missing_ratio=None):
@@ -103,6 +102,50 @@ class Survey_Dataset(Dataset):
     def __len__(self):
         return self.current_length
 
+class GridWindowSurveyDataset(Dataset):
+    """PriSTI view of one already-windowed grid-adapter split."""
+    def __init__(self, values, mask, mode, target_strategy, is_interpolate):
+        self.values = values
+        self.mask = mask.astype(np.float32)
+        self.mode = mode
+        self.target_strategy = target_strategy
+        self.is_interpolate = is_interpolate
+
+    def __len__(self):
+        return len(self.values)
+
+    def __getitem__(self, index):
+        values, mask = self.values[index], self.mask[index]
+        if self.mode == 'test':
+            observed_data = values
+            observed_mask = np.ones_like(mask)
+            gt_mask = mask
+            cond_mask = mask
+        else:
+            observed_data = values * mask
+            observed_mask = mask
+            gt_mask = mask
+            observed_mask_t = torch.tensor(mask).float()
+            if self.target_strategy == 'random':
+                cond_mask = get_randmask(observed_mask_t).numpy()
+            else:
+                cond_mask = get_block_mask(observed_mask_t, target_strategy=self.target_strategy,
+                                           min_seq=3, max_seq=12).numpy()
+        item = {
+            'observed_data': observed_data,
+            'observed_mask': observed_mask,
+            'gt_mask': gt_mask,
+            'timepoints': np.arange(values.shape[0]),
+            'cut_length': 0,
+            'cond_mask': cond_mask,
+        }
+        if self.is_interpolate:
+            tmp = torch.tensor(observed_data).float()
+            itp = torch.where(torch.tensor(cond_mask) == 0, float('nan'), tmp)
+            item['coeffs'] = torchcde.linear_interpolation_coeffs(
+                itp.permute(1, 0).unsqueeze(-1)
+            ).squeeze(-1).permute(1, 0).numpy()
+        return item
 
 def get_dataloader(batch_size, device, val_len=0.2, test_len=0.2, missing_pattern='block',
                    is_interpolate=False, num_workers=4, target_strategy='random',data_prefix='',miss_type='SR-TR',miss_rate=0.1):
@@ -121,10 +164,31 @@ def get_dataloader(batch_size, device, val_len=0.2, test_len=0.2, missing_patter
     miss_datapath = os.path.join(data_prefix,f"miss_data_{miss_type}_{miss_rate}_v2.npz")
 
 
+    true_file = np.load(true_datapath)
+    if 'train_data' in true_file.files:
+        train_values = true_file['train_data'].astype(np.float32)
+        train_mask = true_file['train_mask'].astype(np.float32)
+        train_mean = np.mean(train_values[train_mask == 1])
+        train_std = np.std(train_values[train_mask == 1])
+        if train_std == 0:
+            raise ValueError('Training observations have zero variance.')
+        datasets = []
+        for name in ('train', 'val', 'test'):
+            values = (true_file[f'{name}_data'].astype(np.float32) - train_mean) / train_std
+            mask = true_file[f'{name}_mask'].astype(np.float32)
+            datasets.append(GridWindowSurveyDataset(values, mask, 'valid' if name == 'val' else name,
+                                                    target_strategy, is_interpolate))
+        train_loader = DataLoader(datasets[0], batch_size=batch_size, num_workers=num_workers, shuffle=True)
+        valid_loader = DataLoader(datasets[1], batch_size=batch_size, num_workers=num_workers, shuffle=False)
+        test_loader = DataLoader(datasets[2], batch_size=batch_size, num_workers=num_workers, shuffle=False)
+        scaler = torch.tensor(train_std).to(device).float()
+        mean_scaler = torch.tensor(train_mean).to(device).float()
+        return train_loader, valid_loader, test_loader, scaler, mean_scaler, train_values.shape[-1]
+
     miss = np.load(miss_datapath)
     mask = miss['mask'][:, :, 0] 
 
-    true_data = np.load(true_datapath)['data'].astype(np.float32)[:, :, 0]
+    true_data = true_file['data'].astype(np.float32)[:, :, 0]
     true_data[np.isnan(true_data)] = 0
     train_mean, train_std= np.mean(true_data[mask==1]), np.std(true_data[mask==1])
     true_data = (true_data - train_mean)/train_std
