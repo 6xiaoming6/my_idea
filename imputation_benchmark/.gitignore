@@ -1,0 +1,12 @@
+*.zip
+*.npy
+*.npz
+*.csv
+*.pth
+*.pk
+*.log
+__pycache__
+.idea
+*bak
+*.params
+*.out

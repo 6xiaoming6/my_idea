@@ -1,0 +1,17 @@
+flask
+hdfs
+markdown
+nni
+numpy
+pandas
+scipy
+tables
+tensorboard
+tensorboardX
+xlrd
+dgl-cu101
+xgboost
+jupyter
+jupyter_contrib_nbextensions
+matplotlib
+gensim

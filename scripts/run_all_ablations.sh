@@ -75,7 +75,7 @@ trap cleanup_mask_override EXIT
 
 # ── 数据集列表 ────────────────────────────────────────────────────────────
 if [ "$DATASET" = "all" ]; then
-  DATASETS=("TaxiBJ" "BikeNYC")
+  DATASETS=("TaxiBJ" "BikeNYC" "CHAP")
 else
   DATASETS=("$DATASET")
 fi
@@ -86,6 +86,13 @@ ABLATIONS=(
   "ablation_no_router"
   "ablation_fixed_scale_experts"
   "ablation_no_cross_scale"
+  "ablation_routed_only"
+  "ablation_shared_only"
+)
+
+# CHAP 只跑 3 组消融（低缺失率下 no_router/fixed_scale/no_cross_scale 边际差异小）
+CHAP_ABLATIONS=(
+  "ablation_fine_only"
   "ablation_routed_only"
   "ablation_shared_only"
 )
@@ -102,14 +109,22 @@ declare -A ABL_DESC=(
 declare -A DS_CONFIG=(
   ["TaxiBJ"]="configs/datasets/taxibj.json"
   ["BikeNYC"]="configs/datasets/bikenyc.json"
+  ["CHAP"]="configs/datasets/chap_beijing.json"
 )
 declare -A DS_TRAIN=(
   ["TaxiBJ"]="data/TaxiBJ/taxibj_train.npz"
   ["BikeNYC"]="data/BikeNYC/bikenyc_train.npz"
+  ["CHAP"]="data/CHAP/beijing/chap_beijing_train.npz"
 )
 declare -A DS_VAL=(
   ["TaxiBJ"]="data/TaxiBJ/taxibj_val.npz"
   ["BikeNYC"]="data/BikeNYC/bikenyc_val.npz"
+  ["CHAP"]="data/CHAP/beijing/chap_beijing_val.npz"
+)
+declare -A DS_TEST=(
+  ["TaxiBJ"]="data/TaxiBJ/taxibj_test.npz"
+  ["BikeNYC"]="data/BikeNYC/bikenyc_test.npz"
+  ["CHAP"]="data/CHAP/beijing/chap_beijing_test.npz"
 )
 
 # ── 显示配置 ──────────────────────────────────────────────────────────────
@@ -125,11 +140,24 @@ echo "  开始时间:     $(date '+%Y-%m-%d %H:%M:%S')"
 echo "=============================================="
 echo ""
 
+# ── Rate 展开 (支持 --mask_rate all) ─────────────────────────────────────────
+if [ "$MASK_RATE" = "all" ]; then
+  MASK_RATES=(0.2 0.4 0.6 0.8)
+else
+  MASK_RATES=("$MASK_RATE")
+fi
+
 # ── 检查 CUDA ──────────────────────────────────────────────────────────────
 $PYTHON -c "import torch; assert torch.cuda.is_available(), 'CUDA not available'" || exit 1
 
 # ── 逐数据集运行 ──────────────────────────────────────────────────────────
 GLOBAL_START=$(date +%s)
+
+for MASK_RATE in "${MASK_RATES[@]}"; do
+echo ""
+echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+echo ">>>  rate = ${MASK_RATE}"
+echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
 
 for ds in "${DATASETS[@]}"; do
   cfg="${DS_CONFIG[$ds]}"
@@ -142,14 +170,26 @@ for ds in "${DATASETS[@]}"; do
   # Generate per-dataset offline masks and mask override with CSV paths.
   DS_MASK_OVERRIDE="$MASK_OVERRIDE_FILE"
   DS_MASK_OVERRIDE="/tmp/mask_override_${MASK_PATTERN}_${ds}_${TIMESTAMP}.json"
-  MASK_DIR="data/${ds}/${MASK_PATTERN}_mask/${MASK_RATE}"
+  # CHAP 数据在 beijing 子目录下
+  if [ "$ds" = "CHAP" ]; then
+    MASK_DIR="data/CHAP/beijing/${MASK_PATTERN}_mask/${MASK_RATE}"
+  else
+    MASK_DIR="data/${ds}/${MASK_PATTERN}_mask/${MASK_RATE}"
+  fi
   TRAIN_MASK_CSV="${MASK_DIR}/train.csv"
   VAL_MASK_CSV="${MASK_DIR}/val.csv"
+  TEST_MASK_CSV="${MASK_DIR}/test.csv"
 
   echo "[info] generating ${MASK_PATTERN} masks for ${ds} rate=${MASK_RATE}"
+  test_npz="${DS_TEST[$ds]:-}"
+  TEST_ARGS=()
+  if [ -n "$test_npz" ] && [ -f "$test_npz" ]; then
+    TEST_ARGS=(--test_npz "$test_npz")
+  fi
   $PYTHON scripts/generate_fixed_masks.py \
     --train_npz "$train_npz" \
     --val_npz "$val_npz" \
+    "${TEST_ARGS[@]}" \
     --pattern "$MASK_PATTERN" \
     --mask_rate "$MASK_RATE" \
     --seed "$FIXED_SEED" \
@@ -163,7 +203,8 @@ override = {
             'pattern': '${MASK_PATTERN}',
             'missing_rate': ${MASK_RATE},
             'train_csv': '${TRAIN_MASK_CSV}',
-            'val_csv': '${VAL_MASK_CSV}'
+            'val_csv': '${VAL_MASK_CSV}',
+            'test_csv': '${TEST_MASK_CSV}'
         }
     }
 }
@@ -189,10 +230,16 @@ print(f'[info] mask override for ${ds} → ${DS_MASK_OVERRIDE}')
   fi
 
   # ── Ablations ──────────────────────────────────────────────────────────
-  TOTAL_ABL=${#ABLATIONS[@]}
+  # CHAP 只跑 3 组消融，其他数据集跑全部 6 组
+  if [ "$ds" = "CHAP" ]; then
+    RUN_ABLATIONS=("${CHAP_ABLATIONS[@]}")
+  else
+    RUN_ABLATIONS=("${ABLATIONS[@]}")
+  fi
+  TOTAL_ABL=${#RUN_ABLATIONS[@]}
   echo "--- $ds 消融实验 (${TOTAL_ABL} 组) ---"
-  for i in "${!ABLATIONS[@]}"; do
-    abl="${ABLATIONS[$i]}"
+  for i in "${!RUN_ABLATIONS[@]}"; do
+    abl="${RUN_ABLATIONS[$i]}"
     idx=$((i + 1))
     echo "[$(date '+%H:%M:%S')] [$idx/$TOTAL_ABL] $ds / $abl  —  ${ABL_DESC[$abl]}"
 
@@ -223,7 +270,9 @@ with open('${COMBINED_OVERRIDE}', 'w') as f:
   done
 
   rm -f "$DS_MASK_OVERRIDE"
-done
+done  # end dataset loop
+
+done  # end rate loop
 
 ELAPSED=$(( $(date +%s) - GLOBAL_START ))
 echo "=============================================="
