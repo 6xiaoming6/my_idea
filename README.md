@@ -256,7 +256,8 @@ CHAP 默认运行 `full`、`fine_only`、`routed_only`、`shared_only`；TaxiBJ 
       "pattern": "random",
       "missing_rate": 0.4,
       "train_csv": "data/TaxiBJ/random_mask/0.4/train.csv",
-      "val_csv": "data/TaxiBJ/random_mask/0.4/val.csv"
+      "val_csv": "data/TaxiBJ/random_mask/0.4/val.csv",
+      "test_csv": "data/TaxiBJ/random_mask/0.4/test.csv"
     }
   }
 }
@@ -270,6 +271,7 @@ python scripts/train.py \
   --override_config /path/to/mask_override.json \
   --train_npz data/TaxiBJ/taxibj_train.npz \
   --val_npz data/TaxiBJ/taxibj_val.npz \
+  --test_npz data/TaxiBJ/taxibj_test.npz \
   -n my_experiment \
   --no_plot
 ```
@@ -307,9 +309,11 @@ r_m, r_c
 outputs/{dataset_name}/{experiment_type}/{variant}/{mask_pattern}/rate{missing_rate}/{timestamp}_seed{seed}_bs{batch_size}/
 ├── config.json
 ├── checkpoints/
+│   └── best.pt
 ├── logs/
 │   ├── train.log
 │   ├── val.log
+│   ├── test.log
 │   └── metrics.jsonl
 └── training_curves.png
 ```
@@ -340,7 +344,10 @@ outputs/summary/experiment_index.csv
 
 索引中记录 `run_dir`、数据集、实验类型、消融变体、mask 模式、缺失率、batch size、best epoch、best val MAE、总耗时、平均 step 时间、峰值显存和运行状态。后续做多实验对比时，可以优先读这个 CSV，而不是逐个目录翻 `train.log`。
 
-当前 `train.py` 中 checkpoint 保存默认处于关闭状态，需要时可在 `scripts/train.py` 中重新启用相关代码。
+训练配置中的 `train.val_epoch` 控制验证间隔；最后一个 epoch 始终会验证。
+每次刷新最佳 `val_mae` 时覆盖 `checkpoints/best.pt`，因此每次运行只保留一个最佳权重。
+训练结束后会重新加载该权重，仅对测试集评估一次，并分别写入
+`train.log`、`val.log`和 `test.log`。
 
 ## Git 与数据管理
 

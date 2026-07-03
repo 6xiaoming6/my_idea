@@ -44,23 +44,28 @@ def data_loader(X,  mask, batch_size, shuffle=True, drop_last=True):
     return dataloader
 
 
-def load_data (true_datapath,miss_datapath,val_ratio,test_ratio,batch_size,sample_len=12):
+def load_data(true_datapath, miss_datapath, val_ratio, test_ratio, batch_size,
+              sample_len=12, framewise=False):
     true_file = np.load(true_datapath)
     if 'train_data' in true_file.files:
         """Use the grid adapter's original train/val/test windows verbatim."""
         loaders = []
         all_train = true_file['train_data'].astype(np.float32)
-        _, norm_parameters = normalization(all_train.reshape(all_train.shape[0], -1))
+        train_shape = (-1, all_train.shape[-1]) if framewise else (all_train.shape[0], -1)
+        _, norm_parameters = normalization(all_train.reshape(train_shape))
         for name in ('train', 'val', 'test'):
             values = true_file[f'{name}_data'].astype(np.float32)
             mask = true_file[f'{name}_mask'].astype(np.float32)
             if values.shape[1] != sample_len:
                 raise ValueError(f'{name} window length {values.shape[1]} != sample_len {sample_len}')
             # Reuse training-only min/max for val and test.
-            values = normalization(values.reshape(values.shape[0], -1), norm_parameters)[0]
-            flat_mask = mask.reshape(mask.shape[0], -1)
-            loaders.append(data_loader(values, flat_mask, batch_size, shuffle=name == 'train'))
-        return (*loaders, norm_parameters, all_train.shape[1] * all_train.shape[2])
+            shape = (-1, values.shape[-1]) if framewise else (values.shape[0], -1)
+            values = normalization(values.reshape(shape), norm_parameters)[0]
+            flat_mask = mask.reshape(shape)
+            loaders.append(data_loader(values, flat_mask, batch_size,
+                                       shuffle=name == 'train', drop_last=name == 'train'))
+        dim = all_train.shape[-1] if framewise else all_train.shape[1] * all_train.shape[2]
+        return (*loaders, norm_parameters, dim)
 
     miss = np.load(miss_datapath)
     mask = miss['mask'][:, :, 0] 
@@ -69,8 +74,6 @@ def load_data (true_datapath,miss_datapath,val_ratio,test_ratio,batch_size,sampl
     true_data[np.isnan(true_data)] = 0
 
     true_data , norm_parameters = normalization(true_data)
-
-    dim = true_data.shape[1]*sample_len
 
     val_len = int(true_data.shape[0] * val_ratio)
     test_len = int(true_data.shape[0] * test_ratio)
@@ -84,6 +87,20 @@ def load_data (true_datapath,miss_datapath,val_ratio,test_ratio,batch_size,sampl
                              mask[-test_len:]
     
     print(train_X.shape,val_X.shape,test_X.shape)
+
+    if framewise:
+        # GAIN is a tabular imputer: one timestamp is one sample and grid cells
+        # are its attributes.  Flattening time into the feature axis would make
+        # a 12*1024-dimensional dense network, which is not the original GAIN
+        # data semantics and causes avoidable multi-gigabyte optimizer states.
+        train_loader = data_loader(train_X, train_mask, batch_size)
+        val_loader = data_loader(val_X, val_mask, batch_size, shuffle=False,
+                                 drop_last=False)
+        test_loader = data_loader(test_X, test_mask, batch_size, shuffle=False,
+                                  drop_last=False)
+        return train_loader, val_loader, test_loader, norm_parameters, true_data.shape[1]
+
+    dim = true_data.shape[1] * sample_len
 
     train_X,  train_mask = get_sample_by_overlaped_Sliding_window(train_X,  train_mask, sample_len)
     train_X, train_mask = train_X.reshape(train_X.shape[0],-1), train_mask.reshape(train_mask.shape[0],-1)

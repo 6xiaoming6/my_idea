@@ -20,13 +20,17 @@ def get_adjacency_matrix(distance_df_filename, num_of_vertices):
         edges = [(int(i[0]), int(i[1]), float(i[2])) for i in reader]
         distances = np.array([i[2] for i in edges])
     std = distances.std()
+    # Regular grids use unit-length edges, so their distance variance is zero.
+    # A unit scale preserves a meaningful finite adjacency in that case.
+    if not np.isfinite(std) or std == 0:
+        std = 1.0
     A = np.zeros((num_of_vertices, num_of_vertices), dtype=np.float32)
     for i, j, dist in edges:
         A[i, j] = np.exp(-np.square(dist / std))
     
     noise = np.random.rand(num_of_vertices,num_of_vertices)
     A = np.where((noise<0.2) & (A==0),np.exp(-np.square(1 / std)),A)
-    return A
+    return A.astype(np.float32)
 
 
 def random_walk_normalize(W):

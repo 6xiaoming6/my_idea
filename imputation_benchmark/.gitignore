@@ -1,12 +1,53 @@
+# Large binary / data files
 *.zip
 *.npy
 *.npz
 *.csv
 *.pth
 *.pk
-*.log
-__pycache__
-.idea
-*bak
 *.params
 *.out
+
+# Logs
+*.log
+
+# Python
+__pycache__/
+
+# IDE
+.idea
+
+# Backups
+*bak
+
+# =============================================================================
+# Per-model transient outputs (these directories are created at runtime)
+# =============================================================================
+# General
+**/experiments/
+**/smoke_experiments/
+**/smoke_data/
+**/training_data/
+**/best_model/
+**/save/
+**/logs/
+
+# TensorBoard events
+**/events.out.tfevents.*
+
+# NNI experiment data
+**/nni/results/
+**/nni/logs/
+
+# Generated JSON data (BRITS prepare step)
+**/data_train_*.json
+**/data_val_*.json
+**/data_test_*.json
+**/data_meanstd_*.pkl
+
+# =============================================================================
+# Generated config symlinks (created by generate_*_configs.py)
+# =============================================================================
+configurations/TaxiBJ.yaml
+configurations/BikeNYC.yaml
+configurations/CHAP.yaml

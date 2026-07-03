@@ -69,6 +69,7 @@ test_ratio = float(config['train']['test_ratio'])
 val_ratio = float(config['train']['val_ratio'])
 
 patience = int(config['train']['patience']) #early stop patience
+val_epoch = int(config['train'].get('val_epoch', 1))
 
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^config
 
@@ -231,6 +232,7 @@ if __name__ == "__main__":
 
     if not os.path.exists(savepath):
         os.makedirs(savepath)
+    checkpoint = os.path.join(savepath, "best_model.pth")
 
     count = 0
     train_start = time.time()
@@ -274,21 +276,22 @@ if __name__ == "__main__":
 
         train_epoch_time += time.time() - start
 
-        MAE,RMSE,MAPE = test_error(STmodel, val_loader, A_q, A_h)
-        if use_nni:
-            nni.report_intermediate_result(MAE)
-        
         print(f"epoch{epoch} train loss:{train_loss}")
-        print(f"epoch{epoch} val \t mae:{MAE} \t RMSE:{RMSE} \t MAPE:{MAPE} \n")
-
-        MAE_list.append(MAE)
-        if MAE < best_mae:
-            best_mae = MAE
-            best_epoch = epoch
-            best_model = copy.deepcopy(STmodel)
-            count = 0
-        else :
-            count += 1
+        should_validate = (epoch + 1) % val_epoch == 0 or epoch == max_iter - 1
+        if should_validate:
+            MAE,RMSE,MAPE = test_error(STmodel, val_loader, A_q, A_h)
+            if use_nni:
+                nni.report_intermediate_result(MAE)
+            print(f"epoch{epoch} val \t mae:{MAE} \t RMSE:{RMSE} \t MAPE:{MAPE} \n")
+            MAE_list.append(MAE)
+            if MAE < best_mae:
+                best_mae = MAE
+                best_epoch = epoch
+                best_model = copy.deepcopy(STmodel)
+                torch.save(best_model.state_dict(), checkpoint)
+                count = 0
+            else :
+                count += 1
         
         if count > patience:
             print("early stop")
@@ -310,6 +313,3 @@ if __name__ == "__main__":
     
     if use_nni:
         nni.report_final_result(best_mae)
-    current_time = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
-    torch.save(STmodel.state_dict(), os.path.join(
-                savepath, f"best_model_{current_time}"))

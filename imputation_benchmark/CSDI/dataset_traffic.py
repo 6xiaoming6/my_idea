@@ -69,17 +69,18 @@ def get_dataloader(true_datapath,miss_datapath,val_ratio,test_ratio, batch_size=
             values = (values - mean) / std
             observed = (observed - mean) / std
             observed[observed_mask == 0] = 0
+            evaluation_split = name in {"val", "test"}
             dataset = Traffic_Dataset(
-                observed if name != "test" else values,
+                values if evaluation_split else observed,
                 values,
-                observed_mask if name != "test" else np.ones_like(observed_mask),
-                isTest=name == "test",
+                observed_mask if not evaluation_split else np.ones_like(observed_mask),
+                isTest=evaluation_split,
                 eval_length=eval_length,
             )
             # For test, Traffic_Dataset stores the actual evaluation mask as
             # gt_mask and conditions only on observed entries, matching the
             # original CSDI traffic protocol.
-            if name == "test":
+            if evaluation_split:
                 dataset.gt_masks = observed_mask
             loaders.append(DataLoader(dataset, batch_size=batch_size, shuffle=name == "train"))
         return (*loaders, train_values.shape[-1], std, mean)

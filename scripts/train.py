@@ -19,11 +19,11 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from stmoe_imputer.config import deep_update, load_config, save_config
-from stmoe_imputer.data import build_datasets, build_loader
+from stmoe_imputer.data import build_datasets, build_loader, build_test_dataset
 from stmoe_imputer.engine import build_optimizer, build_scheduler, evaluate, train_one_epoch
 from stmoe_imputer.models import DualBranchSTImputer
 from stmoe_imputer.utils import get_device, set_seed
-from stmoe_imputer.utils.checkpoint import save_checkpoint
+from stmoe_imputer.utils.checkpoint import load_checkpoint, save_checkpoint
 from stmoe_imputer.utils.train_logger import TrainLogger
 
 
@@ -178,6 +178,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--override_config", default=None, help="Optional JSON patch for ablations.")
     parser.add_argument("--train_npz", default=None)
     parser.add_argument("--val_npz", default=None)
+    parser.add_argument("--test_npz", default=None)
     parser.add_argument("--synthetic", action="store_true")
     parser.add_argument("--no_plot", action="store_true", help="Skip plotting training curves.")
     parser.add_argument("--name", "-n", default="run", help="Run name for the output directory.")
@@ -235,8 +236,10 @@ def main() -> None:
 
     device = get_device(cfg.get("device", "auto"))
     train_ds, val_ds = build_datasets(cfg, args.train_npz, args.val_npz, synthetic=args.synthetic)
+    test_ds = build_test_dataset(cfg, args.test_npz, synthetic=args.synthetic)
     train_loader = build_loader(train_ds, cfg, shuffle=True)
     val_loader = build_loader(val_ds, cfg, shuffle=False)
+    test_loader = build_loader(test_ds, cfg, shuffle=False) if test_ds is not None else None
 
     model = DualBranchSTImputer.from_config(cfg).to(device)
     optimizer = build_optimizer(model, cfg)
@@ -254,6 +257,7 @@ def main() -> None:
         "python": platform.python_version(),
         "train_npz": args.train_npz or "(synthetic)",
         "val_npz": args.val_npz or "(synthetic)",
+        "test_npz": args.test_npz or ("(synthetic)" if args.synthetic else "(not provided)"),
         "dataset": dataset_name,
         "experiment_type": experiment_type,
         "variant": variant,
@@ -261,6 +265,8 @@ def main() -> None:
         "val_samples": len(val_ds),
         "train_steps_per_epoch": len(train_loader),
         "val_steps_per_epoch": len(val_loader),
+        "test_samples": len(test_ds) if test_ds is not None else 0,
+        "test_steps": len(test_loader) if test_loader is not None else 0,
         "batch_size": cfg["data"]["batch_size"],
         "mask_pattern": mask_pattern,
         "mask_rate_config": mask_rate,
@@ -276,13 +282,20 @@ def main() -> None:
 
     best_mae = float("inf")
     best_epoch = 0
-    last_improved_epoch = 0
+    val_epoch = int(cfg["train"].get("val_epoch", 1))
+    if val_epoch < 1:
+        raise ValueError("train.val_epoch must be at least 1")
     early_cfg = cfg["train"].get("early_stopping", {})
     early_mode = early_cfg.get("mode", "min")
     early_best = float("inf") if early_mode == "min" else -float("inf")
     history: dict[str, list[float]] = {"train_loss": [], "val_loss": [], "train_mae": [], "val_mae": []}
     epoch_perfs: list[dict[str, float]] = []
     completed_epochs = 0
+    validation_count = 0
+    validations_without_improvement = 0
+    last_val_logs: dict[str, float] | None = None
+    test_logs: dict[str, float] | None = None
+    test_time = 0.0
     total_start = time.perf_counter()
     status = "finished"
     try:
@@ -297,10 +310,16 @@ def main() -> None:
             _sync_device(device)
             train_time = time.perf_counter() - train_start
 
-            val_start = time.perf_counter()
-            val_logs = evaluate(model, val_loader, device, cfg, desc=f"val epoch {epoch}", epoch=epoch)
-            _sync_device(device)
-            val_time = time.perf_counter() - val_start
+            should_validate = epoch % val_epoch == 0 or epoch == cfg["train"]["epochs"]
+            val_logs = None
+            val_time = 0.0
+            if should_validate:
+                val_start = time.perf_counter()
+                val_logs = evaluate(model, val_loader, device, cfg, desc=f"val epoch {epoch}", epoch=epoch)
+                _sync_device(device)
+                val_time = time.perf_counter() - val_start
+                validation_count += 1
+                last_val_logs = val_logs
 
             epoch_time = time.perf_counter() - epoch_start
             current_lr = optimizer.param_groups[0]["lr"]
@@ -315,11 +334,12 @@ def main() -> None:
                 "val_samples_per_sec": len(val_ds) / val_time if val_time > 0 else 0.0,
                 "peak_memory_gb": _peak_memory_gb(device),
             }
-            is_best = val_logs["mae"] < best_mae
+            is_best = val_logs is not None and val_logs["mae"] < best_mae
             if args.quiet:
                 print(f"[E {epoch:3d}/{cfg['train']['epochs']}] "
-                      f"loss={train_logs['loss']:7.2f} mae={val_logs['mae']:7.2f} "
-                      f"rmse={val_logs['rmse']:7.2f} lr={current_lr:.2e} "
+                      f"loss={train_logs['loss']:7.2f} "
+                      f"val_mae={val_logs['mae'] if val_logs else float('nan'):7.2f} "
+                      f"lr={current_lr:.2e} "
                       f"time={epoch_time:.1f}s mem={perf['peak_memory_gb']:.2f}GB")
             else:
                 print(
@@ -334,24 +354,20 @@ def main() -> None:
             completed_epochs = epoch
             epoch_perfs.append(perf)
             history["train_loss"].append(float(train_logs["loss"]))
-            history["val_loss"].append(float(val_logs["loss"]))
             history["train_mae"].append(float(train_logs["mae"]))
-            history["val_mae"].append(float(val_logs["mae"]))
+            history["val_loss"].append(float(val_logs["loss"]) if val_logs else float("nan"))
+            history["val_mae"].append(float(val_logs["mae"]) if val_logs else float("nan"))
 
             metrics = {f"train_{key}": value for key, value in train_logs.items()}
-            metrics.update({f"val_{key}": value for key, value in val_logs.items()})
-            # checkpoint saving disabled — re-enable when needed:
-            # save_checkpoint(ckpt_dir / "last.pt", model, optimizer, epoch, metrics, cfg)
-            # if epoch % cfg["train"].get("save_every", 1) == 0:
-            #     save_checkpoint(ckpt_dir / f"epoch_{epoch}.pt", model, optimizer, epoch, metrics, cfg)
+            if val_logs is not None:
+                metrics.update({f"val_{key}": value for key, value in val_logs.items()})
             if is_best:
                 best_mae = val_logs["mae"]
                 best_epoch = epoch
-                last_improved_epoch = epoch
-                # save_checkpoint(ckpt_dir / "best.pt", model, optimizer, epoch, metrics, cfg)
+                save_checkpoint(ckpt_dir / "best.pt", model, optimizer, epoch, metrics, cfg)
                 logger.log_best(epoch, best_mae)
 
-            if early_cfg.get("enabled", False):
+            if val_logs is not None and early_cfg.get("enabled", False):
                 monitor = early_cfg.get("monitor", "val_mae")
                 patience = int(early_cfg.get("patience", 20))
                 metric_key = monitor[4:] if monitor.startswith("val_") else monitor
@@ -359,10 +375,26 @@ def main() -> None:
                 improved = current < early_best if early_mode == "min" else current > early_best
                 if improved:
                     early_best = current
-                    last_improved_epoch = epoch
-                elif epoch - last_improved_epoch >= patience:
+                    validations_without_improvement = 0
+                else:
+                    validations_without_improvement += 1
+                if validations_without_improvement >= patience:
                     print(f"[info] early stopping at epoch {epoch} ({monitor}={current:.6f})")
                     break
+        best_path = ckpt_dir / "best.pt"
+        if not best_path.is_file():
+            raise RuntimeError("Training completed without a validation checkpoint.")
+        checkpoint = load_checkpoint(best_path, model, map_location=device)
+        if test_loader is not None:
+            test_start = time.perf_counter()
+            test_logs = evaluate(model, test_loader, device, cfg, desc=f"test best epoch {best_epoch}", epoch=best_epoch)
+            _sync_device(device)
+            test_time = time.perf_counter() - test_start
+        logger.log_test(test_logs, {
+            "checkpoint": str(best_path), "best_epoch": checkpoint.get("epoch", best_epoch),
+            "best_val_mae": best_mae, "test_samples": len(test_ds) if test_ds is not None else 0,
+            "test_steps": len(test_loader) if test_loader is not None else 0, "test_time_sec": f"{test_time:.2f}",
+        })
     except KeyboardInterrupt:
         status = "interrupted"
         raise
@@ -380,6 +412,8 @@ def main() -> None:
             "completed_epochs": completed_epochs,
             "best_epoch": best_epoch or "n/a",
             "best_val_mae": f"{best_mae:.6f}" if best_epoch else "n/a",
+            "val_epoch": val_epoch,
+            "validation_count": validation_count,
             "final_train_loss": f"{history['train_loss'][-1]:.6f}" if history["train_loss"] else "n/a",
             "final_train_mae": f"{history['train_mae'][-1]:.6f}" if history["train_mae"] else "n/a",
             "final_val_loss": f"{history['val_loss'][-1]:.6f}" if history["val_loss"] else "n/a",
@@ -389,6 +423,12 @@ def main() -> None:
             "avg_train_sec_per_step": f"{avg_train_step:.4f}",
             "avg_val_sec_per_step": f"{avg_val_step:.4f}",
             "peak_memory_gb": f"{max_mem:.2f}",
+            "test_loss": f"{test_logs['loss']:.6f}" if test_logs else "n/a",
+            "test_mae": f"{test_logs['mae']:.6f}" if test_logs else "n/a",
+            "test_rmse": f"{test_logs['rmse']:.6f}" if test_logs else "n/a",
+            "test_mape": f"{test_logs['mape']:.6f}" if test_logs and "mape" in test_logs else "n/a",
+            "test_time_sec": f"{test_time:.2f}",
+            "best_checkpoint": str(ckpt_dir / "best.pt") if best_epoch else "n/a",
             "metrics_jsonl": str(log_dir / "metrics.jsonl"),
         }
         logger.log_footer(summary=summary, status=status)

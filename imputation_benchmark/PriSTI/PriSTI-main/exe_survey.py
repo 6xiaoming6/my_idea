@@ -68,6 +68,9 @@ def main(args):
             train_loader,
             valid_loader=valid_loader,
             foldername=foldername,
+            scaler=scaler,
+            mean_scaler=mean_scaler,
+            val_nsample=int(config["train"].get("val_nsample", 1)),
         )
     else:
         model.load_state_dict(torch.load("./save/" + args.modelfolder + "/model.pth"))

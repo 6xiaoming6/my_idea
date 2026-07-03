@@ -4,6 +4,7 @@ from torch.optim import Adam
 from tqdm import tqdm
 import pickle
 import logging
+import os
 import time
 import nni
 
@@ -13,6 +14,9 @@ def train(
     train_loader,
     valid_loader=None,
     foldername="",
+    scaler=1,
+    mean_scaler=0,
+    val_nsample=1,
 ):
     use_nni = False
     if 'nni' in config.keys():
@@ -53,7 +57,8 @@ def train(
             logging.info("avg_epoch_loss:" + str(avg_loss / batch_no) + ", epoch:" + str(epoch_no))
             if is_lr_decay:
                 lr_scheduler.step()
-        if valid_loader is not None and (epoch_no + 1) % valid_epoch_interval == 0 and (epoch_no + 1) > config["epochs"] * 0.5:
+        if valid_loader is not None and ((epoch_no + 1) % valid_epoch_interval == 0 or
+                                         epoch_no == config["epochs"] - 1):
             model.eval()
             avg_loss_valid = 0
             with torch.no_grad():
@@ -69,21 +74,30 @@ def train(
                             refresh=False,
                         )
                     logging.info("valid_avg_epoch_loss"+str(avg_loss_valid / batch_no)+", epoch:"+str(epoch_no))
-            if best_valid_loss > avg_loss_valid:
-                best_valid_loss = avg_loss_valid
+            print(f"Validation Epoch {epoch_no + 1}: average Loss: {avg_loss_valid / batch_no}", flush=True)
+            val_mae, val_rmse, val_mape, _ = evaluate(
+                model, valid_loader, nsample=val_nsample, scaler=scaler,
+                mean_scaler=mean_scaler, foldername="", save_outputs=False,
+            )
+            print("Validation Metrics Epoch {}: MAE: {:.6f} RMSE: {:.6f} MAPE: {:.6f}".format(
+                epoch_no + 1, val_mae, val_rmse, val_mape), flush=True)
+            if best_valid_loss > val_mae:
+                best_valid_loss = val_mae
                 print(
-                    "\n best loss is updated to ",
-                    avg_loss_valid / batch_no,
+                    "\n best validation MAE is updated to ",
+                    val_mae,
                     "at",
                     epoch_no,
                 )
-                logging.info("best loss is updated to "+str(avg_loss_valid / batch_no)+" at "+str(epoch_no))
+                logging.info("best validation MAE is updated to "+str(val_mae)+" at "+str(epoch_no))
                 if foldername != "":
-                    torch.save(model.state_dict(), foldername + "/tmp_model"+str(epoch_no)+".pth")
+                    torch.save(model.state_dict(), output_path)
             if use_nni:
                 nni.report_intermediate_result(avg_loss_valid)
-    if foldername != "":
+    if foldername != "" and not os.path.exists(output_path):
         torch.save(model.state_dict(), output_path)
+    if foldername != "" and os.path.exists(output_path):
+        model.load_state_dict(torch.load(output_path, map_location=next(model.parameters()).device))
     if use_nni:
         nni.report_final_result(best_valid_loss)
 
@@ -114,7 +128,8 @@ def calc_quantile_CRPS(target, forecast, eval_points, mean_scaler, scaler):
     return CRPS.item() / len(quantiles)
 
 
-def evaluate(model, test_loader, nsample=100, scaler=1, mean_scaler=0, foldername=""):
+def evaluate(model, test_loader, nsample=100, scaler=1, mean_scaler=0, foldername="",
+             save_outputs=True):
     with torch.no_grad():
         model.eval()
         mse_total = 0
@@ -138,11 +153,12 @@ def evaluate(model, test_loader, nsample=100, scaler=1, mean_scaler=0, foldernam
                 observed_points = observed_points.permute(0, 2, 1)
 
                 samples_median = samples.median(dim=1)
-                all_target.append(c_target)
-                all_evalpoint.append(eval_points)
-                all_observed_point.append(observed_points)
-                all_observed_time.append(observed_time)
-                all_generated_samples.append(samples)
+                if save_outputs:
+                    all_target.append(c_target)
+                    all_evalpoint.append(eval_points)
+                    all_observed_point.append(observed_points)
+                    all_observed_time.append(observed_time)
+                    all_generated_samples.append(samples)
 
                 mse_current = (
                     ((samples_median.values - c_target) * eval_points) ** 2
@@ -173,44 +189,45 @@ def evaluate(model, test_loader, nsample=100, scaler=1, mean_scaler=0, foldernam
                 logging.info("mape_total={}".format(mape_total / evalpoints_total))
                 logging.info("batch_no={}".format(batch_no))
 
-            with open(
-                foldername + "/generated_outputs_nsample" + str(nsample) + ".pk", "wb"
-            ) as f:
-                all_target = torch.cat(all_target, dim=0)
-                all_evalpoint = torch.cat(all_evalpoint, dim=0)
-                all_observed_point = torch.cat(all_observed_point, dim=0)
-                all_observed_time = torch.cat(all_observed_time, dim=0)
-                all_generated_samples = torch.cat(all_generated_samples, dim=0)
+            if save_outputs:
+                with open(
+                    foldername + "/generated_outputs_nsample" + str(nsample) + ".pk", "wb"
+                ) as f:
+                    all_target = torch.cat(all_target, dim=0)
+                    all_evalpoint = torch.cat(all_evalpoint, dim=0)
+                    all_observed_point = torch.cat(all_observed_point, dim=0)
+                    all_observed_time = torch.cat(all_observed_time, dim=0)
+                    all_generated_samples = torch.cat(all_generated_samples, dim=0)
 
-                pickle.dump(
-                    [
-                        all_generated_samples,
-                        all_target,
-                        all_evalpoint,
-                        all_observed_point,
-                        all_observed_time,
-                        scaler,
-                        mean_scaler,
-                    ],
-                    f,
+                    pickle.dump(
+                        [
+                            all_generated_samples,
+                            all_target,
+                            all_evalpoint,
+                            all_observed_point,
+                            all_observed_time,
+                            scaler,
+                            mean_scaler,
+                        ],
+                        f,
+                    )
+
+                CRPS = calc_quantile_CRPS(
+                    all_target, all_generated_samples, all_evalpoint, mean_scaler, scaler
                 )
 
-            CRPS = calc_quantile_CRPS(
-                all_target, all_generated_samples, all_evalpoint, mean_scaler, scaler
-            )
-
-            with open(
-                foldername + "/result_nsample" + str(nsample) + ".pk", "wb"
-            ) as f:
-                pickle.dump(
-                    [
-                        np.sqrt(mse_total / evalpoints_total),
-                        mae_total / evalpoints_total,
-                        mape_total / evalpoints_total,
-                        CRPS,
-                    ],
-                    f,
-                )
+                with open(
+                    foldername + "/result_nsample" + str(nsample) + ".pk", "wb"
+                ) as f:
+                    pickle.dump(
+                        [
+                            np.sqrt(mse_total / evalpoints_total),
+                            mae_total / evalpoints_total,
+                            mape_total / evalpoints_total,
+                            CRPS,
+                        ],
+                        f,
+                    )
                 print("RMSE:", np.sqrt(mse_total / evalpoints_total))
                 print("MAE:", mae_total / evalpoints_total)
                 print("MAPE:",mape_total / evalpoints_total)
@@ -219,6 +236,8 @@ def evaluate(model, test_loader, nsample=100, scaler=1, mean_scaler=0, foldernam
                 logging.info("MAE={}".format(mae_total / evalpoints_total))
                 logging.info("MAPE={}".format(mape_total / evalpoints_total))
                 logging.info("CRPS={}".format(CRPS))
+            else:
+                CRPS = float("nan")
     return mae_total / evalpoints_total,np.sqrt(mse_total / evalpoints_total),mape_total / evalpoints_total,CRPS
 
 def get_randmask(observed_mask, min_miss_ratio=0., max_miss_ratio=1.):

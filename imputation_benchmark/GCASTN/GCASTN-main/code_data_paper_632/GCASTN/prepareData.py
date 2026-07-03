@@ -160,7 +160,8 @@ def get_timestamp(timestamp):
 def read_and_generate_dataset_encoder_decoder(all_datapath,true_datapath,miss_datapath,
                                               num_of_weeks, num_of_days,
                                               num_of_hours, num_for_predict,
-                                              points_per_hour=12, save=False):
+                                              points_per_hour=12, save=False,
+                                              train_ratio=0.6, val_ratio=0.2):
     '''
     Parameters
     ----------
@@ -229,7 +230,7 @@ def read_and_generate_dataset_encoder_decoder(all_datapath,true_datapath,miss_da
             sample)  # sampe：[(week_sample),(day_sample),(hour_sample),target,mask,time_sample] = [(1,N,F,Tw),(1,N,F,Td),(1,N,F,Th),(1,N,Tpre),(1,1)]
 
     test_samples = []
-    data_seq = data_seq[int(len(data_seq)*0.8):]
+    data_seq = data_seq[round(len(data_seq) * (train_ratio + val_ratio)):]
     num_of_series = int (data_seq.shape[0] / 12)
     for i in range(num_of_series):
         test_idx = (i) * 12
@@ -262,11 +263,11 @@ def read_and_generate_dataset_encoder_decoder(all_datapath,true_datapath,miss_da
         test_samples.append(sample)
 
 
-    split_line1 = int(len(all_samples) * 0.6)
-    split_line2 = int(len(all_samples) * 0.8)
+    split_line1 = round(len(all_samples) * train_ratio)
+    split_line2 = round(len(all_samples) * (train_ratio + val_ratio))
 
     training_set = [np.concatenate(i, axis=0)
-                    for i in zip(*all_samples[:split_line2])]  # [(B,N,F,Tw),(B,N,F,Td),(B,N,F,Th),(B,N,Tpre),(B,1)]
+                    for i in zip(*all_samples[:split_line1])]  # [(B,N,F,Tw),(B,N,F,Td),(B,N,F,Th),(B,N,Tpre),(B,1)]
     validation_set = [np.concatenate(i, axis=0)
                       for i in zip(*all_samples[split_line1:split_line2:])]
     testing_set = [np.concatenate(i, axis=0)

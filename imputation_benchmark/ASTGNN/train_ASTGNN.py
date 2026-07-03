@@ -46,6 +46,7 @@ learning_rate = float(training_config['learning_rate'])
 start_epoch = int(training_config['start_epoch']) 
 epochs = int(training_config['epochs'])
 fine_tune_epochs = int(training_config['fine_tune_epochs'])
+val_epoch = int(training_config.get('val_epoch', 1))
 print('total training epoch, fine tune epoch:', epochs, ',' , fine_tune_epochs, flush=True)
 batch_size = int(training_config['batch_size'])
 print('batch_size:', batch_size, flush=True)
@@ -160,16 +161,7 @@ def train_main():
 
     for epoch in range(start_epoch, epochs):
 
-        params_filename = os.path.join(params_path, 'epoch_%s.params' % epoch)
-
-        # apply model on the validation data set
-        val_loss = compute_val_loss(net, val_loader, criterion, sw, epoch)
-
-        if val_loss < best_val_loss:
-            best_val_loss = val_loss
-            best_epoch = epoch
-            torch.save(net.state_dict(), params_filename)
-            print('save parameters to file: %s' % params_filename, flush=True)
+        params_filename = os.path.join(params_path, 'best_model.params')
 
         net.train()  # ensure dropout layers are in train mode
 
@@ -205,18 +197,23 @@ def train_main():
         print('epoch: %s, train time every whole data:%.2fs' % (epoch, time() - train_start_time), flush=True)
         print('epoch: %s, total time:%.2fs' % (epoch, time() - start_time), flush=True)
 
+        if (epoch + 1) % val_epoch == 0 or epoch == epochs - 1:
+            val_loss = compute_val_loss(net, val_loader, criterion, sw, epoch, _mean, _std)
+            print(f"Validation Epoch {epoch + 1}: average Loss: {float(val_loss)}", flush=True)
+            if val_loss < best_val_loss:
+                best_val_loss = val_loss
+                best_epoch = epoch
+                torch.save(net.state_dict(), params_filename)
+                print('save parameters to file: %s' % params_filename, flush=True)
+
     print('best epoch:', best_epoch, flush=True)
-
-    print('apply the best val model on the test data set ...', flush=True)
-
-    predict_main(best_epoch, test_loader, test_target_tensor, _std, _mean, 'test')
 
     # fine tune the model
     optimizer = optim.Adam(net.parameters(), lr=learning_rate*0.1)
     print('fine tune the model ... ', flush=True)
     for epoch in range(epochs, epochs+fine_tune_epochs):
 
-        params_filename = os.path.join(params_path, 'epoch_%s.params' % epoch)
+        params_filename = os.path.join(params_path, 'best_model.params')
 
         net.train()  # ensure dropout layers are in train mode
 
@@ -262,8 +259,11 @@ def train_main():
         print('epoch: %s, train time every whole data:%.2fs' % (epoch, time() - train_start_time), flush=True)
         print('epoch: %s, total time:%.2fs' % (epoch, time() - start_time), flush=True)
 
-        # apply model on the validation data set
-        val_loss = compute_val_loss(net, val_loader, criterion, sw, epoch)
+        should_validate = (epoch + 1) % val_epoch == 0 or epoch == epochs + fine_tune_epochs - 1
+        if not should_validate:
+            continue
+        val_loss = compute_val_loss(net, val_loader, criterion, sw, epoch, _mean, _std)
+        print(f"Validation Epoch {epoch + 1}: average Loss: {float(val_loss)}", flush=True)
 
         if use_nni:
             nni.report_intermediate_result(val_loss.item())
@@ -296,7 +296,7 @@ def predict_main(epoch, data_loader, data_target_tensor, _std, _mean, type):
     :return:
     '''
 
-    params_filename = os.path.join(params_path, 'epoch_%s.params' % epoch)
+    params_filename = os.path.join(params_path, 'best_model.params')
 
     print('load weight from:', params_filename, flush=True)
 
@@ -310,10 +310,6 @@ if __name__ == "__main__":
     train_main()
 
     # predict_main(0, test_loader, test_target_tensor, _std, _mean, 'test')
-
-
-
-
 
 
 

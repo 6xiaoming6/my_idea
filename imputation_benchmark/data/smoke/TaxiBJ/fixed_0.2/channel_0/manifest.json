@@ -1,9 +1,9 @@
 {
   "dataset": "TaxiBJ",
   "source_npz": {
-    "train": "data/TaxiBJ/taxibj_train.npz",
-    "val": "data/TaxiBJ/taxibj_val.npz",
-    "test": "data/TaxiBJ/taxibj_test.npz"
+    "train": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/taxibj_train.npz",
+    "val": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/taxibj_val.npz",
+    "test": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/taxibj_test.npz"
   },
   "source_window_shape": [
     2,

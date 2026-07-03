@@ -8,6 +8,7 @@ Run from the project root before executing the generated commands.
 from __future__ import annotations
 
 import configparser
+import os
 from pathlib import Path
 import yaml
 
@@ -51,16 +52,24 @@ def main() -> None:
     commands: list[str] = []
     for dataset, (h, w, channels, length) in DATASETS.items():
         nodes = h * w
+        # IGNNK's no/nm values select observed/masked nodes rather than define
+        # network layers.  Preserve the template's 247:60 sampling ratio while
+        # keeping the sample within each grid's actual node population.
+        ignnk_nm = max(1, round(nodes * 60 / 307))
+        ignnk_no = nodes - ignnk_nm
         # Graph/legacy models are validated per channel.  The data adapter
         # creates channel_0; channel_1 is generated separately for flow data.
         specs = [
-            ("AGCRN", ROOT / "AGCRN", "configurations/PEMS04.conf", {"data": {"dataset": dataset, "data_prefix": legacy_path(ROOT / "AGCRN", dataset), "type": "fixed", "miss_rate": RATE, "num_nodes": nodes, "seq_len": length}, "train": {"epochs": "1"}}),
-            ("IGNNK", ROOT / "IGNNK", "configurations/PEMS04.conf", {"file": {"data_prefix": legacy_path(ROOT / "IGNNK", dataset), "distance_df_filename": legacy_path(ROOT / "IGNNK", dataset) + "/grid_edges.csv", "save_prefix": "./smoke_experiments"}, "train": {"type": "fixed", "miss_rate": RATE, "num_of_vertices": nodes, "time_dim": length, "max_iter": "1"}}),
-            ("mTAN", ROOT / "mTAN", "configurations/PEMS04_SC-TC_0.5.conf", {"Data": {"data_prefix": legacy_path(ROOT / "mTAN", dataset), "type": "fixed", "miss_rate": RATE, "sample_len": length, "save_prefix": "./smoke_experiments"}, "Training": {"epochs": "1", "batch_size": "1"}}),
-            ("GAIN", ROOT / "GAIN", "configurations/PEMS04.conf", {"file": {"data_prefix": legacy_path(ROOT / "GAIN", dataset), "save_prefix": "./smoke_experiments"}, "train": {"use_nni": "0", "type": "fixed", "miss_rate": RATE, "epoch": "1", "batch_size": "1"}}),
+            ("AGCRN", ROOT / "AGCRN", "configurations/PEMS04.conf", {"data": {"dataset": dataset, "data_prefix": legacy_path(ROOT / "AGCRN", dataset), "type": "fixed", "miss_rate": RATE, "num_nodes": nodes, "seq_len": length}, "train": {"epochs": "1", "batch_size": "1"}}),
+            ("IGNNK", ROOT / "IGNNK", "configurations/PEMS04.conf", {"file": {"data_prefix": legacy_path(ROOT / "IGNNK", dataset), "distance_df_filename": legacy_path(ROOT / "IGNNK", dataset) + "/grid_edges.csv", "save_prefix": "./smoke_experiments"}, "train": {"use_nni": "0", "type": "fixed", "miss_rate": RATE, "num_of_vertices": nodes, "no": ignnk_no, "nm": ignnk_nm, "time_dim": length, "max_iter": "1", "batch_size": "1"}}),
+            ("mTAN", ROOT / "mTAN", "configurations/PEMS04_SC-TC_0.5.conf", {"Data": {"data_prefix": legacy_path(ROOT / "mTAN", dataset), "type": "fixed", "miss_rate": RATE, "sample_len": length, "save_prefix": "./smoke_experiments"}, "Training": {"use_nni": "0", "epochs": "1", "batch_size": "1"}}),
+            ("GAIN", ROOT / "GAIN", "configurations/PEMS04.conf", {"file": {"data_prefix": legacy_path(ROOT / "GAIN", dataset), "save_prefix": "./smoke_experiments"}, "train": {"use_nni": "0", "type": "fixed", "miss_rate": RATE, "epoch": "1", "batch_size": "1", "framewise": "1"}}),
             ("E2GAN", ROOT / "E2GAN", "configurations/PEMS04.conf", {"file": {"data_prefix": legacy_path(ROOT / "E2GAN", dataset), "save_prefix": "./smoke_experiments"}, "train": {"use_nni": "0", "type": "fixed", "miss_rate": RATE, "epoch": "1", "pretrain_epoch": "1", "batch_size": "1"}}),
             ("ASTGNN", ROOT / "ASTGNN", "configurations/PEMS04_SR-TC_70.conf", {"Data": {"adj_filename": legacy_path(ROOT / "ASTGNN", dataset) + "/grid_edges.csv", "graph_signal_matrix_filename": legacy_path(ROOT / "ASTGNN", dataset), "miss_type": "fixed", "miss_rate": RATE, "num_of_vertices": nodes, "points_per_hour": length, "num_for_predict": length, "len_input": length, "dataset_name": dataset}, "Training": {"epochs": "1", "fine_tune_epochs": "0", "batch_size": "1"}}),
-            ("SSTBAN", ROOT / "SSTBAN" / "SSTBAN-imputation", "configurations/PEMS04.conf", {"Data": {"dataset_name": dataset, "data_prefix": legacy_path(ROOT / "SSTBAN" / "SSTBAN-imputation", dataset), "miss_type": "fixed", "miss_rate": RATE, "num_of_vertices": nodes, "sample_len": length}, "Time": {"start": DATASET_TIME[dataset][0], "freq": DATASET_TIME[dataset][1]}, "Training": {"epochs": "1", "batch_size": "1"}}),
+            # SSTBAN's bundled temporal block is parameterized for 12 steps.
+            # The legacy stream adapter can form 12-step windows for CHAP too,
+            # so retain that original model setting instead of changing layers.
+            ("SSTBAN", ROOT / "SSTBAN" / "SSTBAN-imputation", "configurations/PEMS04.conf", {"Data": {"dataset_name": dataset, "data_prefix": legacy_path(ROOT / "SSTBAN" / "SSTBAN-imputation", dataset), "miss_type": "fixed", "miss_rate": RATE, "num_of_vertices": nodes, "sample_len": 12}, "Time": {"start": DATASET_TIME[dataset][0], "freq": DATASET_TIME[dataset][1]}, "Training": {"epochs": "1", "batch_size": "1"}}),
         ]
         for name, model_dir, template_rel, updates in specs:
             output = OUT / dataset / f"{name}_fixed_{RATE}_smoke.conf"
@@ -104,13 +113,28 @@ def main() -> None:
         pristi_dir = ROOT / "PriSTI" / "PriSTI-main"
         pristi = yaml.safe_load((pristi_dir / "config/pems04.yaml").read_text())
         pristi["file"].update({"data_prefix": legacy_path(pristi_dir, dataset), "dataset": dataset.lower(), "miss_type": "fixed", "miss_rate": float(RATE)})
-        pristi["train"].update({"epochs": 1, "batch_size": 1, "nni": False})
+        pristi["diffusion"].update({"adj_file": legacy_path(pristi_dir, dataset) + "/grid_edges.csv", "node_num": nodes})
+        pristi["train"].update({"epochs": 1, "batch_size": 1, "nni": False,
+                                "valid_epoch_interval": 1, "val_epoch": 1,
+                                "val_nsample": 1})
         output = OUT / dataset / f"PriSTI_fixed_{RATE}_smoke.yaml"; output.write_text(yaml.safe_dump(pristi, sort_keys=False))
         commands.append(f"# PriSTI\ncd PriSTI/PriSTI-main && python exe_survey.py --config {OUT.relative_to(ROOT) / f'PriSTI_fixed_{RATE}_smoke.yaml'} --targetstrategy random")
         imp_dir = ROOT / "imputeformer"
         imp = yaml.safe_load((imp_dir / "configurations/PEMS04.yaml").read_text())
         imp.update({"epochs": 1, "patience": 1})
         output = OUT / dataset / f"ImputeFormer_fixed_{RATE}_smoke.yaml"; output.write_text(yaml.safe_dump(imp, sort_keys=False))
+        # ImputeFormer loads model config from ./configurations/{dataset}.yaml
+        # and constructs data paths as {data_prefix}/{dataset}/true_data_*.npz.
+        # Create symlinks so the model finds our generated config and smoke data
+        # without any model-code changes.
+        cfg_link = imp_dir / "configurations" / f"{dataset}.yaml"
+        cfg_link.unlink(missing_ok=True)
+        cfg_link.symlink_to(os.path.relpath(output, cfg_link.parent))
+        data_dir = ROOT / "data" / "smoke" / dataset / f"fixed_{RATE}" / "channel_0"
+        data_dir.mkdir(parents=True, exist_ok=True)
+        data_link = data_dir / dataset
+        if not data_link.exists():
+            data_link.symlink_to(".")
         commands.append(f"# ImputeFormer\ncd imputeformer && python main.py --data_prefix {legacy_path(imp_dir, dataset)} --dataset {dataset} --miss_type fixed --miss_rate {RATE} --sample_len {length} --batch_size 1 --epochs 1")
         # LATC has no network architecture; use one iteration only for smoke.
         latc = OUT / dataset / f"LATC_fixed_{RATE}_smoke.conf"

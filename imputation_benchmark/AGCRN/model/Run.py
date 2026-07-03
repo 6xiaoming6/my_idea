@@ -83,6 +83,7 @@ args.add_argument('--lr_decay_rate', default=config['train']['lr_decay_rate'], t
 args.add_argument('--lr_decay_step', default=config['train']['lr_decay_step'], type=str)
 args.add_argument('--early_stop', default=config['train']['early_stop'], type=eval)
 args.add_argument('--early_stop_patience', default=config['train']['early_stop_patience'], type=int)
+args.add_argument('--val_epoch', default=config['train'].get('val_epoch', 1), type=int)
 args.add_argument('--grad_norm', default=config['train']['grad_norm'], type=eval)
 args.add_argument('--max_grad_norm', default=config['train']['max_grad_norm'], type=int)
 args.add_argument('--teacher_forcing', default=False, type=bool)
@@ -150,7 +151,8 @@ if args.lr_decay:
 #config log path
 current_time = datetime.now().strftime('%Y%m%d%H%M%S')
 current_dir = os.path.dirname(os.path.realpath(__file__))
-log_dir = os.path.join(current_dir,'experiments', args.dataset, current_time)
+protocol = f"{args.type}_{args.miss_rate:g}"
+log_dir = os.path.join(current_dir, 'experiments', args.dataset, protocol, current_time)
 args.log_dir = log_dir
 
 #start training

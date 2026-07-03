@@ -1,9 +1,9 @@
 {
   "dataset": "CHAP",
   "source_npz": {
-    "train": "data/CHAP/beijing/chap_beijing_train.npz",
-    "val": "data/CHAP/beijing/chap_beijing_val.npz",
-    "test": "data/CHAP/beijing/chap_beijing_test.npz"
+    "train": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/CHAP/beijing/chap_beijing_train.npz",
+    "val": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/CHAP/beijing/chap_beijing_val.npz",
+    "test": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/CHAP/beijing/chap_beijing_test.npz"
   },
   "source_window_shape": [
     1,

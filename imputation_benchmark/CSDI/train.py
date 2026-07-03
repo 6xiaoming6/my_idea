@@ -1,6 +1,7 @@
 import argparse
 import torch
 import os
+from pathlib import Path
 import configparser
 from dataset_traffic import get_dataloader
 from main_model import CSDI_Traffic
@@ -61,12 +62,20 @@ train_loader, valid_loader, test_loader,target_dim,_std,_mean = get_dataloader(
 model = CSDI_Traffic(config,target_dim).cuda()
 
 if args.modelpath == "":
+    checkpoint = Path("experiments") / Path(args.config).stem / "best_model.pth"
+    checkpoint.parent.mkdir(parents=True, exist_ok=True)
     train(
         model,
         config["train"],
         train_loader,
-        valid_loader=valid_loader
+        valid_loader=valid_loader,
+        valid_epoch_interval=int(config["train"].get("val_epoch", 5)),
+        checkpoint_path=checkpoint,
+        metric_scaler=_std,
+        metric_mean=_mean,
+        val_nsample=int(config["diffusion"].get("val_nsample", 1)),
     )
+    print(f"Saving best model to {checkpoint}", flush=True)
 else:
     model.load_state_dict(torch.load(args.modelpath))
 

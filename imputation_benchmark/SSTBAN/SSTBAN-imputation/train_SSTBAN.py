@@ -83,6 +83,7 @@ batch_size = int(training_config['batch_size'])
 num_his = int(data_config['sample_len'])
 num_pred = int(data_config['sample_len'])
 patience = int(training_config['patience'])
+val_epoch = int(training_config.get('val_epoch', 1))
 in_channels = int(training_config['in_channels'])
 
 # load dataset
@@ -165,7 +166,7 @@ if use_nni:
 exp_datadir="experiments/SSTBAN/"
 if not os.path.exists(exp_datadir):
     os.makedirs(exp_datadir)
-params_filename = os.path.join(exp_datadir, f"{dataset_name}_{K}_{L}_{d}_{miss_type}_{miss_rate}_best_params")
+params_filename = os.path.join(exp_datadir, f"{dataset_name}_{K}_{L}_{d}_{miss_type}_{miss_rate}_best_params.pth")
 train_time_epochs = []
 val_time_epochs=[]
 total_start_time = time.time()
@@ -218,8 +219,18 @@ for epoch_num in range(0, max_epoch):
     train_loss /= num_train
     end_train = time.time()
 
+    should_validate = (epoch_num + 1) % val_epoch == 0 or epoch_num == max_epoch - 1
+    if not should_validate:
+        train_time_epochs.append(end_train - start_train)
+        val_time_epochs.append(0.0)
+        print(f'epoch: {epoch_num + 1}/{max_epoch}, training time: {end_train - start_train:.1f}s, validation skipped')
+        scheduler.step()
+        continue
+
     print("evaluating on valid set now!")
     val_loss = 0
+    val_abs_sum = val_sq_sum = val_ape_sum = 0.0
+    val_point_count = val_ape_count = 0
     start_val = time.time()
     model.eval()
     with torch.no_grad():
@@ -240,6 +251,16 @@ for epoch_num in range(0, max_epoch):
             
             loss_batch = loss_criterion(pred*eval_point, label*eval_point)
             val_loss += loss_batch * (end_idx - start_idx)
+            selected_pred = pred[eval_point.bool()]
+            selected_true = label[eval_point.bool()]
+            diff = selected_pred - selected_true
+            val_abs_sum += torch.abs(diff).sum().item()
+            val_sq_sum += torch.square(diff).sum().item()
+            val_point_count += diff.numel()
+            nonzero = torch.abs(selected_true) > 1e-4
+            if nonzero.any():
+                val_ape_sum += torch.abs(diff[nonzero] / selected_true[nonzero]).sum().item()
+                val_ape_count += nonzero.sum().item()
             del X, TE, label, pred, loss_batch
     val_loss /= num_val
     end_val = time.time()
@@ -253,16 +274,18 @@ for epoch_num in range(0, max_epoch):
         (datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), epoch_num + 1,
          max_epoch, end_train - start_train, end_val - start_val))
     print(f'train loss: {train_loss:.4f}, val_loss: {val_loss:.4f}')
+    print('Validation Metrics Epoch {}: MAE: {:.6f} RMSE: {:.6f} MAPE: {:.6f}'.format(
+        epoch_num + 1, val_abs_sum / max(1, val_point_count),
+        np.sqrt(val_sq_sum / max(1, val_point_count)), val_ape_sum / max(1, val_ape_count)))
     if val_loss <= val_loss_min:
         wait = 0
         val_loss_min = val_loss
         best_model = deepcopy(model.state_dict())
         best_epoch = epoch_num
+        torch.save(best_model, params_filename)
     else:
         wait += 1
     scheduler.step()
-params_filename=params_filename+"_"+str(val_loss_min.cpu().numpy())
-torch.save(best_model, params_filename)
 print(f"saving model to {params_filename}")
 
 

@@ -40,6 +40,8 @@ graph_signal_matrix_filename = data_config['graph_signal_matrix_filename']
 miss_type = data_config['miss_type']
 miss_rate = float(data_config['miss_rate'])
 data_prefix = graph_signal_matrix_filename
+train_ratio = float(data_config.get('train_ratio', 0.6))
+val_ratio = float(data_config.get('val_ratio', 0.2))
 
 true_datapath = os.path.join(data_prefix,f"true_data_{miss_type}_{miss_rate}_v2.npz")
 miss_datapath = os.path.join(data_prefix,f"miss_data_{miss_type}_{miss_rate}_v2.npz")
@@ -58,6 +60,7 @@ learning_rate = float(training_config['learning_rate'])
 start_epoch = int(training_config['start_epoch']) 
 epochs = int(training_config['epochs'])
 fine_tune_epochs = int(training_config['fine_tune_epochs'])
+val_epoch = int(training_config.get('val_epoch', 1))
 print('total training epoch, fine tune epoch:', epochs, ',' , fine_tune_epochs, flush=True)
 batch_size = int(training_config['batch_size'])
 print('batch_size:', batch_size, flush=True)
@@ -86,7 +89,11 @@ if os.path.exists(all_datapath):
     print(f'read data from {all_datapath}')
     all_data = np.load(all_datapath)
 else:
-    all_data = read_and_generate_dataset_encoder_decoder(all_datapath,true_datapath,miss_datapath, num_of_weeks, num_of_days, num_of_hours, num_for_predict, points_per_hour=points_per_hour, save=True)
+    all_data = read_and_generate_dataset_encoder_decoder(
+        all_datapath, true_datapath, miss_datapath, num_of_weeks,
+        num_of_days, num_of_hours, num_for_predict,
+        points_per_hour=points_per_hour, save=True,
+        train_ratio=train_ratio, val_ratio=val_ratio)
 
 # The generator returns a nested dictionary on a first run, whereas a cached
 # NPZ exposes flat keys.  Normalise both representations at the data boundary
@@ -191,19 +198,7 @@ def train_main():
 
     for epoch in range(start_epoch, epochs):
 
-        params_filename = os.path.join(params_path, 'epoch_%s.params' % epoch)
-
-        # apply model on the validation data set
-
-
-        val_loss = compute_val_loss(net, val_loader, criterion, sw, epoch,DEVICE)
-
-        if val_loss < best_val_loss:
-            best_val_loss = val_loss
-            best_epoch = epoch
-            torch.save(net.state_dict(), params_filename)
-            print('save parameters to file: %s' % params_filename, flush=True)
-
+        params_filename = os.path.join(params_path, 'best_model.params')
 
         net.train()  # ensure dropout layers are in train mode
 
@@ -248,6 +243,15 @@ def train_main():
         print('epoch: %s, train time every whole data:%.2fs' % (epoch, time() - train_start_time), flush=True)
         print('epoch: %s, total time:%.2fs' % (epoch, time() - start_time), flush=True)
 
+        if (epoch + 1) % val_epoch == 0 or epoch == epochs - 1:
+            val_loss = compute_val_loss(net, val_loader, criterion, sw, epoch,DEVICE,_max,_min)
+            print(f"Validation Epoch {epoch + 1}: average Loss: {float(val_loss)}", flush=True)
+            if val_loss < best_val_loss:
+                best_val_loss = val_loss
+                best_epoch = epoch
+                torch.save(net.state_dict(), params_filename)
+                print('save parameters to file: %s' % params_filename, flush=True)
+
     #print('best epoch:', best_epoch, flush=True)
 
 
@@ -260,7 +264,7 @@ def train_main():
     print('fine tune the model ... ', flush=True)
     for epoch in range(epochs, epochs+fine_tune_epochs):
 
-        params_filename = os.path.join(params_path, 'epoch_%s.params' % epoch)
+        params_filename = os.path.join(params_path, 'best_model.params')
 
         net.train()  # ensure dropout layers are in train mode
 
@@ -320,8 +324,11 @@ def train_main():
         print('epoch: %s, train time every whole data:%.2fs' % (epoch, time() - train_start_time), flush=True)
         print('epoch: %s, total time:%.2fs' % (epoch, time() - start_time), flush=True)
 
-        # apply model on the validation data set
-        val_loss = compute_val_loss(net, val_loader, criterion, sw, epoch,DEVICE)
+        should_validate = (epoch + 1) % val_epoch == 0 or epoch == epochs + fine_tune_epochs - 1
+        if not should_validate:
+            continue
+        val_loss = compute_val_loss(net, val_loader, criterion, sw, epoch,DEVICE,_max,_min)
+        print(f"Validation Epoch {epoch + 1}: average Loss: {float(val_loss)}", flush=True)
 
         if val_loss < best_val_loss:
             best_val_loss = val_loss
@@ -349,7 +356,7 @@ def predict_main(epoch, data_loader, data_target_tensor,data_mask_tensor, _max, 
     :return:
     '''
 
-    params_filename = os.path.join(params_path, 'epoch_%s.params' % epoch)
+    params_filename = os.path.join(params_path, 'best_model.params')
 
     print('load weight from:', params_filename, flush=True)
 
@@ -362,11 +369,6 @@ if __name__ == "__main__":
 
     train_main()
     #predict_main(52, test_loader, test_target_tensor,test_mask_tensor, _max, _min, 'test')
-
-
-
-
-
 
 
 

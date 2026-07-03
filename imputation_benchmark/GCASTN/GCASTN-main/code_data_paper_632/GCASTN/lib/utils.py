@@ -366,7 +366,7 @@ def mask_MAPE(y_true, y_pred, mask):
     return mape
 
 
-def compute_val_loss(net, val_loader, criterion, sw, epoch,DEVICE):
+def compute_val_loss(net, val_loader, criterion, sw, epoch,DEVICE, data_max=None, data_min=None):
     '''
     compute mean loss on validation set
     :param net: model
@@ -384,6 +384,8 @@ def compute_val_loss(net, val_loader, criterion, sw, epoch,DEVICE):
         val_loader_length = len(val_loader)  # nb of batch
 
         tmp = []  # 记录了所有batch的loss
+        abs_sum = sq_sum = ape_sum = 0.0
+        point_count = ape_count = 0
 
         start_time = time()
 
@@ -421,6 +423,20 @@ def compute_val_loss(net, val_loader, criterion, sw, epoch,DEVICE):
 
             loss,_ = criterion(predict_output, labels, mask)  # 计算误差
             tmp.append(loss.item())
+            if data_max is not None and data_min is not None:
+                max_value = float(np.asarray(data_max).reshape(-1)[0])
+                min_value = float(np.asarray(data_min).reshape(-1)[0])
+                missing = mask == 0
+                pred_raw = ((predict_output[missing] + 1.0) / 2.0) * (max_value - min_value) + min_value
+                true_raw = ((labels[missing] + 1.0) / 2.0) * (max_value - min_value) + min_value
+                diff = pred_raw - true_raw
+                abs_sum += torch.abs(diff).sum().item()
+                sq_sum += torch.square(diff).sum().item()
+                point_count += diff.numel()
+                nonzero = torch.abs(true_raw) > 1e-4
+                if nonzero.any():
+                    ape_sum += torch.abs(diff[nonzero] / true_raw[nonzero]).sum().item()
+                    ape_count += nonzero.sum().item()
             if batch_index % 100 == 0:
                 print('validation batch %s / %s, loss: %.2f' % (batch_index + 1, val_loader_length, loss.item()))
 
@@ -428,6 +444,10 @@ def compute_val_loss(net, val_loader, criterion, sw, epoch,DEVICE):
 
         validation_loss = sum(tmp) / len(tmp)
         sw.add_scalar('validation_loss', validation_loss, epoch)
+        if point_count:
+            print('Validation Metrics Epoch {}: MAE: {:.6f} RMSE: {:.6f} MAPE: {:.6f}'.format(
+                epoch + 1, abs_sum / point_count, np.sqrt(sq_sum / point_count),
+                ape_sum / max(1, ape_count)), flush=True)
 
     return validation_loss
 
@@ -658,7 +678,7 @@ def load_graphdata_normY_channel1(all_data, num_of_hours, num_of_days, num_of_we
     train_decoder_input2_tensor = torch.from_numpy(train_decoder_input2).type(torch.FloatTensor)  # .to(DEVICE)  # (B, N, T)
     train_target_tensor = torch.from_numpy(train_target_norm).type(torch.FloatTensor)#.to(DEVICE)  # (B, N, T)
     train_mask_tensor = torch.from_numpy(train_mask).type(torch.IntTensor)#.to(DEVICE)
-    train_timestamp_tensor = torch.from_numpy(train_timestamp).type(torch.FloatTensor)#.to(DEVICE)
+    train_timestamp_tensor = torch.as_tensor(train_timestamp).type(torch.FloatTensor)#.to(DEVICE)
     train_delta1_tensor = torch.from_numpy(train_delta1).type(torch.FloatTensor)
     train_delta2_tensor = torch.from_numpy(train_delta2).type(torch.FloatTensor)
 
@@ -687,7 +707,7 @@ def load_graphdata_normY_channel1(all_data, num_of_hours, num_of_days, num_of_we
     val_decoder_input_tensor = torch.from_numpy(val_decoder_input).type(torch.FloatTensor)#.to(DEVICE)  # (B, N, T)
     val_target_tensor = torch.from_numpy(val_target_norm).type(torch.FloatTensor)#.to(DEVICE)  # (B, N, T)
     val_mask_tensor = torch.from_numpy(val_mask).type(torch.IntTensor)#.to(DEVICE)
-    val_timestamp_tensor = torch.from_numpy(val_timestamp).type(torch.FloatTensor)#.to(DEVICE)
+    val_timestamp_tensor = torch.as_tensor(val_timestamp).type(torch.FloatTensor)#.to(DEVICE)
     val_delta_tensor = torch.from_numpy(val_delta).type(torch.FloatTensor)
     #val_coeffs_tensor = get_coeffs(val_timestamp_tensor, val_x_tensor, val_mask_tensor)
 
@@ -704,7 +724,7 @@ def load_graphdata_normY_channel1(all_data, num_of_hours, num_of_days, num_of_we
     test_decoder_input_tensor = torch.from_numpy(test_decoder_input).type(torch.FloatTensor)#.to(DEVICE)  # (B, N, T)
     test_target_tensor = torch.from_numpy(test_target_norm).type(torch.FloatTensor)#.to(DEVICE)  # (B, N, T)
     test_mask_tensor = torch.from_numpy(test_mask).type(torch.IntTensor)#.to(DEVICE)
-    test_timestamp_tensor = torch.from_numpy(test_timestamp).type(torch.FloatTensor)#.to(DEVICE)
+    test_timestamp_tensor = torch.as_tensor(test_timestamp).type(torch.FloatTensor)#.to(DEVICE)
     test_delta_tensor = torch.from_numpy(test_delta).type(torch.FloatTensor)
     #test_coeffs_tensor = get_coeffs(test_timestamp_tensor, test_x_tensor, test_mask_tensor)
 
@@ -718,4 +738,3 @@ def load_graphdata_normY_channel1(all_data, num_of_hours, num_of_days, num_of_we
     print('test:', test_x_tensor.size(), test_decoder_input_tensor.size(), test_target_tensor.size(),test_mask_tensor.size())
 
     return train_loader, train_target_tensor,train_mask_tensor, val_loader, val_target_tensor,val_mask_tensor, test_loader, test_target_tensor,test_mask_tensor, _max, _min
-

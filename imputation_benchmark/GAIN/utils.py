@@ -86,17 +86,17 @@ def renormalization (norm_data, norm_parameters):
     - renorm_data: renormalized original data
   '''
   
-  min_val = norm_parameters['min_val']
-  max_val = norm_parameters['max_val']
-
-  _, dim = norm_data.shape
-  renorm_data = norm_data
-    
-  for i in range(dim):
-    renorm_data[...,i] = renorm_data[...,i] * (max_val[i] + 1e-6)   
-    renorm_data[...,i] = renorm_data[...,i] + min_val[i]
-    
-  return renorm_data
+  min_val = torch.as_tensor(norm_parameters['min_val'], dtype=norm_data.dtype,
+                            device=norm_data.device)
+  max_val = torch.as_tensor(norm_parameters['max_val'], dtype=norm_data.dtype,
+                            device=norm_data.device)
+  if min_val.numel() != norm_data.shape[-1]:
+    repeats = norm_data.shape[-1] // min_val.numel()
+    if repeats * min_val.numel() != norm_data.shape[-1]:
+      raise ValueError('Normalization attributes do not match GAIN output width.')
+    min_val = min_val.repeat(repeats)
+    max_val = max_val.repeat(repeats)
+  return norm_data * (max_val + 1e-6) + min_val
 
 
 def rounding (imputed_data, data_x):

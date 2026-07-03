@@ -23,7 +23,8 @@ diffusion:
   proj_t: 64
   is_cross_t: true
   is_cross_s: true
-  adj_file: ../../data/PEMS04/PEMS04.csv
+  adj_file: ../../data/smoke/CHAP/fixed_0.2/channel_0/grid_edges.csv
+  node_num: 1024
 model:
   is_unconditional: 0
   timeemb: 128

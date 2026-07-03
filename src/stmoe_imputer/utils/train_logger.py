@@ -13,9 +13,11 @@ class TrainLogger:
         log_dir.mkdir(parents=True, exist_ok=True)
         self._train_path = log_dir / "train.log"
         self._val_path = log_dir / "val.log"
+        self._test_path = log_dir / "test.log"
         self._metrics_path = log_dir / "metrics.jsonl"
         self._train_f = self._train_path.open("w", encoding="utf-8", buffering=1)
         self._val_f = self._val_path.open("w", encoding="utf-8", buffering=1)
+        self._test_f = self._test_path.open("w", encoding="utf-8", buffering=1)
         self._metrics_f = self._metrics_path.open("w", encoding="utf-8", buffering=1)
 
     # ── header / footer ──────────────────────────────────────────────
@@ -69,7 +71,7 @@ class TrainLogger:
         self,
         epoch: int,
         train: dict[str, float],
-        val: dict[str, float],
+        val: dict[str, float] | None,
         perf: dict[str, float] | None = None,
         is_best: bool = False,
     ) -> None:
@@ -80,17 +82,19 @@ class TrainLogger:
         epoch_s = perf.get("epoch_time_sec", train_s + val_s)
         mem_gb = perf.get("peak_memory_gb", 0.0)
         best_mark = "*" if is_best else ""
+        val_mae = val["mae"] if val is not None else float("nan")
         t_line = (
             f"{epoch:>6}  {train['loss']:>11.5f}  {train['mae']:>10.4f}  {train['rmse']:>11.4f}  "
-            f"{val['mae']:>10.4f}  {lr:>10.2e}  {train_s:>8.1f}  {val_s:>7.1f}  "
+            f"{val_mae:>10.4f}  {lr:>10.2e}  {train_s:>8.1f}  {val_s:>7.1f}  "
             f"{epoch_s:>8.1f}  {mem_gb:>7.2f}  {best_mark:>5}"
         )
-        v_line = (
-            f"{epoch:>6}  {val['loss']:>11.5f}  {val['mae']:>10.4f}  {val['rmse']:>11.4f}  "
-            f"{train['mae']:>10.4f}  {epoch_s:>8.1f}  {best_mark:>5}"
-        )
         self._train_f.write(t_line + "\n")
-        self._val_f.write(v_line + "\n")
+        if val is not None:
+            v_line = (
+                f"{epoch:>6}  {val['loss']:>11.5f}  {val['mae']:>10.4f}  {val['rmse']:>11.4f}  "
+                f"{train['mae']:>10.4f}  {epoch_s:>8.1f}  {best_mark:>5}"
+            )
+            self._val_f.write(v_line + "\n")
         self._metrics_f.write(
             json.dumps(
                 {"epoch": epoch, "train": train, "val": val, "perf": perf, "is_best": is_best},
@@ -99,6 +103,24 @@ class TrainLogger:
             )
             + "\n"
         )
+
+    def log_test(self, metrics: dict[str, float] | None, extra: dict[str, Any] | None = None) -> None:
+        ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        self._test_f.write(f"Testing started: {ts}\n" + "-" * 96 + "\n")
+        if extra:
+            self._test_f.write("Run\n")
+            for key, value in extra.items():
+                self._test_f.write(f"  {key}: {value}\n")
+        self._test_f.write("-" * 96 + "\nResults\n")
+        if metrics:
+            for key, value in metrics.items():
+                text = f"{value:.6f}" if isinstance(value, float) else str(value)
+                self._test_f.write(f"  {key}: {text}\n")
+        else:
+            self._test_f.write("  status: skipped (no test dataset)\n")
+        self._metrics_f.write(json.dumps({"stage": "test", "metrics": metrics, "extra": extra},
+                                         ensure_ascii=False, sort_keys=True) + "\n")
+        self._test_f.write(f"Testing finished: {datetime.now():%Y-%m-%d %H:%M:%S}\n" + "-" * 96 + "\n")
 
     def log_best(self, epoch: int, val_mae: float) -> None:
         line = f"Best model at epoch {epoch} (val_mae={val_mae:.4f})"
@@ -110,6 +132,7 @@ class TrainLogger:
     def close(self) -> None:
         self._train_f.close()
         self._val_f.close()
+        self._test_f.close()
         self._metrics_f.close()
 
     @property

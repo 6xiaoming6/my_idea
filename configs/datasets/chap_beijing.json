@@ -81,6 +81,7 @@
   },
   "train": {
     "epochs": 100,
+    "val_epoch": 1,
     "lr_main": 0.001,
     "lr_aux": 0.001,
     "weight_decay": 0.0001,

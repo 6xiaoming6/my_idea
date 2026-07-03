@@ -41,6 +41,7 @@ learning_rate = float(config['learning_rate'])
 hid_size = int(config['hid_size'])
 batch_size = int(config['batch_size'])
 patience = int(config['patience'])
+val_epoch = int(config.get('val_epoch', 1))
 file_prefix = config["file_prefix"]
 
 f= open(os.path.join(file_prefix,f"data_meanstd_{config['type']}_{config['miss_rate']}.pkl"),"rb")
@@ -123,25 +124,26 @@ def train(model):
 
         print(f"epoch {epoch} train spend {round(end - start,2)} seconds", flush=True)
 
-        start = time.time()
-
-        val_loss = evaluate(model, val_iter)
-
-        print(f"epoch {epoch} val spend {round(time.time() - start,2)} seconds", flush=True)
-
-        # 早停机制
-        if val_loss < best_loss:
-            print(f"Validation loss decrease from {best_loss} ot {val_loss}")
-            best_loss = val_loss
-            best_model = deepcopy(model.state_dict())
-            best_epoch = epoch
-            impatience = 0
-        else:
-            impatience = impatience + 1
-            print(f"Patience: {impatience}/{patience}")
-        if impatience >= patience:
-            print('Breaking due to early stopping at epoch %d， best epoch at %d' % (epoch, best_epoch), flush=True)
-            break
+        should_validate = (epoch + 1) % val_epoch == 0 or epoch == epochs - 1
+        if should_validate:
+            start = time.time()
+            val_loss, val_mae, val_rmse, val_mape = evaluate(model, val_iter)
+            print(f"epoch {epoch} val spend {round(time.time() - start,2)} seconds", flush=True)
+            print(f"Validation Epoch {epoch + 1}: average Loss: {val_loss}", flush=True)
+            print(f"Validation Metrics Epoch {epoch + 1}: MAE: {val_mae:.6f} RMSE: {val_rmse:.6f} MAPE: {val_mape:.6f}", flush=True)
+            if val_loss < best_loss:
+                print(f"Validation loss decrease from {best_loss} ot {val_loss}")
+                best_loss = val_loss
+                best_model = deepcopy(model.state_dict())
+                best_epoch = epoch
+                torch.save(best_model, model_path)
+                impatience = 0
+            else:
+                impatience += 1
+                print(f"Patience: {impatience}/{patience}")
+            if impatience >= patience:
+                print('Breaking due to early stopping at epoch %d， best epoch at %d' % (epoch, best_epoch), flush=True)
+                break
 
 
         if args.for_test:
@@ -151,8 +153,6 @@ def train(model):
         nni.report_final_result(best_loss)
 
     end_train = time.time()
-
-    torch.save(best_model, model_path)
 
     # 加载最佳模型
     model.load_state_dict(best_model)
@@ -183,6 +183,8 @@ def evaluate(model, val_iter, val_set=True, save=False):
             print("Validation...")
 
             run_loss = 0
+            evals = []
+            imputations = []
 
             for idx, data in enumerate(val_iter):
                 if args.for_test and idx == 5:
@@ -192,8 +194,18 @@ def evaluate(model, val_iter, val_set=True, save=False):
                 ret = model.run_on_batch(data, None)
 
                 run_loss += ret['loss'].item()
-            
-            return run_loss
+                imputation = ret['imputations'].data.cpu().numpy()
+                true_data = data['forward']['true_data'].cpu().numpy()
+                mask = data['forward']['masks'].cpu().numpy()
+                evals.append(true_data[np.where(mask == 0)])
+                imputations.append(imputation[np.where(mask == 0)])
+            evals = np.concatenate(evals, axis=0)
+            imputations = np.concatenate(imputations, axis=0) * std + mean
+            mae = mean_absolute_error(evals, imputations)
+            rmse = mean_squared_error(evals, imputations) ** 0.5
+            with np.errstate(divide='ignore', invalid='ignore'):
+                mape = np.mean(np.nan_to_num(np.abs((evals - imputations) / evals), nan=0, posinf=0, neginf=0))
+            return run_loss, mae, rmse, mape
 
         else:
             print("Test...")

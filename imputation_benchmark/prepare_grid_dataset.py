@@ -24,6 +24,8 @@ from typing import Iterable
 
 import numpy as np
 
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+
 
 @dataclass(frozen=True)
 class DatasetProfile:
@@ -35,22 +37,22 @@ class DatasetProfile:
 
 PROFILES = {
     "TaxiBJ": DatasetProfile(
-        "my_idea/data/TaxiBJ/taxibj_train.npz",
-        "my_idea/data/TaxiBJ/taxibj_val.npz",
-        "my_idea/data/TaxiBJ/taxibj_test.npz",
-        "my_idea/data/TaxiBJ",
+        "data/TaxiBJ/taxibj_train.npz",
+        "data/TaxiBJ/taxibj_val.npz",
+        "data/TaxiBJ/taxibj_test.npz",
+        "data/TaxiBJ",
     ),
     "BikeNYC": DatasetProfile(
-        "my_idea/data/BikeNYC/bikenyc_train.npz",
-        "my_idea/data/BikeNYC/bikenyc_val.npz",
-        "my_idea/data/BikeNYC/bikenyc_test.npz",
-        "my_idea/data/BikeNYC",
+        "data/BikeNYC/bikenyc_train.npz",
+        "data/BikeNYC/bikenyc_val.npz",
+        "data/BikeNYC/bikenyc_test.npz",
+        "data/BikeNYC",
     ),
     "CHAP": DatasetProfile(
-        "my_idea/data/CHAP/beijing/chap_beijing_train.npz",
-        "my_idea/data/CHAP/beijing/chap_beijing_val.npz",
-        "my_idea/data/CHAP/beijing/chap_beijing_test.npz",
-        "my_idea/data/CHAP/beijing",
+        "data/CHAP/beijing/chap_beijing_train.npz",
+        "data/CHAP/beijing/chap_beijing_val.npz",
+        "data/CHAP/beijing/chap_beijing_test.npz",
+        "data/CHAP/beijing",
     ),
 }
 
@@ -188,9 +190,9 @@ def main() -> None:
         raise ValueError("--rate must be between 0 and 1.")
     profile = PROFILES[args.dataset]
     paths = {
-        "train": Path(args.train_npz or profile.train),
-        "val": Path(args.val_npz or profile.val),
-        "test": Path(args.test_npz or profile.test),
+        "train": Path(args.train_npz) if args.train_npz else PROJECT_ROOT / profile.train,
+        "val": Path(args.val_npz) if args.val_npz else PROJECT_ROOT / profile.val,
+        "test": Path(args.test_npz) if args.test_npz else PROJECT_ROOT / profile.test,
     }
     windows = {name: _load_windows(path) for name, path in paths.items()}
     if args.max_windows_per_split is not None:
@@ -228,7 +230,7 @@ def main() -> None:
 
     mask_note: str | None = None
     if args.mask in {"fixed", "random"}:
-        mask_root = Path(args.mask_root or profile.mask_root)
+        mask_root = Path(args.mask_root) if args.mask_root else PROJECT_ROOT / profile.mask_root
         cells = height * width
         csvs = [
             _load_mask_csv(
@@ -280,6 +282,19 @@ def main() -> None:
         saver(miss_path, data=(true_data * mask).astype(np.float32), mask=mask.astype(np.float32))
         saver(output / f"window_true_data_{args.mask}_{args.rate}_v2.npz", **true_payload)
         saver(output / f"window_miss_data_{args.mask}_{args.rate}_v2.npz", **miss_payload)
+        # Zero-copy filename view for loaders that understand canonical
+        # train/val/test windows.  Legacy loaders keep using the parent files.
+        split_view = output / "split"
+        split_view.mkdir(exist_ok=True)
+        split_links = {
+            true_path.name: output / f"window_true_data_{args.mask}_{args.rate}_v2.npz",
+            miss_path.name: output / f"window_miss_data_{args.mask}_{args.rate}_v2.npz",
+            "grid_edges.csv": output / "grid_edges.csv",
+        }
+        for name, target in split_links.items():
+            link = split_view / name
+            link.unlink(missing_ok=True)
+            link.symlink_to(Path("..") / target.name)
     else:
         saver(true_path, **true_payload)
         saver(miss_path, **miss_payload)
@@ -315,6 +330,7 @@ def main() -> None:
             "grid_edges": "grid_edges.csv",
             "window_true": f"window_true_data_{args.mask}_{args.rate}_v2.npz" if args.legacy_stream else None,
             "window_missing": f"window_miss_data_{args.mask}_{args.rate}_v2.npz" if args.legacy_stream else None,
+            "split_view": "split" if args.legacy_stream else None,
         },
         "note": mask_note or "The compatibility stream concatenates complete source windows; use split_* arrays to avoid cross-window samples.",
     }

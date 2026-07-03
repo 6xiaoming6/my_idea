@@ -267,7 +267,7 @@ def trans_norm_Adj(W):
     return trans_norm_Adj
 
 
-def compute_val_loss(net, val_loader, criterion, sw, epoch):
+def compute_val_loss(net, val_loader, criterion, sw, epoch, data_mean=0.0, data_std=1.0):
     '''
     compute mean loss on validation set
     :param net: model
@@ -285,6 +285,8 @@ def compute_val_loss(net, val_loader, criterion, sw, epoch):
         val_loader_length = len(val_loader)  # nb of batch
 
         tmp = []  # 记录了所有batch的loss
+        abs_sum = sq_sum = ape_sum = 0.0
+        point_count = ape_count = 0
 
         start_time = time()
 
@@ -314,6 +316,16 @@ def compute_val_loss(net, val_loader, criterion, sw, epoch):
 
             loss = criterion(predict_output[eval_points], labels[eval_points])  # 计算误差
             tmp.append(loss.item())
+            pred_raw = predict_output[eval_points] * float(data_std) + float(data_mean)
+            true_raw = labels[eval_points] * float(data_std) + float(data_mean)
+            diff = pred_raw - true_raw
+            abs_sum += torch.abs(diff).sum().item()
+            sq_sum += torch.square(diff).sum().item()
+            point_count += diff.numel()
+            nonzero = torch.abs(true_raw) > 1e-4
+            if nonzero.any():
+                ape_sum += torch.abs(diff[nonzero] / true_raw[nonzero]).sum().item()
+                ape_count += nonzero.sum().item()
             if batch_index % 100 == 0:
                 print('validation batch %s / %s, loss: %.2f' % (batch_index + 1, val_loader_length, loss.item()))
 
@@ -321,6 +333,9 @@ def compute_val_loss(net, val_loader, criterion, sw, epoch):
 
         validation_loss = sum(tmp) / len(tmp)
         sw.add_scalar('validation_loss', validation_loss, epoch)
+        print('Validation Metrics Epoch {}: MAE: {:.6f} RMSE: {:.6f} MAPE: {:.6f}'.format(
+            epoch + 1, abs_sum / max(1, point_count), np.sqrt(sq_sum / max(1, point_count)),
+            ape_sum / max(1, ape_count)), flush=True)
 
     return validation_loss
 
@@ -409,13 +424,20 @@ def predict_and_save_results(net, data_loader, data_target_tensor, epoch, _std, 
         for i in range(prediction_length):
             assert data_target_tensor.shape[0] == prediction.shape[0]
             print('current epoch: %s, predict %s points' % (epoch, i))
-            weights = np.nan_to_num(eval_points_all[:, :, i], nan=0.0, posinf=0.0, neginf=0.0)
+            # sklearn treats a two-dimensional sample_weight as per-output
+            # weights.  Grid masks can contain an all-zero node column, which
+            # then raises "Weights sum to zero" despite the horizon containing
+            # valid evaluation points.  Metrics here are point-wise, so flatten
+            # values and their mask into the intended one-dimensional samples.
+            weights = np.nan_to_num(eval_points_all[:, :, i], nan=0.0, posinf=0.0, neginf=0.0).reshape(-1)
             if not float(weights.sum()) > 0:
                 print('No evaluable missing values at this horizon; skip metrics.')
                 continue
-            mae = mean_absolute_error(data_target_tensor[:, :, i], prediction[:, :, i, 0],sample_weight=weights)
-            rmse = mean_squared_error(data_target_tensor[:, :, i], prediction[:, :, i, 0],sample_weight=weights) ** 0.5
-            mape = masked_mape_np(data_target_tensor[:, :, i], prediction[:, :, i, 0],weights, 0)
+            target_i = data_target_tensor[:, :, i].reshape(-1)
+            prediction_i = prediction[:, :, i, 0].reshape(-1)
+            mae = mean_absolute_error(target_i, prediction_i, sample_weight=weights)
+            rmse = mean_squared_error(target_i, prediction_i, sample_weight=weights) ** 0.5
+            mape = masked_mape_np(target_i, prediction_i, weights, 0)
             print('MAE: %.2f' % (mae))
             print('RMSE: %.2f' % (rmse))
             print('MAPE: %.2f' % (mape))
@@ -426,9 +448,9 @@ def predict_and_save_results(net, data_loader, data_target_tensor, epoch, _std, 
         if not float(eval_points_all.sum()) > 0:
             print('No evaluable missing values in this split; test forward pass completed.')
             return
-        mae = mean_absolute_error(data_target_tensor.reshape(-1, 1), prediction.reshape(-1, 1),sample_weight=eval_points_all.reshape(-1, 1))
-        rmse = mean_squared_error(data_target_tensor.reshape(-1, 1), prediction.reshape(-1, 1),sample_weight=eval_points_all.reshape(-1, 1)) ** 0.5
-        mape = masked_mape_np(data_target_tensor.reshape(-1, 1), prediction.reshape(-1, 1),eval_points_all.reshape(-1, 1), 0)
+        mae = mean_absolute_error(data_target_tensor.reshape(-1), prediction.reshape(-1), sample_weight=eval_points_all.reshape(-1))
+        rmse = mean_squared_error(data_target_tensor.reshape(-1), prediction.reshape(-1), sample_weight=eval_points_all.reshape(-1)) ** 0.5
+        mape = masked_mape_np(data_target_tensor.reshape(-1), prediction.reshape(-1), eval_points_all.reshape(-1), 0)
         print('all MAE: %.2f' % (mae))
         print('all RMSE: %.2f' % (rmse))
         print('all MAPE: %.2f' % (mape))

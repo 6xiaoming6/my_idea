@@ -297,6 +297,8 @@ def _run_dataset_combo(
                 spec.train_npz,
                 "--val_npz",
                 spec.val_npz,
+                "--test_npz",
+                spec.test_npz,
                 "-n",
                 "full" if experiment == "full" else experiment,
                 "--no_plot",

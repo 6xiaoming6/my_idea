@@ -93,6 +93,32 @@ def build_datasets(
     return train_ds, val_ds
 
 
+def build_test_dataset(cfg: dict, test_npz: str | None = None, synthetic: bool = False):
+    data_cfg = cfg["data"]
+    scale_cfg = data_cfg["scales"]
+    mask_cfg = data_cfg["mask"]
+    if synthetic:
+        syn = data_cfg["synthetic"]
+        return SyntheticFlowDataset(
+            num_samples=syn["num_val"], t=syn["t"], h=syn["h"], w=syn["w"],
+            c_in=cfg["model"]["c_in"], mask_cfg=mask_cfg,
+            fine_to_mid=scale_cfg["fine_to_mid"], fine_to_coarse=scale_cfg["fine_to_coarse"],
+            pooling_mode=scale_cfg.get("pooling_mode", "avg"), seed=cfg.get("seed", 42) + 30000,
+        )
+    if test_npz is None:
+        return None
+    pattern = mask_cfg.get("pattern", "random")
+    test_csv = mask_cfg.get("test_csv") or mask_cfg.get(f"{pattern}_test_csv")
+    if test_csv is None:
+        raise ValueError(f"data.mask.pattern='{pattern}' requires data.mask.test_csv for final testing.")
+    return FlowNPZDataset(
+        test_npz, mask_cfg=mask_cfg,
+        fine_to_mid=scale_cfg["fine_to_mid"], fine_to_coarse=scale_cfg["fine_to_coarse"],
+        pooling_mode=scale_cfg.get("pooling_mode", "avg"),
+        seed=cfg.get("seed", 42) + 30000, mask_csv=test_csv,
+    )
+
+
 def build_loader(dataset, cfg: dict, shuffle: bool) -> DataLoader:
     data_cfg = cfg["data"]
     return DataLoader(

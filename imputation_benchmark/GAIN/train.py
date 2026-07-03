@@ -45,6 +45,7 @@ def test(data,test_net):
     with torch.no_grad():
         truth_list = []
         imputed_list = []
+        mask_list = []
 
         for batch_idx, (X,M_mb) in enumerate(data):
 
@@ -53,12 +54,16 @@ def test(data,test_net):
 
           imputed_data = test_net(X_mb,M_mb)
 
-          truth_list.append(X[M_mb==0])
-          imputed_list.append(imputed_data[M_mb==0])
+          truth_list.append(X)
+          imputed_list.append(imputed_data)
+          mask_list.append(M_mb)
 
         
-        truth = renormalization(torch.cat(truth_list).view(-1,1),norm_parameters).view(-1)
-        imputed = renormalization(torch.cat(imputed_list).view(-1,1),norm_parameters).view(-1)
+        truth_full = renormalization(torch.cat(truth_list), norm_parameters)
+        imputed_full = renormalization(torch.cat(imputed_list), norm_parameters)
+        missing = torch.cat(mask_list) == 0
+        truth = truth_full[missing]
+        imputed = imputed_full[missing]
 
         MAE = torch.abs(truth - imputed).mean()
         RMSE = torch.sqrt(((truth - imputed)**2).mean())
@@ -97,6 +102,8 @@ def train (train_loader,val_loader,test_loader):
     count = 0
 
     start_train = time.time()
+    os.makedirs(savepath, exist_ok=True)
+    checkpoint = os.path.join(savepath, "best_model.pth")
     # Start Iterations
     for it in range(epoch):
         G.train(), D.train()
@@ -139,26 +146,29 @@ def train (train_loader,val_loader,test_loader):
         print(f"================================epoch{it}=======================================")
         print(f"train  Generator_losss: {G_loss_total.__format__('.6f')}\tDiscriminator_loss: {D_loss_total.__format__('.6f')}")
 
-        val_mae,val_rmse,val_mape = test(val_loader,G)
+        should_validate = (it + 1) % val_epoch == 0 or it == epoch - 1
+        if should_validate:
+            val_mae,val_rmse,val_mape = test(val_loader,G)
+            print(f"val  mae: {val_mae.__format__('.6f')}\trmse: {val_rmse.__format__('.6f')}\tmape: {val_mape.__format__('.6f')}\n")
+            if val_mae<best_mae or best_mae == 0 :
+                best_mae = val_mae
+                best_model_G = copy.deepcopy(G.state_dict())
+                best_model_D = copy.deepcopy(D.state_dict())
+                torch.save({"generator": best_model_G, "discriminator": best_model_D,
+                            "best_val_mae": float(best_mae.detach().cpu())}, checkpoint)
+                count = 0
+            else :
+                count += 1
+            if use_nni:
+                nni.report_intermediate_result(val_mae.cpu().numpy().item())
 
-        print(f"val  mae: {val_mae.__format__('.6f')}\trmse: {val_rmse.__format__('.6f')}\tmape: {val_mape.__format__('.6f')}\n")
-
-        if val_mae<best_mae or best_mae == 0 :
-            best_mae = val_mae
-            best_model_G = copy.deepcopy(G.state_dict())
-            best_model_D = copy.deepcopy(D.state_dict())
-        else :
-            count += 1
-        
-        if use_nni:
-            nni.report_intermediate_result(val_mae.cpu().numpy().item())
-
-        if count == patience :
+        if count >= patience :
             break
     
     train_time = time.time() - start_train
 
     G.load_state_dict(best_model_G)
+    print(f"Saving best model to {checkpoint}", flush=True)
 
     start_test_time = time.time()
     test_mae,test_rmse,test_mape = test(test_loader,G)
@@ -201,7 +211,9 @@ if __name__ == '__main__':
     val_ratio = float(config['train']['val_ratio'])
     test_ratio = float(config['train']['test_ratio'])
     patience = int(config['train']['patience'])
+    val_epoch = int(config['train'].get('val_epoch', 1))
     sample_len = int(config['train']['sample_len'])
+    framewise = config['train'].getboolean('framewise', fallback=False)
 
     if use_nni:
         params = nni.get_next_parameter()
@@ -213,7 +225,8 @@ if __name__ == '__main__':
         config['train']['hint_rate'] = str(hint_rate)
 
 
-    train_loader, val_loader, test_loader, norm_parameters, h_dim = load_data(true_datapath,miss_datapath,val_ratio,\
-                                                                      test_ratio,batch_size,sample_len)
+    train_loader, val_loader, test_loader, norm_parameters, h_dim = load_data(
+        true_datapath, miss_datapath, val_ratio, test_ratio, batch_size,
+        sample_len, framewise=framewise)
 
     train(train_loader,val_loader,test_loader)

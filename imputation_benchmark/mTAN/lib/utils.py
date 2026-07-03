@@ -92,7 +92,12 @@ def re_normalization(x, mean, std):
 
 
 def max_min_normalization(x, _max, _min):
-    x = 1. * (x - _min)/(_max - _min)
+    scale = _max - _min
+    # A smoke subset can legitimately contain constant grid cells.  Treat
+    # their range as one so normalization stays finite; this changes only the
+    # data transform, not the model or its hyperparameters.
+    scale = np.where(scale == 0, 1.0, scale)
+    x = 1. * (x - _min) / scale
     x = x * 2. - 1.
     return x
 
@@ -154,8 +159,11 @@ def load_data (true_datapath,miss_datapath,val_ratio,test_ratio,num_ref_points,s
             file_data[f'{name}_x'] = observed.transpose(0, 2, 1)[..., None]
             file_data[f'{name}_target'] = target.transpose(0, 2, 1)[..., None]
             file_data[f'{name}_mask'] = mask.transpose(0, 2, 1)[..., None]
-            file_data[f'{name}_timestamp'] = np.broadcast_to(timestamp, (target.shape[0], sample_len)).copy()
-            file_data[f'{name}_query'] = np.broadcast_to(query, (target.shape[0], num_ref_points)).copy()
+            nodes = target.shape[2]
+            file_data[f'{name}_timestamp'] = np.broadcast_to(
+                timestamp, (target.shape[0], nodes, sample_len)).copy()
+            file_data[f'{name}_query'] = np.broadcast_to(
+                query, (target.shape[0], nodes, num_ref_points)).copy()
         return file_data
 
     miss = np.load(miss_datapath)

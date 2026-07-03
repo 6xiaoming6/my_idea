@@ -1,0 +1,36 @@
+file:
+  data_prefix: ../../data/adapted/TaxiBJ/fixed_0.8/channel_0/split
+  dataset: taxibj
+  miss_rate: 0.8
+  miss_type: fixed
+train:
+  epochs: 100
+  batch_size: 2
+  lr: 0.001
+  valid_epoch_interval: 10
+  is_lr_decay: true
+  nni: false
+  val_epoch: 10
+  val_nsample: 1
+diffusion:
+  layers: 4
+  channels: 64
+  nheads: 8
+  diffusion_embedding_dim: 128
+  beta_start: 0.0001
+  beta_end: 0.2
+  num_steps: 50
+  schedule: quad
+  is_adp: true
+  proj_t: 64
+  is_cross_t: true
+  is_cross_s: true
+  adj_file: ../../data/adapted/TaxiBJ/fixed_0.8/channel_0/grid_edges.csv
+  node_num: 1024
+model:
+  is_unconditional: 0
+  timeemb: 128
+  featureemb: 16
+  target_strategy: hybrid
+  use_guide: true
+  mask_sensor: []

@@ -78,17 +78,6 @@ def Run(config,miss_type,miss_rate):
             test_set, test_condamask, test_mask    = loadImputationData(config)
 
     B,T,N,F = x_tests.shape
-
-    y_hat,MAE, RMSE, MAPE, time_cost = Last(x_tests,cond_tests,ob_tests)
-
-    print(f"\nDataset: {dataset}  misstype: {miss_type}  missrate: {miss_rate}  (Completion by sample separately):")
-    print(f"MAE: {MAE}")
-    print(f"RMSE: {RMSE}")
-    print(f"MAPE: {MAPE}")
-    print(f"time: {round(time_cost,2)} seconds\n")
-    results.append([round(MAE,2), round(RMSE,2), round(MAPE*100,2), round(time_cost,2)])
-
-
     y_hat,MAE, RMSE, MAPE, time_cost = Last(test_set.reshape(1,-1,N,F),test_condamask.reshape(1,-1,N,F),test_mask.reshape(1,-1,N,F))
 
     print(f"\nDataset: {dataset}  misstype: {miss_type}  missrate: {miss_rate}  (Completing the test set together):")
@@ -102,6 +91,5 @@ def Run(config,miss_type,miss_rate):
 
 if __name__ == '__main__':
     Run(config,miss_type,miss_rate)
-
 
 

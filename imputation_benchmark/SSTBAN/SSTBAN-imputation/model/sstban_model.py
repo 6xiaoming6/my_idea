@@ -4,7 +4,10 @@ import torch.nn.functional as F
 import math
 import numpy as np
 
-device = torch.device("cuda:{}".format(2) if torch.cuda.is_available() else "cpu")
+# The launcher exposes exactly one physical GPU per process, mapped to local
+# cuda:0.  The upstream hard-coded cuda:2 bypassed scheduling and could place
+# both workers on the wrong device; this changes device placement only.
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 class conv2d_(nn.Module):
     def __init__(self, input_dims, output_dims, kernel_size, stride=(1, 1),

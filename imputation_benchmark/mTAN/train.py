@@ -54,6 +54,7 @@ miss_datapath = os.path.join(data_prefix,f"miss_data_{data_config['type']}_{data
 val_ratio = float(training_config['val_ratio'])
 test_ratio = float(training_config['test_ratio'])
 patience = int(training_config['patience'])
+val_epoch = int(training_config.get('val_epoch', 1))
 sample_len = int(data_config['sample_len'])
 use_nni = int(training_config['use_nni'])
 
@@ -134,10 +135,13 @@ if __name__ == '__main__':
     model = models.enc_dec_mtan(input_dim, latent_dim, rec_hidden, gen_hidden, embed_time, enc_num_heads, dec_num_heads, k_iwae, True, device).to(device)
     
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+    os.makedirs(savepath, exist_ok=True)
+    checkpoint = os.path.join(savepath, "best_model.pth")
 
     train_start_time = time()
 
     best_val_loss = np.inf
+    validations_without_improvement = 0
     for epoch in range(0, epochs):
         train_loss = 0
         train_n = 0
@@ -171,18 +175,29 @@ if __name__ == '__main__':
             train_n += batch_len
             avg_reconst += torch.mean(logpx) * batch_len #插补期望均值
             avg_kl += torch.mean(analytic_kl) * batch_len#kl散度均值
-        val_loss = compute_val_loss(model, val_loader)
-        if use_nni:
-            nni.report_intermediate_result(val_loss.item())
-        if val_loss < best_val_loss:
-            best_val_loss = val_loss
-            best_epoch = epoch
-            best_model_state_dict = copy.deepcopy(model.state_dict())
-
         print('Iter: {},Train avg elbo: {:.6f},\t avg reconst: {:.6f},\t avg kl: {:.6f}'
             .format(epoch, train_loss / train_n, -avg_reconst / train_n, avg_kl / train_n))
-        print('Iter: {},Val loss: {:.6f}'
-            .format(epoch, val_loss))
+        should_validate = (epoch + 1) % val_epoch == 0 or epoch == epochs - 1
+        if should_validate:
+            val_loss = compute_val_loss(model, val_loader)
+            val_rmse, val_mae, val_mape = compute_test_metrics(model, val_loader)
+            print('Validation Metrics Epoch {}: MAE: {:.6f} RMSE: {:.6f} MAPE: {:.6f}'.format(
+                epoch + 1, val_mae, val_rmse, val_mape))
+            if use_nni:
+                nni.report_intermediate_result(val_loss.item())
+            print('Iter: {},Val loss: {:.6f}'.format(epoch, val_loss))
+            if val_loss < best_val_loss:
+                best_val_loss = val_loss
+                best_epoch = epoch
+                best_model_state_dict = copy.deepcopy(model.state_dict())
+                torch.save({"model": best_model_state_dict, "best_epoch": best_epoch,
+                            "best_val_loss": float(best_val_loss.detach().cpu())}, checkpoint)
+                validations_without_improvement = 0
+            else:
+                validations_without_improvement += 1
+            if validations_without_improvement >= patience:
+                print(f"Early stopping at epoch {epoch}; best epoch {best_epoch}")
+                break
     
     print('train cost time: %.4fs' % (time()-train_start_time))
 
@@ -194,5 +209,5 @@ if __name__ == '__main__':
     print('Val Best epoch: {}, Best loss: {:.6f}'.format(best_epoch, best_val_loss))
     rmse, mae, mape = compute_test_metrics(best_model, test_loader)
     print('TEST\tMAE: {:.6f},\t RMSE: {:.6f},\t MAPE: {:.6f}'.format( mae,rmse, mape))
+    print(f"Saving best model to {checkpoint}", flush=True)
     
-

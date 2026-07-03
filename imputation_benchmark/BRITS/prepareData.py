@@ -49,8 +49,8 @@ def get_sample_by_overlaped_Sliding_window_only_draw(X, Y,  mask, sample_len):
 def generate_samples_brits(true_data,masks,values,sample_len,test_ratio,val_ratio):
     data_num = true_data.shape[0]
 
-    test_len = int(data_num * test_ratio)
-    val_len = int(data_num * val_ratio)
+    test_len = round(data_num * test_ratio)
+    val_len = round(data_num * val_ratio)
 
     train_X, val_X, test_X = values[ :-(val_len+test_len)], \
                              values[ -(val_len+test_len):-(test_len)],\

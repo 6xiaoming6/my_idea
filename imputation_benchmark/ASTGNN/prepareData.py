@@ -369,8 +369,8 @@ def loadImputationData(config):
 
     # Divide the dataset first ,and construct the sample
     slices = true_data.shape[0]
-    train_slices = int(slices * 0.6)
-    val_slices = int(slices * 0.2)
+    train_slices = round(slices * float(data_config.get('train_ratio', 0.6)))
+    val_slices = round(slices * float(data_config.get('val_ratio', 0.2)))
     test_slices = slices - train_slices - val_slices
 
     train_set = true_data[ : train_slices]

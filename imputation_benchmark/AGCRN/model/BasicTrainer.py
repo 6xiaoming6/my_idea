@@ -39,6 +39,7 @@ class Trainer(object):
     def val_epoch(self, epoch, val_dataloader):
         self.model.eval()
         total_val_loss = 0
+        abs_sum, sq_sum, ape_sum, point_count, ape_count = 0.0, 0.0, 0.0, 0, 0
 
         with torch.no_grad():
             for batch_idx, (data, target,gtmask) in enumerate(val_dataloader):
@@ -48,11 +49,29 @@ class Trainer(object):
                 if self.args.real_value:
                     label = self.scaler.inverse_transform(label)
                 loss = self.loss(output[gtmask], label[gtmask])
+                # ``real_value`` controls the optimization loss convention,
+                # not the reporting scale. Paper metrics are always raw-scale.
+                pred_raw = output if self.args.real_value else self.scaler.inverse_transform(output)
+                true_raw = label if self.args.real_value else self.scaler.inverse_transform(label)
+                pred_eval = pred_raw[gtmask]
+                true_eval = true_raw[gtmask]
+                diff = pred_eval - true_eval
+                abs_sum += torch.abs(diff).sum().item()
+                sq_sum += torch.square(diff).sum().item()
+                point_count += diff.numel()
+                nonzero = torch.abs(true_eval) > 1e-4
+                ape_sum += (torch.abs(diff[nonzero] / true_eval[nonzero]).sum().item()
+                            if nonzero.any() else 0.0)
+                ape_count += nonzero.sum().item()
                 #a whole batch of Metr_LA is filtered
                 if not torch.isnan(loss):
                     total_val_loss += loss.item()
         val_loss = total_val_loss / len(val_dataloader)
         self.logger.info('**********Val Epoch {}: average Loss: {:.6f}'.format(epoch, val_loss))
+        mae = abs_sum / max(1, point_count)
+        rmse = math.sqrt(sq_sum / max(1, point_count))
+        mape = ape_sum / max(1, ape_count)
+        print(f"Validation Metrics Epoch {epoch}: MAE: {mae:.6f} RMSE: {rmse:.6f} MAPE: {mape:.6f}", flush=True)
         return val_loss
 
     def train_epoch(self, epoch):
@@ -112,27 +131,32 @@ class Trainer(object):
                 val_dataloader = self.test_loader
             else:
                 val_dataloader = self.val_loader
-            val_epoch_loss = self.val_epoch(epoch, val_dataloader)
-            if self.args.use_nni:
-                nni.report_intermediate_result(val_epoch_loss.item())
+            should_validate = epoch % self.args.val_epoch == 0 or epoch == self.args.epochs
+            val_epoch_loss = None
+            if should_validate:
+                val_epoch_loss = self.val_epoch(epoch, val_dataloader)
+                if self.args.use_nni:
+                    nni.report_intermediate_result(val_epoch_loss.item())
 
             #print('LR:', self.optimizer.param_groups[0]['lr'])
             train_loss_list.append(train_epoch_loss)
-            val_loss_list.append(val_epoch_loss)
+            if val_epoch_loss is not None:
+                val_loss_list.append(val_epoch_loss)
             if train_epoch_loss > 1e6:
                 self.logger.warning('Gradient explosion detected. Ending...')
                 break
             #if self.val_loader == None:
             #val_epoch_loss = train_epoch_loss
-            if val_epoch_loss < best_loss:
+            best_state = False
+            if val_epoch_loss is not None and val_epoch_loss < best_loss:
                 best_loss = val_epoch_loss
                 not_improved_count = 0
                 best_state = True
-            else:
+            elif val_epoch_loss is not None:
                 not_improved_count += 1
                 best_state = False
             # early stop
-            if self.args.early_stop:
+            if self.args.early_stop and val_epoch_loss is not None:
                 if not_improved_count == self.args.early_stop_patience:
                     self.logger.info("Validation performance didn\'t improve for {} epochs. "
                                     "Training stops.".format(self.args.early_stop_patience))
@@ -141,17 +165,15 @@ class Trainer(object):
             if best_state == True:
                 self.logger.info('*********************************Current best model saved!')
                 best_model = copy.deepcopy(self.model.state_dict())
-
-            if epoch%5 == 0:
-                self.test(self.model, self.args, self.test_loader, self.scaler, self.logger)
+                if not self.args.debug:
+                    torch.save(best_model, self.best_path)
 
         training_time = time.time() - start_time
         self.logger.info("Total training time: {:.4f}min, best loss: {:.6f}".format((training_time / 60), best_loss))
 
         #save the best model to file
         if not self.args.debug:
-            torch.save(best_model, self.best_path)
-            self.logger.info("Saving current best model to " + self.best_path)
+            self.logger.info("Best model retained at " + self.best_path)
 
         #test
         self.model.load_state_dict(best_model)
