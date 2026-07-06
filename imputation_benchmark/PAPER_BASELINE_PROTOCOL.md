@@ -5,10 +5,15 @@
 - Datasets: TaxiBJ, BikeNYC, CHAP
 - Masks: fixed, random
 - Missing rates: 0.2, 0.4, 0.6, 0.8
-- Baselines: 14
+- Baselines: 13 implemented mainline methods (MeanFill, HistoricalAverage,
+  LATC, BRITS, GAIN, CSDI, SAITS, GRIN, PriSTI, ImputeFormer, STCPA,
+  STAMImputer, PAST)
 - Seed: 42, matching the current main-model experiments
 - Channel: 0, matching the validated baseline protocol
-- Total: 336 runs
+- Total: 312 runs
+
+The eight methods listed in `EXTRA_BASELINES.md` are appendix candidates and
+are disabled in all default launchers and policies.
 
 Train/validation/test boundaries are derived from the original project NPZ
 files, not a generic 60/20/20 split. Every method receives the same mask file
@@ -27,20 +32,19 @@ feasible comparison on 24 GB GPUs.
 
 | Model | Training budget | Batch, 1024 nodes | Batch, 288 nodes | `val_epoch` |
 |---|---:|---:|---:|---:|
-| AGCRN | 100 epochs | 8 | 32 | 5 |
-| ASTGNN | 80 + 20 fine-tune | 1 | 4 | 10 |
 | BRITS | 100 epochs | 32 | 64 | 2 |
 | CSDI | 100 epochs | 4 | 16 | 10 |
-| E2GAN | 5 pretrain + 100 epochs | 16 | 64 | 5 |
 | GAIN | 100 epochs | 32 | 64 | 2 |
-| GCASTN | 90 + 10 fine-tune | 1 | 4 | 10 |
-| IGNNK | 100 iterations | 8 | 16 | 5 |
 | ImputeFormer | 100 epochs | 8 | 32 | 5 |
-| mTAN | 100 epochs | 2 | 8 | 10 |
 | PriSTI | 100 epochs | 2 | 8 | 10 |
-| SSTBAN | 100 epochs | 2 | 8 | 10 |
-| LAST | Non-iterative original algorithm | — | — | — |
 | LATC | 100 iterations, original algorithm | — | — | — |
+| SAITS | 100 epochs | 4 | 16 | 5 |
+| GRIN | 100 epochs | 2 | 8 | 5 |
+| STCPA | 100 epochs | 4 | 16 | 5 |
+| STAMImputer | 100 epochs | 1 | 4 | 10 |
+| PAST | 50 epochs | 2 | 8 | 5 |
+| MeanFill | non-neural, one fit/evaluation | — | — | — |
+| HistoricalAverage | non-neural, one fit/evaluation | — | — | — |
 
 Batch size affects throughput and optimizer noise but not model structure. The
 smaller 1024-node batches prevent OOM without shrinking any network layer.
@@ -112,12 +116,11 @@ python imputation_benchmark/run_all_baseline_train_2gpu.py \
   --policy-json imputation_benchmark/policies/baseline_5epoch_test.json
 ```
 
-This launches 14 jobs. Twelve trainable neural baselines run five total epochs
-and complete validation, best-checkpoint selection, and final testing. ASTGNN
-and GCASTN allocate the five epochs as 4 main + 1 fine-tune to preserve their
-native two-stage flow. LATC runs five iterations and LAST remains
-non-iterative. The default policy is `baseline_paper.json`; switching back to
-formal training requires no source-code edits.
+This launches 13 jobs. Ten trainable neural baselines run five epochs and
+complete validation, best-checkpoint selection, and final testing; LATC runs
+five iterations, while MeanFill and HistoricalAverage fit training-set
+statistics once and evaluate without fabricated epochs. The default policy is
+`baseline_paper.json`; switching back to formal training requires no source-code edits.
 
 Resume an interrupted run using the directory printed by the launcher:
 

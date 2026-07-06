@@ -12,14 +12,14 @@
     12
   ],
   "source_samples": {
-    "train": 8,
-    "val": 8,
-    "test": 8
+    "train": 1,
+    "val": 1,
+    "test": 1
   },
   "stride": 1,
-  "max_windows_per_split": 8,
+  "max_windows_per_split": 1,
   "baseline_data_shape": [
-    288,
+    36,
     288,
     1
   ],
@@ -48,7 +48,8 @@
     "missing": "miss_data_fixed_0.2_v2.npz",
     "grid_edges": "grid_edges.csv",
     "window_true": "window_true_data_fixed_0.2_v2.npz",
-    "window_missing": "window_miss_data_fixed_0.2_v2.npz"
+    "window_missing": "window_miss_data_fixed_0.2_v2.npz",
+    "split_view": "split"
   },
   "note": "The compatibility stream concatenates complete source windows; use split_* arrays to avoid cross-window samples."
 }

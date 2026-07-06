@@ -615,6 +615,15 @@ def load_graphdata_normY_channel1(all_data, num_of_hours, num_of_days, num_of_we
     '''
 
     file_data = all_data
+    # Normalise cached data: np.load returns ndarrays but a first-run dict may
+    # contain torch tensors after prepareData.  Coerce everything to numpy once
+    # so downstream torch.from_numpy calls never receive a Tensor.
+    _file_data = {}
+    for _k, _v in file_data.items():
+        if hasattr(_v, 'numpy'):
+            _v = _v.cpu().numpy()
+        _file_data[_k] = _v
+    file_data = _file_data
     train_x1 = file_data['train_x1']  # (10181, 307, 3, 12)
     train_x1 = train_x1[:, :, 0:1, :]
     train_x2 = file_data['train_x2']  # (10181, 307, 3, 12)

@@ -7,9 +7,11 @@ train:
   epochs: 1
   batch_size: 1
   lr: 0.001
-  valid_epoch_interval: 20
+  valid_epoch_interval: 1
   is_lr_decay: true
   nni: false
+  val_epoch: 1
+  val_nsample: 1
 diffusion:
   layers: 4
   channels: 64

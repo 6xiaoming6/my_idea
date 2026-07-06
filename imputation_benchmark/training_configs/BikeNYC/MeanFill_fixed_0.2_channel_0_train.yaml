@@ -1,0 +1,13 @@
+model: MeanFill
+data:
+  dataset: BikeNYC
+  mask: fixed
+  rate: 0.2
+  channel: '0'
+  nodes: 288
+  window: 12
+architecture: {}
+training:
+  seed: 42
+output:
+  checkpoint: /home/students/HuangMingYu/code/py/my_idea/my_idea/imputation_benchmark/experiments/BikeNYC_MeanFill_fixed_0.2_channel_0/best_model.pth

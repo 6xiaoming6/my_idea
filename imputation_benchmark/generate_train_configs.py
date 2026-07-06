@@ -101,7 +101,9 @@ def load_policy(path_text: str) -> tuple[Path, dict]:
         raise FileNotFoundError(f"Training policy not found: {path}")
     policy = json.loads(path.read_text(encoding="utf-8"))
     required = {"AGCRN", "ASTGNN", "BRITS", "CSDI", "E2GAN", "GAIN", "GCASTN",
-                "IGNNK", "ImputeFormer", "mTAN", "PriSTI", "SSTBAN", "LAST", "LATC"}
+                "IGNNK", "ImputeFormer", "mTAN", "PriSTI", "SSTBAN", "LAST", "LATC",
+                "SAITS", "GRIN", "STCPA", "STAMImputer", "PAST", "MeanFill",
+                "HistoricalAverage"}
     missing = required - set(policy.get("models", {}))
     if missing:
         raise ValueError(f"Policy {path} is missing models: {sorted(missing)}")
@@ -290,6 +292,42 @@ def main() -> None:
                    "val_epoch": strategy["ImputeFormer"]["val_epoch"]})
     impute_path = output_path(dataset, "ImputeFormer", mask, rate, channel, "yaml")
     impute_path.write_text(yaml.safe_dump(impute, sort_keys=False), encoding="utf-8")
+
+    # The following YAML files configure only the adapter-owned training
+    # protocol. Architecture values are copied from each upstream repository's
+    # published/default configuration; the model implementations stay intact.
+    architectures = {
+        "SAITS": {"n_groups": 2, "n_group_inner_layers": 1, "param_sharing_strategy": "inner_group",
+                  "d_model": 256, "d_inner": 128, "n_head": 4, "d_k": 64, "d_v": 64, "dropout": 0.1},
+        "GRIN": {"d_hidden": 64, "d_emb": 8, "d_ff": 64, "ff_dropout": 0.0,
+                 "kernel_size": 2, "decoder_order": 1, "n_layers": 1, "layer_norm": False},
+        "STCPA": {"n_blocks": 5, "n_temporal": 3},
+        "STAMImputer": {"embed_dim": 32, "tembed_dim": 64, "num_heads": 4,
+                         "mlp_ratio": 4, "dropout": 0.15, "num_layers": 4, "neighbor_width": 8},
+        "PAST": {"hidden_dim": 64, "layer_num": 3, "dropout": 0.1, "alpha": 0.1, "order": 1},
+    }
+    for model in ("SAITS", "GRIN", "STCPA", "STAMImputer", "PAST", "MeanFill", "HistoricalAverage"):
+        settings = strategy[model]
+        training = {"seed": seed}
+        if not settings.get("non_neural"):
+            training.update({
+                "epochs": settings["epochs"], "val_epoch": settings["val_epoch"],
+                "batch_size": batches[model], "patience": settings["patience"],
+                "lr": settings["lr"], "weight_decay": settings.get("weight_decay", 0.0),
+                "grad_clip": settings.get("grad_clip", 5.0),
+            })
+        payload = {
+            "model": model,
+            "data": {"dataset": dataset, "mask": mask, "rate": rate, "channel": channel,
+                     "nodes": nodes, "window": length},
+            "architecture": architectures.get(model, {}),
+            "training": training,
+            "output": {"checkpoint": str(
+                ROOT / "experiments" / f"{dataset}_{model}_{mask}_{rate_text}_channel_{channel}" / "best_model.pth"
+            )},
+        }
+        path = output_path(dataset, model, mask, rate, channel, "yaml")
+        path.write_text(yaml.safe_dump(payload, sort_keys=False), encoding="utf-8")
 
     print(f"Generated training configs under {OUT / dataset} using policy {policy['name']} ({policy_path})")
 

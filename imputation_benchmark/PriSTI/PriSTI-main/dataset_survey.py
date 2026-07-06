@@ -124,13 +124,17 @@ class GridWindowSurveyDataset(Dataset):
         else:
             observed_data = values * mask
             observed_mask = mask
-            gt_mask = mask
             observed_mask_t = torch.tensor(mask).float()
             if self.target_strategy == 'random':
                 cond_mask = get_randmask(observed_mask_t).numpy()
             else:
                 cond_mask = get_block_mask(observed_mask_t, target_strategy=self.target_strategy,
                                            min_seq=3, max_seq=12).numpy()
+            # PriSTI.evaluate() computes target_mask = observed_mask - cond_mask,
+            # and cond_mask is overwritten with gt_mask.  For val/test evaluation
+            # gt_mask must equal cond_mask (the artificially hidden subset) so that
+            # observed_mask - cond_mask yields the hidden evaluation points.
+            gt_mask = cond_mask
         item = {
             'observed_data': observed_data,
             'observed_mask': observed_mask,

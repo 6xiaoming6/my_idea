@@ -1,0 +1,23 @@
+[
+  {
+    "dataset": "TaxiBJ",
+    "mask": "fixed",
+    "rate": 0.2,
+    "channel": "0",
+    "seed": 42,
+    "model": "ImputeFormer",
+    "id": "TaxiBJ__ImputeFormer__fixed__rate0.2__channel0__seed42",
+    "gpu": "0",
+    "status": "passed",
+    "returncode": 0,
+    "seconds": 838.2963691030018,
+    "log": "imputation_benchmark/taxibj_full_runs/20260705_104245_taxibj_full_no_diffusion_fixed-random_gpu0/launcher_logs/TaxiBJ__ImputeFormer__fixed__rate0.2__channel0__seed42.log",
+    "result_json": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/TaxiBJ/baseline/ImputeFormer/fixed/rate0.2/20260705_104252_seed42_bs8/result.json",
+    "test": {
+      "mae": 72.7214,
+      "rmse": 111.0861,
+      "mape": 5.5807,
+      "time_sec": null
+    }
+  }
+]

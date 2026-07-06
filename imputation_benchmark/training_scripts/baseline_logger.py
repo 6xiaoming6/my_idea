@@ -78,9 +78,6 @@ def _records(model: str, raw: str) -> tuple[list[dict[str, Any]], dict[str, floa
         for match in re.finditer(r"epoch\s+(\d+)\s+train spend\s+([\d.]+)\s+seconds", text, re.I):
             item = record(int(match[1]) + 1)
             item["perf"]["train_time_sec"] = _number(match[2])
-        val_losses = [_number(m[1]) for m in re.finditer(rf"Validation loss decrease from {NUMBER} (?:to|ot) ({NUMBER})", text, re.I)]
-        for item, loss in zip(records.values(), val_losses):
-            item["val"]["loss"] = loss
 
     elif model == "CSDI":
         grouped: dict[int, list[float]] = {}
@@ -90,14 +87,31 @@ def _records(model: str, raw: str) -> tuple[list[dict[str, Any]], dict[str, floa
             record(epoch)["train"]["loss"] = sum(values) / len(values)
 
     elif model in {"E2GAN", "GAIN"}:
-        for match in re.finditer(rf"epoch(\d+).*?(?:^|\n)train\s+Generator_losss:\s*({NUMBER}).*?val\s+mae:\s*({NUMBER})\s+rmse:\s*({NUMBER})\s+mape:\s*({NUMBER})", text, re.I | re.S | re.M):
-            item = record(int(match[1]) + 1)
-            item["train"]["loss"] = _number(match[2])
-            item["val"]["mae"] = _number(match[3])
-            item["val"]["rmse"] = _number(match[4])
-            item["val"]["mape"] = _number(match[5])
+        # Parse bounded epoch blocks. A cross-epoch regex would incorrectly
+        # attach a sparse validation line to the first earlier training epoch.
+        headers = list(re.finditer(r"=+epoch(\d+)=+", text, re.I))
+        for index, header in enumerate(headers):
+            block_end = headers[index + 1].start() if index + 1 < len(headers) else len(text)
+            block = text[header.end():block_end]
+            item = record(int(header[1]) + 1)
+            train_match = re.search(rf"train\s+Generator_losss:\s*({NUMBER})", block, re.I)
+            if train_match:
+                item["train"]["loss"] = _number(train_match[1])
+            val_match = re.search(
+                rf"val\s+mae:\s*({NUMBER})\s+rmse:\s*({NUMBER})\s+mape:\s*({NUMBER})",
+                block,
+                re.I,
+            )
+            if val_match:
+                item["val"].update({
+                    "mae": _number(val_match[1]),
+                    "rmse": _number(val_match[2]),
+                    "mape": _number(val_match[3]),
+                })
 
     elif model == "IGNNK":
+        for match in re.finditer(rf"epoch(\d+) train loss:({NUMBER})", text, re.I):
+            record(int(match[1]) + 1)["train"]["loss"] = _number(match[2])
         for match in re.finditer(rf"epoch(\d+) train loss:({NUMBER}).*?epoch\1 val\s+mae:({NUMBER})\s+RMSE:({NUMBER})\s+MAPE:({NUMBER})", text, re.I | re.S):
             item = record(int(match[1]) + 1)
             item["train"]["loss"] = _number(match[2])
@@ -106,6 +120,12 @@ def _records(model: str, raw: str) -> tuple[list[dict[str, Any]], dict[str, floa
             item["val"]["mape"] = _number(match[5])
 
     elif model == "ImputeFormer":
+        for match in re.finditer(
+            rf"Epoch\s+(\d+)\s+- training loss \([^)]*\):\s*({NUMBER})",
+            text,
+            re.I,
+        ):
+            record(int(match[1]))["train"]["loss"] = _number(match[2])
         for match in re.finditer(rf"Epoch\s+(\d+)\s+- training loss \([^)]*\):\s*({NUMBER}), validation MSE:\s*({NUMBER})", text, re.I):
             item = record(int(match[1]))
             item["train"]["loss"] = _number(match[2])
@@ -119,6 +139,8 @@ def _records(model: str, raw: str) -> tuple[list[dict[str, Any]], dict[str, floa
             item["val"]["rmse"] = _number(match[3])
 
     elif model == "mTAN":
+        for match in re.finditer(rf"Iter:\s*(\d+),Train avg elbo:\s*({NUMBER})", text, re.I):
+            record(int(match[1]) + 1)["train"]["loss"] = _number(match[2])
         for match in re.finditer(rf"Iter:\s*(\d+),Train avg elbo:\s*({NUMBER}).*?Iter:\s*\1,Val loss:\s*({NUMBER})", text, re.I | re.S):
             item = record(int(match[1]) + 1)
             item["train"]["loss"] = _number(match[2])
@@ -136,6 +158,11 @@ def _records(model: str, raw: str) -> tuple[list[dict[str, Any]], dict[str, floa
             item["perf"]["epoch_time_sec"] = float(match[3]) + float(match[4])
             item["train"]["loss"] = _number(match[5])
             item["val"]["loss"] = _number(match[6])
+
+    # Adapter-owned training loops use one stable progress line while keeping
+    # every upstream model class and architecture unchanged.
+    for match in re.finditer(rf"Train Epoch\s+(\d+):\s*averaged Loss:\s*({NUMBER})", text, re.I):
+        record(int(match[1]))["train"]["loss"] = _number(match[2])
 
     # Data-adaptation wrappers print one common aggregate line whenever a
     # baseline completes validation. This fills val.log without fabricating
@@ -207,10 +234,15 @@ def _records(model: str, raw: str) -> tuple[list[dict[str, Any]], dict[str, floa
             test.update({"mae": _number(match[2]), "rmse": _number(match[3]), "mape": _number(match[4])})
 
     ordered = [records[key] for key in sorted(records)]
+    # Follow each baseline's native checkpoint-selection criterion. Most
+    # models select by validation loss; the listed imputers explicitly select
+    # by original-scale validation MAE.
+    mae_selected = {"CSDI", "E2GAN", "GAIN", "IGNNK", "PriSTI"}
     best_value = float("inf")
     for item in ordered:
-        candidate = item["val"]["mae"]
-        if candidate is None:
+        candidate = (item["val"]["mae"] if model in mae_selected
+                     else item["val"]["loss"])
+        if candidate is None and model in mae_selected:
             candidate = item["val"]["loss"]
         if candidate is not None and candidate < best_value:
             item["is_best"] = True
@@ -285,6 +317,7 @@ class BaselineLogAdapter:
         batch = str(batch if batch is not None else "na")
         self.batch = batch
         seed = str(seed if seed not in {None, ""} else 42)
+        self.seed = seed
         stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         root = Path(args.output_root)
         if not root.is_absolute():
@@ -371,6 +404,7 @@ class BaselineLogAdapter:
             "train_steps_per_epoch": steps("train"),
             "val_steps_per_epoch": steps("val"),
             "batch_size": self.batch,
+            "seed": self.seed,
             "mask_pattern": self.args.mask,
             "mask_rate_config": self.args.rate,
             "metric_scale": "original data range (after inverse transform)",
@@ -386,104 +420,65 @@ class BaselineLogAdapter:
             "config_path": self.config_path,
             "best_checkpoint": getattr(self.args, "best_checkpoint", None) or "n/a",
         }
-        t_header = (f"{'epoch':>6}  {'loss':>11}  {'mae':>10}  {'rmse':>11}  {'val_mae':>10}  "
-                    f"{'lr':>10}  {'train_s':>8}  {'val_s':>7}  {'epoch_s':>8}  {'mem_gb':>7}  {'best':>5}")
-        v_header = (f"{'epoch':>6}  {'loss':>11}  {'mae':>10}  {'rmse':>11}  {'mape':>10}  "
-                    f"{'train_mae':>10}  {'epoch_s':>8}  {'best':>5}")
+        t_header = (f"{'epoch':>6}  {'train_loss':>12}  {'val_loss':>11}  {'val_mae':>10}  "
+                    f"{'val_rmse':>10}  {'best':>5}")
+        v_header = (f"{'epoch':>6}  {'val_loss':>11}  {'mae':>10}  {'rmse':>10}  "
+                    f"{'mape':>10}  {'best':>5}")
         with train_path.open("w", encoding="utf-8") as train, val_path.open("w", encoding="utf-8") as val, metrics_path.open("w", encoding="utf-8") as metrics:
-            train.write(f"Training started: {started}\n" + "-" * 96 + "\nRun\n")
-            for key, value in metadata.items():
-                train.write(f"  {key}: {value}\n")
-            train.write("Config\n" + json.dumps(self.config, indent=2, ensure_ascii=False) + "\n" + "-" * 96 + "\n")
+            identity = (f"dataset={self.args.dataset}  model={self.model}  mask={self.args.mask}  "
+                        f"rate={format(self.args.rate, 'g')}  channel={self.args.channel}  "
+                        f"seed={self.seed}  batch={self.batch}  device=cuda:{self.args.gpu}")
+            train.write(f"Baseline training | {started}\n{identity}\n")
+            train.write(f"config: {self.config_path or 'n/a'}\n")
             train.write("-" * len(t_header) + "\n" + t_header + "\n" + "-" * len(t_header) + "\n")
-            val.write("Metric scale: original data range (after inverse transform)\n")
-            val.write("Metric scope: artificially missing entries only\n")
+            val.write(f"Baseline validation | {identity}\n")
+            val.write("metrics: original scale, artificially missing entries only\n")
             val.write("-" * len(v_header) + "\n" + v_header + "\n" + "-" * len(v_header) + "\n")
             best_epoch, best_metric, best_metric_name = None, float("inf"), "val_metric"
+            mae_selected = self.model in {"CSDI", "E2GAN", "GAIN", "IGNNK", "PriSTI"}
             for item in records:
-                epoch, tr, va, perf = item["epoch"], item["train"], item["val"], item["perf"]
+                epoch, tr, va = item["epoch"], item["train"], item["val"]
                 best = "*" if item["is_best"] else ""
-                lr_text = f"{tr['lr']:>10.2e}" if tr["lr"] is not None else f"{'n/a':>10}"
                 train.write(
-                    f"{epoch:>6}  {self._fmt(tr['loss'],11,5)}  {self._fmt(tr['mae'],10,4)}  "
-                    f"{self._fmt(tr['rmse'],11,4)}  {self._fmt(va['mae'],10,4)}  {lr_text}  "
-                    f"{self._fmt(perf['train_time_sec'],8,1)}  {self._fmt(perf['val_time_sec'],7,1)}  "
-                    f"{self._fmt(perf['epoch_time_sec'],8,1)}  {self._fmt(perf['peak_memory_gb'],7,2)}  {best:>5}\n"
+                    f"{epoch:>6}  {self._fmt(tr['loss'],12,5)}  {self._fmt(va['loss'],11,5)}  "
+                    f"{self._fmt(va['mae'],10,4)}  {self._fmt(va['rmse'],10,4)}  {best:>5}\n"
                 )
-                val.write(
-                    f"{epoch:>6}  {self._fmt(va['loss'],11,5)}  {self._fmt(va['mae'],10,4)}  "
-                    f"{self._fmt(va['rmse'],11,4)}  {self._fmt(va['mape'],10,4)}  "
-                    f"{self._fmt(tr['mae'],10,4)}  "
-                    f"{self._fmt(perf['epoch_time_sec'],8,1)}  {best:>5}\n"
-                )
-                metric = va["mae"] if va["mae"] is not None else va["loss"]
+                if any(va[name] is not None for name in ("loss", "mae", "rmse", "mape")):
+                    val.write(
+                        f"{epoch:>6}  {self._fmt(va['loss'],11,5)}  {self._fmt(va['mae'],10,4)}  "
+                        f"{self._fmt(va['rmse'],10,4)}  {self._fmt(va['mape'],10,4)}  {best:>5}\n"
+                    )
+                metric = va["mae"] if mae_selected else va["loss"]
+                if metric is None and mae_selected:
+                    metric = va["loss"]
                 if item["is_best"] and metric is not None:
                     best_epoch, best_metric = epoch, metric
-                    best_metric_name = "val_mae" if va["mae"] is not None else "val_loss"
-                    line = f"Best model at epoch {epoch} ({best_metric_name}={metric:.4f})\n"
-                    train.write(line); val.write(line)
+                    best_metric_name = "val_mae" if mae_selected and va["mae"] is not None else "val_loss"
                 metrics.write(json.dumps(item, ensure_ascii=False, sort_keys=True) + "\n")
-            final = records[-1] if records else _blank(0)
-            epoch_times = [item["perf"]["epoch_time_sec"] for item in records
-                           if item["perf"]["epoch_time_sec"] is not None]
-            train_times = [item["perf"]["train_time_sec"] for item in records
-                           if item["perf"]["train_time_sec"] is not None]
-            val_times = [item["perf"]["val_time_sec"] for item in records
-                         if item["perf"]["val_time_sec"] is not None]
-            memories = [item["perf"]["peak_memory_gb"] for item in records
-                        if item["perf"]["peak_memory_gb"] is not None]
-
-            def average(values: list[float | None]) -> str:
-                clean = [float(value) for value in values if value is not None]
-                return f"{sum(clean) / len(clean):.2f}" if clean else "n/a"
-
-            def summary_value(value: float | None, precision: int = 6) -> str:
-                return f"{value:.{precision}f}" if value is not None else "n/a"
-
-            train_steps = steps("train")
-            val_steps = steps("val")
-            train_per_step = ([value / train_steps for value in train_times]
-                              if isinstance(train_steps, int) and train_steps else [])
-            val_per_step = ([value / val_steps for value in val_times]
-                            if isinstance(val_steps, int) and val_steps else [])
-            finish_text = "finished normally" if status == "finished" else status
-            footer = ["", "-" * 96,
-                      f"Training {finish_text}: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
-                      "Summary", f"  completed_epochs: {len(records)}",
-                      f"  best_epoch: {best_epoch if best_epoch is not None else 'n/a'}",
-                      f"  best_{best_metric_name}: {summary_value(best_metric) if best_epoch is not None else 'n/a'}",
-                      f"  final_train_loss: {summary_value(final['train']['loss'])}",
-                      f"  final_train_mae: {summary_value(final['train']['mae'])}",
-                      f"  final_val_loss: {summary_value(final['val']['loss'])}",
-                      f"  final_val_mae: {summary_value(final['val']['mae'])}",
-                      f"  final_val_rmse: {summary_value(final['val']['rmse'])}",
-                      f"  final_val_mape: {summary_value(final['val']['mape'])}",
-                      f"  total_time: {_human_time(total_time)}",
-                      f"  avg_epoch_time_sec: {average(epoch_times)}",
-                      f"  avg_train_sec_per_step: {average(train_per_step)}",
-                      f"  avg_val_sec_per_step: {average(val_per_step)}",
-                      f"  peak_memory_gb: {max(memories):.2f}" if memories else "  peak_memory_gb: n/a",
-                      f"  metrics_jsonl: {metrics_path}",
-                      f"  returncode: {returncode}",
-                      f"  raw_log: {self.log_dir / 'raw.log'}", "-" * 96]
-            block = "\n".join(footer) + "\n"
-            train.write(block); val.write(block)
+            completed_epochs = max((item["epoch"] for item in records), default=0)
+            summary = (f"best: epoch={best_epoch if best_epoch is not None else 'n/a'}  "
+                       f"{best_metric_name}={best_metric:.6f}" if best_epoch is not None else "best: n/a")
+            footer = (f"{'-' * len(t_header)}\n{summary}\n"
+                      f"epochs={completed_epochs}  time={_human_time(total_time)}  "
+                      f"status={status}  returncode={returncode}\n")
+            train.write(footer)
+            val.write(f"{'-' * len(v_header)}\n{summary}\n")
         with test_path.open("w", encoding="utf-8") as test_log:
-            test_log.write(f"Testing started: {datetime.now():%Y-%m-%d %H:%M:%S}\n" + "-" * 96 + "\nRun\n")
-            for key, value in metadata.items():
-                test_log.write(f"  {key}: {value}\n")
-            test_log.write("-" * 96 + "\nResults\n")
-            test_log.write(f"  selected_best_epoch: {best_epoch if best_epoch is not None else 'n/a'}\n")
-            test_log.write(f"  selected_best_metric: {best_metric if best_epoch is not None else 'n/a'}\n")
-            test_log.write(f"  test_mae: {test['mae'] if test['mae'] is not None else 'n/a'}\n")
-            test_log.write(f"  test_rmse: {test['rmse'] if test['rmse'] is not None else 'n/a'}\n")
-            test_log.write(f"  test_mape: {test['mape'] if test['mape'] is not None else 'n/a'}\n")
-            test_log.write(f"  status: {status}\n  returncode: {returncode}\n")
-            test_log.write(f"Testing record finished: {datetime.now():%Y-%m-%d %H:%M:%S}\n" + "-" * 96 + "\n")
+            identity = (f"dataset={self.args.dataset}  model={self.model}  mask={self.args.mask}  "
+                        f"rate={format(self.args.rate, 'g')}  channel={self.args.channel}  seed={self.seed}")
+            test_log.write(f"Baseline test | {identity}\n")
+            test_log.write("metrics: original scale, artificially missing entries only\n")
+            test_log.write(f"checkpoint: epoch={best_epoch if best_epoch is not None else 'n/a'}  "
+                           f"criterion={best_metric_name if best_epoch is not None else 'n/a'}  "
+                           f"value={best_metric if best_epoch is not None else 'n/a'}\n")
+            test_log.write(f"MAE={test['mae'] if test['mae'] is not None else 'n/a'}  "
+                           f"RMSE={test['rmse'] if test['rmse'] is not None else 'n/a'}  "
+                           f"MAPE={test['mape'] if test['mape'] is not None else 'n/a'}\n")
+            test_log.write(f"time={_human_time(total_time)}  status={status}  returncode={returncode}\n")
         (self.run_dir / "config.json").write_text(json.dumps(self.config, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
         result = {
             **metadata, "status": status, "returncode": returncode,
-            "completed_epochs": len(records),
+            "completed_epochs": max((item["epoch"] for item in records), default=0),
             "best_epoch": best_epoch,
             "best_metric_name": best_metric_name if best_epoch is not None else None,
             "best_metric": best_metric if best_epoch is not None else None,

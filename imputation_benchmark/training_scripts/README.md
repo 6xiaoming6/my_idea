@@ -44,11 +44,22 @@ outputs/<dataset>/baseline/<model>/<mask>/rate<rate>/
     result.json
 ```
 
-`train.log`, `val.log`, and `metrics.jsonl` use the main project's columns and
-JSON schema. `raw.log` preserves all original baseline output for auditing.
+The three human-readable logs are intentionally compact: `train.log` contains
+one row per recorded epoch, `val.log` contains only epochs that actually ran
+validation, and `test.log` contains the selected checkpoint plus final
+MAE/RMSE/MAPE. Full metadata stays in `result.json`, full configuration in
+`config.json`, structured epoch details in `metrics.jsonl`, and untouched
+model output in `raw.log` for auditing.
 When an original baseline does not report a particular metric, the readable
 table records `n/a` and JSONL records `null`; no value is fabricated. Override
 the root with `--output-root /path/to/outputs`.
+
+Existing runs can be rebuilt from their preserved `raw.log` without retraining:
+
+```bash
+python imputation_benchmark/training_scripts/compact_existing_logs.py \
+  --output-root outputs
+```
 
 By default, every trainable baseline retains exactly one checkpoint selected by
 its validation criterion. A newly better state overwrites the prior candidate;
@@ -56,6 +67,13 @@ after final testing, any superseded native checkpoints are removed and the best
 one is stored under `checkpoints/`. Use `--no-checkpoint` to retain logs and
 metrics only. LAST and LATC are non-parametric algorithms, so they do not
 produce a model checkpoint.
+
+The survey additions have dedicated scripts: `train_saits.py`, `train_grin.py`,
+`train_stcpa.py`, `train_stamimputer.py`, `train_past.py`, `train_meanfill.py`,
+and `train_historical_average.py`. Their shared outer runner imports the
+original vendored model classes and only adapts data/scaling, split handling,
+training orchestration, validation, metrics, and checkpoint I/O. MeanFill and
+HistoricalAverage are deterministic and therefore do not write weights.
 
 Each JSON model entry has `val_epoch`, meaning validation runs every N training
 epochs (and always after the final epoch). Early stopping and best-checkpoint
@@ -79,3 +97,19 @@ the five-epoch end-to-end test. Omitting the option selects
 `baseline_paper.json`. The JSON policy is translated into each upstream
 model's required INI/YAML format; model architecture and optimizer definitions
 remain in the original baseline templates.
+
+## TaxiBJ full single-GPU run
+
+Run the safe TaxiBJ comparison in one terminal on one physical GPU. The script
+finishes all fixed jobs before starting random jobs; CSDI and PriSTI are
+completely excluded:
+
+```bash
+python imputation_benchmark/run_taxibj_full_baselines.py --gpu 0
+```
+
+This launches 32 sequential jobs (4 current mainline baselines × 4 missing
+rates × 2 mask families), shows output live, and continues past individual failures. A global
+launcher lock prevents accidentally starting a second fixed/random terminal.
+Use `--mask fixed` or `--mask random` only when intentionally running one
+family by itself.

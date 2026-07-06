@@ -102,6 +102,11 @@ def _checkpoint_roots(model: str, cwd: Path) -> tuple[Path, ...]:
         "mTAN": (cwd / "experiments",),
         "PriSTI": (cwd / "save",),
         "SSTBAN": (cwd / "experiments",),
+        "SAITS": (cwd / "experiments",),
+        "GRIN": (cwd / "experiments",),
+        "STCPA": (cwd / "experiments",),
+        "STAMImputer": (cwd / "experiments",),
+        "PAST": (cwd / "experiments",),
     }
     return roots.get(model, ())
 

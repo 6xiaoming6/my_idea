@@ -27,32 +27,39 @@
 
 # 1. 总览表
 
-| 类别 | 方法 | 年份 | 尺度 | 输入类型 | 公开源码 | 推荐程度 | 适配难度 |
-|---|---:|---:|---|---|---|---|---|
-| 简单方法 | Mean Fill / Global Mean | - | 单尺度 | flow + mask | 自己实现 | 必做 | 低 |
-| 简单方法 | Historical Average / Periodic Mean | - | 单尺度 | flow + 时间周期 | 自己实现 | 必做 | 低 |
-| 简单方法 | Linear / Temporal Interpolation | - | 单尺度 | flow + mask | 自己实现 | 必做 | 低 |
-| 简单方法 | Spatial Neighbor Mean | - | 单尺度 | flow + mask + 网格邻域 | 自己实现 | 推荐 | 低 |
-| 简单方法 | KNNImputer | - | 单尺度 | flow 展平特征 | scikit-learn | 推荐 | 低 |
-| 经典方法 | SoftImpute / Nuclear Norm MC | 经典 | 单尺度 | matrix/tensor 展平 | R 包 / 可复现 | 推荐 | 中 |
-| 经典方法 | LRTC-TNN | 2020 | 单尺度 | traffic tensor | 论文清楚，可复现 | 推荐 | 中 |
-| 经典方法 | LATC | 2021 | 单尺度 | sensor × time-of-day × day tensor | 官方代码 | 强烈推荐 | 中 |
-| 经典方法 | BRITS | 2018 | 单尺度 | multivariate time series | 官方代码 | 推荐 | 中 |
-| 经典方法 | GAIN | 2018 | 单尺度 | tabular/time series 展平 | 官方代码 | 推荐 | 中 |
-| 新近方法 | SAITS | 2022 | 单尺度 | multivariate time series | 官方代码 / PyPOTS | 强烈推荐 | 中 |
-| 新近方法 | CSDI | 2021 | 单尺度 | probabilistic time series | 官方代码 | 推荐 | 中高 |
-| 新近方法 | GRIN | 2022 | 单尺度/图结构 | graph time series | 官方代码 | 强烈推荐 | 中高 |
-| 新近方法 | PriSTI | 2023 | 单尺度/图结构 | spatiotemporal + graph prior | 官方代码 | 强烈推荐 | 中高 |
-| 新近方法 | ImputeFormer | 2024 | 单尺度/通用 ST | spatiotemporal series | 官方代码 / PyPOTS | 强烈推荐 | 中 |
-| 新近方法 | STCPA | 2022 | 单尺度/图结构 | traffic speed graph | 官方代码 | 可选 | 中高 |
-| 新近方法 | STAMImputer | 2025 | 单尺度/图结构/MoE | traffic graph | 官方代码 | 强烈推荐 | 高 |
-| 新近方法 | PAST | 2025 | 单尺度/图结构 + auxiliary | traffic graph + 时间/节点属性 | GitHub 代码 | 推荐 | 高 |
-| 多尺度方法 | UrbanFM / UrbanPy | 2019/2020 | 多尺度 | coarse flow → fine flow + external factors | 非官方/公开实现 | 推荐 | 中 |
-| 多尺度方法 | ST-Pyramid Multi-Scale Data Completion | 2026 | 多尺度 | sparse MCS multiscale | 未发现官方代码，论文清楚 | 推荐 | 中高 |
-| 多尺度方法 | Non-Aligned Multi-Scale Data Completion | 2025 | 多尺度 | non-aligned multiscale MCS | 未发现官方代码，论文/Slides 清楚 | 推荐 | 高 |
-| 多模态方法 | E2-CSTP | 2025 | 单/多尺度可扩展 | flow + text/image/aux modalities | 官方代码 | 作为多模态参考 baseline | 高 |
-| 多模态方法 | DSTTN Cross-modal Imputation | 2024 | 单尺度 | time series + spatial modal data | 论文清楚，代码不确定 | 可选 | 高 |
+| 类别 | 方法 | 年份 | 尺度 | 输入类型 | 公开源码 | 推荐程度 | 适配难度 | 已实现 |
+|---|---:|---:|---|---|---|---|---|---|
+| 简单方法 | Mean Fill / Global Mean | - | 单尺度 | flow + mask | 自己实现 | 必做 | 低 | ✅ 已适配（三数据集 smoke） |
+| 简单方法 | Historical Average / Periodic Mean | - | 单尺度 | flow + 时间周期 | 自己实现 | 必做 | 低 | ✅ 已适配（三数据集 smoke） |
+| 简单方法 | Linear / Temporal Interpolation | - | 单尺度 | flow + mask | 自己实现 | 必做 | 低 | |
+| 简单方法 | Spatial Neighbor Mean | - | 单尺度 | flow + mask + 网格邻域 | 自己实现 | 推荐 | 低 | |
+| 简单方法 | KNNImputer | - | 单尺度 | flow 展平特征 | [scikit-learn](https://scikit-learn.org/stable/modules/generated/sklearn.impute.KNNImputer.html) | 推荐 | 低 | |
+| 经典方法 | SoftImpute / Nuclear Norm MC | 经典 | 单尺度 | matrix/tensor 展平 | [R 包](https://cran.r-project.org/package=softImpute) | 推荐 | 中 | |
+| 经典方法 | LRTC-TNN | 2020 | 单尺度 | traffic tensor | 论文清楚，可复现 | 推荐 | 中 | |
+| 经典方法 | LATC | 2021 | 单尺度 | sensor × time-of-day × day tensor | [官方代码](https://github.com/xinychen/autoregressive-tensor) | 强烈推荐 | 中 | ✅ |
+| 经典方法 | BRITS | 2018 | 单尺度 | multivariate time series | [官方代码](https://github.com/caow13/BRITS) | 推荐 | 中 | ✅ |
+| 经典方法 | GAIN | 2018 | 单尺度 | tabular/time series 展平 | [官方代码](https://github.com/jsyoon0823/GAIN) | 推荐 | 中 | ✅ |
+| 新近方法 | SAITS | 2022 | 单尺度 | multivariate time series | [官方代码](https://github.com/WenjieDu/SAITS) / [PyPOTS](https://github.com/WenjieDu/PyPOTS) | 强烈推荐 | 中 | ✅ 已适配（三数据集 smoke） |
+| 新近方法 | CSDI | 2021 | 单尺度 | probabilistic time series | [官方代码](https://github.com/ermongroup/CSDI) | 推荐 | 中高 | ✅ |
+| 新近方法 | GRIN | 2022 | 单尺度/图结构 | graph time series | [官方代码](https://github.com/Graph-Machine-Learning-Group/grin) | 强烈推荐 | 中高 | ✅ 已适配（三数据集 smoke） |
+| 新近方法 | PriSTI | 2023 | 单尺度/图结构 | spatiotemporal + graph prior | [官方代码](https://github.com/LMZZML/PriSTI) | 强烈推荐 | 中高 | ✅ |
+| 新近方法 | ImputeFormer | 2024 | 单尺度/通用 ST | spatiotemporal series | [官方代码](https://github.com/tongnie/ImputeFormer) / [PyPOTS](https://github.com/WenjieDu/PyPOTS) | 强烈推荐 | 中 | ✅ |
+| 新近方法 | STCPA | 2022 | 单尺度/图结构 | traffic speed graph | [官方代码](https://github.com/Sam1224/STCPA) | 可选 | 中高 | ✅ 已适配（三数据集 smoke） |
+| 新近方法 | STAMImputer | 2025 | 单尺度/图结构/MoE | traffic graph | [官方代码](https://github.com/RingBDStack/STAMImupter) | 强烈推荐 | 高 | ✅ 已适配（三数据集 smoke） |
+| 新近方法 | PAST | 2025 | 单尺度/图结构 + auxiliary | traffic graph + 时间/节点属性 | [GitHub](https://github.com/Hanwen-Hu/PAST) | 推荐 | 高 | ✅ 已适配（三数据集 smoke） |
+| 多尺度方法 | UrbanFM / UrbanPy | 2019/2020 | 多尺度 | coarse flow → fine flow + external factors | [公开实现](https://github.com/yoshall/UrbanFM) | 推荐 | 中 | |
+| 多尺度方法 | ST-Pyramid Multi-Scale Data Completion | 2026 | 多尺度 | sparse MCS multiscale | 未发现官方代码，论文清楚 | 推荐 | 中高 | |
+| 多尺度方法 | Non-Aligned Multi-Scale Data Completion | 2025 | 多尺度 | non-aligned multiscale MCS | 未发现官方代码，论文/Slides 清楚 | 推荐 | 高 | |
+| 多模态方法 | E2-CSTP | 2025 | 单/多尺度可扩展 | flow + text/image/aux modalities | [官方代码](https://github.com/ZJU-DAILY/E2-CSTP) | 作为多模态参考 baseline | 高 | |
+| 多模态方法 | DSTTN Cross-modal Imputation | 2024 | 单尺度 | time series + spatial modal data | 论文清楚，代码不确定 | 可选 | 高 | |
 | 多模态方法 | DiffUFlow / DP-TFI | 2023 | 多尺度/生成式 | coarse flow + external/land features | 代码不确定 | 可选参考 | 高 |
+
+简单方法最终选用 **Mean Fill** 和 **Historical Average**。选择依据不是随意凑数：GRIN
+官方实验代码直接提供 mean baseline；交通缺失数据综述将均值/历史均值归为常用简单方法；
+交通插补研究也把 Historical Average 列为常用插值基线。参考：
+[GRIN 官方仓库](https://github.com/Graph-Machine-Learning-Group/grin)、
+[Traffic Missing Data Imputation 综述](https://doi.org/10.3390/math10142544)、
+[PARATUCK2 traffic imputation study](https://doi.org/10.1177/03611981221089298)。
 
 ---
 

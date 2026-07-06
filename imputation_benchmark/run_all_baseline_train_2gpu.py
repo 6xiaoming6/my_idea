@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Two-GPU paper-comparison launcher for every adapted baseline.
+"""Two-GPU paper-comparison launcher for every adapted mainline baseline.
 
-Defaults reproduce the main experiment grid: 14 baselines x 3 datasets x
-2 mask patterns x 4 missing rates = 336 full training jobs, using seed 42.
+Defaults reproduce the main experiment grid: 13 baselines x 3 datasets x
+2 mask patterns x 4 missing rates = 312 full training jobs, using seed 42.
 One job is assigned to each GPU at a time.  Job failures are recorded and do
 not stop the remaining queue; rerun with --resume-run to continue.
 """
@@ -27,10 +27,12 @@ DATASETS = ("TaxiBJ", "BikeNYC", "CHAP")
 MASKS = ("fixed", "random")
 RATES = (0.2, 0.4, 0.6, 0.8)
 DEFAULT_POLICY = BENCH / "policies" / "baseline_paper.json"
-# Expensive models go first so the two workers remain balanced near the end.
+# Main-paper models implemented from st_imputation_baseline_survey.md.
+# EXTRA_BASELINES.md models remain individually runnable but are deliberately
+# absent from every default training matrix.
 MODELS = (
-    "CSDI", "PriSTI", "ImputeFormer", "ASTGNN", "GCASTN", "SSTBAN",
-    "AGCRN", "BRITS", "E2GAN", "GAIN", "IGNNK", "mTAN", "LAST", "LATC",
+    "MeanFill", "HistoricalAverage", "LATC", "BRITS", "GAIN", "CSDI",
+    "SAITS", "GRIN", "PriSTI", "ImputeFormer", "STCPA", "STAMImputer", "PAST",
 )
 SCRIPTS = {
     "AGCRN": "train_agcrn.py", "ASTGNN": "train_astgnn.py",
@@ -40,6 +42,10 @@ SCRIPTS = {
     "ImputeFormer": "train_imputeformer.py", "LAST": "train_last.py",
     "LATC": "train_latc.py", "mTAN": "train_mtan.py",
     "PriSTI": "train_pristi.py", "SSTBAN": "train_sstban.py",
+    "SAITS": "train_saits.py", "GRIN": "train_grin.py",
+    "STCPA": "train_stcpa.py", "STAMImputer": "train_stamimputer.py",
+    "PAST": "train_past.py", "MeanFill": "train_meanfill.py",
+    "HistoricalAverage": "train_historical_average.py",
 }
 
 
@@ -139,6 +145,20 @@ def main() -> None:
         raise FileNotFoundError(f"Training policy not found: {args.policy_path}")
     policy = json.loads(args.policy_path.read_text(encoding="utf-8"))
     policy_name = policy.get("name", args.policy_path.stem)
+    disabled_models = {
+        model for model, settings in policy.get("models", {}).items()
+        if settings.get("enabled") is False
+    }
+    if disabled_models:
+        requested_disabled = disabled_models.intersection(args.models)
+        if requested_disabled:
+            print(
+                "Policy-disabled models excluded: " + ", ".join(sorted(requested_disabled)),
+                flush=True,
+            )
+        args.models = [model for model in args.models if model not in disabled_models]
+    if not args.models:
+        raise ValueError("No enabled models remain after applying the training policy")
     if len(set(args.gpus)) != len(args.gpus):
         raise ValueError("--gpus must not contain duplicate GPU IDs")
     if any(not 0 < rate < 1 for rate in args.rates):

@@ -20,10 +20,10 @@ from pathlib import Path
 BENCH = Path(__file__).resolve().parent
 PROJECT = BENCH.parent
 DATASETS = ("TaxiBJ", "BikeNYC", "CHAP")
-MODELS = (
-    "AGCRN", "ASTGNN", "BRITS", "CSDI", "E2GAN", "GAIN", "GCASTN",
-    "IGNNK", "ImputeFormer", "LAST", "LATC", "mTAN", "PriSTI", "SSTBAN",
-)
+# Default smoke matrix follows the survey's implemented mainline baselines.
+# Extra appendix candidates remain available through their individual scripts.
+MODELS = ("MeanFill", "HistoricalAverage", "BRITS", "CSDI", "GAIN", "ImputeFormer", "LATC",
+          "PriSTI", "SAITS", "GRIN", "STCPA", "STAMImputer", "PAST")
 MODEL_SCRIPTS = {
     "AGCRN": "run_agcrn_smoke.py",
     "ASTGNN": "run_astgnn_smoke.py",
@@ -39,6 +39,13 @@ MODEL_SCRIPTS = {
     "mTAN": "run_mtan_smoke.py",
     "PriSTI": "run_pristi_smoke.py",
     "SSTBAN": "run_sstban_smoke.py",
+    "SAITS": "run_saits_smoke.py",
+    "GRIN": "run_grin_smoke.py",
+    "STCPA": "run_stcpa_smoke.py",
+    "STAMImputer": "run_stamimputer_smoke.py",
+    "PAST": "run_past_smoke.py",
+    "MeanFill": "run_meanfill_smoke.py",
+    "HistoricalAverage": "run_historical_average_smoke.py",
 }
 
 
@@ -86,6 +93,11 @@ def prepare(args: argparse.Namespace) -> None:
             "--mask", "fixed", "--rate", "0.2", "--channel", "0", "--legacy-stream",
             "--max-windows-per-split", str(args.windows), "--output-root",
             str(BENCH / "data/smoke"),
+        ], cwd=PROJECT, check=True)
+        subprocess.run([
+            args.python, str(BENCH / "generate_train_configs.py"), "--dataset", dataset,
+            "--mask", "fixed", "--rate", "0.2", "--channel", "0",
+            "--policy-json", "imputation_benchmark/policies/baseline_5epoch_test.json",
         ], cwd=PROJECT, check=True)
 
 
