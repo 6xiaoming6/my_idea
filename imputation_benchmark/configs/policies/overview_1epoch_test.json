@@ -1,0 +1,27 @@
+{
+  "name": "overview_1epoch_test",
+  "description": "Exactly one train epoch, one validation pass, and one test pass for implemented methods in the survey overview; appendix-only methods are disabled.",
+  "models": {
+    "AGCRN": {"enabled": false, "epochs": 1, "val_epoch": 1, "batch_large": 1, "batch_small": 1, "early_stop": false, "patience": 1},
+    "ASTGNN": {"enabled": false, "epochs": 1, "fine_tune_epochs": 0, "val_epoch": 1, "batch_large": 1, "batch_small": 1},
+    "BRITS": {"epochs": 1, "val_epoch": 1, "batch_large": 1, "batch_small": 1, "patience": 1},
+    "CSDI": {"epochs": 1, "val_epoch": 1, "val_nsample": 1, "batch_large": 1, "batch_small": 1},
+    "E2GAN": {"enabled": false, "epochs": 1, "pretrain_epochs": 0, "val_epoch": 1, "batch_large": 1, "batch_small": 1, "patience": 1},
+    "GAIN": {"epochs": 1, "val_epoch": 1, "batch_large": 1, "batch_small": 1, "patience": 1},
+    "GCASTN": {"enabled": false, "epochs": 1, "fine_tune_epochs": 0, "val_epoch": 1, "batch_large": 1, "batch_small": 1},
+    "IGNNK": {"enabled": false, "epochs": 1, "val_epoch": 1, "batch_large": 1, "batch_small": 1, "patience": 1},
+    "ImputeFormer": {"epochs": 1, "val_epoch": 1, "batch_large": 1, "batch_small": 1, "patience": 1},
+    "mTAN": {"enabled": false, "epochs": 1, "val_epoch": 1, "batch_large": 1, "batch_small": 1, "patience": 1},
+    "PriSTI": {"epochs": 1, "val_epoch": 1, "val_nsample": 1, "batch_large": 1, "batch_small": 1},
+    "SSTBAN": {"enabled": false, "epochs": 1, "val_epoch": 1, "batch_large": 1, "batch_small": 1, "patience": 1},
+    "LAST": {"enabled": false, "epochs": 0, "non_iterative": true},
+    "LATC": {"epochs": 1, "non_neural": true},
+    "SAITS": {"epochs": 1, "val_epoch": 1, "batch_large": 1, "batch_small": 1, "patience": 1, "lr": 0.001},
+    "GRIN": {"epochs": 1, "val_epoch": 1, "batch_large": 1, "batch_small": 1, "patience": 1, "lr": 0.001},
+    "STCPA": {"epochs": 1, "val_epoch": 1, "batch_large": 1, "batch_small": 1, "patience": 1, "lr": 0.001},
+    "STAMImputer": {"epochs": 1, "val_epoch": 1, "batch_large": 1, "batch_small": 1, "patience": 1, "lr": 0.0013, "weight_decay": 0.00005},
+    "PAST": {"epochs": 1, "val_epoch": 1, "batch_large": 1, "batch_small": 1, "patience": 1, "lr": 0.003},
+    "MeanFill": {"non_neural": true},
+    "HistoricalAverage": {"non_neural": true}
+  }
+}

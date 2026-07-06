@@ -48,6 +48,16 @@ __pycache__/
 # =============================================================================
 # Generated config symlinks (created by generate_*_configs.py)
 # =============================================================================
-configurations/TaxiBJ.yaml
-configurations/BikeNYC.yaml
-configurations/CHAP.yaml
+**/configurations/TaxiBJ.yaml
+**/configurations/BikeNYC.yaml
+**/configurations/CHAP.yaml
+
+# Centralized generated content
+configs/training/
+configs/testing/
+artifacts/runs/
+artifacts/selftests/
+artifacts/native_experiments/
+artifacts/legacy/
+data/adapted/
+data/testing/

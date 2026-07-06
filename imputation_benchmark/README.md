@@ -1,150 +1,57 @@
-# imputation_benchmark
+# Imputation Benchmark
 
-The official implementation of “An Experimental Evaluation of Imputation Models for Spatial-Temporal Traffic Data”
+用于 TaxiBJ、BikeNYC 和 CHAP 的时空缺失值补全基准工程。所有上游模型源码、
+数据适配、配置、运行入口和实验产物均按职责分区，根目录不存放临时测试结果。
 
-![pipeline](./assets/pipeline.png)
+## 目录结构
 
-## Data and missing scenarios
-
-We used **3** traffic datasets and **20** missing scenarios(**4** missing types and **5** missing rates) to evaluate each imputation model.
-
-$$
-\begin{array}
-{cll}
-\hline
-	\text{Dataset} & \text{Time points} & \text{Nodes} & \text{Time Interval} & \text{Time range} \\
-\hline
-	\text{PEMS04} & 16692    & 307 & 5\text{mins} &2018.1.1-2018.2.28\\
-	\text{PEMS08} & 17856    & 170 & 5\text{mins} &2016.7.1-2016.8.31\\
-	\text{Seattle} & 8760    & 323 & 1\text{hour} &2015\\
-\hline	
-\end{array}
-$$
-
-$$
-\begin{array}
-{cll}
-\hline
-	\text{Missing pattern} & \text{Description}\\
-\hline
-	\text{SR-TR} & \text{Spatial random missing and Temporal random missing}\\
-	\text{SR-TC} & \text{Spatial random missing and Temporal continuous missing}\\
-	\text{SC-TR} & \text{Spatial continuous missing and Temporal random missing}\\
-	\text{SC-TC} & \text{Spatial continuous missing and Temporal continuous missing}\\
-\hline	
-\end{array}
-$$
-
-Missing rates including **10%**, **30%**, **50%**, **70%**, **90%**
-
----
-
-We have summaries of existing imputation models from 2018-2024.![pipeline](./assets/Summary_imputation_model.png)
-
-
-
-## Constructing missing data for train and test (Optional)
-
-Run the following command to construct the corresponding missing scenario from the raw data.
-
-``` bash
-cd GenerateData 
-python generator.py --config xxx.conf --missrate 0.3 --misstype SR-TR
+```text
+imputation_benchmark/
+├── baselines/              # 上游 baseline 源码（不修改模型结构）
+├── configs/
+│   ├── policies/           # 训练策略 JSON
+│   ├── training/           # 正式训练生成配置
+│   ├── testing/            # 集成测试专用配置
+│   └── legacy_smoke/       # 只读归档的旧 smoke 配置
+├── scripts/
+│   ├── config/             # 配置生成
+│   ├── data/               # 数据适配
+│   ├── launch/             # 统一任务入口
+│   └── train/              # 模型专用训练适配器
+├── data/
+│   ├── adapted/            # 正式适配数据
+│   ├── testing/            # 集成测试小数据
+│   └── legacy/             # 旧格式兼容数据
+├── artifacts/
+│   ├── runs/               # paper、TaxiBJ、集成测试运行记录
+│   ├── selftests/          # 启动器自检记录
+│   ├── legacy/             # 历史 smoke 只读归档
+│   └── native_experiments/ # 上游模型临时原生输出
+└── docs/                   # 协议、数据说明和上游原 README
 ```
 
-The **conf file** is configured with the save path, the raw data path, and a csv file containing the node adjacencies (distances).
+## 常用入口
 
-Two files will be generated:
+从项目目录 `my_idea/` 运行：
 
-1. miss_data_{misstype}_{missrate}_v2.npz
-2. true_data_{misstype}_{missrate}_v2.npz
+```bash
+# 13 个主表 baseline × 3 数据集的一轮集成测试
+python imputation_benchmark/scripts/launch/run_overview_baseline_1epoch.py --gpu 0
 
-**Usage**
+# 正式 baseline 矩阵
+python imputation_benchmark/scripts/launch/run_all_baseline_train_2gpu.py --gpus 0 1
 
-``` python
-#e.g. miss_datapath = miss_data_{SR-TR}_{0.9}_v2.npz
-#e.g. true_datapath = true_data_{SR-TR}_{0.9}_v2.npz
-miss = np.load(miss_datapath)
-mask = miss['mask'] # mask matrix (T,N,F), 0 means missing
-miss_data = miss['data'] # 0 means missing (T,N,F)
+# TaxiBJ 单卡安全队列（不包含 CSDI/PriSTI）
+python imputation_benchmark/scripts/launch/run_taxibj_full_baselines.py --gpu 0
 
-true_data = np.load(true_datapath)['data'] # ground-truth (T,N,F)
-
+# 单独训练一个模型
+python imputation_benchmark/scripts/train/train_saits.py \
+  --dataset TaxiBJ --mask fixed --rate 0.2 --channel 0 --gpu 0
 ```
 
-You can skip the data generation stage by wrapping the data in the above form.
+正式输出仍统一写入项目级 `outputs/<dataset>/baseline/...`。启动器汇总、测试结果
+和上游临时产物写入本目录的 `artifacts/`，不会重新散落到根目录。
 
-
-
-## Train and Test imputation model
-
-### AGCRN
-
-``` bash
-cd AGCRN/model
-python Run.py --config ./configurations/PEMS04.conf
-```
-
-### BRITS
-
-``` bash
-cd BRITS
-python input_process.py --config ./configurations/PEMS04_12_SR-TR_0.1_prepare.conf
-python main.py --config ./configurations/PEMS04_12_SR-TR_0.1.conf --for_test 0
-```
-
-### E2GAN
-
-``` bash
-cd E2GAN
-python train.py --config ./configurations/PEMS04_12_SR-TR_0.1.conf
-```
-
-### GCASTN
-
-``` bash
-cd GCASTN/GCASTN-main/code_data_paper_632/GCASTN
-python train_GCASTN.py --config ./configurations/PEMS04.conf
-```
-
-### IGNNK
-
-``` bash
-cd IGNNK
-python train.py --config ./configurations/PEMS04.conf
-```
-
-### LATC
-
-``` bash
-cd LATC
-python train_LATC.py --config ./configurations/PEMS04_SR-TR_0.1.conf
-```
-
-### mTAN
-
-``` bash
-cd mTAN
-python train.py --config ./configurations/PEMS04_SR-TR_0.5.conf
-```
-
-### PriSTI
-
-``` bash
-cd PriSTI/PriSTI-main
-python exe_survey.py --config ./config/pems04.yaml
-```
-
-### ASTGNN
-
-``` bash
-cd ASTGNN
-python train_ASTGNN.py.py --config ./configurations/PEMS04_SR-TC_70.conf
-```
-
-### ImputeFormer
-
-``` bash
-cd imputeformer
-python main.py.py --config ./configurations/PEMS04.yaml --data_prefix ./miss_data --dataset PEMS04 --miss_type SR-TR --miss_rate 0.9
-```
+详细说明见 [论文对比协议](docs/PAPER_BASELINE_PROTOCOL.md)、
+[网格数据适配指南](docs/GRID_DATASET_GUIDE.md) 和
+[训练脚本说明](scripts/train/README.md)。
