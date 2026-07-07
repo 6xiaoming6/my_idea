@@ -124,6 +124,12 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--conda-env", "--conda_env", default="difftdi")
     parser.add_argument(
+        "--training-policy",
+        "--training_policy",
+        default=None,
+        help="Optional dataset-specific JSON training policy merged before mask/ablation overrides.",
+    )
+    parser.add_argument(
         "--cpu-threads",
         "--cpu_threads",
         type=int,
@@ -217,6 +223,34 @@ def _write_json(path: Path, content: dict) -> None:
     path.write_text(json.dumps(content, indent=2, ensure_ascii=False), encoding="utf-8")
 
 
+def _load_training_policy(path_text: str | None, datasets: tuple[str, ...]) -> tuple[str | None, dict[str, dict]]:
+    if not path_text:
+        return None, {dataset: {} for dataset in datasets}
+    path = Path(path_text).expanduser()
+    if not path.is_absolute():
+        path = (ROOT / path).resolve()
+    if not path.is_file():
+        raise FileNotFoundError(f"Training policy not found: {path}")
+    content = json.loads(path.read_text(encoding="utf-8"))
+    policy_datasets = content.get("datasets")
+    if not isinstance(policy_datasets, dict):
+        raise ValueError(f"Training policy must contain a datasets object: {path}")
+    missing = [dataset for dataset in datasets if dataset not in policy_datasets]
+    if missing:
+        raise ValueError(f"Training policy {path} is missing datasets: {', '.join(missing)}")
+    name = str(content.get("name", path.stem))
+    patches = {}
+    for dataset in datasets:
+        patch = policy_datasets[dataset]
+        if not isinstance(patch, dict):
+            raise ValueError(f"Training policy entry {dataset} must be an object")
+        patches[dataset] = _deep_update(
+            patch,
+            {"experiment_policy": {"name": name, "source": str(path)}},
+        )
+    return name, patches
+
+
 def _generate_masks(args: argparse.Namespace, spec: DatasetSpec, pattern: str, rate: str, env: dict[str, str]) -> None:
     output_dir = Path(spec.mask_root) / f"{pattern}_mask" / rate
     print(f"[info] generating {pattern} masks: {output_dir}")
@@ -254,6 +288,7 @@ def _run_dataset_combo(
     temp_dir: Path,
     run_index: int,
     run_total: int,
+    training_override: dict,
 ) -> None:
     print("\n" + "#" * 72)
     print(f"[{run_index}/{run_total}] {dataset_name} | pattern={pattern} | rate={rate}")
@@ -261,8 +296,9 @@ def _run_dataset_combo(
     _generate_masks(args, spec, pattern, rate, env)
 
     mask_override = _mask_override(spec, pattern, rate)
+    base_override = _deep_update(training_override, mask_override)
     mask_override_path = temp_dir / f"mask_{dataset_name}_{pattern}_{rate}.json"
-    _write_json(mask_override_path, mask_override)
+    _write_json(mask_override_path, base_override)
 
     skip_ablations = set(_parse_names(args.skip_ablations))
     experiments = _experiments_for(spec, args.experiments, args.skip_full, skip_ablations)
@@ -279,7 +315,7 @@ def _run_dataset_combo(
             if not ablation_path.is_file():
                 raise FileNotFoundError(f"Ablation config not found: {ablation_path}")
             ablation_override = json.loads(ablation_path.read_text(encoding="utf-8"))
-            combined = _deep_update(mask_override, ablation_override)
+            combined = _deep_update(base_override, ablation_override)
             override_path = temp_dir / f"{dataset_name}_{pattern}_{rate}_{experiment}.json"
             _write_json(override_path, combined)
             display_name = ABLATION_DESCRIPTIONS.get(experiment, experiment)
@@ -319,6 +355,7 @@ def main() -> None:
     rates = _expand(args.mask_rate, MASK_RATES)
     for name in dataset_names:
         _validate_files(DATASETS[name])
+    policy_name, training_patches = _load_training_policy(args.training_policy, dataset_names)
 
     combinations = [(name, pattern, rate) for rate in rates for pattern in patterns for name in dataset_names]
     print("=" * 72)
@@ -327,6 +364,7 @@ def main() -> None:
     print(f"patterns: {', '.join(patterns)}")
     print(f"rates: {', '.join(rates)}")
     print(f"GPU: cuda:{args.gpu} | child CPU threads: {args.cpu_threads}")
+    print(f"training policy: {policy_name or 'dataset defaults'}")
     print(f"dataset/mask combinations: {len(combinations)}")
     print("=" * 72)
 
@@ -352,6 +390,7 @@ def main() -> None:
                 temp_dir,
                 index,
                 len(combinations),
+                training_patches[name],
             )
 
     elapsed = time.perf_counter() - started

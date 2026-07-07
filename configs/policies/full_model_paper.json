@@ -1,0 +1,90 @@
+{
+  "name": "full_model_paper_v1",
+  "description": "Single-GPU full-model paper training policy selected from the completed fixed-mask convergence runs.",
+  "datasets": {
+    "TaxiBJ": {
+      "seed": 42,
+      "data": {
+        "batch_size": 32,
+        "num_workers": 0,
+        "pin_memory": true,
+        "drop_last": true
+      },
+      "train": {
+        "epochs": 160,
+        "val_epoch": 5,
+        "lr_main": 0.001,
+        "lr_aux": 0.001,
+        "weight_decay": 0.0001,
+        "grad_clip_norm": 1.0,
+        "amp": true,
+        "scheduler": {
+          "type": "cosine",
+          "eta_min": 0.000001
+        },
+        "early_stopping": {
+          "enabled": true,
+          "monitor": "val_mae",
+          "patience": 8,
+          "mode": "min"
+        }
+      }
+    },
+    "BikeNYC": {
+      "seed": 42,
+      "data": {
+        "batch_size": 16,
+        "num_workers": 0,
+        "pin_memory": true,
+        "drop_last": true
+      },
+      "train": {
+        "epochs": 140,
+        "val_epoch": 2,
+        "lr_main": 0.001,
+        "lr_aux": 0.001,
+        "weight_decay": 0.0001,
+        "grad_clip_norm": 1.0,
+        "amp": true,
+        "scheduler": {
+          "type": "cosine",
+          "eta_min": 0.000001
+        },
+        "early_stopping": {
+          "enabled": true,
+          "monitor": "val_mae",
+          "patience": 12,
+          "mode": "min"
+        }
+      }
+    },
+    "CHAP": {
+      "seed": 42,
+      "data": {
+        "batch_size": 32,
+        "num_workers": 0,
+        "pin_memory": true,
+        "drop_last": true
+      },
+      "train": {
+        "epochs": 150,
+        "val_epoch": 5,
+        "lr_main": 0.001,
+        "lr_aux": 0.001,
+        "weight_decay": 0.0001,
+        "grad_clip_norm": 1.0,
+        "amp": true,
+        "scheduler": {
+          "type": "cosine",
+          "eta_min": 0.000001
+        },
+        "early_stopping": {
+          "enabled": true,
+          "monitor": "val_mae",
+          "patience": 8,
+          "mode": "min"
+        }
+      }
+    }
+  }
+}

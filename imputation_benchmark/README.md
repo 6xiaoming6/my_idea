@@ -49,6 +49,9 @@ python imputation_benchmark/scripts/train/train_saits.py \
   --dataset TaxiBJ --mask fixed --rate 0.2 --channel 0 --gpu 0
 ```
 
+正式训练采用严格的两阶段安全队列：先用指定 GPU 跑完全部普通 baseline，
+再只用第一张指定 GPU 依次运行 PriSTI、CSDI，两个扩散模型不会与其他任务重叠。
+
 正式输出仍统一写入项目级 `outputs/<dataset>/baseline/...`。启动器汇总、测试结果
 和上游临时产物写入本目录的 `artifacts/`，不会重新散落到根目录。
 

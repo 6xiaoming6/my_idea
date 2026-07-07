@@ -83,6 +83,10 @@ always validated regardless of cadence.
 python imputation_benchmark/scripts/launch/run_all_baseline_train_2gpu.py --gpus 0 1
 ```
 
+The launcher uses a strict two-phase safety queue. All regular baselines must
+finish before PriSTI starts; PriSTI and then CSDI run sequentially on the first
+requested GPU, so neither diffusion model overlaps another training process.
+
 To split the two mask families across two independently visible terminals, run:
 
 ```bash

@@ -24,6 +24,7 @@ MODELS = (
     "MeanFill", "HistoricalAverage", "LATC", "BRITS", "GAIN", "SAITS", "GRIN",
     "ImputeFormer", "STCPA", "STAMImputer", "PAST", "PriSTI", "CSDI",
 )
+DEFERRED_MODELS = ("PriSTI", "CSDI")
 NEURAL_MODELS = set(MODELS) - {"MeanFill", "HistoricalAverage", "LATC"}
 SCRIPTS = {
     "MeanFill": "train_meanfill.py", "HistoricalAverage": "train_historical_average.py",
@@ -136,6 +137,7 @@ def main() -> None:
         "config_root": str(Path(args.config_root).resolve()),
         "contract": "one train epoch -> one validation pass -> load best -> one test pass",
         "checkpoint_policy": "best checkpoint used for test, then deleted",
+        "safety_queue": "all regular baselines first, then PriSTI, then CSDI",
     }
     (run_dir / "manifest.json").write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     for dataset in args.datasets:
@@ -143,7 +145,12 @@ def main() -> None:
         prepare(args, dataset)
 
     results: list[dict] = []
-    jobs = [(dataset, model) for dataset in args.datasets for model in args.models]
+    regular_models = [model for model in args.models if model not in DEFERRED_MODELS]
+    deferred_models = [model for model in DEFERRED_MODELS if model in args.models]
+    jobs = (
+        [(dataset, model) for dataset in args.datasets for model in regular_models]
+        + [(dataset, model) for model in deferred_models for dataset in args.datasets]
+    )
     for index, (dataset, model) in enumerate(jobs, 1):
         identifier = f"{dataset}__{model}__{args.mask}__rate{rate_label(args.rate)}"
         launcher_log = run_dir / "launcher_logs" / f"{identifier}.log"

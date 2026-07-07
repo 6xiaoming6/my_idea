@@ -3,8 +3,9 @@
 
 Defaults reproduce the main experiment grid: 13 baselines x 3 datasets x
 2 mask patterns x 4 missing rates = 312 full training jobs, using seed 42.
-One job is assigned to each GPU at a time.  Job failures are recorded and do
-not stop the remaining queue; rerun with --resume-run to continue.
+Regular jobs use all requested GPUs. PriSTI and CSDI are deferred to the end
+and run sequentially on the first GPU. Job failures are recorded and do not
+stop the remaining queue; rerun with --resume-run to continue.
 """
 from __future__ import annotations
 
@@ -31,9 +32,10 @@ DEFAULT_POLICY = BENCH / "configs" / "policies" / "baseline_paper.json"
 # EXTRA_BASELINES.md models remain individually runnable but are deliberately
 # absent from every default training matrix.
 MODELS = (
-    "MeanFill", "HistoricalAverage", "LATC", "BRITS", "GAIN", "CSDI",
-    "SAITS", "GRIN", "PriSTI", "ImputeFormer", "STCPA", "STAMImputer", "PAST",
+    "MeanFill", "HistoricalAverage", "LATC", "BRITS", "GAIN", "SAITS",
+    "GRIN", "ImputeFormer", "STCPA", "STAMImputer", "PAST", "PriSTI", "CSDI",
 )
+DEFERRED_MODELS = ("PriSTI", "CSDI")
 SCRIPTS = {
     "AGCRN": "train_agcrn.py", "ASTGNN": "train_astgnn.py",
     "BRITS": "train_brits.py", "CSDI": "train_csdi.py",
@@ -167,8 +169,21 @@ def main() -> None:
         {"dataset": dataset, "mask": mask, "rate": rate, "channel": args.channel, "seed": args.seed}
         for dataset in args.datasets for mask in args.masks for rate in args.rates
     ]
-    jobs = [{**protocol, "model": model} for protocol in protocols for model in args.models]
+    regular_models = [model for model in args.models if model not in DEFERRED_MODELS]
+    deferred_models = [model for model in DEFERRED_MODELS if model in args.models]
+    execution_models = regular_models + deferred_models
+    jobs = (
+        [{**protocol, "model": model} for protocol in protocols for model in regular_models]
+        + [{**protocol, "model": model} for model in deferred_models for protocol in protocols]
+    )
     print(f"Protocols: {len(protocols)}, models: {len(args.models)}, total jobs: {len(jobs)}")
+    if deferred_models:
+        print(
+            "Safety queue: all regular baselines first; then "
+            + " -> ".join(deferred_models)
+            + " (serialized across GPUs)",
+            flush=True,
+        )
     if args.dry_run:
         for job in jobs:
             print(job_id(job))
@@ -188,7 +203,8 @@ def main() -> None:
     (run_dir / "launcher_logs").mkdir(exist_ok=True)
     manifest = {
         "created_at": datetime.now().isoformat(timespec="seconds"),
-        "datasets": args.datasets, "models": args.models, "masks": args.masks,
+        "datasets": args.datasets, "models": args.models,
+        "execution_model_order": execution_models, "masks": args.masks,
         "rates": args.rates, "channel": args.channel, "seed": args.seed,
         "gpus": list(args.gpus), "jobs": len(jobs),
         "checkpoint_policy": "none" if args.no_checkpoint else "best_only",
@@ -199,6 +215,7 @@ def main() -> None:
             "max_epochs": max(int(item.get("epochs", 0)) for item in policy["models"].values()),
             "metrics": ["MAE", "RMSE", "MAPE (CHAP only recommended for reporting)"],
             "model_structure": "unchanged baseline source architecture",
+            "safety_queue": "PriSTI and CSDI globally last and mutually serialized",
         },
     }
     (run_dir / "manifest.json").write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
@@ -215,22 +232,24 @@ def main() -> None:
     if old_summary.exists():
         for item in json.loads(old_summary.read_text(encoding="utf-8")):
             states[item["id"]] = item
-    pending = queue.Queue()
+    regular_pending = queue.Queue()
+    deferred_pending = queue.Queue()
     for job in jobs:
         identifier = job_id(job)
         if states.get(identifier, {}).get("status") == "passed":
             continue
-        pending.put(job)
+        target_queue = deferred_pending if job["model"] in DEFERRED_MODELS else regular_pending
+        target_queue.put(job)
     lock = threading.Lock()
     console_lock = threading.Lock()
     # Native baselines write checkpoints below model-specific trees. Serializing
     # jobs of the same model prevents one worker from pruning another's files.
     model_locks = {model: threading.Lock() for model in SCRIPTS}
 
-    def worker(gpu: str) -> None:
+    def worker(gpu: str, work_queue: queue.Queue) -> None:
         while True:
             try:
-                job = pending.get_nowait()
+                job = work_queue.get_nowait()
             except queue.Empty:
                 return
             identifier = job_id(job)
@@ -299,13 +318,25 @@ def main() -> None:
                 tail = "\n".join(launcher_text.splitlines()[-12:])
                 with console_lock:
                     print(f"[{gpu}] FAILURE DETAIL {identifier}: returncode={result.returncode}\n{tail}", flush=True)
-            pending.task_done()
+            work_queue.task_done()
 
-    threads = [threading.Thread(target=worker, args=(gpu,), daemon=False) for gpu in args.gpus]
-    for thread in threads:
-        thread.start()
-    for thread in threads:
-        thread.join()
+    def run_phase(name: str, work_queue: queue.Queue, gpus: list[str]) -> None:
+        if work_queue.empty():
+            return
+        print(f"Starting {name} phase on GPU(s): {', '.join(gpus)}", flush=True)
+        threads = [
+            threading.Thread(target=worker, args=(gpu, work_queue), daemon=False)
+            for gpu in gpus
+        ]
+        for thread in threads:
+            thread.start()
+        for thread in threads:
+            thread.join()
+
+    # A strict phase boundary prevents a diffusion job from overlapping the
+    # final regular job. PriSTI and CSDI then share only the first requested GPU.
+    run_phase("regular baseline", regular_pending, list(args.gpus))
+    run_phase("deferred diffusion", deferred_pending, [args.gpus[0]])
     write_summary(run_dir, states)
     failures = sum(item["status"] != "passed" for item in states.values())
     print(f"Summary: {run_dir / 'summary.md'}")
