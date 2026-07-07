@@ -4,6 +4,12 @@
 
 关键设计：多尺度表示（fine/mid/coarse）、质量感知稀疏路由（QualityRouter + TopKRoutedExpertPool）、可靠性感知跨尺度共享专家（GatedCrossScaleSharedExpert + ReliabilityAwareScaleGate）、共享-路由双分支残差融合（SharedRoutedResidualFusion）。模型仅以观测值作为输入，缺失位置真值不参与前向计算。
 
+> **分支说明**：`main` 分支是项目的核心基线，包含经过完整实验验证的模型结构和训练流程。其他分支均在 `main` 的基础上尝试修改或优化模型结构，属于实验性探索，不代表最终方案。
+>
+> **分支命名规则**：
+> - `single-v{i}` — 单分支架构第 i 个版本，不包含多模态辅助分支（`aux.enabled=false`）
+> - `dual-v{j}` — 双分支架构第 j 个版本，在单分支基础上增加多模态辅助分支（`aux.enabled=true`）
+
 ---
 
 ## 项目结构
