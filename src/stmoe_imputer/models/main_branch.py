@@ -4,10 +4,12 @@ import torch
 from torch import nn
 
 from .embedding import ScaleTokenEncoder
-from .experts import TopKRoutedExpertPool
+from .experts import ConditionalRoutedExpertPool, TopKRoutedExpertPool
 from .fusion import (
     ExpertEnhancedSharedInput,
     GatedCrossScaleSharedExpert,
+    GlobalPriorExpert,
+    PriorSpecializedFusion,
     ProgressiveRouteFusion,
     SharedRoutedResidualFusion,
 )
@@ -48,6 +50,10 @@ class MultiScaleMoEBackbone(nn.Module):
         route_dropout: float = 0.0,
         enable_branch_aux: bool = True,
         enable_complementary_loss: bool = True,
+        model_variant: str = "main",
+        shared_expert_type: str = "gated_cross_scale",
+        routed_expert_type: str = "topk",
+        fusion_type: str = "shared_routed_residual",
     ) -> None:
         super().__init__()
         self.dim = dim
@@ -72,6 +78,10 @@ class MultiScaleMoEBackbone(nn.Module):
         self.route_dropout = route_dropout
         self.enable_branch_aux = enable_branch_aux
         self.enable_complementary_loss = enable_complementary_loss
+        self.model_variant = model_variant
+        self.shared_expert_type = shared_expert_type
+        self.routed_expert_type = routed_expert_type
+        self.fusion_type = fusion_type
 
         self.embed_f = ScaleTokenEncoder(c_in, dim, max_t, h, w, num_groups=num_groups)
         self.embed_m = ScaleTokenEncoder(c_in, dim, max_t, h // 2, w // 2, num_groups=num_groups)
@@ -81,27 +91,31 @@ class MultiScaleMoEBackbone(nn.Module):
         self.router_m = QualityRouter(dim, q_dim, num_experts)
         self.router_c = QualityRouter(dim, q_dim, num_experts)
 
-        self.routed_expert_pool = TopKRoutedExpertPool(
+        routed_pool_cls = self._resolve_routed_expert_pool(routed_expert_type)
+        self.routed_expert_pool = routed_pool_cls(
             dim, num_experts, top_k=self.top_k, num_groups=num_groups, dropout=dropout
         )
         if share_experts:
             self.routed_expert_pool_m = self.routed_expert_pool
             self.routed_expert_pool_c = self.routed_expert_pool
         else:
-            self.routed_expert_pool_m = TopKRoutedExpertPool(
+            self.routed_expert_pool_m = routed_pool_cls(
                 dim, num_experts, top_k=self.top_k, num_groups=num_groups, dropout=dropout
             )
-            self.routed_expert_pool_c = TopKRoutedExpertPool(
+            self.routed_expert_pool_c = routed_pool_cls(
                 dim, num_experts, top_k=self.top_k, num_groups=num_groups, dropout=dropout
             )
 
-        self.cross_scale_shared_expert = GatedCrossScaleSharedExpert(
-            dim,
-            stat_dim=q_dim,
-            num_groups=num_groups,
-            dropout=dropout,
+        shared_expert_cls = self._resolve_shared_expert(shared_expert_type)
+        shared_expert = shared_expert_cls(
+            dim, stat_dim=q_dim, num_groups=num_groups, dropout=dropout,
             use_scale_gate=use_scale_gate,
         )
+        if shared_expert_type == "global_prior":
+            self.global_prior_expert = shared_expert
+        else:
+            # Preserve legacy state-dict keys for existing main checkpoints.
+            self.cross_scale_shared_expert = shared_expert
         self.shared_input_adapter = ExpertEnhancedSharedInput(
             dim=dim,
             mode=shared_input_mode,
@@ -110,16 +124,28 @@ class MultiScaleMoEBackbone(nn.Module):
         self.route_fusion = ProgressiveRouteFusion(
             dim, num_groups=num_groups, dropout=dropout
         )
-        self.branch_fusion = SharedRoutedResidualFusion(
-            dim,
-            num_groups=num_groups,
-            dropout=dropout,
-            route_gamma_init=route_gamma_init,
-            branch_fusion_mode=branch_fusion_mode,
-            branch_gate_init=branch_gate_init,
-            q_dim=q_dim,
-            route_dropout=route_dropout,
-        )
+        if fusion_type == "prior_specialized":
+            self.prior_specialized_fusion = PriorSpecializedFusion(
+                dim,
+                num_groups=num_groups,
+                dropout=dropout,
+                route_gamma_init=route_gamma_init,
+                route_dropout=route_dropout,
+            )
+        elif fusion_type in {"shared_routed_residual", "legacy"}:
+            # Preserve legacy state-dict keys for existing main checkpoints.
+            self.branch_fusion = SharedRoutedResidualFusion(
+                dim,
+                num_groups=num_groups,
+                dropout=dropout,
+                route_gamma_init=route_gamma_init,
+                branch_fusion_mode=branch_fusion_mode,
+                branch_gate_init=branch_gate_init,
+                q_dim=q_dim,
+                route_dropout=route_dropout,
+            )
+        else:
+            raise ValueError(f"Unsupported fusion_type: {fusion_type}")
         head_hidden = max(1, dim // 2)
         self.pred_head = nn.Sequential(
             nn.Conv3d(dim, max(1, dim // 2), kernel_size=3, padding=1),
@@ -136,6 +162,22 @@ class MultiScaleMoEBackbone(nn.Module):
             nn.GELU(),
             nn.Conv3d(head_hidden, c_in, kernel_size=1),
         )
+
+    @staticmethod
+    def _resolve_routed_expert_pool(expert_type: str) -> type[TopKRoutedExpertPool]:
+        if expert_type in {"conditional_specialized", "conditional_routed"}:
+            return ConditionalRoutedExpertPool
+        if expert_type in {"topk", "legacy"}:
+            return TopKRoutedExpertPool
+        raise ValueError(f"Unsupported routed_expert_type: {expert_type}")
+
+    @staticmethod
+    def _resolve_shared_expert(expert_type: str) -> type[GatedCrossScaleSharedExpert]:
+        if expert_type == "global_prior":
+            return GlobalPriorExpert
+        if expert_type in {"gated_cross_scale", "legacy"}:
+            return GatedCrossScaleSharedExpert
+        raise ValueError(f"Unsupported shared_expert_type: {expert_type}")
 
     @classmethod
     def from_config(cls, cfg: dict) -> "MultiScaleMoEBackbone":
@@ -180,10 +222,32 @@ class MultiScaleMoEBackbone(nn.Module):
             route_dropout=main_cfg.get("route_dropout", 0.0),
             enable_branch_aux=main_cfg.get("enable_branch_aux", True),
             enable_complementary_loss=main_cfg.get("enable_complementary_loss", True),
+            model_variant=model_cfg.get("name", "main"),
+            shared_expert_type=main_cfg.get(
+                "shared_expert_type", model_cfg.get("shared_expert_type", "gated_cross_scale")
+            ),
+            routed_expert_type=main_cfg.get(
+                "routed_expert_type", model_cfg.get("routed_expert_type", "topk")
+            ),
+            fusion_type=main_cfg.get(
+                "fusion_type", model_cfg.get("fusion_type", "shared_routed_residual")
+            ),
         )
 
     def get_scale_embed_vec(self, embed_module: ScaleTokenEncoder, batch_size: int) -> torch.Tensor:
         return embed_module.scale_embed.view(1, self.dim).expand(batch_size, self.dim)
+
+    def _global_prior_module(self) -> GatedCrossScaleSharedExpert:
+        if self.shared_expert_type == "global_prior":
+            return self.global_prior_expert
+        return self.cross_scale_shared_expert
+
+    def _prior_specialized_fusion_module(
+        self,
+    ) -> PriorSpecializedFusion | SharedRoutedResidualFusion:
+        if self.fusion_type == "prior_specialized":
+            return self.prior_specialized_fusion
+        return self.branch_fusion
 
     def _route(
         self,
@@ -274,7 +338,7 @@ class MultiScaleMoEBackbone(nn.Module):
                 z_m=z_m_for_shared,
                 z_c=z_c_for_shared,
             )
-            z_shared, h_m_up, h_c_up, scale_gate = self.cross_scale_shared_expert(
+            h_prior, h_m_up, h_c_up, scale_gate = self._global_prior_module()(
                 h_f=h_f_shared,
                 h_m=h_m_shared,
                 h_c=h_c_shared,
@@ -286,7 +350,7 @@ class MultiScaleMoEBackbone(nn.Module):
                 active_mask=active_mask,
             )
         else:
-            z_shared = torch.zeros_like(z_f)
+            h_prior = torch.zeros_like(z_f)
             h_m_up = torch.zeros_like(z_f)
             h_c_up = torch.zeros_like(z_f)
             h_f_shared = torch.zeros_like(h_f)
@@ -339,7 +403,8 @@ class MultiScaleMoEBackbone(nn.Module):
             )
 
         if self.use_shared_branch and not self.use_routed_branch:
-            h_shared = self.branch_fusion.refine_shared(z_shared)
+            fusion_module = self._prior_specialized_fusion_module()
+            h_shared = fusion_module.refine_shared(h_prior)
 
         if self.use_shared_branch and not self.use_routed_branch:
             h_main = h_shared
@@ -350,14 +415,24 @@ class MultiScaleMoEBackbone(nn.Module):
             branch_mode = "routed_only"
             branch_gate[:, 1] = 1.0
         else:
-            h_main, h_shared, h_route_proj, branch_gate = self.branch_fusion(
-                z_shared=z_shared,
-                h_route=route_outputs["h_route"],
-                q_f=q_f,
-                scale_gate=scale_gate,
-            )
-            route_gamma = torch.sigmoid(self.branch_fusion.route_gamma)
-            branch_mode = self.branch_fusion_mode
+            fusion_module = self._prior_specialized_fusion_module()
+            if self.fusion_type == "prior_specialized":
+                h_main, h_shared, h_route_proj, branch_gate = fusion_module(
+                    h_prior=h_prior,
+                    h_special=route_outputs["h_route"],
+                    q_f=q_f,
+                    scale_gate=scale_gate,
+                )
+                branch_mode = "prior_specialized"
+            else:
+                h_main, h_shared, h_route_proj, branch_gate = fusion_module(
+                    z_shared=h_prior,
+                    h_route=route_outputs["h_route"],
+                    q_f=q_f,
+                    scale_gate=scale_gate,
+                )
+                branch_mode = self.branch_fusion_mode
+            route_gamma = torch.sigmoid(fusion_module.route_gamma)
 
         x_hat_main = self.pred_head(h_main)
         is_full = self.use_shared_branch and self.use_routed_branch
@@ -371,6 +446,8 @@ class MultiScaleMoEBackbone(nn.Module):
             "x_hat_main": x_hat_main,
             "x_hat_shared": x_hat_shared,
             "x_hat_route": x_hat_route,
+            "x_hat_prior": x_hat_shared,
+            "x_hat_specialized": x_hat_route,
             "h_st_aux": h_main,
             "gates": {
                 "fine": gate_f,
@@ -408,7 +485,13 @@ class MultiScaleMoEBackbone(nn.Module):
                 "z_m_to_f": route_outputs["z_m_to_f"],
                 "z_mc": route_outputs["z_mc"],
                 "z_mc_to_f": route_outputs["z_mc_to_f"],
-                "z_shared": z_shared,
+                "h_prior": h_prior,
+                "h_special": route_outputs["h_route"],
+                "h_prior_refined": h_shared,
+                "h_special_proj": h_route_proj,
+                # Legacy aliases are intentionally retained for old reports,
+                # checkpoints, diagnostics, and ablation tooling.
+                "z_shared": h_prior,
                 "h_shared": h_shared,
                 "h_route": route_outputs["h_route"],
                 "h_route_proj": h_route_proj,
@@ -425,6 +508,10 @@ class MultiScaleMoEBackbone(nn.Module):
             "detach_shared_expert_input": self.detach_shared_expert_input,
             "enable_branch_aux": self.enable_branch_aux,
             "enable_complementary_loss": self.enable_complementary_loss,
+            "model_variant": self.model_variant,
+            "shared_expert_type": self.shared_expert_type,
+            "routed_expert_type": self.routed_expert_type,
+            "fusion_type": self.fusion_type,
             "route_gamma": route_gamma.detach(),
             "diagnostics": {
                 "shared_input_beta": self.shared_input_adapter.beta_values().detach(),

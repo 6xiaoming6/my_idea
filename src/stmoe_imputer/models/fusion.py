@@ -172,6 +172,17 @@ class GatedCrossScaleSharedExpert(nn.Module):
         return z_shared, h_m_up, h_c_up, scale_weight
 
 
+class GlobalPriorExpert(GatedCrossScaleSharedExpert):
+    """Shared expert that learns stable global multi-scale priors.
+
+    v7-single deliberately inherits the stable main-branch implementation so
+    that the architecture can be reformulated without changing the established
+    scale gate, reliability handling, or output shape.
+    """
+
+    pass
+
+
 class ExpertEnhancedSharedInput(nn.Module):
     def __init__(
         self,
@@ -443,3 +454,56 @@ class SharedRoutedResidualFusion(nn.Module):
             h_main = w_shared * h_shared + w_route * h_route_proj
             return h_main, h_shared, h_route_proj, branch_gate
         raise ValueError(f"Unsupported branch_fusion_mode: {self.branch_fusion_mode}")
+
+
+class PriorSpecializedFusion(nn.Module):
+    """Fuse a stable global prior with a small conditional expert residual."""
+
+    def __init__(
+        self,
+        dim: int,
+        num_groups: int = 8,
+        dropout: float = 0.0,
+        route_gamma_init: float = -3.0,
+        route_dropout: float = 0.1,
+    ) -> None:
+        super().__init__()
+        self.prior_refine = ResidualSTBlock(
+            dim, num_groups=num_groups, dropout=dropout
+        )
+        self.specialized_proj = nn.Sequential(
+            nn.Conv3d(dim, dim, kernel_size=1),
+            ResidualSTBlock(dim, num_groups=num_groups, dropout=dropout),
+            nn.Dropout3d(route_dropout) if route_dropout > 0 else nn.Identity(),
+        )
+        self.route_gamma = nn.Parameter(torch.tensor(float(route_gamma_init)))
+
+    def refine_prior(self, h_prior: torch.Tensor) -> torch.Tensor:
+        return self.prior_refine(h_prior)
+
+    def project_specialized(self, h_special: torch.Tensor) -> torch.Tensor:
+        return self.specialized_proj(h_special)
+
+    # Compatibility methods keep the surrounding training and ablation code
+    # able to switch between legacy and v7-single fusion implementations.
+    def refine_shared(self, h_prior: torch.Tensor) -> torch.Tensor:
+        return self.refine_prior(h_prior)
+
+    def project_route(self, h_special: torch.Tensor) -> torch.Tensor:
+        return self.project_specialized(h_special)
+
+    def forward(
+        self,
+        h_prior: torch.Tensor,
+        h_special: torch.Tensor,
+        q_f: torch.Tensor | None = None,
+        scale_gate: torch.Tensor | None = None,
+    ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
+        del q_f, scale_gate
+        h_prior_refined = self.refine_prior(h_prior)
+        h_special_proj = self.project_specialized(h_special)
+        alpha = torch.sigmoid(self.route_gamma)
+        h_main = h_prior_refined + alpha * h_special_proj
+        branch_gate = torch.stack([torch.ones_like(alpha), alpha], dim=0).view(1, 2)
+        branch_gate = branch_gate.expand(h_prior.shape[0], 2)
+        return h_main, h_prior_refined, h_special_proj, branch_gate

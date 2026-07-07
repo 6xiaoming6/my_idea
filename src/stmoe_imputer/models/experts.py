@@ -81,6 +81,17 @@ class TopKRoutedExpertPool(nn.Module):
         raise ValueError(f"Unsupported routing_mode: {routing_mode}")
 
 
+class ConditionalRoutedExpertPool(TopKRoutedExpertPool):
+    """Quality-conditioned specialized expert pool used by the v7-single model.
+
+    The v7-single implementation intentionally reuses the proven Top-K
+    execution path.  The dedicated class gives the routed branch a precise
+    architectural meaning without changing expert selection or tensor shapes.
+    """
+
+    pass
+
+
 class CrossScaleSharedExpert(nn.Module):
     def __init__(self, dim: int, num_groups: int = 8, dropout: float = 0.0) -> None:
         super().__init__()

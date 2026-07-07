@@ -211,19 +211,27 @@ def compute_main_stage_loss(
             l_branch_entropy = categorical_entropy_loss(branch_gate)
 
     l_shared_aux = _empty_loss_like(l_main)
-    x_hat_shared = outputs.get("x_hat_shared")
+    x_hat_shared = outputs.get("x_hat_prior", outputs.get("x_hat_shared"))
     if is_full and x_hat_shared is not None and cfg["model"]["main"].get("enable_branch_aux", True):
         l_shared_aux = masked_loss(x_hat_shared, x_f_gt, m_f, loss_type=loss_type)
 
     l_route_aux = _empty_loss_like(l_main)
-    x_hat_route = outputs.get("x_hat_route")
+    x_hat_route = outputs.get("x_hat_specialized", outputs.get("x_hat_route"))
     if is_full and x_hat_route is not None and cfg["model"]["main"].get("enable_branch_aux", True):
         l_route_aux = masked_loss(x_hat_route, x_f_gt, m_f, loss_type=loss_type)
 
     l_complementary = _empty_loss_like(l_main)
     features = outputs.get("features", {})
-    h_shared = features.get("h_shared") if isinstance(features, dict) else None
-    h_route = features.get("h_route_proj") if isinstance(features, dict) else None
+    h_shared = (
+        features.get("h_prior_refined", features.get("h_shared"))
+        if isinstance(features, dict)
+        else None
+    )
+    h_route = (
+        features.get("h_special_proj", features.get("h_route_proj"))
+        if isinstance(features, dict)
+        else None
+    )
     if (
         is_full
         and cfg["model"]["main"].get("enable_complementary_loss", True)
@@ -260,6 +268,8 @@ def compute_main_stage_loss(
         "l_branch_entropy": l_branch_entropy.detach(),
         "l_shared_aux": l_shared_aux.detach(),
         "l_route_aux": l_route_aux.detach(),
+        "l_prior_aux": l_shared_aux.detach(),
+        "l_specialized_aux": l_route_aux.detach(),
         "l_complementary": l_complementary.detach(),
         "aux_loss_warmup": torch.as_tensor(warmup_factor, device=l_main.device).detach(),
     }
