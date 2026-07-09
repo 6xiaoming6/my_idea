@@ -1,0 +1,7 @@
+{
+  "model": {
+    "main": {
+      "use_difficulty_router": false
+    }
+  }
+}

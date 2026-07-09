@@ -52,6 +52,7 @@ ABLATION_DESCRIPTIONS = {
 @dataclass(frozen=True)
 class DatasetSpec:
     config: str
+    model_config_name: str
     train_npz: str
     val_npz: str
     test_npz: str
@@ -62,6 +63,7 @@ class DatasetSpec:
 DATASETS = {
     "TaxiBJ": DatasetSpec(
         config="configs/datasets/taxibj.json",
+        model_config_name="taxibj.json",
         train_npz="data/TaxiBJ/taxibj_train.npz",
         val_npz="data/TaxiBJ/taxibj_val.npz",
         test_npz="data/TaxiBJ/taxibj_test.npz",
@@ -70,6 +72,7 @@ DATASETS = {
     ),
     "BikeNYC": DatasetSpec(
         config="configs/datasets/bikenyc.json",
+        model_config_name="bikenyc.json",
         train_npz="data/BikeNYC/bikenyc_train.npz",
         val_npz="data/BikeNYC/bikenyc_val.npz",
         test_npz="data/BikeNYC/bikenyc_test.npz",
@@ -78,6 +81,7 @@ DATASETS = {
     ),
     "CHAP": DatasetSpec(
         config="configs/datasets/chap_beijing.json",
+        model_config_name="chap.json",
         train_npz="data/CHAP/beijing/chap_beijing_train.npz",
         val_npz="data/CHAP/beijing/chap_beijing_val.npz",
         test_npz="data/CHAP/beijing/chap_beijing_test.npz",
@@ -128,6 +132,15 @@ def parse_args() -> argparse.Namespace:
         "--training_policy",
         default=None,
         help="Optional dataset-specific JSON training policy merged before mask/ablation overrides.",
+    )
+    parser.add_argument(
+        "--model-config-dir",
+        "--model_config_dir",
+        default=None,
+        help=(
+            "Optional directory containing dataset model overrides named "
+            "taxibj.json, bikenyc.json, and chap.json."
+        ),
     )
     parser.add_argument(
         "--cpu-threads",
@@ -251,6 +264,29 @@ def _load_training_policy(path_text: str | None, datasets: tuple[str, ...]) -> t
     return name, patches
 
 
+def _load_model_overrides(
+    directory_text: str | None,
+    datasets: tuple[str, ...],
+) -> tuple[str | None, dict[str, dict]]:
+    if not directory_text:
+        return None, {dataset: {} for dataset in datasets}
+    directory = Path(directory_text).expanduser()
+    if not directory.is_absolute():
+        directory = (ROOT / directory).resolve()
+    if not directory.is_dir():
+        raise FileNotFoundError(f"Model config directory not found: {directory}")
+    patches = {}
+    for dataset in datasets:
+        path = directory / DATASETS[dataset].model_config_name
+        if not path.is_file():
+            raise FileNotFoundError(f"Model config not found for {dataset}: {path}")
+        patch = json.loads(path.read_text(encoding="utf-8"))
+        if not isinstance(patch, dict):
+            raise ValueError(f"Model config must contain a JSON object: {path}")
+        patches[dataset] = patch
+    return directory.name, patches
+
+
 def _generate_masks(args: argparse.Namespace, spec: DatasetSpec, pattern: str, rate: str, env: dict[str, str]) -> None:
     output_dir = Path(spec.mask_root) / f"{pattern}_mask" / rate
     print(f"[info] generating {pattern} masks: {output_dir}")
@@ -356,6 +392,13 @@ def main() -> None:
     for name in dataset_names:
         _validate_files(DATASETS[name])
     policy_name, training_patches = _load_training_policy(args.training_policy, dataset_names)
+    model_config_name, model_patches = _load_model_overrides(
+        args.model_config_dir, dataset_names
+    )
+    combined_patches = {
+        name: _deep_update(model_patches[name], training_patches[name])
+        for name in dataset_names
+    }
 
     combinations = [(name, pattern, rate) for rate in rates for pattern in patterns for name in dataset_names]
     print("=" * 72)
@@ -365,6 +408,7 @@ def main() -> None:
     print(f"rates: {', '.join(rates)}")
     print(f"GPU: cuda:{args.gpu} | child CPU threads: {args.cpu_threads}")
     print(f"training policy: {policy_name or 'dataset defaults'}")
+    print(f"model config: {model_config_name or 'dataset defaults'}")
     print(f"dataset/mask combinations: {len(combinations)}")
     print("=" * 72)
 
@@ -390,7 +434,7 @@ def main() -> None:
                 temp_dir,
                 index,
                 len(combinations),
-                training_patches[name],
+                combined_patches[name],
             )
 
     elapsed = time.perf_counter() - started

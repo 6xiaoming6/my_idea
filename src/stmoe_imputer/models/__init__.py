@@ -1,4 +1,7 @@
 from .imputer import DualBranchSTImputer, ParallelTwoBranchImputer
+from .difficulty import DifficultyDescriptor, compute_raw_difficulty_stats
+from .router import DifficultyAwareRouter
+from .v_single import V8DifficultyMRMoEBackbone
 from .fusion import (
     AdaptiveBranchGate,
     ExpertEnhancedSharedInput,
@@ -20,6 +23,8 @@ from .main_branch import (
 
 __all__ = [
     "DualBranchSTImputer",
+    "DifficultyAwareRouter",
+    "DifficultyDescriptor",
     "AdaptiveBranchGate",
     "ExpertEnhancedSharedInput",
     "GatedFusion2",
@@ -34,7 +39,9 @@ __all__ = [
     "ProgressiveScaleGatedFusion",
     "ReliabilityAwareScaleGate",
     "SharedRoutedResidualFusion",
+    "V8DifficultyMRMoEBackbone",
     "build_scale_active_mask",
     "get_active_scales",
     "is_scale_active",
+    "compute_raw_difficulty_stats",
 ]

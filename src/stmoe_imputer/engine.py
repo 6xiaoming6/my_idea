@@ -134,6 +134,46 @@ def _append_model_diagnostics(logs: dict[str, list[float]], outputs: dict) -> No
         logs["shared_input_beta_m"].append(float(beta[1].detach().cpu()))
         logs["shared_input_beta_c"].append(float(beta[2].detach().cpu()))
 
+    difficulty_scores = (
+        diagnostics.get("difficulty_scores") if isinstance(diagnostics, dict) else None
+    )
+    gates = outputs.get("gates", {})
+    if isinstance(difficulty_scores, dict):
+        for scale in ("fine", "mid", "coarse"):
+            score = difficulty_scores.get(scale)
+            gate = gates.get(scale) if isinstance(gates, dict) else None
+            if score is None or gate is None or not torch.is_tensor(score):
+                continue
+            score = score.detach().float()
+            gate = gate.detach().float()
+            entropy = -(gate * gate.clamp_min(1e-8).log()).sum(dim=1)
+            score_centered = score - score.mean()
+            entropy_centered = entropy - entropy.mean()
+            denominator = (
+                score_centered.square().mean().sqrt()
+                * entropy_centered.square().mean().sqrt()
+            ).clamp_min(1e-8)
+            correlation = (score_centered * entropy_centered).mean() / denominator
+            logs[f"difficulty_{scale}_mean"].append(float(score.mean().cpu()))
+            logs[f"difficulty_{scale}_std"].append(float(score.std(unbiased=False).cpu()))
+            logs[f"expert_entropy_{scale}_mean"].append(float(entropy.mean().cpu()))
+            logs[f"difficulty_entropy_corr_{scale}"].append(float(correlation.cpu()))
+
+            threshold = score.median()
+            low_mask = score <= threshold
+            high_mask = score > threshold
+            for expert_idx in range(gate.shape[1]):
+                if low_mask.any():
+                    low_value = gate[low_mask, expert_idx].mean()
+                    logs[f"gate_{scale}_expert{expert_idx}_low_diff"].append(
+                        float(low_value.cpu())
+                    )
+                if high_mask.any():
+                    high_value = gate[high_mask, expert_idx].mean()
+                    logs[f"gate_{scale}_expert{expert_idx}_high_diff"].append(
+                        float(high_value.cpu())
+                    )
+
     features = outputs.get("features", {})
     h_shared = features.get("h_shared") if isinstance(features, dict) else None
     h_route_proj = features.get("h_route_proj") if isinstance(features, dict) else None

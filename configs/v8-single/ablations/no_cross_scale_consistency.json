@@ -1,0 +1,7 @@
+{
+  "model": {
+    "main": {
+      "difficulty_use_cross_scale_consistency": false
+    }
+  }
+}

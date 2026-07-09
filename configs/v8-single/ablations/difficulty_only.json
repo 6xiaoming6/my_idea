@@ -1,0 +1,7 @@
+{
+  "model": {
+    "main": {
+      "difficulty_router_mode": "difficulty_only"
+    }
+  }
+}

@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import torch
 from torch import nn
+import torch.nn.functional as F
 
+from .difficulty import DifficultyDescriptor, aggregate_difficulty_score
 from .embedding import ScaleTokenEncoder
 from .experts import TopKRoutedExpertPool
 from .fusion import (
@@ -11,7 +13,7 @@ from .fusion import (
     ProgressiveRouteFusion,
     SharedRoutedResidualFusion,
 )
-from .router import QualityRouter, uniform_gate
+from .router import DifficultyAwareRouter, QualityRouter, uniform_gate
 from .scale_utils import build_scale_active_mask
 from .stats import compute_observation_stats
 
@@ -48,6 +50,16 @@ class MultiScaleMoEBackbone(nn.Module):
         route_dropout: float = 0.0,
         enable_branch_aux: bool = True,
         enable_complementary_loss: bool = True,
+        model_version: str = "main",
+        use_difficulty_router: bool = False,
+        difficulty_dim: int = 16,
+        difficulty_hidden_dim: int = 32,
+        difficulty_zero_init: bool = True,
+        difficulty_descriptor_zero_init: bool = False,
+        difficulty_dropout: float = 0.1,
+        difficulty_router_mode: str = "hybrid",
+        difficulty_use_spatial_block: bool = True,
+        difficulty_use_cross_scale_consistency: bool = True,
     ) -> None:
         super().__init__()
         self.dim = dim
@@ -72,14 +84,39 @@ class MultiScaleMoEBackbone(nn.Module):
         self.route_dropout = route_dropout
         self.enable_branch_aux = enable_branch_aux
         self.enable_complementary_loss = enable_complementary_loss
+        self.model_version = model_version
+        self.use_difficulty_router = use_difficulty_router
+        self.difficulty_router_mode = difficulty_router_mode
 
         self.embed_f = ScaleTokenEncoder(c_in, dim, max_t, h, w, num_groups=num_groups)
         self.embed_m = ScaleTokenEncoder(c_in, dim, max_t, h // 2, w // 2, num_groups=num_groups)
         self.embed_c = ScaleTokenEncoder(c_in, dim, max_t, h // 4, w // 4, num_groups=num_groups)
 
-        self.router_f = QualityRouter(dim, q_dim, num_experts)
-        self.router_m = QualityRouter(dim, q_dim, num_experts)
-        self.router_c = QualityRouter(dim, q_dim, num_experts)
+        if use_difficulty_router:
+            router_kwargs = {
+                "dim": dim,
+                "q_dim": q_dim,
+                "num_experts": num_experts,
+                "difficulty_dim": difficulty_dim,
+                "dropout": difficulty_dropout,
+                "zero_init": difficulty_zero_init,
+                "mode": difficulty_router_mode,
+            }
+            self.router_f = DifficultyAwareRouter(**router_kwargs)
+            self.router_m = DifficultyAwareRouter(**router_kwargs)
+            self.router_c = DifficultyAwareRouter(**router_kwargs)
+            self.difficulty_descriptor = DifficultyDescriptor(
+                out_dim=difficulty_dim,
+                hidden_dim=difficulty_hidden_dim,
+                zero_init=difficulty_descriptor_zero_init,
+                dropout=difficulty_dropout,
+                use_spatial_block=difficulty_use_spatial_block,
+                use_cross_scale_consistency=difficulty_use_cross_scale_consistency,
+            )
+        else:
+            self.router_f = QualityRouter(dim, q_dim, num_experts)
+            self.router_m = QualityRouter(dim, q_dim, num_experts)
+            self.router_c = QualityRouter(dim, q_dim, num_experts)
 
         self.routed_expert_pool = TopKRoutedExpertPool(
             dim, num_experts, top_k=self.top_k, num_groups=num_groups, dropout=dropout
@@ -180,6 +217,22 @@ class MultiScaleMoEBackbone(nn.Module):
             route_dropout=main_cfg.get("route_dropout", 0.0),
             enable_branch_aux=main_cfg.get("enable_branch_aux", True),
             enable_complementary_loss=main_cfg.get("enable_complementary_loss", True),
+            model_version=model_cfg.get("version", "main"),
+            use_difficulty_router=main_cfg.get("use_difficulty_router", False),
+            difficulty_dim=main_cfg.get("difficulty_dim", 16),
+            difficulty_hidden_dim=main_cfg.get("difficulty_hidden_dim", 32),
+            difficulty_zero_init=main_cfg.get("difficulty_zero_init", True),
+            difficulty_descriptor_zero_init=main_cfg.get(
+                "difficulty_descriptor_zero_init", False
+            ),
+            difficulty_dropout=main_cfg.get("difficulty_dropout", 0.1),
+            difficulty_router_mode=main_cfg.get("difficulty_router_mode", "hybrid"),
+            difficulty_use_spatial_block=main_cfg.get(
+                "difficulty_use_spatial_block", True
+            ),
+            difficulty_use_cross_scale_consistency=main_cfg.get(
+                "difficulty_use_cross_scale_consistency", True
+            ),
         )
 
     def get_scale_embed_vec(self, embed_module: ScaleTokenEncoder, batch_size: int) -> torch.Tensor:
@@ -189,12 +242,13 @@ class MultiScaleMoEBackbone(nn.Module):
         self,
         router: QualityRouter,
         h: torch.Tensor,
-        mask: torch.Tensor,
+        q: torch.Tensor,
         scale_embed_vec: torch.Tensor,
+        difficulty: torch.Tensor | None = None,
     ) -> torch.Tensor:
         if not self.use_router:
             return uniform_gate(h.shape[0], self.num_experts, h.device, h.dtype)
-        return router(h, compute_observation_stats(mask), scale_embed_vec)
+        return router(h, q, scale_embed_vec, difficulty=difficulty)
 
     def _effective_routing_mode(self) -> str:
         if self.use_router:
@@ -226,9 +280,43 @@ class MultiScaleMoEBackbone(nn.Module):
         q_m = compute_observation_stats(m_m)
         q_c = compute_observation_stats(m_c)
 
-        gate_f = self._route(self.router_f, h_f, m_f, self.get_scale_embed_vec(self.embed_f, batch_size))
-        gate_m = self._route(self.router_m, h_m, m_m, self.get_scale_embed_vec(self.embed_m, batch_size))
-        gate_c = self._route(self.router_c, h_c, m_c, self.get_scale_embed_vec(self.embed_c, batch_size))
+        if self.use_difficulty_router:
+            target_f = x_f.shape[-3:]
+            target_m = x_m.shape[-3:]
+            target_c = x_c.shape[-3:]
+            x_m_to_f = F.interpolate(x_m, size=target_f, mode="trilinear", align_corners=False)
+            x_c_to_f = F.interpolate(x_c, size=target_f, mode="trilinear", align_corners=False)
+            x_c_to_m = F.interpolate(x_c, size=target_m, mode="trilinear", align_corners=False)
+            x_m_to_c = F.interpolate(x_m, size=target_c, mode="trilinear", align_corners=False)
+            d_f, raw_d_f = self.difficulty_descriptor(
+                x_f, m_f, h=h_f, reliability=None,
+                cross_scale_reference=0.5 * (x_m_to_f + x_c_to_f),
+            )
+            d_m, raw_d_m = self.difficulty_descriptor(
+                x_m, m_m, h=h_m, reliability=r_m, cross_scale_reference=x_c_to_m,
+            )
+            d_c, raw_d_c = self.difficulty_descriptor(
+                x_c, m_c, h=h_c, reliability=r_c, cross_scale_reference=x_m_to_c,
+            )
+        else:
+            d_f = d_m = d_c = None
+            raw_d_f = x_f.new_zeros(batch_size, 9)
+            raw_d_m = x_f.new_zeros(batch_size, 9)
+            raw_d_c = x_f.new_zeros(batch_size, 9)
+
+        difficulty_score_f = aggregate_difficulty_score(raw_d_f)
+        difficulty_score_m = aggregate_difficulty_score(raw_d_m)
+        difficulty_score_c = aggregate_difficulty_score(raw_d_c)
+
+        gate_f = self._route(
+            self.router_f, h_f, q_f, self.get_scale_embed_vec(self.embed_f, batch_size), d_f
+        )
+        gate_m = self._route(
+            self.router_m, h_m, q_m, self.get_scale_embed_vec(self.embed_m, batch_size), d_m
+        )
+        gate_c = self._route(
+            self.router_c, h_c, q_c, self.get_scale_embed_vec(self.embed_c, batch_size), d_c
+        )
 
         routing_mode = self._effective_routing_mode()
         need_expert_features = self.use_routed_branch or (
@@ -425,10 +513,28 @@ class MultiScaleMoEBackbone(nn.Module):
             "detach_shared_expert_input": self.detach_shared_expert_input,
             "enable_branch_aux": self.enable_branch_aux,
             "enable_complementary_loss": self.enable_complementary_loss,
+            "model_version": self.model_version,
+            "use_difficulty_router": self.use_difficulty_router,
+            "difficulty_router_mode": self.difficulty_router_mode,
             "route_gamma": route_gamma.detach(),
             "diagnostics": {
                 "shared_input_beta": self.shared_input_adapter.beta_values().detach(),
                 "branch_gate": branch_gate.detach(),
+                "difficulty_embeddings": {
+                    "fine": d_f,
+                    "mid": d_m,
+                    "coarse": d_c,
+                },
+                "difficulty_stats": {
+                    "fine": raw_d_f,
+                    "mid": raw_d_m,
+                    "coarse": raw_d_c,
+                },
+                "difficulty_scores": {
+                    "fine": difficulty_score_f,
+                    "mid": difficulty_score_m,
+                    "coarse": difficulty_score_c,
+                },
             },
         }
 

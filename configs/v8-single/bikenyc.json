@@ -1,0 +1,20 @@
+{
+  "output_dir": "outputs/v8-single",
+  "model": {
+    "version": "v8-single",
+    "main": {
+      "architecture": "v8_difficulty_mr_moe",
+      "use_difficulty_router": true,
+      "difficulty_dim": 16,
+      "difficulty_hidden_dim": 32,
+      "difficulty_zero_init": true,
+      "difficulty_descriptor_zero_init": false,
+      "difficulty_dropout": 0.15,
+      "difficulty_router_mode": "hybrid",
+      "difficulty_use_spatial_block": true,
+      "difficulty_use_cross_scale_consistency": true,
+      "num_experts": 4,
+      "top_k": 2
+    }
+  }
+}
