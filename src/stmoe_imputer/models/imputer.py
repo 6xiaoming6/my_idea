@@ -23,7 +23,15 @@ class DualBranchSTImputer(nn.Module):
 
     @classmethod
     def from_config(cls, cfg: dict) -> "DualBranchSTImputer":
-        main_branch = MultiScaleMoEBackbone.from_config(cfg)
+        architecture = cfg["model"]["main"].get("architecture", "main")
+        if architecture == "v9_coarse_to_fine_residual_moe":
+            from .v_single import CoarseToFineResidualMoE
+
+            main_branch = CoarseToFineResidualMoE.from_config(cfg)
+        elif architecture in {"main", "default"}:
+            main_branch = MultiScaleMoEBackbone.from_config(cfg)
+        else:
+            raise ValueError(f"Unsupported model architecture: {architecture}")
         aux_branch = NullResidualBranch(c_out=cfg["model"]["c_in"])
         aux_cfg = cfg["model"].get("aux", {})
         return cls(

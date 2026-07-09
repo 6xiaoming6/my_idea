@@ -1,0 +1,7 @@
+{
+  "model": {
+    "main": {
+      "enable_mid_residual": false
+    }
+  }
+}

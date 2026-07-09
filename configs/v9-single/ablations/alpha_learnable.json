@@ -1,0 +1,9 @@
+{
+  "model": {
+    "main": {
+      "alpha_mode": "learnable",
+      "alpha_m_init": -3.0,
+      "alpha_f_init": -3.0
+    }
+  }
+}

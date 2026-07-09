@@ -1,0 +1,7 @@
+{
+  "model": {
+    "main": {
+      "enable_fine_residual": false
+    }
+  }
+}

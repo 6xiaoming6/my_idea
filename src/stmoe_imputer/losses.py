@@ -91,6 +91,56 @@ def cross_scale_loss(
     return loss + observed_loss(x_hat_c, x_c_obs, m_c, loss_type)
 
 
+def multi_resolution_supervision_loss(
+    outputs: dict,
+    x_f_gt: torch.Tensor,
+    m_m: torch.Tensor,
+    m_c: torch.Tensor,
+    fine_to_mid: int = 2,
+    fine_to_coarse: int = 4,
+    pooling_mode: str = "avg",
+    loss_type: str = "smooth_l1",
+) -> tuple[torch.Tensor, torch.Tensor]:
+    """Supervise v9 mid/coarse predictions on hidden positions only.
+
+    Targets are built from the full fine-scale target inside the loss function.
+    The model forward pass still receives only observed multi-resolution inputs,
+    so this supervision does not leak target values into predictions.
+    """
+    x_hat_mid = outputs.get("x_hat_mid")
+    x_hat_coarse = outputs.get("x_hat_coarse")
+    if x_hat_mid is None and x_hat_coarse is None:
+        empty = _empty_loss_like(x_f_gt)
+        return empty, empty
+
+    ones_f = torch.ones(
+        x_f_gt.shape[0],
+        1,
+        x_f_gt.shape[2],
+        x_f_gt.shape[3],
+        x_f_gt.shape[4],
+        device=x_f_gt.device,
+        dtype=x_f_gt.dtype,
+    )
+    x_m_gt, m_m_gt = masked_pool2d_spatial(
+        x_f_gt, ones_f, kernel_size=fine_to_mid, mode=pooling_mode
+    )
+    if x_hat_mid is not None:
+        l_mid = masked_loss(x_hat_mid, x_m_gt, m_m, loss_type=loss_type)
+    else:
+        l_mid = _empty_loss_like(x_f_gt)
+
+    if x_hat_coarse is not None:
+        mid_to_coarse = max(1, fine_to_coarse // fine_to_mid)
+        x_c_gt, _ = masked_pool2d_spatial(
+            x_m_gt, m_m_gt, kernel_size=mid_to_coarse, mode=pooling_mode
+        )
+        l_coarse = masked_loss(x_hat_coarse, x_c_gt, m_c, loss_type=loss_type)
+    else:
+        l_coarse = _empty_loss_like(x_f_gt)
+    return l_mid, l_coarse
+
+
 def _empty_loss_like(tensor: torch.Tensor) -> torch.Tensor:
     return tensor.sum() * 0.0
 
@@ -175,6 +225,20 @@ def compute_main_stage_loss(
         loss_type=loss_type,
         scale_mode=scale_mode,
     )
+    if loss_cfg.get("use_mid_coarse_supervision", False):
+        l_mid_supervision, l_coarse_supervision = multi_resolution_supervision_loss(
+            outputs,
+            x_f_gt,
+            batch["m_m"],
+            batch["m_c"],
+            fine_to_mid=scale_cfg["fine_to_mid"],
+            fine_to_coarse=scale_cfg["fine_to_coarse"],
+            pooling_mode=scale_cfg.get("pooling_mode", "avg"),
+            loss_type=loss_type,
+        )
+    else:
+        l_mid_supervision = _empty_loss_like(l_main)
+        l_coarse_supervision = _empty_loss_like(l_main)
     routing_mode = outputs.get("routing_mode", "topk")
     if scale_mode == "fine":
         balance_scales = ("fine",)
@@ -236,6 +300,8 @@ def compute_main_stage_loss(
     warmup_factor = 1.0 if epoch is None else min(1.0, max(0.0, epoch / warmup_epochs))
 
     loss = l_main + loss_cfg.get("lambda_cross", 0.1) * warmup_factor * l_cross
+    loss = loss + loss_cfg.get("lambda_mid_supervision", 0.0) * warmup_factor * l_mid_supervision
+    loss = loss + loss_cfg.get("lambda_coarse_supervision", 0.0) * warmup_factor * l_coarse_supervision
     balance_weight = loss_cfg.get("lambda_balance", 0.01)
     importance_weight = loss_cfg.get("lambda_importance_balance", balance_weight)
     load_weight = loss_cfg.get("lambda_load_balance", balance_weight)
@@ -253,6 +319,8 @@ def compute_main_stage_loss(
         "l_final": l_final.detach(),
         "l_main": l_main.detach(),
         "l_cross": l_cross.detach(),
+        "l_mid_supervision": l_mid_supervision.detach(),
+        "l_coarse_supervision": l_coarse_supervision.detach(),
         "l_balance": l_balance.detach(),
         "l_importance_balance": l_importance_balance.detach(),
         "l_load_balance": l_load_balance.detach(),

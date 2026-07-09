@@ -1,0 +1,90 @@
+{
+  "name": "v9_single_quick_5epoch",
+  "description": "5-epoch validation policy for v9-single five-point smoke matrix.",
+  "datasets": {
+    "TaxiBJ": {
+      "seed": 42,
+      "data": {
+        "batch_size": 8,
+        "num_workers": 0,
+        "pin_memory": true,
+        "drop_last": true
+      },
+      "train": {
+        "epochs": 5,
+        "val_epoch": 1,
+        "lr_main": 0.001,
+        "lr_aux": 0.001,
+        "weight_decay": 0.0001,
+        "grad_clip_norm": 1.0,
+        "amp": true,
+        "scheduler": {
+          "type": "cosine",
+          "eta_min": 0.000001
+        },
+        "early_stopping": {
+          "enabled": false,
+          "monitor": "val_mae",
+          "patience": 8,
+          "mode": "min"
+        }
+      }
+    },
+    "BikeNYC": {
+      "seed": 42,
+      "data": {
+        "batch_size": 8,
+        "num_workers": 0,
+        "pin_memory": true,
+        "drop_last": true
+      },
+      "train": {
+        "epochs": 5,
+        "val_epoch": 1,
+        "lr_main": 0.001,
+        "lr_aux": 0.001,
+        "weight_decay": 0.0001,
+        "grad_clip_norm": 1.0,
+        "amp": true,
+        "scheduler": {
+          "type": "cosine",
+          "eta_min": 0.000001
+        },
+        "early_stopping": {
+          "enabled": false,
+          "monitor": "val_mae",
+          "patience": 8,
+          "mode": "min"
+        }
+      }
+    },
+    "CHAP": {
+      "seed": 42,
+      "data": {
+        "batch_size": 8,
+        "num_workers": 0,
+        "pin_memory": true,
+        "drop_last": true
+      },
+      "train": {
+        "epochs": 5,
+        "val_epoch": 1,
+        "lr_main": 0.001,
+        "lr_aux": 0.001,
+        "weight_decay": 0.0001,
+        "grad_clip_norm": 1.0,
+        "amp": true,
+        "scheduler": {
+          "type": "cosine",
+          "eta_min": 0.000001
+        },
+        "early_stopping": {
+          "enabled": false,
+          "monitor": "val_mae",
+          "patience": 8,
+          "mode": "min"
+        }
+      }
+    }
+  }
+}

@@ -30,7 +30,16 @@ def build_optimizer(model: torch.nn.Module, cfg: dict) -> torch.optim.Optimizer:
         if not param.requires_grad:
             continue
         name_l = name.lower()
-        if any(token in name_l for token in ("route_gamma", "shared_gamma", "shared_input_adapter.beta")):
+        if any(
+            token in name_l
+            for token in (
+                "route_gamma",
+                "shared_gamma",
+                "shared_input_adapter.beta",
+                "alpha_m_logit",
+                "alpha_f_logit",
+            )
+        ):
             grouped["scalar"]["params"].append(param)
         elif "scale_gate" in name_l or "branch_gate" in name_l:
             grouped["gate"]["params"].append(param)
@@ -133,6 +142,11 @@ def _append_model_diagnostics(logs: dict[str, list[float]], outputs: dict) -> No
         logs["shared_input_beta_f"].append(float(beta[0].detach().cpu()))
         logs["shared_input_beta_m"].append(float(beta[1].detach().cpu()))
         logs["shared_input_beta_c"].append(float(beta[2].detach().cpu()))
+
+    for key in ("residual_alpha_m", "residual_alpha_f"):
+        value = diagnostics.get(key) if isinstance(diagnostics, dict) else None
+        if value is not None and torch.is_tensor(value):
+            logs[key].append(float(value.detach().cpu()))
 
     features = outputs.get("features", {})
     h_shared = features.get("h_shared") if isinstance(features, dict) else None

@@ -17,10 +17,12 @@ from .main_branch import (
     OAMSBackbone,
     ObservationAwareMultiScaleMoEImputer,
 )
+from .v_single import CoarseToFineResidualMoE
 
 __all__ = [
     "DualBranchSTImputer",
     "AdaptiveBranchGate",
+    "CoarseToFineResidualMoE",
     "ExpertEnhancedSharedInput",
     "GatedFusion2",
     "GatedFusion3",
