@@ -45,6 +45,7 @@ class TopKRoutedExpertPool(nn.Module):
         h: torch.Tensor,
         gate: torch.Tensor,
         routing_mode: str = "topk",
+        mask: torch.Tensor | None = None,
     ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
         expert_outputs = torch.stack([expert(h) for expert in self.experts], dim=1)
         batch_size = h.shape[0]

@@ -1,0 +1,77 @@
+{
+  "name": "v10_quick_1epoch",
+  "datasets": {
+    "TaxiBJ": {
+      "seed": 42,
+      "data": {
+        "batch_size": 4,
+        "num_workers": 0,
+        "pin_memory": true,
+        "drop_last": false
+      },
+      "train": {
+        "epochs": 1,
+        "val_epoch": 1,
+        "lr_main": 0.001,
+        "lr_aux": 0.001,
+        "weight_decay": 0.0001,
+        "grad_clip_norm": 1.0,
+        "amp": true,
+        "scheduler": {
+          "type": "none"
+        },
+        "early_stopping": {
+          "enabled": false
+        }
+      }
+    },
+    "BikeNYC": {
+      "seed": 42,
+      "data": {
+        "batch_size": 4,
+        "num_workers": 0,
+        "pin_memory": true,
+        "drop_last": false
+      },
+      "train": {
+        "epochs": 1,
+        "val_epoch": 1,
+        "lr_main": 0.001,
+        "lr_aux": 0.001,
+        "weight_decay": 0.0001,
+        "grad_clip_norm": 1.0,
+        "amp": true,
+        "scheduler": {
+          "type": "none"
+        },
+        "early_stopping": {
+          "enabled": false
+        }
+      }
+    },
+    "CHAP": {
+      "seed": 42,
+      "data": {
+        "batch_size": 4,
+        "num_workers": 0,
+        "pin_memory": true,
+        "drop_last": false
+      },
+      "train": {
+        "epochs": 1,
+        "val_epoch": 1,
+        "lr_main": 0.001,
+        "lr_aux": 0.001,
+        "weight_decay": 0.0001,
+        "grad_clip_norm": 1.0,
+        "amp": true,
+        "scheduler": {
+          "type": "none"
+        },
+        "early_stopping": {
+          "enabled": false
+        }
+      }
+    }
+  }
+}

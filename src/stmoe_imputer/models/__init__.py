@@ -17,15 +17,27 @@ from .main_branch import (
     OAMSBackbone,
     ObservationAwareMultiScaleMoEImputer,
 )
+from .v_single import (
+    DynamicExpert,
+    FunctionalExpertPool,
+    LocalSpatialExpert,
+    MissingPatternExpert,
+    SmoothExpert,
+    TemporalExpert,
+)
 
 __all__ = [
     "DualBranchSTImputer",
     "AdaptiveBranchGate",
+    "DynamicExpert",
     "ExpertEnhancedSharedInput",
+    "FunctionalExpertPool",
     "GatedFusion2",
     "GatedFusion3",
     "GatedCrossScaleSharedExpert",
     "LearnableUpsample3D",
+    "LocalSpatialExpert",
+    "MissingPatternExpert",
     "MultiScaleMoEBackbone",
     "OAMSBackbone",
     "ObservationAwareMultiScaleMoEImputer",
@@ -34,6 +46,8 @@ __all__ = [
     "ProgressiveScaleGatedFusion",
     "ReliabilityAwareScaleGate",
     "SharedRoutedResidualFusion",
+    "SmoothExpert",
+    "TemporalExpert",
     "build_scale_active_mask",
     "get_active_scales",
     "is_scale_active",

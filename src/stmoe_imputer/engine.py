@@ -134,6 +134,32 @@ def _append_model_diagnostics(logs: dict[str, list[float]], outputs: dict) -> No
         logs["shared_input_beta_m"].append(float(beta[1].detach().cpu()))
         logs["shared_input_beta_c"].append(float(beta[2].detach().cpu()))
 
+    expert_names = diagnostics.get("expert_names") if isinstance(diagnostics, dict) else None
+    gates = outputs.get("gates", {})
+    selected_masks = outputs.get("selected_masks", {})
+    if expert_names and isinstance(gates, dict):
+        gate_values = [
+            value for key, value in gates.items()
+            if key in {"fine", "mid", "coarse"} and torch.is_tensor(value)
+        ]
+        if gate_values:
+            gate_all = torch.cat(gate_values, dim=0)
+            entropy = -(gate_all * gate_all.clamp_min(1e-8).log()).sum(dim=1).mean()
+            logs["expert_usage_entropy"].append(float(entropy.detach().cpu()))
+            for idx, name in enumerate(expert_names):
+                if idx < gate_all.shape[1]:
+                    logs[f"expert_gate_{name}_mean"].append(float(gate_all[:, idx].mean().detach().cpu()))
+        if isinstance(selected_masks, dict):
+            selected_values = [
+                value for key, value in selected_masks.items()
+                if key in {"fine", "mid", "coarse"} and torch.is_tensor(value)
+            ]
+            if selected_values:
+                selected_all = torch.cat(selected_values, dim=0)
+                for idx, name in enumerate(expert_names):
+                    if idx < selected_all.shape[1]:
+                        logs[f"expert_usage_{name}"].append(float(selected_all[:, idx].mean().detach().cpu()))
+
     features = outputs.get("features", {})
     h_shared = features.get("h_shared") if isinstance(features, dict) else None
     h_route_proj = features.get("h_route_proj") if isinstance(features, dict) else None

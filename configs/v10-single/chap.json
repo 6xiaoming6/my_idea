@@ -1,0 +1,25 @@
+{
+  "output_dir": "outputs/v10-single",
+  "model": {
+    "version": "v10-single",
+    "architecture": "functional_pyramid_moe",
+    "main": {
+      "expert_pool_type": "functional",
+      "functional_expert_names": ["smooth", "local", "temporal", "missing", "dynamic"],
+      "num_experts": 5,
+      "top_k": 2,
+      "share_experts": true,
+      "use_multiscale": true,
+      "use_router": true,
+      "use_routed_branch": true,
+      "use_shared_branch": true,
+      "routing_mode": "topk",
+      "scale_mode": "fine_mid_coarse",
+      "dropout": 0.1,
+      "route_dropout": 0.1,
+      "route_gamma_init": -3.0,
+      "enable_branch_aux": true,
+      "enable_complementary_loss": true
+    }
+  }
+}

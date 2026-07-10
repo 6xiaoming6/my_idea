@@ -1,0 +1,10 @@
+{
+  "model": {
+    "architecture": "main_homogeneous_moe",
+    "main": {
+      "expert_pool_type": "homogeneous",
+      "num_experts": 4,
+      "top_k": 2
+    }
+  }
+}

@@ -14,6 +14,7 @@ from .fusion import (
 from .router import QualityRouter, uniform_gate
 from .scale_utils import build_scale_active_mask
 from .stats import compute_observation_stats
+from .v_single.functional_experts import FUNCTIONAL_EXPERT_NAMES, FunctionalExpertPool
 
 
 class MultiScaleMoEBackbone(nn.Module):
@@ -48,11 +49,22 @@ class MultiScaleMoEBackbone(nn.Module):
         route_dropout: float = 0.0,
         enable_branch_aux: bool = True,
         enable_complementary_loss: bool = True,
+        expert_pool_type: str = "homogeneous",
+        functional_expert_names: tuple[str, ...] | list[str] | None = None,
     ) -> None:
         super().__init__()
+        if expert_pool_type not in {"homogeneous", "functional"}:
+            raise ValueError(f"Unsupported expert_pool_type: {expert_pool_type}")
+        functional_expert_names = tuple(functional_expert_names or FUNCTIONAL_EXPERT_NAMES)
+        if expert_pool_type == "functional":
+            num_experts = len(functional_expert_names)
         self.dim = dim
         self.num_experts = num_experts
         self.top_k = min(max(1, top_k), num_experts)
+        self.expert_pool_type = expert_pool_type
+        self.functional_expert_names = functional_expert_names if expert_pool_type == "functional" else tuple(
+            f"expert_{idx}" for idx in range(num_experts)
+        )
         self.use_multiscale = use_multiscale
         self.use_router = use_router
         self.share_experts = share_experts
@@ -81,18 +93,30 @@ class MultiScaleMoEBackbone(nn.Module):
         self.router_m = QualityRouter(dim, q_dim, num_experts)
         self.router_c = QualityRouter(dim, q_dim, num_experts)
 
-        self.routed_expert_pool = TopKRoutedExpertPool(
-            dim, num_experts, top_k=self.top_k, num_groups=num_groups, dropout=dropout
+        self.routed_expert_pool = self._build_routed_expert_pool(
+            dim=dim,
+            num_experts=num_experts,
+            top_k=self.top_k,
+            num_groups=num_groups,
+            dropout=dropout,
         )
         if share_experts:
             self.routed_expert_pool_m = self.routed_expert_pool
             self.routed_expert_pool_c = self.routed_expert_pool
         else:
-            self.routed_expert_pool_m = TopKRoutedExpertPool(
-                dim, num_experts, top_k=self.top_k, num_groups=num_groups, dropout=dropout
+            self.routed_expert_pool_m = self._build_routed_expert_pool(
+                dim=dim,
+                num_experts=num_experts,
+                top_k=self.top_k,
+                num_groups=num_groups,
+                dropout=dropout,
             )
-            self.routed_expert_pool_c = TopKRoutedExpertPool(
-                dim, num_experts, top_k=self.top_k, num_groups=num_groups, dropout=dropout
+            self.routed_expert_pool_c = self._build_routed_expert_pool(
+                dim=dim,
+                num_experts=num_experts,
+                top_k=self.top_k,
+                num_groups=num_groups,
+                dropout=dropout,
             )
 
         self.cross_scale_shared_expert = GatedCrossScaleSharedExpert(
@@ -180,6 +204,31 @@ class MultiScaleMoEBackbone(nn.Module):
             route_dropout=main_cfg.get("route_dropout", 0.0),
             enable_branch_aux=main_cfg.get("enable_branch_aux", True),
             enable_complementary_loss=main_cfg.get("enable_complementary_loss", True),
+            expert_pool_type=main_cfg.get("expert_pool_type", "homogeneous"),
+            functional_expert_names=main_cfg.get("functional_expert_names"),
+        )
+
+    def _build_routed_expert_pool(
+        self,
+        dim: int,
+        num_experts: int,
+        top_k: int,
+        num_groups: int,
+        dropout: float,
+    ) -> nn.Module:
+        if self.expert_pool_type == "functional":
+            return FunctionalExpertPool(
+                dim=dim,
+                top_k=top_k,
+                dropout=dropout,
+                expert_names=self.functional_expert_names,
+            )
+        return TopKRoutedExpertPool(
+            dim,
+            num_experts,
+            top_k=top_k,
+            num_groups=num_groups,
+            dropout=dropout,
         )
 
     def get_scale_embed_vec(self, embed_module: ScaleTokenEncoder, batch_size: int) -> torch.Tensor:
@@ -236,13 +285,13 @@ class MultiScaleMoEBackbone(nn.Module):
         )
         if need_expert_features:
             z_f, top_idx_f, top_w_f, selected_f = self.routed_expert_pool(
-                h_f, gate_f, routing_mode=routing_mode
+                h_f, gate_f, routing_mode=routing_mode, mask=m_f
             )
             z_m, top_idx_m, top_w_m, selected_m = self.routed_expert_pool_m(
-                h_m, gate_m, routing_mode=routing_mode
+                h_m, gate_m, routing_mode=routing_mode, mask=m_m
             )
             z_c, top_idx_c, top_w_c, selected_c = self.routed_expert_pool_c(
-                h_c, gate_c, routing_mode=routing_mode
+                h_c, gate_c, routing_mode=routing_mode, mask=m_c
             )
         else:
             z_f = torch.zeros_like(h_f)
@@ -429,6 +478,8 @@ class MultiScaleMoEBackbone(nn.Module):
             "diagnostics": {
                 "shared_input_beta": self.shared_input_adapter.beta_values().detach(),
                 "branch_gate": branch_gate.detach(),
+                "expert_pool_type": self.expert_pool_type,
+                "expert_names": self.functional_expert_names,
             },
         }
 
