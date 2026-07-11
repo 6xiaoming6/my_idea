@@ -14,6 +14,7 @@ from .fusion import (
 from .router import QualityRouter, uniform_gate
 from .scale_utils import build_scale_active_mask
 from .stats import compute_observation_stats
+from .v_single import ConfidenceCalibratedExpertPool
 
 
 class MultiScaleMoEBackbone(nn.Module):
@@ -48,8 +49,33 @@ class MultiScaleMoEBackbone(nn.Module):
         route_dropout: float = 0.0,
         enable_branch_aux: bool = True,
         enable_complementary_loss: bool = True,
+        expert_pool_type: str = "homogeneous",
+        confidence_mode: str = "sample",
+        confidence_enabled: bool = False,
+        confidence_hidden_dim: int | None = None,
+        confidence_dropout: float = 0.1,
+        confidence_beta_init: float = 0.05,
+        confidence_beta_max: float = 0.5,
+        confidence_zero_init: bool = True,
+        confidence_use_mask: bool = True,
+        confidence_use_input_feature: bool = True,
+        use_calibrated_scale_fusion: bool = False,
+        fallback_mode: str = "main_gate_only",
     ) -> None:
         super().__init__()
+        if expert_pool_type not in {"homogeneous", "confidence_calibrated"}:
+            raise ValueError(f"Unsupported expert_pool_type: {expert_pool_type}")
+        if confidence_mode != "sample":
+            raise ValueError(
+                f"v11 currently supports sample-level confidence only, got {confidence_mode}"
+            )
+        if use_calibrated_scale_fusion:
+            raise ValueError(
+                "use_calibrated_scale_fusion is reserved for a later ablation; "
+                "v11 first-stage implementation records scale confidence without changing scale fusion."
+            )
+        if fallback_mode != "main_gate_only":
+            raise ValueError(f"Unsupported fallback_mode: {fallback_mode}")
         self.dim = dim
         self.num_experts = num_experts
         self.top_k = min(max(1, top_k), num_experts)
@@ -72,6 +98,18 @@ class MultiScaleMoEBackbone(nn.Module):
         self.route_dropout = route_dropout
         self.enable_branch_aux = enable_branch_aux
         self.enable_complementary_loss = enable_complementary_loss
+        self.expert_pool_type = expert_pool_type
+        self.confidence_mode = confidence_mode
+        self.confidence_enabled = confidence_enabled
+        self.confidence_hidden_dim = confidence_hidden_dim
+        self.confidence_dropout = confidence_dropout
+        self.confidence_beta_init = confidence_beta_init
+        self.confidence_beta_max = confidence_beta_max
+        self.confidence_zero_init = confidence_zero_init
+        self.confidence_use_mask = confidence_use_mask
+        self.confidence_use_input_feature = confidence_use_input_feature
+        self.use_calibrated_scale_fusion = use_calibrated_scale_fusion
+        self.fallback_mode = fallback_mode
 
         self.embed_f = ScaleTokenEncoder(c_in, dim, max_t, h, w, num_groups=num_groups)
         self.embed_m = ScaleTokenEncoder(c_in, dim, max_t, h // 2, w // 2, num_groups=num_groups)
@@ -81,17 +119,17 @@ class MultiScaleMoEBackbone(nn.Module):
         self.router_m = QualityRouter(dim, q_dim, num_experts)
         self.router_c = QualityRouter(dim, q_dim, num_experts)
 
-        self.routed_expert_pool = TopKRoutedExpertPool(
+        self.routed_expert_pool = self._build_expert_pool(
             dim, num_experts, top_k=self.top_k, num_groups=num_groups, dropout=dropout
         )
         if share_experts:
             self.routed_expert_pool_m = self.routed_expert_pool
             self.routed_expert_pool_c = self.routed_expert_pool
         else:
-            self.routed_expert_pool_m = TopKRoutedExpertPool(
+            self.routed_expert_pool_m = self._build_expert_pool(
                 dim, num_experts, top_k=self.top_k, num_groups=num_groups, dropout=dropout
             )
-            self.routed_expert_pool_c = TopKRoutedExpertPool(
+            self.routed_expert_pool_c = self._build_expert_pool(
                 dim, num_experts, top_k=self.top_k, num_groups=num_groups, dropout=dropout
             )
 
@@ -180,6 +218,74 @@ class MultiScaleMoEBackbone(nn.Module):
             route_dropout=main_cfg.get("route_dropout", 0.0),
             enable_branch_aux=main_cfg.get("enable_branch_aux", True),
             enable_complementary_loss=main_cfg.get("enable_complementary_loss", True),
+            expert_pool_type=main_cfg.get("expert_pool_type", "homogeneous"),
+            confidence_mode=main_cfg.get(
+                "confidence_mode", model_cfg.get("confidence_mode", "sample")
+            ),
+            confidence_enabled=main_cfg.get(
+                "confidence_enabled", model_cfg.get("confidence_enabled", False)
+            ),
+            confidence_hidden_dim=main_cfg.get(
+                "confidence_hidden_dim", model_cfg.get("confidence_hidden_dim")
+            ),
+            confidence_dropout=main_cfg.get(
+                "confidence_dropout", model_cfg.get("confidence_dropout", 0.1)
+            ),
+            confidence_beta_init=main_cfg.get(
+                "confidence_beta_init", model_cfg.get("confidence_beta_init", 0.05)
+            ),
+            confidence_beta_max=main_cfg.get(
+                "confidence_beta_max", model_cfg.get("confidence_beta_max", 0.5)
+            ),
+            confidence_zero_init=main_cfg.get(
+                "confidence_zero_init", model_cfg.get("confidence_zero_init", True)
+            ),
+            confidence_use_mask=main_cfg.get(
+                "confidence_use_mask", model_cfg.get("confidence_use_mask", True)
+            ),
+            confidence_use_input_feature=main_cfg.get(
+                "confidence_use_input_feature",
+                model_cfg.get("confidence_use_input_feature", True),
+            ),
+            use_calibrated_scale_fusion=main_cfg.get(
+                "use_calibrated_scale_fusion",
+                model_cfg.get("use_calibrated_scale_fusion", False),
+            ),
+            fallback_mode=main_cfg.get(
+                "fallback_mode", model_cfg.get("fallback_mode", "main_gate_only")
+            ),
+        )
+
+    def _build_expert_pool(
+        self,
+        dim: int,
+        num_experts: int,
+        top_k: int,
+        num_groups: int,
+        dropout: float,
+    ) -> nn.Module:
+        if self.expert_pool_type == "confidence_calibrated":
+            return ConfidenceCalibratedExpertPool(
+                dim=dim,
+                num_experts=num_experts,
+                top_k=top_k,
+                num_groups=num_groups,
+                dropout=dropout,
+                confidence_hidden_dim=self.confidence_hidden_dim,
+                confidence_dropout=self.confidence_dropout,
+                confidence_beta_init=self.confidence_beta_init,
+                confidence_beta_max=self.confidence_beta_max,
+                confidence_zero_init=self.confidence_zero_init,
+                confidence_use_mask=self.confidence_use_mask,
+                confidence_use_input_feature=self.confidence_use_input_feature,
+                confidence_enabled=self.confidence_enabled,
+            )
+        return TopKRoutedExpertPool(
+            dim,
+            num_experts,
+            top_k=top_k,
+            num_groups=num_groups,
+            dropout=dropout,
         )
 
     def get_scale_embed_vec(self, embed_module: ScaleTokenEncoder, batch_size: int) -> torch.Tensor:
@@ -191,10 +297,47 @@ class MultiScaleMoEBackbone(nn.Module):
         h: torch.Tensor,
         mask: torch.Tensor,
         scale_embed_vec: torch.Tensor,
-    ) -> torch.Tensor:
+    ) -> tuple[torch.Tensor, torch.Tensor]:
         if not self.use_router:
-            return uniform_gate(h.shape[0], self.num_experts, h.device, h.dtype)
-        return router(h, compute_observation_stats(mask), scale_embed_vec)
+            weight = uniform_gate(h.shape[0], self.num_experts, h.device, h.dtype)
+            return weight, torch.zeros_like(weight)
+        weight, logits = router(
+            h,
+            compute_observation_stats(mask),
+            scale_embed_vec,
+            return_logits=True,
+        )
+        return weight, logits
+
+    def _apply_expert_pool(
+        self,
+        pool: nn.Module,
+        h: torch.Tensor,
+        mask: torch.Tensor,
+        gate: torch.Tensor,
+        router_logits: torch.Tensor,
+        routing_mode: str,
+    ) -> tuple[
+        torch.Tensor,
+        torch.Tensor,
+        torch.Tensor,
+        torch.Tensor,
+        dict[str, torch.Tensor] | None,
+    ]:
+        if self.expert_pool_type == "confidence_calibrated":
+            return pool(
+                h,
+                gate,
+                routing_mode=routing_mode,
+                mask=mask,
+                router_logits=router_logits,
+            )
+        z, top_indices, top_weights, selected_mask = pool(
+            h,
+            gate,
+            routing_mode=routing_mode,
+        )
+        return z, top_indices, top_weights, selected_mask, None
 
     def _effective_routing_mode(self) -> str:
         if self.use_router:
@@ -226,23 +369,44 @@ class MultiScaleMoEBackbone(nn.Module):
         q_m = compute_observation_stats(m_m)
         q_c = compute_observation_stats(m_c)
 
-        gate_f = self._route(self.router_f, h_f, m_f, self.get_scale_embed_vec(self.embed_f, batch_size))
-        gate_m = self._route(self.router_m, h_m, m_m, self.get_scale_embed_vec(self.embed_m, batch_size))
-        gate_c = self._route(self.router_c, h_c, m_c, self.get_scale_embed_vec(self.embed_c, batch_size))
+        gate_f, router_logits_f = self._route(
+            self.router_f, h_f, m_f, self.get_scale_embed_vec(self.embed_f, batch_size)
+        )
+        gate_m, router_logits_m = self._route(
+            self.router_m, h_m, m_m, self.get_scale_embed_vec(self.embed_m, batch_size)
+        )
+        gate_c, router_logits_c = self._route(
+            self.router_c, h_c, m_c, self.get_scale_embed_vec(self.embed_c, batch_size)
+        )
 
         routing_mode = self._effective_routing_mode()
         need_expert_features = self.use_routed_branch or (
             self.use_shared_branch and self.shared_input_mode != "pre"
         )
         if need_expert_features:
-            z_f, top_idx_f, top_w_f, selected_f = self.routed_expert_pool(
-                h_f, gate_f, routing_mode=routing_mode
+            z_f, top_idx_f, top_w_f, selected_f, confidence_f = self._apply_expert_pool(
+                self.routed_expert_pool,
+                h_f,
+                m_f,
+                gate_f,
+                router_logits_f,
+                routing_mode,
             )
-            z_m, top_idx_m, top_w_m, selected_m = self.routed_expert_pool_m(
-                h_m, gate_m, routing_mode=routing_mode
+            z_m, top_idx_m, top_w_m, selected_m, confidence_m = self._apply_expert_pool(
+                self.routed_expert_pool_m,
+                h_m,
+                m_m,
+                gate_m,
+                router_logits_m,
+                routing_mode,
             )
-            z_c, top_idx_c, top_w_c, selected_c = self.routed_expert_pool_c(
-                h_c, gate_c, routing_mode=routing_mode
+            z_c, top_idx_c, top_w_c, selected_c, confidence_c = self._apply_expert_pool(
+                self.routed_expert_pool_c,
+                h_c,
+                m_c,
+                gate_c,
+                router_logits_c,
+                routing_mode,
             )
         else:
             z_f = torch.zeros_like(h_f)
@@ -257,6 +421,16 @@ class MultiScaleMoEBackbone(nn.Module):
             selected_f = torch.zeros_like(gate_f)
             selected_m = torch.zeros_like(gate_m)
             selected_c = torch.zeros_like(gate_c)
+            confidence_f = confidence_m = confidence_c = None
+
+        if confidence_f is not None:
+            effective_gate_f = confidence_f["calibrated_weight"]
+            effective_gate_m = confidence_m["calibrated_weight"]
+            effective_gate_c = confidence_c["calibrated_weight"]
+        else:
+            effective_gate_f = gate_f
+            effective_gate_m = gate_m
+            effective_gate_c = gate_c
 
         active_mask = build_scale_active_mask(self.scale_mode, batch_size, x_f.device)
         scale_gate = active_mask.to(dtype=x_f.dtype)
@@ -373,9 +547,9 @@ class MultiScaleMoEBackbone(nn.Module):
             "x_hat_route": x_hat_route,
             "h_st_aux": h_main,
             "gates": {
-                "fine": gate_f,
-                "mid": gate_m,
-                "coarse": gate_c,
+                "fine": effective_gate_f,
+                "mid": effective_gate_m,
+                "coarse": effective_gate_c,
                 "scale_gate": scale_gate,
                 "branch_gate": branch_gate,
                 "route_fusion_16": route_outputs["gate_16"],
@@ -429,6 +603,14 @@ class MultiScaleMoEBackbone(nn.Module):
             "diagnostics": {
                 "shared_input_beta": self.shared_input_adapter.beta_values().detach(),
                 "branch_gate": branch_gate.detach(),
+                "expert_pool_type": self.expert_pool_type,
+                "confidence_enabled": self.confidence_enabled,
+                "confidence_mode": self.confidence_mode,
+                "confidence": {
+                    "fine": confidence_f,
+                    "mid": confidence_m,
+                    "coarse": confidence_c,
+                },
             },
         }
 

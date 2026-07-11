@@ -30,7 +30,15 @@ def build_optimizer(model: torch.nn.Module, cfg: dict) -> torch.optim.Optimizer:
         if not param.requires_grad:
             continue
         name_l = name.lower()
-        if any(token in name_l for token in ("route_gamma", "shared_gamma", "shared_input_adapter.beta")):
+        if any(
+            token in name_l
+            for token in (
+                "route_gamma",
+                "shared_gamma",
+                "shared_input_adapter.beta",
+                "beta_conf_raw",
+            )
+        ):
             grouped["scalar"]["params"].append(param)
         elif "scale_gate" in name_l or "branch_gate" in name_l:
             grouped["gate"]["params"].append(param)
@@ -133,6 +141,81 @@ def _append_model_diagnostics(logs: dict[str, list[float]], outputs: dict) -> No
         logs["shared_input_beta_f"].append(float(beta[0].detach().cpu()))
         logs["shared_input_beta_m"].append(float(beta[1].detach().cpu()))
         logs["shared_input_beta_c"].append(float(beta[2].detach().cpu()))
+
+    confidence_scales = diagnostics.get("confidence") if isinstance(diagnostics, dict) else None
+    if isinstance(confidence_scales, dict):
+        scale_confidence: list[torch.Tensor] = []
+        router_weights: list[torch.Tensor] = []
+        calibrated_weights: list[torch.Tensor] = []
+        missing_rates: list[torch.Tensor] = []
+        beta_values: list[torch.Tensor] = []
+        for scale_name in ("fine", "mid", "coarse"):
+            aux = confidence_scales.get(scale_name)
+            if not isinstance(aux, dict):
+                continue
+            confidence = aux.get("confidence")
+            router_weight = aux.get("router_weight")
+            calibrated_weight = aux.get("calibrated_weight")
+            missing_rate = aux.get("missing_rate")
+            beta_conf = aux.get("beta_conf")
+            if torch.is_tensor(confidence):
+                scale_confidence.append(confidence)
+                logs[f"confidence_{scale_name}_mean"].append(
+                    float(confidence.mean().detach().cpu())
+                )
+                logs[f"confidence_{scale_name}_std"].append(
+                    float(confidence.std(unbiased=False).detach().cpu())
+                )
+            if torch.is_tensor(router_weight):
+                router_weights.append(router_weight)
+            if torch.is_tensor(calibrated_weight):
+                calibrated_weights.append(calibrated_weight)
+            if torch.is_tensor(missing_rate):
+                missing_rates.append(missing_rate)
+                logs[f"confidence_{scale_name}_missing_rate"].append(
+                    float(missing_rate.mean().detach().cpu())
+                )
+            if torch.is_tensor(beta_conf):
+                beta_values.append(beta_conf.reshape(1))
+
+        if scale_confidence:
+            confidence_all = torch.cat(scale_confidence, dim=0)
+            logs["confidence_mean"].append(float(confidence_all.mean().detach().cpu()))
+            logs["confidence_std"].append(
+                float(confidence_all.std(unbiased=False).detach().cpu())
+            )
+            for expert_idx in range(confidence_all.shape[1]):
+                logs[f"confidence_expert_{expert_idx}_mean"].append(
+                    float(confidence_all[:, expert_idx].mean().detach().cpu())
+                )
+        if router_weights:
+            router_all = torch.cat(router_weights, dim=0)
+            router_entropy = -(
+                router_all * router_all.clamp_min(1e-8).log()
+            ).sum(dim=1).mean()
+            logs["router_weight_entropy"].append(float(router_entropy.detach().cpu()))
+        if calibrated_weights:
+            calibrated_all = torch.cat(calibrated_weights, dim=0)
+            calibrated_entropy = -(
+                calibrated_all * calibrated_all.clamp_min(1e-8).log()
+            ).sum(dim=1).mean()
+            logs["calibrated_weight_entropy"].append(
+                float(calibrated_entropy.detach().cpu())
+            )
+            if router_weights:
+                shift = (calibrated_all - router_all).abs().mean()
+                logs["confidence_weight_shift_l1"].append(float(shift.detach().cpu()))
+        if missing_rates:
+            missing_rate_all = torch.cat(missing_rates, dim=0)
+            logs["confidence_missing_rate"].append(
+                float(missing_rates[0].mean().detach().cpu())
+            )
+            logs["confidence_multiscale_missing_rate_mean"].append(
+                float(missing_rate_all.mean().detach().cpu())
+            )
+        if beta_values:
+            beta_all = torch.cat(beta_values)
+            logs["confidence_beta"].append(float(beta_all.mean().detach().cpu()))
 
     features = outputs.get("features", {})
     h_shared = features.get("h_shared") if isinstance(features, dict) else None

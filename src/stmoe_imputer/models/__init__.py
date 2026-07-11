@@ -17,11 +17,19 @@ from .main_branch import (
     OAMSBackbone,
     ObservationAwareMultiScaleMoEImputer,
 )
+from .v_single import (
+    CalibratedWeightComposer,
+    ConfidenceCalibratedExpertPool,
+    ExpertConfidenceHead,
+)
 
 __all__ = [
     "DualBranchSTImputer",
     "AdaptiveBranchGate",
+    "CalibratedWeightComposer",
+    "ConfidenceCalibratedExpertPool",
     "ExpertEnhancedSharedInput",
+    "ExpertConfidenceHead",
     "GatedFusion2",
     "GatedFusion3",
     "GatedCrossScaleSharedExpert",

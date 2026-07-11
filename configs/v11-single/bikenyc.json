@@ -1,0 +1,35 @@
+{
+  "output_dir": "outputs/v11-single",
+  "model": {
+    "version": "v11-single",
+    "architecture": "confidence_calibrated_moe",
+    "main": {
+      "expert_pool_type": "confidence_calibrated",
+      "num_experts": 4,
+      "top_k": 2,
+      "share_experts": true,
+      "use_multiscale": true,
+      "use_router": true,
+      "use_routed_branch": true,
+      "use_shared_branch": true,
+      "routing_mode": "soft",
+      "scale_mode": "fine_mid_coarse",
+      "dropout": 0.15,
+      "route_dropout": 0.05,
+      "route_gamma_init": -3.5,
+      "confidence_mode": "sample",
+      "confidence_enabled": true,
+      "confidence_hidden_dim": 64,
+      "confidence_dropout": 0.1,
+      "confidence_beta_init": 0.05,
+      "confidence_beta_max": 0.5,
+      "confidence_zero_init": true,
+      "confidence_use_mask": true,
+      "confidence_use_input_feature": true,
+      "use_calibrated_scale_fusion": false,
+      "fallback_mode": "main_gate_only",
+      "enable_branch_aux": true,
+      "enable_complementary_loss": true
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "model": {
+    "architecture": "main_gate_only",
+    "main": {
+      "expert_pool_type": "homogeneous",
+      "routing_mode": "topk",
+      "confidence_enabled": false
+    }
+  }
+}

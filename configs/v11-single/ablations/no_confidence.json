@@ -1,0 +1,9 @@
+{
+  "model": {
+    "main": {
+      "expert_pool_type": "confidence_calibrated",
+      "confidence_enabled": false,
+      "routing_mode": "soft"
+    }
+  }
+}

@@ -18,10 +18,14 @@ class QualityRouter(nn.Module):
         h: torch.Tensor,
         q: torch.Tensor,
         scale_embed_vec: torch.Tensor,
-    ) -> torch.Tensor:
+        return_logits: bool = False,
+    ) -> torch.Tensor | tuple[torch.Tensor, torch.Tensor]:
         pooled = h.mean(dim=(2, 3, 4))
         logits = self.net(torch.cat([pooled, q, scale_embed_vec], dim=1))
-        return torch.softmax(logits, dim=-1)
+        weight = torch.softmax(logits, dim=-1)
+        if return_logits:
+            return weight, logits
+        return weight
 
 
 def uniform_gate(batch_size: int, num_experts: int, device, dtype) -> torch.Tensor:

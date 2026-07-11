@@ -1,0 +1,38 @@
+{
+  "name": "v11_quick_5epoch",
+  "datasets": {
+    "TaxiBJ": {
+      "seed": 42,
+      "data": {"batch_size": 8, "num_workers": 0, "drop_last": true},
+      "train": {
+        "epochs": 5,
+        "val_epoch": 1,
+        "amp": true,
+        "scheduler": {"type": "cosine", "eta_min": 0.000001},
+        "early_stopping": {"enabled": false}
+      }
+    },
+    "BikeNYC": {
+      "seed": 42,
+      "data": {"batch_size": 8, "num_workers": 0, "drop_last": true},
+      "train": {
+        "epochs": 5,
+        "val_epoch": 1,
+        "amp": true,
+        "scheduler": {"type": "cosine", "eta_min": 0.000001},
+        "early_stopping": {"enabled": false}
+      }
+    },
+    "CHAP": {
+      "seed": 42,
+      "data": {"batch_size": 8, "num_workers": 0, "drop_last": true},
+      "train": {
+        "epochs": 5,
+        "val_epoch": 1,
+        "amp": true,
+        "scheduler": {"type": "cosine", "eta_min": 0.000001},
+        "early_stopping": {"enabled": false}
+      }
+    }
+  }
+}
