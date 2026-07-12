@@ -1,0 +1,12 @@
+{
+  "model": {
+    "architecture": "main_gate_only",
+    "main": {
+      "expert_pool_type": "homogeneous",
+      "num_experts": 4,
+      "top_k": 2,
+      "routing_mode": "topk",
+      "frequency_mode": "none"
+    }
+  }
+}

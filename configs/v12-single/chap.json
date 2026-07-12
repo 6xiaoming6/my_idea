@@ -1,0 +1,35 @@
+{
+  "output_dir": "outputs/v12-single",
+  "model": {
+    "version": "v12-single",
+    "architecture": "frequency_mr_moe",
+    "main": {
+      "expert_pool_type": "frequency_mr",
+      "share_experts": true,
+      "use_multiscale": true,
+      "use_router": true,
+      "use_routed_branch": true,
+      "use_shared_branch": true,
+      "routing_mode": "topk",
+      "scale_mode": "fine_mid_coarse",
+      "dropout": 0.1,
+      "route_dropout": 0.1,
+      "route_gamma_init": -3.0,
+      "frequency_mode": "avg_residual",
+      "frequency_branch_mode": "low_plus_high",
+      "low_num_experts": 3,
+      "high_num_experts": 3,
+      "low_top_k": 1,
+      "high_top_k": 1,
+      "frequency_kernel_t": 3,
+      "frequency_kernel_s": 3,
+      "high_eta_init": -3.0,
+      "high_eta_trainable": true,
+      "high_eta_fixed": 0.05,
+      "frequency_gate_zero_init": true,
+      "use_fft": false,
+      "enable_branch_aux": true,
+      "enable_complementary_loss": true
+    }
+  }
+}

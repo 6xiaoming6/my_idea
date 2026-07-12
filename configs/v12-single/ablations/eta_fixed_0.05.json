@@ -1,0 +1,8 @@
+{
+  "model": {
+    "main": {
+      "high_eta_trainable": false,
+      "high_eta_fixed": 0.05
+    }
+  }
+}

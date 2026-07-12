@@ -17,11 +17,15 @@ from .main_branch import (
     OAMSBackbone,
     ObservationAwareMultiScaleMoEImputer,
 )
+from .v_single import FrequencyDecomposition, FrequencyGate, FrequencyMultiResolutionExpertPool
 
 __all__ = [
     "DualBranchSTImputer",
     "AdaptiveBranchGate",
     "ExpertEnhancedSharedInput",
+    "FrequencyDecomposition",
+    "FrequencyGate",
+    "FrequencyMultiResolutionExpertPool",
     "GatedFusion2",
     "GatedFusion3",
     "GatedCrossScaleSharedExpert",

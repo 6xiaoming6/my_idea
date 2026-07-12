@@ -14,6 +14,7 @@ from .fusion import (
 from .router import QualityRouter, uniform_gate
 from .scale_utils import build_scale_active_mask
 from .stats import compute_observation_stats
+from .v_single import FrequencyMultiResolutionExpertPool
 
 
 class MultiScaleMoEBackbone(nn.Module):
@@ -48,11 +49,56 @@ class MultiScaleMoEBackbone(nn.Module):
         route_dropout: float = 0.0,
         enable_branch_aux: bool = True,
         enable_complementary_loss: bool = True,
+        expert_pool_type: str = "homogeneous",
+        frequency_mode: str = "avg_residual",
+        frequency_branch_mode: str = "low_plus_high",
+        low_num_experts: int = 3,
+        high_num_experts: int = 3,
+        low_top_k: int = 1,
+        high_top_k: int = 1,
+        frequency_kernel_t: int = 3,
+        frequency_kernel_s: int = 3,
+        high_eta_init: float = -3.0,
+        high_eta_trainable: bool = True,
+        high_eta_fixed: float = 0.05,
+        frequency_gate_zero_init: bool = True,
+        use_fft: bool = False,
     ) -> None:
         super().__init__()
+        if frequency_mode == "none" and expert_pool_type == "frequency_mr":
+            expert_pool_type = "homogeneous"
+        if expert_pool_type not in {"homogeneous", "frequency_mr"}:
+            raise ValueError(f"Unsupported expert_pool_type: {expert_pool_type}")
+        if frequency_branch_mode not in {"low_plus_high", "low_only", "high_only"}:
+            raise ValueError(f"Unsupported frequency_branch_mode: {frequency_branch_mode}")
         self.dim = dim
-        self.num_experts = num_experts
-        self.top_k = min(max(1, top_k), num_experts)
+        self.expert_pool_type = expert_pool_type
+        self.frequency_mode = frequency_mode
+        self.frequency_branch_mode = frequency_branch_mode
+        self.low_num_experts = low_num_experts
+        self.high_num_experts = high_num_experts
+        self.low_top_k = min(max(1, low_top_k), low_num_experts)
+        self.high_top_k = min(max(1, high_top_k), high_num_experts)
+        self.frequency_kernel_t = frequency_kernel_t
+        self.frequency_kernel_s = frequency_kernel_s
+        self.high_eta_init = high_eta_init
+        self.high_eta_trainable = high_eta_trainable
+        self.high_eta_fixed = high_eta_fixed
+        self.frequency_gate_zero_init = frequency_gate_zero_init
+        self.use_fft = use_fft
+        if expert_pool_type == "frequency_mr":
+            if frequency_branch_mode == "low_only":
+                self.num_experts = low_num_experts
+                self.top_k = self.low_top_k
+            elif frequency_branch_mode == "high_only":
+                self.num_experts = high_num_experts
+                self.top_k = self.high_top_k
+            else:
+                self.num_experts = low_num_experts + high_num_experts
+                self.top_k = self.low_top_k + self.high_top_k
+        else:
+            self.num_experts = num_experts
+            self.top_k = min(max(1, top_k), num_experts)
         self.use_multiscale = use_multiscale
         self.use_router = use_router
         self.share_experts = share_experts
@@ -77,22 +123,40 @@ class MultiScaleMoEBackbone(nn.Module):
         self.embed_m = ScaleTokenEncoder(c_in, dim, max_t, h // 2, w // 2, num_groups=num_groups)
         self.embed_c = ScaleTokenEncoder(c_in, dim, max_t, h // 4, w // 4, num_groups=num_groups)
 
-        self.router_f = QualityRouter(dim, q_dim, num_experts)
-        self.router_m = QualityRouter(dim, q_dim, num_experts)
-        self.router_c = QualityRouter(dim, q_dim, num_experts)
+        if expert_pool_type == "frequency_mr":
+            self.router_f = self.router_m = self.router_c = None
+        else:
+            self.router_f = QualityRouter(dim, q_dim, num_experts)
+            self.router_m = QualityRouter(dim, q_dim, num_experts)
+            self.router_c = QualityRouter(dim, q_dim, num_experts)
 
-        self.routed_expert_pool = TopKRoutedExpertPool(
-            dim, num_experts, top_k=self.top_k, num_groups=num_groups, dropout=dropout
+        self.routed_expert_pool = self._build_expert_pool(
+            dim=dim,
+            num_experts=num_experts,
+            top_k=self.top_k,
+            q_dim=q_dim,
+            num_groups=num_groups,
+            dropout=dropout,
         )
         if share_experts:
             self.routed_expert_pool_m = self.routed_expert_pool
             self.routed_expert_pool_c = self.routed_expert_pool
         else:
-            self.routed_expert_pool_m = TopKRoutedExpertPool(
-                dim, num_experts, top_k=self.top_k, num_groups=num_groups, dropout=dropout
+            self.routed_expert_pool_m = self._build_expert_pool(
+                dim=dim,
+                num_experts=num_experts,
+                top_k=self.top_k,
+                q_dim=q_dim,
+                num_groups=num_groups,
+                dropout=dropout,
             )
-            self.routed_expert_pool_c = TopKRoutedExpertPool(
-                dim, num_experts, top_k=self.top_k, num_groups=num_groups, dropout=dropout
+            self.routed_expert_pool_c = self._build_expert_pool(
+                dim=dim,
+                num_experts=num_experts,
+                top_k=self.top_k,
+                q_dim=q_dim,
+                num_groups=num_groups,
+                dropout=dropout,
             )
 
         self.cross_scale_shared_expert = GatedCrossScaleSharedExpert(
@@ -180,6 +244,75 @@ class MultiScaleMoEBackbone(nn.Module):
             route_dropout=main_cfg.get("route_dropout", 0.0),
             enable_branch_aux=main_cfg.get("enable_branch_aux", True),
             enable_complementary_loss=main_cfg.get("enable_complementary_loss", True),
+            expert_pool_type=main_cfg.get("expert_pool_type", "homogeneous"),
+            frequency_mode=main_cfg.get(
+                "frequency_mode", model_cfg.get("frequency_mode", "avg_residual")
+            ),
+            frequency_branch_mode=main_cfg.get(
+                "frequency_branch_mode", model_cfg.get("frequency_branch_mode", "low_plus_high")
+            ),
+            low_num_experts=main_cfg.get(
+                "low_num_experts", model_cfg.get("low_num_experts", 3)
+            ),
+            high_num_experts=main_cfg.get(
+                "high_num_experts", model_cfg.get("high_num_experts", 3)
+            ),
+            low_top_k=main_cfg.get("low_top_k", model_cfg.get("low_top_k", 1)),
+            high_top_k=main_cfg.get("high_top_k", model_cfg.get("high_top_k", 1)),
+            frequency_kernel_t=main_cfg.get(
+                "frequency_kernel_t", model_cfg.get("frequency_kernel_t", 3)
+            ),
+            frequency_kernel_s=main_cfg.get(
+                "frequency_kernel_s", model_cfg.get("frequency_kernel_s", 3)
+            ),
+            high_eta_init=main_cfg.get("high_eta_init", model_cfg.get("high_eta_init", -3.0)),
+            high_eta_trainable=main_cfg.get(
+                "high_eta_trainable", model_cfg.get("high_eta_trainable", True)
+            ),
+            high_eta_fixed=main_cfg.get(
+                "high_eta_fixed", model_cfg.get("high_eta_fixed", 0.05)
+            ),
+            frequency_gate_zero_init=main_cfg.get(
+                "frequency_gate_zero_init", model_cfg.get("frequency_gate_zero_init", True)
+            ),
+            use_fft=main_cfg.get("use_fft", model_cfg.get("use_fft", False)),
+        )
+
+    def _build_expert_pool(
+        self,
+        dim: int,
+        num_experts: int,
+        top_k: int,
+        q_dim: int,
+        num_groups: int,
+        dropout: float,
+    ) -> nn.Module:
+        if self.expert_pool_type == "frequency_mr":
+            return FrequencyMultiResolutionExpertPool(
+                dim=dim,
+                q_dim=q_dim,
+                low_num_experts=self.low_num_experts,
+                high_num_experts=self.high_num_experts,
+                low_top_k=self.low_top_k,
+                high_top_k=self.high_top_k,
+                num_groups=num_groups,
+                dropout=dropout,
+                frequency_mode=self.frequency_mode,
+                frequency_kernel_t=self.frequency_kernel_t,
+                frequency_kernel_s=self.frequency_kernel_s,
+                use_fft=self.use_fft,
+                high_eta_init=self.high_eta_init,
+                high_eta_trainable=self.high_eta_trainable,
+                high_eta_fixed=self.high_eta_fixed,
+                frequency_gate_zero_init=self.frequency_gate_zero_init,
+                branch_mode=self.frequency_branch_mode,
+            )
+        return TopKRoutedExpertPool(
+            dim,
+            num_experts,
+            top_k=top_k,
+            num_groups=num_groups,
+            dropout=dropout,
         )
 
     def get_scale_embed_vec(self, embed_module: ScaleTokenEncoder, batch_size: int) -> torch.Tensor:
@@ -195,6 +328,39 @@ class MultiScaleMoEBackbone(nn.Module):
         if not self.use_router:
             return uniform_gate(h.shape[0], self.num_experts, h.device, h.dtype)
         return router(h, compute_observation_stats(mask), scale_embed_vec)
+
+    def _apply_expert_pool(
+        self,
+        pool: nn.Module,
+        router: nn.Module | None,
+        h: torch.Tensor,
+        mask: torch.Tensor,
+        q: torch.Tensor,
+        scale_embed_vec: torch.Tensor,
+        routing_mode: str,
+    ) -> tuple[
+        torch.Tensor,
+        torch.Tensor,
+        torch.Tensor,
+        torch.Tensor,
+        torch.Tensor,
+        dict[str, torch.Tensor] | None,
+    ]:
+        if self.expert_pool_type == "frequency_mr":
+            z, indices, weights, selected, aux = pool(
+                h=h,
+                mask=mask,
+                q=q,
+                scale_embed_vec=scale_embed_vec,
+                routing_mode=routing_mode,
+                use_router=self.use_router,
+            )
+            return z, indices, weights, selected, aux["combined_gate"], aux
+        if router is None:
+            raise RuntimeError("A standard expert pool requires a QualityRouter")
+        gate = self._route(router, h, mask, scale_embed_vec)
+        z, indices, weights, selected = pool(h, gate, routing_mode=routing_mode)
+        return z, indices, weights, selected, gate, None
 
     def _effective_routing_mode(self) -> str:
         if self.use_router:
@@ -226,37 +392,55 @@ class MultiScaleMoEBackbone(nn.Module):
         q_m = compute_observation_stats(m_m)
         q_c = compute_observation_stats(m_c)
 
-        gate_f = self._route(self.router_f, h_f, m_f, self.get_scale_embed_vec(self.embed_f, batch_size))
-        gate_m = self._route(self.router_m, h_m, m_m, self.get_scale_embed_vec(self.embed_m, batch_size))
-        gate_c = self._route(self.router_c, h_c, m_c, self.get_scale_embed_vec(self.embed_c, batch_size))
-
         routing_mode = self._effective_routing_mode()
         need_expert_features = self.use_routed_branch or (
             self.use_shared_branch and self.shared_input_mode != "pre"
         )
         if need_expert_features:
-            z_f, top_idx_f, top_w_f, selected_f = self.routed_expert_pool(
-                h_f, gate_f, routing_mode=routing_mode
+            z_f, top_idx_f, top_w_f, selected_f, gate_f, frequency_f = self._apply_expert_pool(
+                self.routed_expert_pool,
+                self.router_f,
+                h_f,
+                m_f,
+                q_f,
+                self.get_scale_embed_vec(self.embed_f, batch_size),
+                routing_mode,
             )
-            z_m, top_idx_m, top_w_m, selected_m = self.routed_expert_pool_m(
-                h_m, gate_m, routing_mode=routing_mode
+            z_m, top_idx_m, top_w_m, selected_m, gate_m, frequency_m = self._apply_expert_pool(
+                self.routed_expert_pool_m,
+                self.router_m,
+                h_m,
+                m_m,
+                q_m,
+                self.get_scale_embed_vec(self.embed_m, batch_size),
+                routing_mode,
             )
-            z_c, top_idx_c, top_w_c, selected_c = self.routed_expert_pool_c(
-                h_c, gate_c, routing_mode=routing_mode
+            z_c, top_idx_c, top_w_c, selected_c, gate_c, frequency_c = self._apply_expert_pool(
+                self.routed_expert_pool_c,
+                self.router_c,
+                h_c,
+                m_c,
+                q_c,
+                self.get_scale_embed_vec(self.embed_c, batch_size),
+                routing_mode,
             )
         else:
             z_f = torch.zeros_like(h_f)
             z_m = torch.zeros_like(h_m)
             z_c = torch.zeros_like(h_c)
+            gate_f = torch.zeros(batch_size, self.num_experts, device=x_f.device, dtype=x_f.dtype)
+            gate_m = torch.zeros_like(gate_f)
+            gate_c = torch.zeros_like(gate_f)
             top_idx_f = top_idx_m = top_idx_c = torch.zeros(
-                (gate_f.shape[0], self.top_k), device=gate_f.device, dtype=torch.long
+                (batch_size, self.top_k), device=x_f.device, dtype=torch.long
             )
             top_w_f = top_w_m = top_w_c = torch.zeros(
-                (gate_f.shape[0], self.top_k), device=gate_f.device, dtype=gate_f.dtype
+                (batch_size, self.top_k), device=x_f.device, dtype=x_f.dtype
             )
             selected_f = torch.zeros_like(gate_f)
             selected_m = torch.zeros_like(gate_m)
             selected_c = torch.zeros_like(gate_c)
+            frequency_f = frequency_m = frequency_c = None
 
         active_mask = build_scale_active_mask(self.scale_mode, batch_size, x_f.device)
         scale_gate = active_mask.to(dtype=x_f.dtype)
@@ -429,6 +613,13 @@ class MultiScaleMoEBackbone(nn.Module):
             "diagnostics": {
                 "shared_input_beta": self.shared_input_adapter.beta_values().detach(),
                 "branch_gate": branch_gate.detach(),
+                "expert_pool_type": self.expert_pool_type,
+                "frequency_branch_mode": self.frequency_branch_mode,
+                "frequency": {
+                    "fine": frequency_f,
+                    "mid": frequency_m,
+                    "coarse": frequency_c,
+                },
             },
         }
 

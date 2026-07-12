@@ -52,6 +52,7 @@ ABLATION_DESCRIPTIONS = {
 @dataclass(frozen=True)
 class DatasetSpec:
     config: str
+    model_config_name: str
     train_npz: str
     val_npz: str
     test_npz: str
@@ -62,6 +63,7 @@ class DatasetSpec:
 DATASETS = {
     "TaxiBJ": DatasetSpec(
         config="configs/datasets/taxibj.json",
+        model_config_name="taxibj.json",
         train_npz="data/TaxiBJ/taxibj_train.npz",
         val_npz="data/TaxiBJ/taxibj_val.npz",
         test_npz="data/TaxiBJ/taxibj_test.npz",
@@ -70,6 +72,7 @@ DATASETS = {
     ),
     "BikeNYC": DatasetSpec(
         config="configs/datasets/bikenyc.json",
+        model_config_name="bikenyc.json",
         train_npz="data/BikeNYC/bikenyc_train.npz",
         val_npz="data/BikeNYC/bikenyc_val.npz",
         test_npz="data/BikeNYC/bikenyc_test.npz",
@@ -78,6 +81,7 @@ DATASETS = {
     ),
     "CHAP": DatasetSpec(
         config="configs/datasets/chap_beijing.json",
+        model_config_name="chap.json",
         train_npz="data/CHAP/beijing/chap_beijing_train.npz",
         val_npz="data/CHAP/beijing/chap_beijing_val.npz",
         test_npz="data/CHAP/beijing/chap_beijing_test.npz",
@@ -112,6 +116,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--fixed-seed", "--fixed_seed", type=int, default=42)
     parser.add_argument("--skip-full", "--skip_full", action="store_true")
     parser.add_argument(
+        "--full-name",
+        "--full_name",
+        default="full",
+        help="Run name passed to scripts/train.py for the selected full-model configuration.",
+    )
+    parser.add_argument(
         "--skip-ablations",
         "--skip_ablations",
         default="",
@@ -128,6 +138,12 @@ def parse_args() -> argparse.Namespace:
         "--training_policy",
         default=None,
         help="Optional dataset-specific JSON training policy merged before mask/ablation overrides.",
+    )
+    parser.add_argument(
+        "--model-config-dir",
+        "--model_config_dir",
+        default=None,
+        help="Optional directory containing taxibj.json, bikenyc.json, and chap.json.",
     )
     parser.add_argument(
         "--cpu-threads",
@@ -251,6 +267,26 @@ def _load_training_policy(path_text: str | None, datasets: tuple[str, ...]) -> t
     return name, patches
 
 
+def _load_model_patches(path_text: str | None, datasets: tuple[str, ...]) -> tuple[str | None, dict[str, dict]]:
+    if not path_text:
+        return None, {dataset: {} for dataset in datasets}
+    directory = Path(path_text).expanduser()
+    if not directory.is_absolute():
+        directory = (ROOT / directory).resolve()
+    if not directory.is_dir():
+        raise FileNotFoundError(f"Model config directory not found: {directory}")
+    patches: dict[str, dict] = {}
+    for dataset in datasets:
+        config_path = directory / DATASETS[dataset].model_config_name
+        if not config_path.is_file():
+            raise FileNotFoundError(f"Model config not found for {dataset}: {config_path}")
+        patch = json.loads(config_path.read_text(encoding="utf-8"))
+        if not isinstance(patch, dict):
+            raise ValueError(f"Model config must be a JSON object: {config_path}")
+        patches[dataset] = patch
+    return str(directory), patches
+
+
 def _generate_masks(args: argparse.Namespace, spec: DatasetSpec, pattern: str, rate: str, env: dict[str, str]) -> None:
     output_dir = Path(spec.mask_root) / f"{pattern}_mask" / rate
     print(f"[info] generating {pattern} masks: {output_dir}")
@@ -289,6 +325,7 @@ def _run_dataset_combo(
     run_index: int,
     run_total: int,
     training_override: dict,
+    model_override: dict,
 ) -> None:
     print("\n" + "#" * 72)
     print(f"[{run_index}/{run_total}] {dataset_name} | pattern={pattern} | rate={rate}")
@@ -296,7 +333,8 @@ def _run_dataset_combo(
     _generate_masks(args, spec, pattern, rate, env)
 
     mask_override = _mask_override(spec, pattern, rate)
-    base_override = _deep_update(training_override, mask_override)
+    base_override = _deep_update(training_override, model_override)
+    base_override = _deep_update(base_override, mask_override)
     mask_override_path = temp_dir / f"mask_{dataset_name}_{pattern}_{rate}.json"
     _write_json(mask_override_path, base_override)
 
@@ -309,7 +347,7 @@ def _run_dataset_combo(
     for idx, experiment in enumerate(experiments, 1):
         if experiment == "full":
             override_path = mask_override_path
-            display_name = "Full Model"
+            display_name = "Full Model" if args.full_name == "full" else args.full_name
         else:
             ablation_path = ROOT / "configs" / "ablations" / f"{experiment}.json"
             if not ablation_path.is_file():
@@ -336,7 +374,7 @@ def _run_dataset_combo(
                 "--test_npz",
                 spec.test_npz,
                 "-n",
-                "full" if experiment == "full" else experiment,
+                args.full_name if experiment == "full" else experiment,
                 "--no_plot",
                 "--quiet",
             ),
@@ -356,6 +394,7 @@ def main() -> None:
     for name in dataset_names:
         _validate_files(DATASETS[name])
     policy_name, training_patches = _load_training_policy(args.training_policy, dataset_names)
+    model_config_dir, model_patches = _load_model_patches(args.model_config_dir, dataset_names)
 
     combinations = [(name, pattern, rate) for rate in rates for pattern in patterns for name in dataset_names]
     print("=" * 72)
@@ -365,6 +404,7 @@ def main() -> None:
     print(f"rates: {', '.join(rates)}")
     print(f"GPU: cuda:{args.gpu} | child CPU threads: {args.cpu_threads}")
     print(f"training policy: {policy_name or 'dataset defaults'}")
+    print(f"model config dir: {model_config_dir or 'dataset defaults'}")
     print(f"dataset/mask combinations: {len(combinations)}")
     print("=" * 72)
 
@@ -391,6 +431,7 @@ def main() -> None:
                 index,
                 len(combinations),
                 training_patches[name],
+                model_patches[name],
             )
 
     elapsed = time.perf_counter() - started

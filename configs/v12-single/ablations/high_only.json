@@ -1,0 +1,7 @@
+{
+  "model": {
+    "main": {
+      "frequency_branch_mode": "high_only"
+    }
+  }
+}

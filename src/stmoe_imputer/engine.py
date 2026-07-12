@@ -30,7 +30,15 @@ def build_optimizer(model: torch.nn.Module, cfg: dict) -> torch.optim.Optimizer:
         if not param.requires_grad:
             continue
         name_l = name.lower()
-        if any(token in name_l for token in ("route_gamma", "shared_gamma", "shared_input_adapter.beta")):
+        if any(
+            token in name_l
+            for token in (
+                "route_gamma",
+                "shared_gamma",
+                "shared_input_adapter.beta",
+                "high_eta_logit",
+            )
+        ):
             grouped["scalar"]["params"].append(param)
         elif "scale_gate" in name_l or "branch_gate" in name_l:
             grouped["gate"]["params"].append(param)
@@ -133,6 +141,57 @@ def _append_model_diagnostics(logs: dict[str, list[float]], outputs: dict) -> No
         logs["shared_input_beta_f"].append(float(beta[0].detach().cpu()))
         logs["shared_input_beta_m"].append(float(beta[1].detach().cpu()))
         logs["shared_input_beta_c"].append(float(beta[2].detach().cpu()))
+
+    frequency_scales = diagnostics.get("frequency") if isinstance(diagnostics, dict) else None
+    if isinstance(frequency_scales, dict):
+        eta_values: list[torch.Tensor] = []
+        for scale_name in ("fine", "mid", "coarse"):
+            aux = frequency_scales.get(scale_name)
+            if not isinstance(aux, dict):
+                continue
+            metric_keys = {
+                "frequency_high_gate": "high_gate",
+                "low_energy": "low_energy",
+                "high_energy": "high_energy",
+                "high_energy_ratio": "high_energy_ratio",
+                "h_low_energy": "input_low_energy",
+                "h_high_energy": "input_high_energy",
+                "high_coefficient": "high_coefficient",
+            }
+            for key, label in metric_keys.items():
+                value = aux.get(key)
+                if torch.is_tensor(value):
+                    logs[f"frequency_{scale_name}_{label}_mean"].append(
+                        float(value.mean().detach().cpu())
+                    )
+                    logs[f"frequency_{scale_name}_{label}_std"].append(
+                        float(value.std(unbiased=False).detach().cpu())
+                    )
+            eta = aux.get("eta_high")
+            if torch.is_tensor(eta):
+                eta_values.append(eta.reshape(1))
+
+            for band in ("low", "high"):
+                gate = aux.get(f"{band}_gate" if band == "low" else "high_router_gate")
+                if torch.is_tensor(gate):
+                    entropy = -(gate * gate.clamp_min(1e-8).log()).sum(dim=1).mean()
+                    logs[f"frequency_{scale_name}_{band}_router_entropy"].append(
+                        float(entropy.detach().cpu())
+                    )
+                    for expert_idx in range(gate.shape[1]):
+                        logs[f"frequency_{scale_name}_{band}_expert_{expert_idx}_weight"].append(
+                            float(gate[:, expert_idx].mean().detach().cpu())
+                        )
+                selected = aux.get(f"{band}_selected")
+                if torch.is_tensor(selected):
+                    for expert_idx in range(selected.shape[1]):
+                        logs[f"frequency_{scale_name}_{band}_expert_{expert_idx}_usage"].append(
+                            float(selected[:, expert_idx].mean().detach().cpu())
+                        )
+        if eta_values:
+            logs["frequency_eta_high"].append(
+                float(torch.cat(eta_values).mean().detach().cpu())
+            )
 
     features = outputs.get("features", {})
     h_shared = features.get("h_shared") if isinstance(features, dict) else None
