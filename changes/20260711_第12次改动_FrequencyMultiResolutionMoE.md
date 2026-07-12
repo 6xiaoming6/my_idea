@@ -2,7 +2,7 @@
 
 - 开发分支：v12-single
 - 修改前提交：4a4933b
-- 修改后提交：待提交后补充
+- 修改后提交：`a4bc2ff5cb48123729976c820c3611c03c80b475`
 - 设计文档：`model_designs/v12-single.md`
 - 独立输出目录：`outputs/v12-single/`
 
