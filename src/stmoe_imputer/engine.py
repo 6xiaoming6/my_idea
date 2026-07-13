@@ -30,7 +30,16 @@ def build_optimizer(model: torch.nn.Module, cfg: dict) -> torch.optim.Optimizer:
         if not param.requires_grad:
             continue
         name_l = name.lower()
-        if any(token in name_l for token in ("route_gamma", "shared_gamma", "shared_input_adapter.beta")):
+        if any(
+            token in name_l
+            for token in (
+                "route_gamma",
+                "shared_gamma",
+                "shared_input_adapter.beta",
+                "global_gamma",
+                "local_alpha_logit",
+            )
+        ):
             grouped["scalar"]["params"].append(param)
         elif "scale_gate" in name_l or "branch_gate" in name_l:
             grouped["gate"]["params"].append(param)
@@ -133,6 +142,23 @@ def _append_model_diagnostics(logs: dict[str, list[float]], outputs: dict) -> No
         logs["shared_input_beta_f"].append(float(beta[0].detach().cpu()))
         logs["shared_input_beta_m"].append(float(beta[1].detach().cpu()))
         logs["shared_input_beta_c"].append(float(beta[2].detach().cpu()))
+
+    v13 = diagnostics.get("v13_global_local") if isinstance(diagnostics, dict) else None
+    if isinstance(v13, dict):
+        for key in (
+            "rank",
+            "global_gamma",
+            "alpha_local",
+            "rank_attention_entropy",
+            "global_update_norm",
+            "global_feature_norm",
+            "local_feature_norm",
+            "local_projected_norm",
+            "fused_feature_norm",
+        ):
+            value = v13.get(key)
+            if value is not None and torch.is_tensor(value):
+                logs[f"v13_{key}"].append(float(value.detach().float().mean().cpu()))
 
     features = outputs.get("features", {})
     h_shared = features.get("h_shared") if isinstance(features, dict) else None

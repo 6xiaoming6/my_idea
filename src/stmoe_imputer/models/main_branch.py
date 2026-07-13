@@ -14,6 +14,7 @@ from .fusion import (
 from .router import QualityRouter, uniform_gate
 from .scale_utils import build_scale_active_mask
 from .stats import compute_observation_stats
+from .v_single import V13LowRankGlobalLocalMoE
 
 
 class MultiScaleMoEBackbone(nn.Module):
@@ -48,8 +49,25 @@ class MultiScaleMoEBackbone(nn.Module):
         route_dropout: float = 0.0,
         enable_branch_aux: bool = True,
         enable_complementary_loss: bool = True,
+        global_local_mode: str = "none",
+        use_lowrank_global: bool = False,
+        use_sparse_local_moe: bool = False,
+        lowrank_mode: str = "anchor_attention",
+        lowrank_rank: int = 16,
+        lowrank_num_heads: int = 4,
+        lowrank_dropout: float = 0.1,
+        global_gamma_init: float = -3.0,
+        global_out_init_scale: float = 1e-3,
+        local_alpha_init: float = -3.0,
+        local_alpha_trainable: bool = True,
+        local_alpha_fixed: float = 0.05,
+        local_proj_zero_init: bool = True,
     ) -> None:
         super().__init__()
+        if global_local_mode not in {
+            "none", "global_plus_local", "global_only", "local_only"
+        }:
+            raise ValueError(f"Unsupported global_local_mode: {global_local_mode}")
         self.dim = dim
         self.num_experts = num_experts
         self.top_k = min(max(1, top_k), num_experts)
@@ -72,6 +90,9 @@ class MultiScaleMoEBackbone(nn.Module):
         self.route_dropout = route_dropout
         self.enable_branch_aux = enable_branch_aux
         self.enable_complementary_loss = enable_complementary_loss
+        self.global_local_mode = global_local_mode
+        self.use_lowrank_global = use_lowrank_global
+        self.use_sparse_local_moe = use_sparse_local_moe
 
         self.embed_f = ScaleTokenEncoder(c_in, dim, max_t, h, w, num_groups=num_groups)
         self.embed_m = ScaleTokenEncoder(c_in, dim, max_t, h // 2, w // 2, num_groups=num_groups)
@@ -110,6 +131,26 @@ class MultiScaleMoEBackbone(nn.Module):
         self.route_fusion = ProgressiveRouteFusion(
             dim, num_groups=num_groups, dropout=dropout
         )
+        if global_local_mode == "none":
+            self.v13_global_local = None
+        else:
+            self.v13_global_local = V13LowRankGlobalLocalMoE(
+                dim=dim,
+                mode=global_local_mode,
+                use_lowrank_global=use_lowrank_global,
+                use_sparse_local_moe=use_sparse_local_moe,
+                lowrank_mode=lowrank_mode,
+                rank=lowrank_rank,
+                num_heads=lowrank_num_heads,
+                lowrank_dropout=lowrank_dropout,
+                global_gamma_init=global_gamma_init,
+                global_out_init_scale=global_out_init_scale,
+                local_alpha_init=local_alpha_init,
+                local_alpha_trainable=local_alpha_trainable,
+                local_alpha_fixed=local_alpha_fixed,
+                local_proj_zero_init=local_proj_zero_init,
+                local_dropout=dropout,
+            )
         self.branch_fusion = SharedRoutedResidualFusion(
             dim,
             num_groups=num_groups,
@@ -180,6 +221,19 @@ class MultiScaleMoEBackbone(nn.Module):
             route_dropout=main_cfg.get("route_dropout", 0.0),
             enable_branch_aux=main_cfg.get("enable_branch_aux", True),
             enable_complementary_loss=main_cfg.get("enable_complementary_loss", True),
+            global_local_mode=main_cfg.get("global_local_mode", "none"),
+            use_lowrank_global=main_cfg.get("use_lowrank_global", False),
+            use_sparse_local_moe=main_cfg.get("use_sparse_local_moe", False),
+            lowrank_mode=main_cfg.get("lowrank_mode", "anchor_attention"),
+            lowrank_rank=main_cfg.get("lowrank_rank", 16),
+            lowrank_num_heads=main_cfg.get("lowrank_num_heads", 4),
+            lowrank_dropout=main_cfg.get("lowrank_dropout", 0.1),
+            global_gamma_init=main_cfg.get("global_gamma_init", -3.0),
+            global_out_init_scale=main_cfg.get("global_out_init_scale", 1e-3),
+            local_alpha_init=main_cfg.get("local_alpha_init", -3.0),
+            local_alpha_trainable=main_cfg.get("local_alpha_trainable", True),
+            local_alpha_fixed=main_cfg.get("local_alpha_fixed", 0.05),
+            local_proj_zero_init=main_cfg.get("local_proj_zero_init", True),
         )
 
     def get_scale_embed_vec(self, embed_module: ScaleTokenEncoder, batch_size: int) -> torch.Tensor:
@@ -231,7 +285,8 @@ class MultiScaleMoEBackbone(nn.Module):
         gate_c = self._route(self.router_c, h_c, m_c, self.get_scale_embed_vec(self.embed_c, batch_size))
 
         routing_mode = self._effective_routing_mode()
-        need_expert_features = self.use_routed_branch or (
+        v13_needs_local = self.global_local_mode in {"global_plus_local", "local_only"}
+        need_expert_features = self.use_routed_branch or v13_needs_local or (
             self.use_shared_branch and self.shared_input_mode != "pre"
         )
         if need_expert_features:
@@ -297,7 +352,11 @@ class MultiScaleMoEBackbone(nn.Module):
             z_m = torch.zeros_like(h_m)
             z_c = torch.zeros_like(h_c)
 
-        if not self.use_shared_branch and not self.use_routed_branch:
+        if (
+            self.global_local_mode == "none"
+            and not self.use_shared_branch
+            and not self.use_routed_branch
+        ):
             raise ValueError("At least one of shared/routed branch must be enabled.")
 
         route_outputs = {
@@ -330,7 +389,7 @@ class MultiScaleMoEBackbone(nn.Module):
         route_gamma = torch.zeros((), device=z_f.device, dtype=z_f.dtype)
         branch_gate = torch.zeros(z_f.shape[0], 2, device=z_f.device, dtype=z_f.dtype)
 
-        if self.use_routed_branch:
+        if self.use_routed_branch or v13_needs_local:
             route_outputs = self.route_fusion(
                 z_f=z_f,
                 z_m=z_m,
@@ -338,26 +397,44 @@ class MultiScaleMoEBackbone(nn.Module):
                 scale_mode=self.scale_mode,
             )
 
-        if self.use_shared_branch and not self.use_routed_branch:
-            h_shared = self.branch_fusion.refine_shared(z_shared)
-
-        if self.use_shared_branch and not self.use_routed_branch:
-            h_main = h_shared
-            branch_mode = "shared_only"
-            branch_gate[:, 0] = 1.0
-        elif self.use_routed_branch and not self.use_shared_branch:
-            h_main = route_outputs["h_route"]
-            branch_mode = "routed_only"
-            branch_gate[:, 1] = 1.0
-        else:
-            h_main, h_shared, h_route_proj, branch_gate = self.branch_fusion(
-                z_shared=z_shared,
-                h_route=route_outputs["h_route"],
-                q_f=q_f,
-                scale_gate=scale_gate,
+        v13_diagnostics = None
+        if self.v13_global_local is not None:
+            h_main, v13_diagnostics = self.v13_global_local(
+                h_f=h_f,
+                h_local=route_outputs["h_route"],
             )
-            route_gamma = torch.sigmoid(self.branch_fusion.route_gamma)
-            branch_mode = self.branch_fusion_mode
+            h_shared = v13_diagnostics["h_global"]
+            h_route_proj = v13_diagnostics["h_local_projected"]
+            branch_mode = f"v13_{self.global_local_mode}"
+            if self.global_local_mode == "global_only":
+                branch_gate[:, 0] = 1.0
+            elif self.global_local_mode == "local_only":
+                branch_gate[:, 1] = 1.0
+            else:
+                alpha_local = v13_diagnostics["alpha_local"].to(dtype=branch_gate.dtype)
+                branch_gate[:, 0] = 1.0
+                branch_gate[:, 1] = alpha_local
+        else:
+            if self.use_shared_branch and not self.use_routed_branch:
+                h_shared = self.branch_fusion.refine_shared(z_shared)
+
+            if self.use_shared_branch and not self.use_routed_branch:
+                h_main = h_shared
+                branch_mode = "shared_only"
+                branch_gate[:, 0] = 1.0
+            elif self.use_routed_branch and not self.use_shared_branch:
+                h_main = route_outputs["h_route"]
+                branch_mode = "routed_only"
+                branch_gate[:, 1] = 1.0
+            else:
+                h_main, h_shared, h_route_proj, branch_gate = self.branch_fusion(
+                    z_shared=z_shared,
+                    h_route=route_outputs["h_route"],
+                    q_f=q_f,
+                    scale_gate=scale_gate,
+                )
+                route_gamma = torch.sigmoid(self.branch_fusion.route_gamma)
+                branch_mode = self.branch_fusion_mode
 
         x_hat_main = self.pred_head(h_main)
         is_full = self.use_shared_branch and self.use_routed_branch
@@ -415,6 +492,19 @@ class MultiScaleMoEBackbone(nn.Module):
                 "h_m_up": h_m_up,
                 "h_c_up": h_c_up,
                 "h_main": h_main,
+                "h_global": (
+                    v13_diagnostics["h_global"] if v13_diagnostics is not None else h_shared
+                ),
+                "h_local": (
+                    v13_diagnostics["h_local"]
+                    if v13_diagnostics is not None
+                    else route_outputs["h_route"]
+                ),
+                "h_local_projected": (
+                    v13_diagnostics["h_local_projected"]
+                    if v13_diagnostics is not None
+                    else h_route_proj
+                ),
             },
             "routing_mode": routing_mode,
             "branch_mode": branch_mode,
@@ -425,10 +515,12 @@ class MultiScaleMoEBackbone(nn.Module):
             "detach_shared_expert_input": self.detach_shared_expert_input,
             "enable_branch_aux": self.enable_branch_aux,
             "enable_complementary_loss": self.enable_complementary_loss,
+            "global_local_mode": self.global_local_mode,
             "route_gamma": route_gamma.detach(),
             "diagnostics": {
                 "shared_input_beta": self.shared_input_adapter.beta_values().detach(),
                 "branch_gate": branch_gate.detach(),
+                "v13_global_local": v13_diagnostics,
             },
         }
 

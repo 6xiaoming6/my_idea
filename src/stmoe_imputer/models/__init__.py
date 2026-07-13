@@ -17,6 +17,7 @@ from .main_branch import (
     OAMSBackbone,
     ObservationAwareMultiScaleMoEImputer,
 )
+from .v_single import GlobalLocalResidualFusion, LowRankGlobalMixer, V13LowRankGlobalLocalMoE
 
 __all__ = [
     "DualBranchSTImputer",
@@ -25,7 +26,9 @@ __all__ = [
     "GatedFusion2",
     "GatedFusion3",
     "GatedCrossScaleSharedExpert",
+    "GlobalLocalResidualFusion",
     "LearnableUpsample3D",
+    "LowRankGlobalMixer",
     "MultiScaleMoEBackbone",
     "OAMSBackbone",
     "ObservationAwareMultiScaleMoEImputer",
@@ -34,6 +37,7 @@ __all__ = [
     "ProgressiveScaleGatedFusion",
     "ReliabilityAwareScaleGate",
     "SharedRoutedResidualFusion",
+    "V13LowRankGlobalLocalMoE",
     "build_scale_active_mask",
     "get_active_scales",
     "is_scale_active",

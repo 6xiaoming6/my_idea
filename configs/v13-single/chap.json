@@ -1,0 +1,31 @@
+{
+  "output_dir": "outputs/v13-single",
+  "model": {
+    "version": "v13-single",
+    "architecture": "lowrank_global_sparse_local_moe",
+    "main": {
+      "use_multiscale": true,
+      "use_router": true,
+      "share_experts": true,
+      "use_routed_branch": true,
+      "use_shared_branch": false,
+      "enable_branch_aux": false,
+      "enable_complementary_loss": false,
+      "routing_mode": "topk",
+      "scale_mode": "fine_mid_coarse",
+      "global_local_mode": "global_plus_local",
+      "use_lowrank_global": true,
+      "use_sparse_local_moe": true,
+      "lowrank_mode": "anchor_attention",
+      "lowrank_rank": 16,
+      "lowrank_num_heads": 4,
+      "lowrank_dropout": 0.1,
+      "global_gamma_init": -3.0,
+      "global_out_init_scale": 0.001,
+      "local_alpha_init": -3.0,
+      "local_alpha_trainable": true,
+      "local_alpha_fixed": 0.05,
+      "local_proj_zero_init": true
+    }
+  }
+}

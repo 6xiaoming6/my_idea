@@ -1,0 +1,8 @@
+{
+  "model": {
+    "main": {
+      "local_alpha_trainable": false,
+      "local_alpha_fixed": 0.05
+    }
+  }
+}

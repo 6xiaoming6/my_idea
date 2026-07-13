@@ -1,0 +1,13 @@
+{
+  "model": {
+    "main": {
+      "global_local_mode": "global_only",
+      "use_lowrank_global": true,
+      "use_sparse_local_moe": false,
+      "use_shared_branch": false,
+      "use_routed_branch": false,
+      "enable_branch_aux": false,
+      "enable_complementary_loss": false
+    }
+  }
+}
