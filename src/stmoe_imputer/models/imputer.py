@@ -4,7 +4,7 @@ import torch
 from torch import nn
 
 from .aux_branch import NullResidualBranch
-from .main_branch import MultiScaleMoEBackbone
+from .registry import build_model_backbone
 
 
 class DualBranchSTImputer(nn.Module):
@@ -23,7 +23,7 @@ class DualBranchSTImputer(nn.Module):
 
     @classmethod
     def from_config(cls, cfg: dict) -> "DualBranchSTImputer":
-        main_branch = MultiScaleMoEBackbone.from_config(cfg)
+        main_branch = build_model_backbone(cfg)
         aux_branch = NullResidualBranch(c_out=cfg["model"]["c_in"])
         aux_cfg = cfg["model"].get("aux", {})
         return cls(

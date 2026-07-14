@@ -1,0 +1,45 @@
+{
+  "output_dir": "outputs/v14-single",
+  "model": {
+    "version": "v14-single",
+    "architecture": "v14_safe_c2f_moe",
+    "v14": {
+      "enabled": true,
+      "use_main_bypass": true,
+      "difficulty_enabled": true,
+      "difficulty_hidden": 16,
+      "difficulty_out_dim": 16,
+      "controller_hidden": 32,
+      "controller_dropout": 0.0,
+      "controller_zero_init": true,
+      "dynamic_gate": true,
+      "refiner_hidden": 16,
+      "prediction_embed_dim": 8,
+      "correction_hidden": 8,
+      "refiner_dropout": 0.0,
+      "alpha_mid_bias": -3.0,
+      "alpha_fine_bias": -3.0,
+      "alpha_final_bias": -5.0,
+      "alpha_mid_max": 0.8,
+      "alpha_fine_max": 0.8,
+      "alpha_final_max": 0.5,
+      "correction_zero_init": true,
+      "fine_uses_main_feature": true,
+      "use_observed_consistency": true,
+      "use_geometry_descriptor": true,
+      "use_scale_reliability": true,
+      "lambda_base": 0.25,
+      "lambda_mid": 0.05,
+      "lambda_coarse": 0.03,
+      "lambda_regret": 0.1,
+      "lambda_gate": 0.0001
+    }
+  },
+  "loss": {
+    "lambda_v14_base": 0.25,
+    "lambda_v14_mid": 0.05,
+    "lambda_v14_coarse": 0.03,
+    "lambda_v14_regret": 0.1,
+    "lambda_v14_gate": 0.0001
+  }
+}

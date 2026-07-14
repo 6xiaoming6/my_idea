@@ -17,12 +17,15 @@ def build_optimizer(model: torch.nn.Module, cfg: dict) -> torch.optim.Optimizer:
     weight_decay = train_cfg.get("weight_decay", 0.0)
     gate_lr_mult = train_cfg.get("gate_lr_mult", 1.0)
     scalar_lr_mult = train_cfg.get("scalar_lr_mult", 2.0)
+    v14_lr = train_cfg.get("lr_v14", base_lr)
 
     grouped: dict[str, dict] = {
         "main": {"params": [], "lr": base_lr, "weight_decay": weight_decay},
         "gate": {"params": [], "lr": base_lr * gate_lr_mult, "weight_decay": 0.0},
         "scalar": {"params": [], "lr": base_lr * scalar_lr_mult, "weight_decay": 0.0},
         "no_decay": {"params": [], "lr": base_lr, "weight_decay": 0.0},
+        "v14": {"params": [], "lr": v14_lr, "weight_decay": weight_decay},
+        "v14_no_decay": {"params": [], "lr": v14_lr, "weight_decay": 0.0},
         "other": {"params": [], "lr": aux_lr, "weight_decay": weight_decay},
     }
 
@@ -30,7 +33,29 @@ def build_optimizer(model: torch.nn.Module, cfg: dict) -> torch.optim.Optimizer:
         if not param.requires_grad:
             continue
         name_l = name.lower()
-        if any(token in name_l for token in ("route_gamma", "shared_gamma", "shared_input_adapter.beta")):
+        is_v14_new = any(
+            token in name_l
+            for token in (
+                "main_branch.condition_encoder",
+                "main_branch.controller",
+                "main_branch.refiner",
+            )
+        )
+        if is_v14_new and (name_l.endswith(".bias") or "norm" in name_l):
+            grouped["v14_no_decay"]["params"].append(param)
+        elif is_v14_new:
+            grouped["v14"]["params"].append(param)
+        elif any(
+            token in name_l
+            for token in (
+                "route_gamma",
+                "shared_gamma",
+                "shared_input_adapter.beta",
+                "controller.mid_bias",
+                "controller.fine_bias",
+                "controller.final_bias",
+            )
+        ):
             grouped["scalar"]["params"].append(param)
         elif "scale_gate" in name_l or "branch_gate" in name_l:
             grouped["gate"]["params"].append(param)
@@ -134,12 +159,39 @@ def _append_model_diagnostics(logs: dict[str, list[float]], outputs: dict) -> No
         logs["shared_input_beta_m"].append(float(beta[1].detach().cpu()))
         logs["shared_input_beta_c"].append(float(beta[2].detach().cpu()))
 
+    v14 = diagnostics.get("v14") if isinstance(diagnostics, dict) else None
+    if isinstance(v14, dict):
+        for key, value in v14.items():
+            if value is None or not torch.is_tensor(value):
+                continue
+            value_f = value.detach().float()
+            summary_key = f"v14_{key}" if key.endswith("_mean") else f"v14_{key}_mean"
+            logs[summary_key].append(float(value_f.mean().cpu()))
+            if key in {"alpha_mid", "alpha_fine", "alpha_final"}:
+                logs[f"v14_{key}_std"].append(float(value_f.std(unbiased=False).cpu()))
+                logs[f"v14_{key}_min"].append(float(value_f.min().cpu()))
+                logs[f"v14_{key}_max"].append(float(value_f.max().cpu()))
+
+    if isinstance(v14, dict):
+        for scale in ("fine", "mid", "coarse"):
+            gate = outputs.get("gates", {}).get(scale)
+            if gate is None or not torch.is_tensor(gate):
+                continue
+            gate_f = gate.detach().float()
+            entropy = -(gate_f * gate_f.clamp_min(1e-8).log()).sum(dim=1)
+            logs[f"expert_entropy_{scale}"].append(float(entropy.mean().cpu()))
+            selected = outputs.get("selected_masks", {}).get(scale)
+            if selected is not None and torch.is_tensor(selected):
+                usage = selected.detach().float().mean(dim=0)
+                for index, value in enumerate(usage):
+                    logs[f"expert_usage_{scale}_{index}"].append(float(value.cpu()))
+
     features = outputs.get("features", {})
     h_shared = features.get("h_shared") if isinstance(features, dict) else None
     h_route_proj = features.get("h_route_proj") if isinstance(features, dict) else None
     if h_shared is not None and h_route_proj is not None:
-        shared_norm = h_shared.detach().pow(2).mean().sqrt()
-        route_norm = h_route_proj.detach().pow(2).mean().sqrt()
+        shared_norm = h_shared.detach().float().square().mean().sqrt()
+        route_norm = h_route_proj.detach().float().square().mean().sqrt()
         logs["effective_shared_norm"].append(float(shared_norm.cpu()))
         logs["effective_route_norm"].append(float(route_norm.cpu()))
         logs["effective_route_ratio"].append(float((route_norm / shared_norm.clamp_min(1e-6)).cpu()))

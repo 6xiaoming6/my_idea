@@ -91,6 +91,67 @@ def cross_scale_loss(
     return loss + observed_loss(x_hat_c, x_c_obs, m_c, loss_type)
 
 
+def multi_resolution_supervision_loss(
+    outputs: dict,
+    x_f_gt: torch.Tensor,
+    m_m: torch.Tensor,
+    m_c: torch.Tensor,
+    fine_to_mid: int,
+    fine_to_coarse: int,
+    pooling_mode: str,
+    loss_type: str,
+) -> tuple[torch.Tensor, torch.Tensor]:
+    x_hat_mid = outputs.get("x_hat_mid")
+    x_hat_coarse = outputs.get("x_hat_coarse")
+    if x_hat_mid is None and x_hat_coarse is None:
+        empty = _empty_loss_like(x_f_gt)
+        return empty, empty
+    ones_f = torch.ones(
+        x_f_gt.shape[0], 1, *x_f_gt.shape[2:],
+        device=x_f_gt.device, dtype=x_f_gt.dtype,
+    )
+    x_m_gt, m_m_gt = masked_pool2d_spatial(
+        x_f_gt, ones_f, kernel_size=fine_to_mid, mode=pooling_mode
+    )
+    l_mid = (
+        masked_loss(x_hat_mid, x_m_gt, m_m, loss_type)
+        if x_hat_mid is not None
+        else _empty_loss_like(x_f_gt)
+    )
+    if x_hat_coarse is None:
+        return l_mid, _empty_loss_like(x_f_gt)
+    mid_to_coarse = max(1, fine_to_coarse // fine_to_mid)
+    x_c_gt, _ = masked_pool2d_spatial(
+        x_m_gt, m_m_gt, kernel_size=mid_to_coarse, mode=pooling_mode
+    )
+    return l_mid, masked_loss(x_hat_coarse, x_c_gt, m_c, loss_type)
+
+
+def _missing_absolute_error(
+    pred: torch.Tensor,
+    target: torch.Tensor,
+    mask: torch.Tensor,
+) -> tuple[torch.Tensor, torch.Tensor]:
+    missing = expand_mask_as(1.0 - mask, pred)
+    error = (pred - target).abs() * missing
+    denom = missing.sum().clamp_min(1.0)
+    return error, denom
+
+
+def v14_regret_loss(
+    pred_final: torch.Tensor,
+    pred_base: torch.Tensor,
+    target: torch.Tensor,
+    mask: torch.Tensor,
+) -> tuple[torch.Tensor, torch.Tensor]:
+    final_error, denom = _missing_absolute_error(pred_final, target, mask)
+    base_error, _ = _missing_absolute_error(pred_base.detach(), target, mask)
+    regret = F.relu(final_error - base_error).sum() / denom
+    missing = expand_mask_as(1.0 - mask, pred_final)
+    violation = ((final_error > base_error).to(pred_final.dtype) * missing).sum() / denom
+    return regret, violation
+
+
 def _empty_loss_like(tensor: torch.Tensor) -> torch.Tensor:
     return tensor.sum() * 0.0
 
@@ -175,6 +236,45 @@ def compute_main_stage_loss(
         loss_type=loss_type,
         scale_mode=scale_mode,
     )
+    x_hat_base = outputs.get("x_hat_base")
+    x_hat_ctf = outputs.get("x_hat_ctf")
+    if x_hat_base is not None:
+        l_v14_base = masked_loss(x_hat_base, x_f_gt, m_f, loss_type=loss_type)
+        l_v14_mid, l_v14_coarse = multi_resolution_supervision_loss(
+            outputs,
+            x_f_gt,
+            batch["m_m"],
+            batch["m_c"],
+            fine_to_mid=scale_cfg["fine_to_mid"],
+            fine_to_coarse=scale_cfg["fine_to_coarse"],
+            pooling_mode=scale_cfg.get("pooling_mode", "avg"),
+            loss_type=loss_type,
+        )
+        l_v14_regret, v14_violation_rate = v14_regret_loss(
+            outputs["x_hat_main"], x_hat_base, x_f_gt, m_f
+        )
+        v14_diagnostics = outputs.get("diagnostics", {}).get("v14", {})
+        alpha_final = v14_diagnostics.get("alpha_final")
+        l_v14_gate = alpha_final.mean() if torch.is_tensor(alpha_final) else _empty_loss_like(l_main)
+        base_error, base_denom = _missing_absolute_error(x_hat_base, x_f_gt, m_f)
+        v14_base_hidden_mae = base_error.sum() / base_denom
+        final_error, final_denom = _missing_absolute_error(outputs["x_hat_main"], x_f_gt, m_f)
+        v14_final_hidden_mae = final_error.sum() / final_denom
+        if x_hat_ctf is not None:
+            ctf_error, ctf_denom = _missing_absolute_error(x_hat_ctf, x_f_gt, m_f)
+            v14_ctf_hidden_mae = ctf_error.sum() / ctf_denom
+        else:
+            v14_ctf_hidden_mae = _empty_loss_like(l_main)
+    else:
+        l_v14_base = _empty_loss_like(l_main)
+        l_v14_mid = _empty_loss_like(l_main)
+        l_v14_coarse = _empty_loss_like(l_main)
+        l_v14_regret = _empty_loss_like(l_main)
+        l_v14_gate = _empty_loss_like(l_main)
+        v14_violation_rate = _empty_loss_like(l_main)
+        v14_base_hidden_mae = _empty_loss_like(l_main)
+        v14_ctf_hidden_mae = _empty_loss_like(l_main)
+        v14_final_hidden_mae = _empty_loss_like(l_main)
     routing_mode = outputs.get("routing_mode", "topk")
     if scale_mode == "fine":
         balance_scales = ("fine",)
@@ -246,9 +346,15 @@ def compute_main_stage_loss(
     loss = loss + loss_cfg.get("lambda_shared_aux", 0.0) * l_shared_aux
     loss = loss + loss_cfg.get("lambda_route_aux", 0.0) * l_route_aux
     loss = loss + loss_cfg.get("lambda_complementary", 0.0) * l_complementary
+    v14_cfg = cfg.get("model", {}).get("v14", {})
+    loss = loss + loss_cfg.get("lambda_v14_base", v14_cfg.get("lambda_base", 0.0)) * l_v14_base
+    loss = loss + loss_cfg.get("lambda_v14_mid", v14_cfg.get("lambda_mid", 0.0)) * l_v14_mid
+    loss = loss + loss_cfg.get("lambda_v14_coarse", v14_cfg.get("lambda_coarse", 0.0)) * l_v14_coarse
+    loss = loss + loss_cfg.get("lambda_v14_regret", v14_cfg.get("lambda_regret", 0.0)) * l_v14_regret
+    loss = loss + loss_cfg.get("lambda_v14_gate", v14_cfg.get("lambda_gate", 0.0)) * l_v14_gate
     if loss_cfg.get("lambda_final", 0.0) > 0:
         loss = loss + loss_cfg["lambda_final"] * l_final
-    return loss, {
+    loss_logs = {
         "loss": loss.detach(),
         "l_final": l_final.detach(),
         "l_main": l_main.detach(),
@@ -263,3 +369,16 @@ def compute_main_stage_loss(
         "l_complementary": l_complementary.detach(),
         "aux_loss_warmup": torch.as_tensor(warmup_factor, device=l_main.device).detach(),
     }
+    if x_hat_base is not None:
+        loss_logs.update({
+            "l_v14_base": l_v14_base.detach(),
+            "l_v14_mid": l_v14_mid.detach(),
+            "l_v14_coarse": l_v14_coarse.detach(),
+            "l_v14_regret": l_v14_regret.detach(),
+            "l_v14_gate": l_v14_gate.detach(),
+            "v14_base_hidden_mae": v14_base_hidden_mae.detach(),
+            "v14_ctf_hidden_mae": v14_ctf_hidden_mae.detach(),
+            "v14_final_hidden_mae": v14_final_hidden_mae.detach(),
+            "v14_non_regression_violation_rate": v14_violation_rate.detach(),
+        })
+    return loss, loss_logs

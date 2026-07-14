@@ -17,9 +17,18 @@ from .main_branch import (
     OAMSBackbone,
     ObservationAwareMultiScaleMoEImputer,
 )
+from .registry import MODEL_REGISTRY, build_model_backbone, resolve_architecture
+from .v_single import (
+    DifficultyConditionEncoder,
+    ObservedConsistencyEvaluator,
+    SafeCoarseToFineRefiner,
+    SafetyController,
+    V14SafeC2FMoE,
+)
 
 __all__ = [
     "DualBranchSTImputer",
+    "DifficultyConditionEncoder",
     "AdaptiveBranchGate",
     "ExpertEnhancedSharedInput",
     "GatedFusion2",
@@ -27,14 +36,21 @@ __all__ = [
     "GatedCrossScaleSharedExpert",
     "LearnableUpsample3D",
     "MultiScaleMoEBackbone",
+    "MODEL_REGISTRY",
     "OAMSBackbone",
     "ObservationAwareMultiScaleMoEImputer",
+    "ObservedConsistencyEvaluator",
     "ParallelTwoBranchImputer",
     "ProgressiveRouteFusion",
     "ProgressiveScaleGatedFusion",
     "ReliabilityAwareScaleGate",
     "SharedRoutedResidualFusion",
+    "SafeCoarseToFineRefiner",
+    "SafetyController",
+    "V14SafeC2FMoE",
+    "build_model_backbone",
     "build_scale_active_mask",
     "get_active_scales",
     "is_scale_active",
+    "resolve_architecture",
 ]

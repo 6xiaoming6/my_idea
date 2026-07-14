@@ -1,0 +1,60 @@
+{
+  "output_dir": "outputs/v14-single",
+  "model": {
+    "version": "v14-single",
+    "architecture": "v14_safe_c2f_moe",
+    "v14": {
+  "enabled": true,
+  "reuse_main_features": true,
+  "use_main_bypass": true,
+  "refiner_hidden": 32,
+  "prediction_embed_dim": 16,
+  "correction_hidden": 16,
+  "refiner_dropout": 0.1,
+  "difficulty_enabled": true,
+  "difficulty_hidden": 32,
+  "difficulty_out_dim": 32,
+  "difficulty_use_spatial_block": true,
+  "difficulty_use_cross_scale_consistency": true,
+  "controller_hidden": 64,
+  "controller_dropout": 0.1,
+  "controller_zero_init": true,
+  "dynamic_gate": true,
+  "alpha_mid_bias": -3.0,
+  "alpha_fine_bias": -3.0,
+  "alpha_final_bias": -5.0,
+  "alpha_mid_max": 0.8,
+  "alpha_fine_max": 0.8,
+  "alpha_final_max": 0.5,
+  "correction_zero_init": true,
+  "fine_uses_main_feature": true,
+  "use_observed_consistency": true,
+  "use_geometry_descriptor": true,
+  "use_scale_reliability": true,
+  "freeze_main": false,
+  "lambda_base": 0.25,
+  "lambda_mid": 0.05,
+  "lambda_coarse": 0.03,
+  "lambda_regret": 0.1,
+  "lambda_gate": 0.0001
+}
+  },
+  "loss": {
+    "lambda_v14_base": 0.25,
+    "lambda_v14_mid": 0.05,
+    "lambda_v14_coarse": 0.03,
+    "lambda_v14_regret": 0.1,
+    "lambda_v14_gate": 0.0001
+  },
+  "train": {
+    "epochs": 160,
+    "val_epoch": 5,
+    "lr_v14": 0.001,
+    "early_stopping": {
+      "enabled": false,
+      "monitor": "val_mae",
+      "patience": 8,
+      "mode": "min"
+    }
+  }
+}

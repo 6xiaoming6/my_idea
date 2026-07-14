@@ -82,10 +82,10 @@ class TrainLogger:
         epoch_s = perf.get("epoch_time_sec", train_s + val_s)
         mem_gb = perf.get("peak_memory_gb", 0.0)
         best_mark = "*" if is_best else ""
-        val_mae = val["mae"] if val is not None else float("nan")
+        val_mae = f"{val['mae']:.4f}" if val is not None else "-"
         t_line = (
             f"{epoch:>6}  {train['loss']:>11.5f}  {train['mae']:>10.4f}  {train['rmse']:>11.4f}  "
-            f"{val_mae:>10.4f}  {lr:>10.2e}  {train_s:>8.1f}  {val_s:>7.1f}  "
+            f"{val_mae:>10}  {lr:>10.2e}  {train_s:>8.1f}  {val_s:>7.1f}  "
             f"{epoch_s:>8.1f}  {mem_gb:>7.2f}  {best_mark:>5}"
         )
         self._train_f.write(t_line + "\n")

@@ -2,8 +2,11 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
+import json
 import os
 import platform
+import shutil
 import subprocess
 import time
 from datetime import datetime
@@ -27,16 +30,47 @@ from stmoe_imputer.utils.checkpoint import load_checkpoint, save_checkpoint
 from stmoe_imputer.utils.train_logger import TrainLogger
 
 
-def _run_git_commit() -> str:
+def _git_metadata() -> dict[str, str]:
     try:
-        return subprocess.check_output(
-            ["git", "rev-parse", "--short", "HEAD"],
+        git_executable = shutil.which("git")
+        if git_executable is None:
+            conda_exe = os.environ.get("CONDA_EXE")
+            candidates = []
+            if conda_exe:
+                candidates.append(Path(conda_exe).resolve().with_name("git"))
+            python_path = Path(sys.executable).resolve()
+            if len(python_path.parents) >= 3:
+                candidates.append(python_path.parents[2] / "bin" / "git")
+            git_executable = next((str(path) for path in candidates if path.is_file()), None)
+        if git_executable is None:
+            raise FileNotFoundError("git executable is not available in PATH or the Conda root")
+        commit = subprocess.check_output(
+            [git_executable, "rev-parse", "HEAD"],
             cwd=ROOT,
             text=True,
-            stderr=subprocess.DEVNULL,
+            stderr=subprocess.STDOUT,
         ).strip()
-    except Exception:
-        return "unknown"
+        branch = subprocess.check_output(
+            [git_executable, "branch", "--show-current"], cwd=ROOT, text=True,
+            stderr=subprocess.STDOUT,
+        ).strip() or "detached"
+        status = subprocess.check_output(
+            [git_executable, "status", "--porcelain"], cwd=ROOT, text=True,
+            stderr=subprocess.STDOUT,
+        )
+        return {"git_commit": commit, "git_branch": branch, "git_dirty": str(bool(status.strip()))}
+    except Exception as error:
+        return {
+            "git_commit": "unavailable",
+            "git_branch": "unavailable",
+            "git_dirty": "unavailable",
+            "git_error": f"{type(error).__name__}: {error}",
+        }
+
+
+def _config_hash(cfg: dict) -> str:
+    payload = json.dumps(cfg, sort_keys=True, ensure_ascii=False, separators=(",", ":"))
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
 
 def _device_name(device: torch.device) -> str:
@@ -247,14 +281,18 @@ def main() -> None:
 
     total_params = sum(p.numel() for p in model.parameters())
     trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
-    git_commit = _run_git_commit()
+    git_meta = _git_metadata()
+    git_commit = git_meta["git_commit"]
     started_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     logger = TrainLogger(log_dir)
     logger.log_header(cfg, extra={
         "run_dir": str(run_dir),
         "command": " ".join(sys.argv),
-        "git_commit": git_commit,
+        **git_meta,
+        "config_sha256": _config_hash(cfg),
         "python": platform.python_version(),
+        "torch": torch.__version__,
+        "cuda_runtime": torch.version.cuda or "not_available",
         "train_npz": args.train_npz or "(synthetic)",
         "val_npz": args.val_npz or "(synthetic)",
         "test_npz": args.test_npz or ("(synthetic)" if args.synthetic else "(not provided)"),
@@ -336,9 +374,10 @@ def main() -> None:
             }
             is_best = val_logs is not None and val_logs["mae"] < best_mae
             if args.quiet:
+                val_mae_text = f"{val_logs['mae']:7.2f}" if val_logs is not None else f"{'-':>7}"
                 print(f"[E {epoch:3d}/{cfg['train']['epochs']}] "
                       f"loss={train_logs['loss']:7.2f} "
-                      f"val_mae={val_logs['mae'] if val_logs else float('nan'):7.2f} "
+                      f"val_mae={val_mae_text} "
                       f"lr={current_lr:.2e} "
                       f"time={epoch_time:.1f}s mem={perf['peak_memory_gb']:.2f}GB")
             else:

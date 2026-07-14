@@ -1,0 +1,12 @@
+{
+  "loss": {
+    "lambda_v14_mid": 0.0,
+    "lambda_v14_coarse": 0.0
+  },
+  "model": {
+    "v14": {
+      "lambda_mid": 0.0,
+      "lambda_coarse": 0.0
+    }
+  }
+}
