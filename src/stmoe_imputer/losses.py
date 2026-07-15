@@ -138,6 +138,17 @@ def _missing_absolute_error(
     return error, denom
 
 
+def masked_mean_per_sample(
+    value: torch.Tensor,
+    mask: torch.Tensor,
+) -> torch.Tensor:
+    """Average ``value`` per sample over positions selected by an explicit mask."""
+    expanded = expand_mask_as(mask, value).to(dtype=value.dtype)
+    numerator = (value * expanded).flatten(1).sum(dim=1)
+    denominator = expanded.flatten(1).sum(dim=1).clamp_min(1.0)
+    return numerator / denominator
+
+
 def v14_regret_loss(
     pred_final: torch.Tensor,
     pred_base: torch.Tensor,
@@ -238,7 +249,8 @@ def compute_main_stage_loss(
     )
     x_hat_base = outputs.get("x_hat_base")
     x_hat_ctf = outputs.get("x_hat_ctf")
-    if x_hat_base is not None:
+    is_v14 = bool(outputs.get("v14_enabled", False))
+    if is_v14 and x_hat_base is not None:
         l_v14_base = masked_loss(x_hat_base, x_f_gt, m_f, loss_type=loss_type)
         l_v14_mid, l_v14_coarse = multi_resolution_supervision_loss(
             outputs,
@@ -275,6 +287,40 @@ def compute_main_stage_loss(
         v14_base_hidden_mae = _empty_loss_like(l_main)
         v14_ctf_hidden_mae = _empty_loss_like(l_main)
         v14_final_hidden_mae = _empty_loss_like(l_main)
+
+    effective_delta = outputs.get("delta_effective")
+    is_v15 = bool(outputs.get("v15_enabled", False))
+    l_v15_base = _empty_loss_like(l_main)
+    l_v15_delta = _empty_loss_like(l_main)
+    l_v15_safe = _empty_loss_like(l_main)
+    v15_base_hidden_mae = _empty_loss_like(l_main)
+    v15_final_hidden_mae = _empty_loss_like(l_main)
+    v15_final_vs_base_improvement = _empty_loss_like(l_main)
+    v15_sample_violation_rate = _empty_loss_like(l_main)
+    if is_v15 and x_hat_base is not None and effective_delta is not None:
+        l_v15_base = masked_loss(x_hat_base, x_f_gt, m_f, loss_type=loss_type)
+        target_delta = x_f_gt - x_hat_base.detach()
+        l_v15_delta = masked_loss(
+            effective_delta, target_delta, m_f, loss_type=loss_type
+        )
+
+        missing = expand_mask_as(1.0 - m_f, x_hat_base)
+        base_per_sample = masked_mean_per_sample(
+            (x_hat_base.detach() - x_f_gt).abs(), missing
+        )
+        final_per_sample = masked_mean_per_sample(
+            (outputs["x_hat_main"] - x_f_gt).abs(), missing
+        )
+        sample_regret = F.relu(final_per_sample - base_per_sample)
+        l_v15_safe = sample_regret.mean()
+        v15_base_hidden_mae = base_per_sample.mean()
+        v15_final_hidden_mae = final_per_sample.mean()
+        v15_final_vs_base_improvement = (
+            v15_base_hidden_mae - v15_final_hidden_mae
+        )
+        v15_sample_violation_rate = (
+            final_per_sample > base_per_sample
+        ).to(dtype=l_main.dtype).mean()
     routing_mode = outputs.get("routing_mode", "topk")
     if scale_mode == "fine":
         balance_scales = ("fine",)
@@ -352,6 +398,16 @@ def compute_main_stage_loss(
     loss = loss + loss_cfg.get("lambda_v14_coarse", v14_cfg.get("lambda_coarse", 0.0)) * l_v14_coarse
     loss = loss + loss_cfg.get("lambda_v14_regret", v14_cfg.get("lambda_regret", 0.0)) * l_v14_regret
     loss = loss + loss_cfg.get("lambda_v14_gate", v14_cfg.get("lambda_gate", 0.0)) * l_v14_gate
+    v15_cfg = cfg.get("model", {}).get("v15", {})
+    loss = loss + loss_cfg.get(
+        "lambda_v15_base", v15_cfg.get("lambda_base", 0.0)
+    ) * l_v15_base
+    loss = loss + loss_cfg.get(
+        "lambda_v15_delta", v15_cfg.get("lambda_delta", 0.0)
+    ) * l_v15_delta
+    loss = loss + loss_cfg.get(
+        "lambda_v15_safe", v15_cfg.get("lambda_safe", 0.0)
+    ) * l_v15_safe
     if loss_cfg.get("lambda_final", 0.0) > 0:
         loss = loss + loss_cfg["lambda_final"] * l_final
     loss_logs = {
@@ -369,7 +425,7 @@ def compute_main_stage_loss(
         "l_complementary": l_complementary.detach(),
         "aux_loss_warmup": torch.as_tensor(warmup_factor, device=l_main.device).detach(),
     }
-    if x_hat_base is not None:
+    if is_v14 and x_hat_base is not None:
         loss_logs.update({
             "l_v14_base": l_v14_base.detach(),
             "l_v14_mid": l_v14_mid.detach(),
@@ -380,5 +436,15 @@ def compute_main_stage_loss(
             "v14_ctf_hidden_mae": v14_ctf_hidden_mae.detach(),
             "v14_final_hidden_mae": v14_final_hidden_mae.detach(),
             "v14_non_regression_violation_rate": v14_violation_rate.detach(),
+        })
+    if is_v15 and x_hat_base is not None and effective_delta is not None:
+        loss_logs.update({
+            "l_v15_base": l_v15_base.detach(),
+            "l_v15_delta": l_v15_delta.detach(),
+            "l_v15_safe": l_v15_safe.detach(),
+            "v15_base_hidden_mae": v15_base_hidden_mae.detach(),
+            "v15_final_hidden_mae": v15_final_hidden_mae.detach(),
+            "v15_final_vs_base_improvement": v15_final_vs_base_improvement.detach(),
+            "v15_sample_non_regression_violation_rate": v15_sample_violation_rate.detach(),
         })
     return loss, loss_logs

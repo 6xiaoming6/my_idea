@@ -1,0 +1,10 @@
+{
+  "model": {
+    "v15": {
+      "lambda_safe": 0.0
+    }
+  },
+  "loss": {
+    "lambda_v15_safe": 0.0
+  }
+}

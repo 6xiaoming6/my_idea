@@ -1,0 +1,46 @@
+{
+  "output_dir": "outputs/v15-single",
+  "model": {
+    "version": "v15-single",
+    "architecture": "v15_compact_residual_moe",
+    "v15": {
+      "enabled": true,
+      "reuse_main_features": true,
+      "use_pyramid": true,
+      "pyramid_dim": 64,
+      "pyramid_dropout": 0.1,
+      "residual_zero_init": true,
+      "condition_dim": 8,
+      "controller_hidden": 32,
+      "controller_dropout": 0.1,
+      "controller_zero_init": true,
+      "dynamic_budget": true,
+      "fixed_beta": 0.05,
+      "bounded_residual": true,
+      "beta_max": 0.5,
+      "beta_bias": -3.0,
+      "detach_scale_gate": true,
+      "scale_floor": 0.001,
+      "freeze_main": false,
+      "lambda_base": 0.5,
+      "lambda_delta": 0.1,
+      "lambda_safe": 0.1
+    }
+  },
+  "loss": {
+    "lambda_v15_base": 0.5,
+    "lambda_v15_delta": 0.1,
+    "lambda_v15_safe": 0.1
+  },
+  "train": {
+    "epochs": 160,
+    "val_epoch": 5,
+    "lr_v15": 0.001,
+    "early_stopping": {
+      "enabled": false,
+      "monitor": "val_mae",
+      "patience": 8,
+      "mode": "min"
+    }
+  }
+}

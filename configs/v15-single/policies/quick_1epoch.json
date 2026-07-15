@@ -1,0 +1,8 @@
+{
+  "name": "v15_quick_1epoch",
+  "datasets": {
+    "TaxiBJ": {"train": {"epochs": 1, "val_epoch": 1, "early_stopping": {"enabled": false}}},
+    "BikeNYC": {"train": {"epochs": 1, "val_epoch": 1, "early_stopping": {"enabled": false}}},
+    "CHAP": {"train": {"epochs": 1, "val_epoch": 1, "early_stopping": {"enabled": false}}}
+  }
+}

@@ -5,7 +5,7 @@ from collections.abc import Callable
 from torch import nn
 
 from .main_branch import MultiScaleMoEBackbone
-from .v_single import V14SafeC2FMoE
+from .v_single import V14SafeC2FMoE, V15CompactResidualMoE
 
 
 ModelBuilder = Callable[[dict], nn.Module]
@@ -14,6 +14,7 @@ ModelBuilder = Callable[[dict], nn.Module]
 MODEL_REGISTRY: dict[str, ModelBuilder] = {
     "main": MultiScaleMoEBackbone.from_config,
     "v14_safe_c2f_moe": V14SafeC2FMoE.from_config,
+    "v15_compact_residual_moe": V15CompactResidualMoE.from_config,
 }
 
 

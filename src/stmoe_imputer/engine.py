@@ -18,6 +18,7 @@ def build_optimizer(model: torch.nn.Module, cfg: dict) -> torch.optim.Optimizer:
     gate_lr_mult = train_cfg.get("gate_lr_mult", 1.0)
     scalar_lr_mult = train_cfg.get("scalar_lr_mult", 2.0)
     v14_lr = train_cfg.get("lr_v14", base_lr)
+    v15_lr = train_cfg.get("lr_v15", base_lr)
 
     grouped: dict[str, dict] = {
         "main": {"params": [], "lr": base_lr, "weight_decay": weight_decay},
@@ -26,6 +27,8 @@ def build_optimizer(model: torch.nn.Module, cfg: dict) -> torch.optim.Optimizer:
         "no_decay": {"params": [], "lr": base_lr, "weight_decay": 0.0},
         "v14": {"params": [], "lr": v14_lr, "weight_decay": weight_decay},
         "v14_no_decay": {"params": [], "lr": v14_lr, "weight_decay": 0.0},
+        "v15": {"params": [], "lr": v15_lr, "weight_decay": weight_decay},
+        "v15_no_decay": {"params": [], "lr": v15_lr, "weight_decay": 0.0},
         "other": {"params": [], "lr": aux_lr, "weight_decay": weight_decay},
     }
 
@@ -41,7 +44,18 @@ def build_optimizer(model: torch.nn.Module, cfg: dict) -> torch.optim.Optimizer:
                 "main_branch.refiner",
             )
         )
-        if is_v14_new and (name_l.endswith(".bias") or "norm" in name_l):
+        is_v15_new = any(
+            token in name_l
+            for token in (
+                "main_branch.residual_pyramid",
+                "main_branch.budget_controller",
+            )
+        )
+        if is_v15_new and (name_l.endswith(".bias") or "norm" in name_l):
+            grouped["v15_no_decay"]["params"].append(param)
+        elif is_v15_new:
+            grouped["v15"]["params"].append(param)
+        elif is_v14_new and (name_l.endswith(".bias") or "norm" in name_l):
             grouped["v14_no_decay"]["params"].append(param)
         elif is_v14_new:
             grouped["v14"]["params"].append(param)
@@ -172,7 +186,19 @@ def _append_model_diagnostics(logs: dict[str, list[float]], outputs: dict) -> No
                 logs[f"v14_{key}_min"].append(float(value_f.min().cpu()))
                 logs[f"v14_{key}_max"].append(float(value_f.max().cpu()))
 
-    if isinstance(v14, dict):
+    v15 = diagnostics.get("v15") if isinstance(diagnostics, dict) else None
+    if isinstance(v15, dict):
+        for key, value in v15.items():
+            if value is None or not torch.is_tensor(value):
+                continue
+            value_f = value.detach().float()
+            logs[f"v15_{key}_mean"].append(float(value_f.mean().cpu()))
+            if key == "beta":
+                logs["v15_beta_std"].append(float(value_f.std(unbiased=False).cpu()))
+                logs["v15_beta_min"].append(float(value_f.min().cpu()))
+                logs["v15_beta_max"].append(float(value_f.max().cpu()))
+
+    if isinstance(v14, dict) or isinstance(v15, dict):
         for scale in ("fine", "mid", "coarse"):
             gate = outputs.get("gates", {}).get(scale)
             if gate is None or not torch.is_tensor(gate):

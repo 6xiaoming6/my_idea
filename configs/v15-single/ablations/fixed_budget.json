@@ -1,0 +1,8 @@
+{
+  "model": {
+    "v15": {
+      "dynamic_budget": false,
+      "fixed_beta": 0.05
+    }
+  }
+}

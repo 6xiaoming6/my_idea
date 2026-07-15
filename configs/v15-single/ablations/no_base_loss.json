@@ -1,0 +1,10 @@
+{
+  "model": {
+    "v15": {
+      "lambda_base": 0.0
+    }
+  },
+  "loss": {
+    "lambda_v15_base": 0.0
+  }
+}
