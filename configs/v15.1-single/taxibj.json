@@ -1,0 +1,48 @@
+{
+  "output_dir": "outputs/v15.1-single",
+  "model": {
+    "version": "v15.1-single",
+    "architecture": "v15_1_scale_guided_residual_moe",
+    "v15_1": {
+      "enabled": true,
+      "residual_dim": 24,
+      "residual_dropout": 0.1,
+      "residual_zero_init": true,
+      "residual_scale_mode": "inherit",
+      "use_scale_guidance": true,
+      "rho": 0.05,
+      "accept_condition_dim": 9,
+      "accept_hidden_dim": 24,
+      "accept_fixed_bias": -1.5,
+      "accept_dropout": 0.1,
+      "accept_zero_init": true,
+      "accept_gain_margin": 0.002,
+      "acceptance_mode": "learned",
+      "detach_residual_inputs": true,
+      "detach_scale_gate": true,
+      "scale_floor": 0.001,
+      "freeze_main": false,
+      "lambda_base": 0.5,
+      "lambda_candidate": 0.1,
+      "lambda_accept": 0.05,
+      "lambda_safe": 0.1
+    }
+  },
+  "loss": {
+    "lambda_v15_1_base": 0.5,
+    "lambda_v15_1_candidate": 0.1,
+    "lambda_v15_1_accept": 0.05,
+    "lambda_v15_1_safe": 0.1
+  },
+  "train": {
+    "epochs": 160,
+    "val_epoch": 5,
+    "lr_v15_1": 0.001,
+    "early_stopping": {
+      "enabled": false,
+      "monitor": "val_mae",
+      "patience": 8,
+      "mode": "min"
+    }
+  }
+}

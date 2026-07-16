@@ -321,6 +321,100 @@ def compute_main_stage_loss(
         v15_sample_violation_rate = (
             final_per_sample > base_per_sample
         ).to(dtype=l_main.dtype).mean()
+
+    x_hat_candidate = outputs.get("x_hat_candidate")
+    accept_gate = outputs.get("accept_gate")
+    accept_logit = outputs.get("accept_logit")
+    is_v15_1 = bool(outputs.get("v15_1_enabled", False))
+    l_v15_1_base = _empty_loss_like(l_main)
+    l_v15_1_candidate = _empty_loss_like(l_main)
+    l_v15_1_accept = _empty_loss_like(l_main)
+    l_v15_1_safe = _empty_loss_like(l_main)
+    v15_1_base_hidden_mae = _empty_loss_like(l_main)
+    v15_1_candidate_hidden_mae = _empty_loss_like(l_main)
+    v15_1_final_hidden_mae = _empty_loss_like(l_main)
+    v15_1_candidate_vs_base_gain = _empty_loss_like(l_main)
+    v15_1_final_vs_base_gain = _empty_loss_like(l_main)
+    v15_1_candidate_violation_rate = _empty_loss_like(l_main)
+    v15_1_final_violation_rate = _empty_loss_like(l_main)
+    v15_1_accept_target_mean = _empty_loss_like(l_main)
+    v15_1_accept_positive_rate = _empty_loss_like(l_main)
+    v15_1_accept_negative_rate = _empty_loss_like(l_main)
+    v15_1_accept_uncertain_rate = _empty_loss_like(l_main)
+    v15_1_accept_accuracy = _empty_loss_like(l_main)
+    if (
+        is_v15_1
+        and x_hat_base is not None
+        and x_hat_candidate is not None
+        and accept_gate is not None
+        and accept_logit is not None
+    ):
+        l_v15_1_base = masked_loss(x_hat_base, x_f_gt, m_f, loss_type=loss_type)
+        l_v15_1_candidate = masked_loss(
+            x_hat_candidate, x_f_gt, m_f, loss_type=loss_type
+        )
+
+        missing = expand_mask_as(1.0 - m_f, x_hat_base)
+        base_per_sample = masked_mean_per_sample(
+            (x_hat_base.detach() - x_f_gt).abs(), missing
+        )
+        candidate_per_sample = masked_mean_per_sample(
+            (x_hat_candidate.detach() - x_f_gt).abs(), missing
+        )
+        final_per_sample = masked_mean_per_sample(
+            (outputs["x_hat_main"] - x_f_gt).abs(), missing
+        )
+        relative_gain = (
+            base_per_sample - candidate_per_sample
+        ) / base_per_sample.clamp_min(1e-6)
+        gain_margin = float(
+            cfg.get("model", {}).get("v15_1", {}).get("accept_gain_margin", 0.002)
+        )
+        positive = relative_gain > gain_margin
+        negative = relative_gain < -gain_margin
+        uncertain = ~(positive | negative)
+        target_accept = torch.full_like(relative_gain, 0.5)
+        target_accept = torch.where(
+            positive, torch.full_like(target_accept, 0.95), target_accept
+        )
+        target_accept = torch.where(
+            negative, torch.full_like(target_accept, 0.05), target_accept
+        )
+
+        accept_prediction = accept_gate.flatten(1).mean(dim=1).clamp(1e-6, 1.0 - 1e-6)
+        accept_logit_per_sample = accept_logit.flatten(1).mean(dim=1)
+        l_v15_1_accept = F.binary_cross_entropy_with_logits(
+            accept_logit_per_sample, target_accept.detach()
+        )
+        sample_regret = F.relu(final_per_sample - base_per_sample)
+        l_v15_1_safe = sample_regret.mean()
+
+        v15_1_base_hidden_mae = base_per_sample.mean()
+        v15_1_candidate_hidden_mae = candidate_per_sample.mean()
+        v15_1_final_hidden_mae = final_per_sample.mean()
+        v15_1_candidate_vs_base_gain = (
+            v15_1_base_hidden_mae - v15_1_candidate_hidden_mae
+        )
+        v15_1_final_vs_base_gain = (
+            v15_1_base_hidden_mae - v15_1_final_hidden_mae
+        )
+        v15_1_candidate_violation_rate = (
+            candidate_per_sample > base_per_sample
+        ).to(dtype=l_main.dtype).mean()
+        v15_1_final_violation_rate = (
+            final_per_sample > base_per_sample
+        ).to(dtype=l_main.dtype).mean()
+        v15_1_accept_target_mean = target_accept.mean()
+        v15_1_accept_positive_rate = positive.to(dtype=l_main.dtype).mean()
+        v15_1_accept_negative_rate = negative.to(dtype=l_main.dtype).mean()
+        v15_1_accept_uncertain_rate = uncertain.to(dtype=l_main.dtype).mean()
+        decided = positive | negative
+        predicted_positive = accept_prediction >= 0.5
+        correct = (predicted_positive & positive) | (~predicted_positive & negative)
+        v15_1_accept_accuracy = (
+            correct.to(dtype=l_main.dtype).sum()
+            / decided.to(dtype=l_main.dtype).sum().clamp_min(1.0)
+        )
     routing_mode = outputs.get("routing_mode", "topk")
     if scale_mode == "fine":
         balance_scales = ("fine",)
@@ -408,6 +502,19 @@ def compute_main_stage_loss(
     loss = loss + loss_cfg.get(
         "lambda_v15_safe", v15_cfg.get("lambda_safe", 0.0)
     ) * l_v15_safe
+    v15_1_cfg = cfg.get("model", {}).get("v15_1", {})
+    loss = loss + loss_cfg.get(
+        "lambda_v15_1_base", v15_1_cfg.get("lambda_base", 0.0)
+    ) * l_v15_1_base
+    loss = loss + loss_cfg.get(
+        "lambda_v15_1_candidate", v15_1_cfg.get("lambda_candidate", 0.0)
+    ) * l_v15_1_candidate
+    loss = loss + loss_cfg.get(
+        "lambda_v15_1_accept", v15_1_cfg.get("lambda_accept", 0.0)
+    ) * l_v15_1_accept
+    loss = loss + loss_cfg.get(
+        "lambda_v15_1_safe", v15_1_cfg.get("lambda_safe", 0.0)
+    ) * l_v15_1_safe
     if loss_cfg.get("lambda_final", 0.0) > 0:
         loss = loss + loss_cfg["lambda_final"] * l_final
     loss_logs = {
@@ -446,5 +553,24 @@ def compute_main_stage_loss(
             "v15_final_hidden_mae": v15_final_hidden_mae.detach(),
             "v15_final_vs_base_improvement": v15_final_vs_base_improvement.detach(),
             "v15_sample_non_regression_violation_rate": v15_sample_violation_rate.detach(),
+        })
+    if is_v15_1 and x_hat_base is not None and x_hat_candidate is not None:
+        loss_logs.update({
+            "l_v15_1_base": l_v15_1_base.detach(),
+            "l_v15_1_candidate": l_v15_1_candidate.detach(),
+            "l_v15_1_accept": l_v15_1_accept.detach(),
+            "l_v15_1_safe": l_v15_1_safe.detach(),
+            "v15_1_base_hidden_mae": v15_1_base_hidden_mae.detach(),
+            "v15_1_candidate_hidden_mae": v15_1_candidate_hidden_mae.detach(),
+            "v15_1_final_hidden_mae": v15_1_final_hidden_mae.detach(),
+            "v15_1_candidate_vs_base_gain": v15_1_candidate_vs_base_gain.detach(),
+            "v15_1_final_vs_base_gain": v15_1_final_vs_base_gain.detach(),
+            "v15_1_candidate_violation_rate": v15_1_candidate_violation_rate.detach(),
+            "v15_1_final_violation_rate": v15_1_final_violation_rate.detach(),
+            "v15_1_accept_target_mean": v15_1_accept_target_mean.detach(),
+            "v15_1_accept_positive_rate": v15_1_accept_positive_rate.detach(),
+            "v15_1_accept_negative_rate": v15_1_accept_negative_rate.detach(),
+            "v15_1_accept_uncertain_rate": v15_1_accept_uncertain_rate.detach(),
+            "v15_1_accept_accuracy": v15_1_accept_accuracy.detach(),
         })
     return loss, loss_logs

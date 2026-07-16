@@ -1,0 +1,7 @@
+{
+  "model": {
+    "v15_1": {
+      "residual_scale_mode": "fine"
+    }
+  }
+}

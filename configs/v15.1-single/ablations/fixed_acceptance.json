@@ -1,0 +1,10 @@
+{
+  "model": {
+    "v15_1": {
+      "acceptance_mode": "fixed_one"
+    }
+  },
+  "loss": {
+    "lambda_v15_1_accept": 0.0
+  }
+}
