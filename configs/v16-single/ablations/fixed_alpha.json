@@ -1,0 +1,4 @@
+{
+  "model": {"v16": {"calibration_mode": "fixed_one"}},
+  "loss": {"lambda_v16_calibration": 0.0}
+}

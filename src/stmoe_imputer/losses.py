@@ -149,6 +149,72 @@ def masked_mean_per_sample(
     return numerator / denominator
 
 
+@torch.no_grad()
+def oracle_alpha_grid(
+    x_base: torch.Tensor,
+    delta_candidate: torch.Tensor,
+    target: torch.Tensor,
+    observed_mask: torch.Tensor,
+    alpha_grid: list[float] | tuple[float, ...] | torch.Tensor,
+) -> torch.Tensor:
+    """Select the per-sample residual scale with lowest hidden Smooth-L1 loss."""
+    if not torch.is_tensor(alpha_grid):
+        values = tuple(float(value) for value in alpha_grid)
+        if len(values) < 2 or any(value < 0.0 or value > 1.0 for value in values):
+            raise ValueError("oracle alpha grid must contain at least two values in [0,1]")
+        alpha_grid = values
+    grid = torch.as_tensor(
+        alpha_grid,
+        device=x_base.device,
+        dtype=x_base.dtype,
+    ).flatten()
+    if grid.numel() < 2:
+        raise ValueError("oracle alpha grid must contain at least two values")
+    missing = expand_mask_as(1.0 - observed_mask, x_base).to(dtype=x_base.dtype)
+    denominator = missing.flatten(1).sum(dim=1).clamp_min(1.0)
+    scores = []
+    for alpha in grid:
+        prediction = x_base.detach() + alpha * delta_candidate.detach()
+        error = F.smooth_l1_loss(
+            prediction,
+            target.detach(),
+            reduction="none",
+        )
+        scores.append((error * missing).flatten(1).sum(dim=1) / denominator)
+    return grid[torch.stack(scores, dim=1).argmin(dim=1)]
+
+
+def _pearson(value: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
+    value = value.float().flatten()
+    target = target.float().flatten()
+    value = value - value.mean()
+    target = target - target.mean()
+    denominator = value.square().sum().sqrt() * target.square().sum().sqrt()
+    if value.numel() < 2:
+        return value.sum() * 0.0
+    correlation = (value * target).sum() / denominator.clamp_min(1e-12)
+    return torch.where(denominator > 1e-12, correlation, correlation * 0.0)
+
+
+def _rank(value: torch.Tensor) -> torch.Tensor:
+    value = value.float().flatten()
+    # Spearman uses average ranks for ties; alpha_star intentionally contains
+    # many grid-value ties, so ordinal ranks would give a misleading correlation.
+    _, inverse, counts = torch.unique(
+        value,
+        sorted=True,
+        return_inverse=True,
+        return_counts=True,
+    )
+    counts_f = counts.to(dtype=torch.float32)
+    average_rank = counts_f.cumsum(dim=0) - (counts_f + 1.0) / 2.0
+    return average_rank[inverse]
+
+
+def _spearman(value: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
+    return _pearson(_rank(value), _rank(target))
+
+
 def v14_regret_loss(
     pred_final: torch.Tensor,
     pred_base: torch.Tensor,
@@ -219,6 +285,7 @@ def compute_main_stage_loss(
     batch: dict[str, torch.Tensor],
     cfg: dict,
     epoch: int | None = None,
+    teacher_outputs: dict | None = None,
 ) -> tuple[torch.Tensor, dict[str, torch.Tensor]]:
     loss_cfg = cfg["loss"]
     loss_type = loss_cfg.get("type", "smooth_l1")
@@ -415,6 +482,180 @@ def compute_main_stage_loss(
             correct.to(dtype=l_main.dtype).sum()
             / decided.to(dtype=l_main.dtype).sum().clamp_min(1.0)
         )
+    is_v16 = bool(outputs.get("v16_enabled", False))
+    v16_cfg = cfg.get("model", {}).get("v16", {})
+    empty_v16 = _empty_loss_like(l_main)
+    l_v16_base_gt = empty_v16
+    l_v16_base_teacher = empty_v16
+    l_v16_anchor = empty_v16
+    l_v16_candidate = empty_v16
+    l_v16_calibration = empty_v16
+    l_v16_safe = empty_v16
+    v16_logs: dict[str, torch.Tensor] = {}
+    if is_v16:
+        v16_base = outputs["x_hat_base"]
+        v16_candidate = outputs["x_hat_candidate"]
+        v16_final = outputs["x_hat_main"]
+        delta_candidate = outputs["delta_candidate"]
+        alpha_pred = outputs["residual_alpha"].flatten(1).mean(dim=1)
+        l_v16_base_gt = masked_loss(
+            v16_base, x_f_gt, m_f, loss_type=loss_type
+        )
+        teacher_prediction = None
+        if teacher_outputs is not None:
+            teacher_prediction = teacher_outputs["x_hat_main"].detach()
+            l_v16_base_teacher = masked_loss(
+                v16_base,
+                teacher_prediction,
+                m_f,
+                loss_type=loss_type,
+            )
+        teacher_inside = float(v16_cfg.get("lambda_teacher_inside", 0.5))
+        l_v16_anchor = l_v16_base_gt + teacher_inside * l_v16_base_teacher
+        l_v16_candidate = masked_loss(
+            v16_candidate, x_f_gt, m_f, loss_type=loss_type
+        )
+
+        alpha_grid = v16_cfg.get(
+            "oracle_alpha_grid",
+            (0.0, 0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875, 1.0),
+        )
+        alpha_star = oracle_alpha_grid(
+            x_base=v16_base,
+            delta_candidate=delta_candidate,
+            target=x_f_gt,
+            observed_mask=m_f,
+            alpha_grid=alpha_grid,
+        )
+        supervision = outputs.get(
+            "calibration_supervision",
+            v16_cfg.get("calibration_supervision", "oracle"),
+        )
+        calibration_mode = outputs.get(
+            "calibration_mode", v16_cfg.get("calibration_mode", "learned")
+        )
+        if calibration_mode == "fixed_one":
+            l_v16_calibration = _empty_loss_like(l_main)
+        elif supervision == "binary":
+            missing = expand_mask_as(1.0 - m_f, v16_base)
+            base_for_binary = masked_mean_per_sample(
+                (v16_base.detach() - x_f_gt).abs(), missing
+            )
+            candidate_for_binary = masked_mean_per_sample(
+                (v16_candidate.detach() - x_f_gt).abs(), missing
+            )
+            relative_gain = (
+                base_for_binary - candidate_for_binary
+            ) / base_for_binary.clamp_min(1e-6)
+            margin = float(v16_cfg.get("binary_gain_margin", 0.002))
+            target_accept = torch.full_like(relative_gain, 0.5)
+            target_accept = torch.where(
+                relative_gain > margin,
+                torch.full_like(target_accept, 0.95),
+                target_accept,
+            )
+            target_accept = torch.where(
+                relative_gain < -margin,
+                torch.full_like(target_accept, 0.05),
+                target_accept,
+            )
+            logits = outputs["residual_alpha_logit"].flatten(1).mean(dim=1)
+            l_v16_calibration = F.binary_cross_entropy_with_logits(
+                logits, target_accept.detach()
+            )
+        else:
+            l_v16_calibration = F.smooth_l1_loss(alpha_pred, alpha_star.detach())
+
+        missing = expand_mask_as(1.0 - m_f, v16_base)
+        base_sample = masked_mean_per_sample(
+            (v16_base.detach() - x_f_gt).abs(), missing
+        )
+        candidate_sample = masked_mean_per_sample(
+            (v16_candidate.detach() - x_f_gt).abs(), missing
+        )
+        final_sample = masked_mean_per_sample(
+            (v16_final - x_f_gt).abs(), missing
+        )
+        oracle_prediction = (
+            v16_base.detach()
+            + alpha_star.view(-1, 1, 1, 1, 1) * delta_candidate.detach()
+        )
+        oracle_sample = masked_mean_per_sample(
+            (oracle_prediction - x_f_gt).abs(), missing
+        )
+        l_v16_safe = F.relu(final_sample - base_sample).mean()
+
+        if teacher_prediction is not None:
+            teacher_sample = masked_mean_per_sample(
+                (teacher_prediction - x_f_gt).abs(), missing
+            )
+            teacher_hidden_mae = teacher_sample.mean()
+            base_vs_teacher_gap = base_sample.mean() - teacher_hidden_mae
+            final_vs_teacher_gain = teacher_hidden_mae - final_sample.mean()
+            teacher_available = torch.ones_like(l_main)
+        else:
+            teacher_hidden_mae = _empty_loss_like(l_main)
+            base_vs_teacher_gap = _empty_loss_like(l_main)
+            final_vs_teacher_gain = _empty_loss_like(l_main)
+            teacher_available = _empty_loss_like(l_main)
+        base_hidden_mae = base_sample.mean()
+        candidate_hidden_mae = candidate_sample.mean()
+        final_hidden_mae = final_sample.mean()
+        oracle_hidden_mae = oracle_sample.mean()
+        alpha_error = alpha_pred - alpha_star
+        v16_logs = {
+            "v16_teacher_hidden_mae": teacher_hidden_mae,
+            "v16_student_base_hidden_mae": base_hidden_mae,
+            "v16_candidate_hidden_mae": candidate_hidden_mae,
+            "v16_final_hidden_mae": final_hidden_mae,
+            "v16_teacher_available": teacher_available,
+            "v16_student_base_vs_teacher_gap": base_vs_teacher_gap,
+            "v16_final_vs_teacher_gain": final_vs_teacher_gain,
+            "v16_final_vs_base_gain": base_hidden_mae - final_hidden_mae,
+            "v16_candidate_vs_base_gain": base_hidden_mae - candidate_hidden_mae,
+            "v16_alpha_pred_mean": alpha_pred.mean(),
+            "v16_alpha_pred_std": alpha_pred.std(unbiased=False),
+            "v16_alpha_pred_min": alpha_pred.min(),
+            "v16_alpha_pred_max": alpha_pred.max(),
+            "v16_alpha_star_mean": alpha_star.mean(),
+            "v16_alpha_star_std": alpha_star.std(unbiased=False),
+            "v16_alpha_star_min": alpha_star.min(),
+            "v16_alpha_star_max": alpha_star.max(),
+            "v16_alpha_absolute_error": alpha_error.abs().mean(),
+            "v16_alpha_rmse": alpha_error.square().mean().sqrt(),
+            "v16_alpha_pearson": _pearson(alpha_pred.detach(), alpha_star),
+            "v16_alpha_spearman": _spearman(alpha_pred.detach(), alpha_star),
+            "v16_alpha_zero_target_rate": (alpha_star == 0).to(l_main.dtype).mean(),
+            "v16_alpha_full_target_rate": (alpha_star == 1).to(l_main.dtype).mean(),
+            "v16_alpha_middle_target_rate": (
+                (alpha_star > 0) & (alpha_star < 1)
+            ).to(l_main.dtype).mean(),
+            "v16_oracle_hidden_mae": oracle_hidden_mae,
+            "v16_calibration_regret": final_hidden_mae - oracle_hidden_mae,
+            "v16_final_violation_rate": (
+                final_sample > base_sample
+            ).to(l_main.dtype).mean(),
+        }
+        condition = outputs.get("calibration_condition")
+        if torch.is_tensor(condition):
+            correlation_indices = {
+                "missing_rate": 0,
+                "scale_weight_f": 5,
+                "scale_weight_m": 6,
+                "scale_weight_c": 7,
+                "candidate_relative_rms": 8,
+            }
+            if condition.shape[1] >= 12:
+                correlation_indices.update({
+                    "branch_disagreement": 9,
+                    "observed_base_mae": 10,
+                    "observed_gain": 11,
+                })
+            for name, index in correlation_indices.items():
+                v16_logs[f"v16_alpha_corr_{name}"] = _pearson(
+                    condition[:, index].detach(), alpha_star
+                )
+
     routing_mode = outputs.get("routing_mode", "topk")
     if scale_mode == "fine":
         balance_scales = ("fine",)
@@ -515,8 +756,25 @@ def compute_main_stage_loss(
     loss = loss + loss_cfg.get(
         "lambda_v15_1_safe", v15_1_cfg.get("lambda_safe", 0.0)
     ) * l_v15_1_safe
+    if is_v16:
+        loss = loss + loss_cfg.get(
+            "lambda_v16_anchor", v16_cfg.get("lambda_anchor", 0.30)
+        ) * l_v16_anchor
+        loss = loss + loss_cfg.get(
+            "lambda_v16_candidate", v16_cfg.get("lambda_candidate", 0.05)
+        ) * l_v16_candidate
+        loss = loss + loss_cfg.get(
+            "lambda_v16_calibration", v16_cfg.get("lambda_calibration", 0.10)
+        ) * l_v16_calibration
+        loss = loss + loss_cfg.get(
+            "lambda_v16_safe", v16_cfg.get("lambda_safe", 0.10)
+        ) * l_v16_safe
     if loss_cfg.get("lambda_final", 0.0) > 0:
         loss = loss + loss_cfg["lambda_final"] * l_final
+    # During the proposer warm-up the backbone and calibrator are frozen and the
+    # candidate objective is intentionally the sole optimization target.
+    if is_v16 and outputs.get("v16_stage") == "warmup":
+        loss = l_v16_candidate
     loss_logs = {
         "loss": loss.detach(),
         "l_final": l_final.detach(),
@@ -572,5 +830,19 @@ def compute_main_stage_loss(
             "v15_1_accept_negative_rate": v15_1_accept_negative_rate.detach(),
             "v15_1_accept_uncertain_rate": v15_1_accept_uncertain_rate.detach(),
             "v15_1_accept_accuracy": v15_1_accept_accuracy.detach(),
+        })
+    if is_v16:
+        loss_logs.update({
+            "l_v16_base_gt": l_v16_base_gt.detach(),
+            "l_v16_base_teacher": l_v16_base_teacher.detach(),
+            "l_v16_anchor": l_v16_anchor.detach(),
+            "l_v16_candidate": l_v16_candidate.detach(),
+            "l_v16_calibration": l_v16_calibration.detach(),
+            "l_v16_safe": l_v16_safe.detach(),
+            "v16_warmup_active": torch.as_tensor(
+                float(outputs.get("v16_stage") == "warmup"),
+                device=l_main.device,
+            ),
+            **{key: value.detach() for key, value in v16_logs.items()},
         })
     return loss, loss_logs

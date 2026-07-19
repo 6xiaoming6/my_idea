@@ -1,0 +1,4 @@
+{
+  "teacher": {"enabled": false},
+  "model": {"v16": {"lambda_teacher_inside": 0.0}}
+}

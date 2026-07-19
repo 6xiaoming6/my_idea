@@ -1,0 +1,8 @@
+{
+  "name": "v16_quick_5epoch",
+  "datasets": {
+    "TaxiBJ": {"train": {"epochs": 5, "val_epoch": 1}, "model": {"v16": {"warmup_epochs": 1}}},
+    "BikeNYC": {"train": {"epochs": 5, "val_epoch": 1}, "model": {"v16": {"warmup_epochs": 1}}},
+    "CHAP": {"train": {"epochs": 5, "val_epoch": 1}, "model": {"v16": {"warmup_epochs": 1}}}
+  }
+}

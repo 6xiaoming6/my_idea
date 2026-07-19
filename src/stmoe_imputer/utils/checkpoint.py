@@ -12,6 +12,7 @@ def save_checkpoint(
     epoch: int,
     metrics: dict,
     cfg: dict,
+    metadata: dict | None = None,
 ) -> None:
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -21,6 +22,7 @@ def save_checkpoint(
         "epoch": epoch,
         "metrics": metrics,
         "config": cfg,
+        "metadata": dict(metadata or {}),
     }
     torch.save(payload, path)
 

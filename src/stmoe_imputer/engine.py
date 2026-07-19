@@ -20,6 +20,8 @@ def build_optimizer(model: torch.nn.Module, cfg: dict) -> torch.optim.Optimizer:
     v14_lr = train_cfg.get("lr_v14", base_lr)
     v15_lr = train_cfg.get("lr_v15", base_lr)
     v15_1_lr = train_cfg.get("lr_v15_1", base_lr)
+    v16_residual_lr = train_cfg.get("lr_v16_residual", base_lr)
+    v16_calibrator_lr = train_cfg.get("lr_v16_calibrator", base_lr)
 
     grouped: dict[str, dict] = {
         "main": {"params": [], "lr": base_lr, "weight_decay": weight_decay},
@@ -32,6 +34,10 @@ def build_optimizer(model: torch.nn.Module, cfg: dict) -> torch.optim.Optimizer:
         "v15_no_decay": {"params": [], "lr": v15_lr, "weight_decay": 0.0},
         "v15_1": {"params": [], "lr": v15_1_lr, "weight_decay": weight_decay},
         "v15_1_no_decay": {"params": [], "lr": v15_1_lr, "weight_decay": 0.0},
+        "v16_residual": {"params": [], "lr": v16_residual_lr, "weight_decay": weight_decay},
+        "v16_residual_no_decay": {"params": [], "lr": v16_residual_lr, "weight_decay": 0.0},
+        "v16_calibrator": {"params": [], "lr": v16_calibrator_lr, "weight_decay": weight_decay},
+        "v16_calibrator_no_decay": {"params": [], "lr": v16_calibrator_lr, "weight_decay": 0.0},
         "other": {"params": [], "lr": aux_lr, "weight_decay": weight_decay},
     }
 
@@ -61,7 +67,17 @@ def build_optimizer(model: torch.nn.Module, cfg: dict) -> torch.optim.Optimizer:
                 "main_branch.acceptance_gate",
             )
         )
-        if is_v15_1_new and (name_l.endswith(".bias") or "norm" in name_l):
+        is_v16_residual = "main_branch.residual_proposer" in name_l
+        is_v16_calibrator = "main_branch.calibrator" in name_l
+        if is_v16_calibrator and (name_l.endswith(".bias") or "norm" in name_l):
+            grouped["v16_calibrator_no_decay"]["params"].append(param)
+        elif is_v16_calibrator:
+            grouped["v16_calibrator"]["params"].append(param)
+        elif is_v16_residual and (name_l.endswith(".bias") or "norm" in name_l):
+            grouped["v16_residual_no_decay"]["params"].append(param)
+        elif is_v16_residual:
+            grouped["v16_residual"]["params"].append(param)
+        elif is_v15_1_new and (name_l.endswith(".bias") or "norm" in name_l):
             grouped["v15_1_no_decay"]["params"].append(param)
         elif is_v15_1_new:
             grouped["v15_1"]["params"].append(param)
@@ -226,7 +242,21 @@ def _append_model_diagnostics(logs: dict[str, list[float]], outputs: dict) -> No
                 logs["v15_1_accept_gate_min"].append(float(value_f.min().cpu()))
                 logs["v15_1_accept_gate_max"].append(float(value_f.max().cpu()))
 
-    if isinstance(v14, dict) or isinstance(v15, dict) or isinstance(v15_1, dict):
+    v16 = diagnostics.get("v16") if isinstance(diagnostics, dict) else None
+    if isinstance(v16, dict):
+        for key, value in v16.items():
+            if value is None or not torch.is_tensor(value):
+                continue
+            value_f = value.detach().float()
+            logs[f"v16_{key}_mean"].append(float(value_f.mean().cpu()))
+            if key == "residual_alpha":
+                logs["v16_residual_alpha_std"].append(
+                    float(value_f.std(unbiased=False).cpu())
+                )
+                logs["v16_residual_alpha_min"].append(float(value_f.min().cpu()))
+                logs["v16_residual_alpha_max"].append(float(value_f.max().cpu()))
+
+    if any(isinstance(item, dict) for item in (v14, v15, v15_1, v16)):
         for scale in ("fine", "mid", "coarse"):
             gate = outputs.get("gates", {}).get(scale)
             if gate is None or not torch.is_tensor(gate):
@@ -264,8 +294,15 @@ def train_one_epoch(
     device: torch.device,
     cfg: dict,
     epoch: int,
+    teacher: torch.nn.Module | None = None,
 ) -> dict[str, float]:
+    main_branch = getattr(model, "main_branch", None)
+    configure_stage = getattr(main_branch, "configure_training_stage", None)
+    if callable(configure_stage):
+        configure_stage(epoch)
     model.train()
+    if teacher is not None:
+        teacher.eval()
     logs: dict[str, list[float]] = defaultdict(list)
     use_amp = cfg["train"].get("amp", True) and device.type == "cuda"
     scaler = torch.amp.GradScaler(device.type, enabled=use_amp)
@@ -274,8 +311,19 @@ def train_one_epoch(
         batch = move_batch_to_device(batch, device)
         optimizer.zero_grad(set_to_none=True)
         with torch.autocast(device_type=device.type, enabled=use_amp):
+            teacher_outputs = None
+            if teacher is not None and getattr(main_branch, "training_stage", "joint") != "warmup":
+                with torch.no_grad():
+                    teacher_prediction = teacher(batch)["x_hat_main"]
+                teacher_outputs = {"x_hat_main": teacher_prediction}
             outputs = model(batch)
-            loss, loss_dict = compute_main_stage_loss(outputs, batch, cfg, epoch=epoch)
+            loss, loss_dict = compute_main_stage_loss(
+                outputs,
+                batch,
+                cfg,
+                epoch=epoch,
+                teacher_outputs=teacher_outputs,
+            )
         scaler.scale(loss).backward()
         grad_clip = cfg["train"].get("grad_clip_norm")
         if grad_clip:
@@ -307,13 +355,29 @@ def evaluate(
     cfg: dict,
     desc: str = "eval",
     epoch: int | None = None,
+    teacher: torch.nn.Module | None = None,
 ) -> dict[str, float]:
+    main_branch = getattr(model, "main_branch", None)
+    configure_stage = getattr(main_branch, "configure_training_stage", None)
+    if callable(configure_stage) and epoch is not None:
+        configure_stage(epoch)
     model.eval()
+    if teacher is not None:
+        teacher.eval()
     logs: dict[str, list[float]] = defaultdict(list)
     for batch in tqdm(loader, desc=desc, leave=False):
         batch = move_batch_to_device(batch, device)
+        teacher_outputs = None
+        if teacher is not None:
+            teacher_outputs = {"x_hat_main": teacher(batch)["x_hat_main"]}
         outputs = model(batch)
-        _, loss_dict = compute_main_stage_loss(outputs, batch, cfg, epoch=epoch)
+        _, loss_dict = compute_main_stage_loss(
+            outputs,
+            batch,
+            cfg,
+            epoch=epoch,
+            teacher_outputs=teacher_outputs,
+        )
         metrics = masked_metrics(outputs["x_hat_final"], batch["x_f_gt"], batch["m_f"])
         if outputs.get("x_hat_shared") is not None:
             shared_metrics = masked_metrics(outputs["x_hat_shared"], batch["x_f_gt"], batch["m_f"])

@@ -1,0 +1,55 @@
+{
+  "output_dir": "outputs/v16-single",
+  "model": {
+    "version": "v16-single",
+    "architecture": "v16_teacher_anchored_residual_moe",
+    "v16": {
+      "enabled": true,
+      "residual_dim": 24,
+      "residual_dropout": 0.1,
+      "residual_zero_init": true,
+      "residual_scale_mode": "inherit",
+      "use_scale_guidance": true,
+      "rho": 0.05,
+      "scale_floor": 0.001,
+      "calibration_condition_dim": 12,
+      "calibration_hidden_dim": 32,
+      "calibration_fixed_bias": -2.0,
+      "calibration_dropout": 0.0,
+      "calibration_zero_init": true,
+      "calibration_mode": "learned",
+      "calibration_supervision": "oracle",
+      "oracle_alpha_grid": [0.0, 0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875, 1.0],
+      "detach_residual_inputs": true,
+      "detach_scale_gate": true,
+      "warmup_epochs": 12,
+      "lambda_anchor": 0.3,
+      "lambda_teacher_inside": 0.5,
+      "lambda_candidate": 0.05,
+      "lambda_calibration": 0.1,
+      "lambda_safe": 0.1
+    }
+  },
+  "teacher": {
+    "enabled": true,
+    "architecture": "v14_safe_c2f_moe",
+    "checkpoint": "AUTO_RESOLVE",
+    "seed": 42,
+    "strict": true,
+    "initialize_student": true
+  },
+  "loss": {
+    "lambda_v16_anchor": 0.3,
+    "lambda_v16_candidate": 0.05,
+    "lambda_v16_calibration": 0.1,
+    "lambda_v16_safe": 0.1
+  },
+  "train": {
+    "epochs": 120,
+    "val_epoch": 2,
+    "lr_main": 0.0002,
+    "lr_v16_residual": 0.001,
+    "lr_v16_calibrator": 0.0005,
+    "early_stopping": {"enabled": false, "monitor": "val_mae", "patience": 12, "mode": "min"}
+  }
+}

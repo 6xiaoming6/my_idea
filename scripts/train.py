@@ -25,6 +25,7 @@ from stmoe_imputer.config import deep_update, load_config, save_config
 from stmoe_imputer.data import build_datasets, build_loader, build_test_dataset
 from stmoe_imputer.engine import build_optimizer, build_scheduler, evaluate, train_one_epoch
 from stmoe_imputer.models import DualBranchSTImputer
+from stmoe_imputer.teacher_utils import prepare_v16_teacher
 from stmoe_imputer.utils import get_device, set_seed
 from stmoe_imputer.utils.checkpoint import load_checkpoint, save_checkpoint
 from stmoe_imputer.utils.train_logger import TrainLogger
@@ -276,6 +277,14 @@ def main() -> None:
     test_loader = build_loader(test_ds, cfg, shuffle=False) if test_ds is not None else None
 
     model = DualBranchSTImputer.from_config(cfg).to(device)
+    teacher_context = prepare_v16_teacher(cfg, model, device) if (
+        cfg.get("model", {}).get("architecture")
+        == "v16_teacher_anchored_residual_moe"
+    ) else None
+    teacher = teacher_context.model if teacher_context is not None else None
+    teacher_metadata = (
+        teacher_context.metadata if teacher_context is not None else {"teacher_enabled": False}
+    )
     optimizer = build_optimizer(model, cfg)
     scheduler = build_scheduler(optimizer, cfg)
 
@@ -315,6 +324,7 @@ def main() -> None:
         "device_name": _device_name(device),
         "total_params": f"{total_params:,}",
         "trainable_params": f"{trainable_params:,}",
+        **teacher_metadata,
     })
     logger.log_table_headers()
 
@@ -344,7 +354,9 @@ def main() -> None:
 
             _sync_device(device)
             train_start = time.perf_counter()
-            train_logs = train_one_epoch(model, train_loader, optimizer, device, cfg, epoch)
+            train_logs = train_one_epoch(
+                model, train_loader, optimizer, device, cfg, epoch, teacher=teacher
+            )
             _sync_device(device)
             train_time = time.perf_counter() - train_start
 
@@ -353,7 +365,15 @@ def main() -> None:
             val_time = 0.0
             if should_validate:
                 val_start = time.perf_counter()
-                val_logs = evaluate(model, val_loader, device, cfg, desc=f"val epoch {epoch}", epoch=epoch)
+                val_logs = evaluate(
+                    model,
+                    val_loader,
+                    device,
+                    cfg,
+                    desc=f"val epoch {epoch}",
+                    epoch=epoch,
+                    teacher=teacher,
+                )
                 _sync_device(device)
                 val_time = time.perf_counter() - val_start
                 validation_count += 1
@@ -403,7 +423,15 @@ def main() -> None:
             if is_best:
                 best_mae = val_logs["mae"]
                 best_epoch = epoch
-                save_checkpoint(ckpt_dir / "best.pt", model, optimizer, epoch, metrics, cfg)
+                save_checkpoint(
+                    ckpt_dir / "best.pt",
+                    model,
+                    optimizer,
+                    epoch,
+                    metrics,
+                    cfg,
+                    metadata=teacher_metadata,
+                )
                 logger.log_best(epoch, best_mae)
 
             if val_logs is not None and early_cfg.get("enabled", False):
@@ -426,7 +454,15 @@ def main() -> None:
         checkpoint = load_checkpoint(best_path, model, map_location=device)
         if test_loader is not None:
             test_start = time.perf_counter()
-            test_logs = evaluate(model, test_loader, device, cfg, desc=f"test best epoch {best_epoch}", epoch=best_epoch)
+            test_logs = evaluate(
+                model,
+                test_loader,
+                device,
+                cfg,
+                desc=f"test best epoch {best_epoch}",
+                epoch=best_epoch,
+                teacher=teacher,
+            )
             _sync_device(device)
             test_time = time.perf_counter() - test_start
         logger.log_test(test_logs, {
