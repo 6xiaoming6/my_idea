@@ -142,6 +142,20 @@ def _mean_logs(accumulator: dict[str, list[float]]) -> dict[str, float]:
     return {key: sum(values) / max(1, len(values)) for key, values in accumulator.items()}
 
 
+def _finite_pearson(x: torch.Tensor, y: torch.Tensor) -> float:
+    x = x.detach().float().flatten()
+    y = y.detach().float().flatten()
+    if x.numel() < 2 or y.numel() != x.numel():
+        return 0.0
+    x = x - x.mean()
+    y = y - y.mean()
+    denom = x.square().sum().sqrt() * y.square().sum().sqrt()
+    if float(denom.cpu()) <= 1e-12:
+        return 0.0
+    value = (x * y).sum() / denom
+    return float(value.cpu()) if torch.isfinite(value) else 0.0
+
+
 def _append_model_diagnostics(logs: dict[str, list[float]], outputs: dict) -> None:
     scale_gate = outputs.get("gates", {}).get("scale_gate")
     if scale_gate is not None:
@@ -197,6 +211,102 @@ def _append_model_diagnostics(logs: dict[str, list[float]], outputs: dict) -> No
                 logs["v15_beta_std"].append(float(value_f.std(unbiased=False).cpu()))
                 logs["v15_beta_min"].append(float(value_f.min().cpu()))
                 logs["v15_beta_max"].append(float(value_f.max().cpu()))
+
+    v17 = diagnostics.get("v17") if isinstance(diagnostics, dict) else None
+    if isinstance(v17, dict):
+        raw_scale = v17.get("scale_weight_raw")
+        if torch.is_tensor(raw_scale):
+            raw_scale_f = raw_scale.detach().float()
+            for index, label in enumerate(("f", "m", "c")):
+                values = raw_scale_f[:, index]
+                logs[f"v17_scale_raw_{label}_mean"].append(float(values.mean().cpu()))
+                logs[f"v17_scale_raw_{label}_std"].append(
+                    float(values.std(unbiased=False).cpu())
+                )
+
+        scale_entropy = v17.get("scale_entropy")
+        if torch.is_tensor(scale_entropy):
+            values = scale_entropy.detach().float()
+            logs["v17_scale_entropy_mean"].append(float(values.mean().cpu()))
+            logs["v17_scale_entropy_std"].append(float(values.std(unbiased=False).cpu()))
+
+        scale_top1 = v17.get("scale_top1")
+        if torch.is_tensor(scale_top1):
+            top1 = scale_top1.detach()
+            for index, label in enumerate(("f", "m", "c")):
+                frequency = (top1 == index).float().mean()
+                logs[f"v17_scale_top1_{label}_frequency"].append(float(frequency.cpu()))
+
+        active_scale_mask = v17.get("active_scale_mask")
+        if torch.is_tensor(active_scale_mask):
+            active = active_scale_mask.detach().float().mean(dim=0)
+            for index, label in enumerate(("f", "m", "c")):
+                logs[f"v17_active_scale_{label}"].append(float(active[index].cpu()))
+
+        reliability_strength = v17.get("reliability_strength")
+        if torch.is_tensor(reliability_strength):
+            logs["v17_reliability_prior_strength"].append(
+                float(reliability_strength.detach().float().mean().cpu())
+            )
+
+        route_gate = v17.get("route_branch_gate")
+        if torch.is_tensor(route_gate):
+            route = route_gate.detach().float().flatten()
+            logs["v17_route_gate_mean"].append(float(route.mean().cpu()))
+            logs["v17_route_gate_std"].append(float(route.std(unbiased=False).cpu()))
+            logs["v17_route_gate_min"].append(float(route.min().cpu()))
+            logs["v17_route_gate_max"].append(float(route.max().cpu()))
+            missing_rate = v17.get("missing_rate")
+            if torch.is_tensor(missing_rate):
+                logs["v17_route_gate_missing_rate_corr"].append(
+                    _finite_pearson(route, missing_rate)
+                )
+            if torch.is_tensor(scale_entropy):
+                logs["v17_route_gate_scale_entropy_corr"].append(
+                    _finite_pearson(route, scale_entropy)
+                )
+
+        for metric_name in ("adapter_delta_rms", "adapter_relative_rms"):
+            metric = v17.get(metric_name)
+            if not isinstance(metric, dict):
+                continue
+            for scale in ("fine", "mid", "coarse"):
+                value = metric.get(scale)
+                if torch.is_tensor(value):
+                    logs[f"v17_{metric_name}_{scale}_mean"].append(
+                        float(value.detach().float().mean().cpu())
+                    )
+
+        joint = v17.get("joint_scale_expert")
+        if torch.is_tensor(joint):
+            joint_f = joint.detach().float().mean(dim=0)
+            for scale_index, scale in enumerate(("fine", "mid", "coarse")):
+                for expert_index, value in enumerate(joint_f[scale_index]):
+                    logs[f"v17_joint_{scale}_expert_{expert_index}"].append(
+                        float(value.cpu())
+                    )
+
+        for scale in ("fine", "mid", "coarse"):
+            gate = outputs.get("gates", {}).get(scale)
+            if gate is None or not torch.is_tensor(gate):
+                continue
+            gate_f = gate.detach().float()
+            entropy = -(gate_f * gate_f.clamp_min(1e-8).log()).sum(dim=1)
+            logs[f"v17_expert_entropy_{scale}"].append(float(entropy.mean().cpu()))
+            top1 = gate_f.argmax(dim=1)
+            selected = outputs.get("selected_masks", {}).get(scale)
+            selected_f = selected.detach().float() if torch.is_tensor(selected) else None
+            for expert_index in range(gate_f.shape[1]):
+                logs[f"v17_expert_gate_{scale}_{expert_index}_mean"].append(
+                    float(gate_f[:, expert_index].mean().cpu())
+                )
+                logs[f"v17_expert_top1_{scale}_{expert_index}_frequency"].append(
+                    float((top1 == expert_index).float().mean().cpu())
+                )
+                if selected_f is not None:
+                    logs[f"v17_expert_topk_{scale}_{expert_index}_load"].append(
+                        float(selected_f[:, expert_index].mean().cpu())
+                    )
 
     if isinstance(v14, dict) or isinstance(v15, dict):
         for scale in ("fine", "mid", "coarse"):

@@ -1,0 +1,86 @@
+{
+  "output_dir": "outputs/v17-single",
+  "model": {
+    "version": "v17-single",
+    "architecture": "v17_hierarchical_scale_moe",
+    "main": {
+      "dim": 64,
+      "num_experts": 4,
+      "top_k": 2,
+      "share_experts": true,
+      "use_routed_branch": true,
+      "use_shared_branch": true,
+      "shared_input_mode": "pre",
+      "branch_fusion_mode": "residual",
+      "route_dropout": 0.1,
+      "enable_branch_aux": true,
+      "enable_complementary_loss": true,
+      "routing_mode": "topk",
+      "scale_mode": "fine_mid"
+    },
+    "v17": {
+      "enabled": true,
+      "adapter_enabled": true,
+      "adapter_dim": 16,
+      "adapter_dropout": 0,
+      "adapter_zero_init": true,
+      "router_local_dim": 32,
+      "router_global_dim": 64,
+      "router_scale_embed_dim": 8,
+      "scale_temperature": 1,
+      "reliability_prior_enabled": true,
+      "reliability_prior_init": 1,
+      "unified_scale_expert_router": true,
+      "sample_route_gate": true,
+      "route_gate_bias": -3,
+      "route_gate_zero_init": true,
+      "route_fusion": "fine_preserved_parallel",
+      "fine_floor": 0.25,
+      "mid_projection": true,
+      "coarse_projection": true,
+      "unified_scale_weight": true,
+      "lambda_scale_entropy": 0
+    }
+  },
+  "loss": {
+    "lambda_scale_entropy": 0,
+    "scale_entropy_min": 0.5
+  },
+  "train": {
+    "epochs": 160,
+    "val_epoch": 5,
+    "lr_main": 0.001,
+    "lr_aux": 0.001,
+    "weight_decay": 0.0001,
+    "grad_clip_norm": 1,
+    "amp": true,
+    "scheduler": {
+      "type": "cosine",
+      "eta_min": 0.000001
+    },
+    "early_stopping": {
+      "enabled": false,
+      "monitor": "val_mae",
+      "patience": 10,
+      "mode": "min"
+    }
+  },
+  "train_policy_by_mask": {
+    "fixed": {
+      "early_stopping": {
+        "enabled": false,
+        "monitor": "val_mae",
+        "patience": 10,
+        "mode": "min"
+      }
+    },
+    "random": {
+      "early_stopping": {
+        "enabled": true,
+        "monitor": "val_mae",
+        "patience": 10,
+        "mode": "min"
+      }
+    }
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "model": {
+    "v17": {
+      "route_fusion": "progressive"
+    }
+  }
+}

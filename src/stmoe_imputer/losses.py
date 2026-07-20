@@ -356,6 +356,28 @@ def compute_main_stage_loss(
         if branch_gate is not None:
             l_branch_entropy = categorical_entropy_loss(branch_gate)
 
+    l_scale_entropy_floor = _empty_loss_like(l_balance)
+    scale_entropy_weight = loss_cfg.get(
+        "lambda_scale_entropy",
+        cfg.get("model", {}).get("v17", {}).get("lambda_scale_entropy", 0.0),
+    )
+    if scale_entropy_weight != 0:
+        scale_gate = outputs.get("gates", {}).get("scale_gate")
+        if scale_gate is not None:
+            scale_entropy = categorical_entropy_loss(scale_gate)
+            active_scale_count = len(balance_scales)
+            maximum_entropy = float(torch.log(torch.tensor(float(active_scale_count))))
+            configured_floor = float(loss_cfg.get("scale_entropy_min", 0.5))
+            entropy_floor = min(configured_floor, maximum_entropy)
+            l_scale_entropy_floor = F.relu(
+                torch.as_tensor(
+                    entropy_floor,
+                    device=scale_entropy.device,
+                    dtype=scale_entropy.dtype,
+                )
+                - scale_entropy
+            )
+
     l_shared_aux = _empty_loss_like(l_main)
     x_hat_shared = outputs.get("x_hat_shared")
     if is_full and x_hat_shared is not None and cfg["model"]["main"].get("enable_branch_aux", True):
@@ -389,6 +411,7 @@ def compute_main_stage_loss(
     loss = loss + load_weight * warmup_factor * l_load_balance
     loss = loss + loss_cfg.get("lambda_fusion_entropy", 0.0) * l_fusion_entropy
     loss = loss + loss_cfg.get("lambda_branch_entropy", 0.0) * l_branch_entropy
+    loss = loss + scale_entropy_weight * l_scale_entropy_floor
     loss = loss + loss_cfg.get("lambda_shared_aux", 0.0) * l_shared_aux
     loss = loss + loss_cfg.get("lambda_route_aux", 0.0) * l_route_aux
     loss = loss + loss_cfg.get("lambda_complementary", 0.0) * l_complementary
@@ -420,6 +443,7 @@ def compute_main_stage_loss(
         "l_load_balance": l_load_balance.detach(),
         "l_fusion_entropy": l_fusion_entropy.detach(),
         "l_branch_entropy": l_branch_entropy.detach(),
+        "l_scale_entropy_floor": l_scale_entropy_floor.detach(),
         "l_shared_aux": l_shared_aux.detach(),
         "l_route_aux": l_route_aux.detach(),
         "l_complementary": l_complementary.detach(),

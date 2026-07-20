@@ -140,6 +140,7 @@ class GatedCrossScaleSharedExpert(nn.Module):
         r_m: torch.Tensor | None = None,
         r_c: torch.Tensor | None = None,
         active_mask: torch.Tensor | None = None,
+        external_scale_weight: torch.Tensor | None = None,
     ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
         batch_size = h_f.shape[0]
         target_size = h_f.shape[-3:]
@@ -149,7 +150,22 @@ class GatedCrossScaleSharedExpert(nn.Module):
         if active_mask is None:
             active_mask = torch.ones(batch_size, 3, device=h_f.device, dtype=torch.bool)
 
-        if self.use_scale_gate:
+        if external_scale_weight is not None:
+            if external_scale_weight.shape != (batch_size, 3):
+                raise ValueError(
+                    "external_scale_weight must have shape "
+                    f"{(batch_size, 3)}, got {tuple(external_scale_weight.shape)}"
+                )
+            if not torch.isfinite(external_scale_weight).all():
+                raise ValueError("external_scale_weight contains NaN or Inf")
+            scale_weight = external_scale_weight.to(device=h_f.device, dtype=h_f.dtype)
+            scale_weight = scale_weight * active_mask.to(dtype=h_f.dtype)
+            if (scale_weight < 0).any():
+                raise ValueError("external_scale_weight must be non-negative")
+            scale_weight = scale_weight / scale_weight.sum(
+                dim=-1, keepdim=True
+            ).clamp_min(1e-6)
+        elif self.use_scale_gate:
             scale_weight = self.scale_gate(
                 h_f=h_f,
                 h_m=h_m,
@@ -418,10 +434,32 @@ class SharedRoutedResidualFusion(nn.Module):
         h_route: torch.Tensor,
         q_f: torch.Tensor | None = None,
         scale_gate: torch.Tensor | None = None,
+        external_route_gate: torch.Tensor | None = None,
     ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
         h_shared = self.refine_shared(z_shared)
         h_route_proj = self.project_route(h_route)
         h_route_proj = self.route_dropout(h_route_proj)
+        if external_route_gate is not None:
+            route_gate = external_route_gate.to(
+                device=h_shared.device, dtype=h_shared.dtype
+            )
+            if route_gate.ndim == 2 and route_gate.shape == (h_shared.shape[0], 1):
+                route_gate = route_gate.view(h_shared.shape[0], 1, 1, 1, 1)
+            if route_gate.shape != (h_shared.shape[0], 1, 1, 1, 1):
+                raise ValueError(
+                    "external_route_gate must have shape [B,1] or [B,1,1,1,1], "
+                    f"got {tuple(route_gate.shape)}"
+                )
+            if not torch.isfinite(route_gate).all():
+                raise ValueError("external_route_gate contains NaN or Inf")
+            if (route_gate < 0).any() or (route_gate > 1).any():
+                raise ValueError("external_route_gate must lie in [0, 1]")
+            h_main = h_shared + route_gate * h_route_proj
+            route_flat = route_gate.flatten(1)[:, 0]
+            branch_gate = torch.stack(
+                [torch.ones_like(route_flat), route_flat], dim=1
+            )
+            return h_main, h_shared, h_route_proj, branch_gate
         if self.branch_fusion_mode in {"residual", "shared_plus_routed_residual"}:
             gamma = torch.sigmoid(self.route_gamma)
             h_main = h_shared + gamma * h_route_proj
