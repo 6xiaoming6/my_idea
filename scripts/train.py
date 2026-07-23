@@ -55,7 +55,14 @@ def _git_metadata() -> dict[str, str]:
             stderr=subprocess.STDOUT,
         ).strip() or "detached"
         status = subprocess.check_output(
-            [git_executable, "status", "--porcelain"], cwd=ROOT, text=True,
+            [
+                git_executable,
+                "status",
+                "--porcelain",
+                "--ignore-submodules=all",
+            ],
+            cwd=ROOT,
+            text=True,
             stderr=subprocess.STDOUT,
         )
         return {"git_commit": commit, "git_branch": branch, "git_dirty": str(bool(status.strip()))}

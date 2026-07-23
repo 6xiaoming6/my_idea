@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -103,9 +104,47 @@ def _apply_training_policy(
     )
 
 
+def _git_executable() -> str:
+    discovered = shutil.which("git")
+    if discovered is not None:
+        return discovered
+
+    candidates: list[Path] = []
+    conda_executable = os.environ.get("CONDA_EXE")
+    if conda_executable:
+        candidates.append(Path(conda_executable).resolve().with_name("git"))
+
+    conda_prefix = os.environ.get("CONDA_PREFIX")
+    if conda_prefix:
+        prefix = Path(conda_prefix).resolve()
+        candidates.append(prefix / "bin" / "git")
+        if prefix.parent.name == "envs":
+            candidates.append(prefix.parent.parent / "bin" / "git")
+
+    python_path = Path(sys.executable).resolve()
+    for parent in python_path.parents:
+        candidates.append(parent / "bin" / "git")
+
+    executable = next(
+        (path for path in candidates if path.is_file() and os.access(path, os.X_OK)),
+        None,
+    )
+    if executable is None:
+        raise RuntimeError(
+            "Git executable was not found. Install Git in the active environment "
+            "or make the Conda-root git executable available."
+        )
+    return str(executable)
+
+
 def _git_is_dirty() -> bool:
     result = subprocess.run(
-        ["git", "status", "--porcelain"],
+        [
+            _git_executable(),
+            "status",
+            "--porcelain",
+            "--ignore-submodules=all",
+        ],
         cwd=ROOT,
         text=True,
         stdout=subprocess.PIPE,
