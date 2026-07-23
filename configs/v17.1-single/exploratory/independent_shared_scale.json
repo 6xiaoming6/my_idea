@@ -1,0 +1,11 @@
+{
+  "experiment": {
+    "group": "v17_exploratory_ablation",
+    "variant": "independent_shared_scale"
+  },
+  "model": {
+    "v17": {
+      "unified_scale_weight": false
+    }
+  }
+}

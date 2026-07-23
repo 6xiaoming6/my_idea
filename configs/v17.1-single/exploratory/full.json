@@ -1,0 +1,6 @@
+{
+  "experiment": {
+    "group": "v17_exploratory_ablation",
+    "variant": "full"
+  }
+}

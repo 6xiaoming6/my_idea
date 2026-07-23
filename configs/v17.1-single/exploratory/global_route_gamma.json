@@ -1,0 +1,11 @@
+{
+  "experiment": {
+    "group": "v17_exploratory_ablation",
+    "variant": "global_route_gamma"
+  },
+  "model": {
+    "v17": {
+      "sample_route_gate": false
+    }
+  }
+}

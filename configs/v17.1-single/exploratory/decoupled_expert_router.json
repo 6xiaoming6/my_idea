@@ -1,0 +1,11 @@
+{
+  "experiment": {
+    "group": "v17_exploratory_ablation",
+    "variant": "decoupled_expert_router"
+  },
+  "model": {
+    "v17": {
+      "expert_router_mode": "decoupled"
+    }
+  }
+}

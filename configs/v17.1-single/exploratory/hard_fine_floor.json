@@ -1,0 +1,11 @@
+{
+  "experiment": {
+    "group": "v17_exploratory_ablation",
+    "variant": "hard_fine_floor"
+  },
+  "model": {
+    "v17": {
+      "fine_floor_mode": "hard"
+    }
+  }
+}

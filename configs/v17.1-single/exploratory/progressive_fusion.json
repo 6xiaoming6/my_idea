@@ -1,0 +1,11 @@
+{
+  "experiment": {
+    "group": "v17_exploratory_ablation",
+    "variant": "progressive_fusion"
+  },
+  "model": {
+    "v17": {
+      "route_fusion": "progressive"
+    }
+  }
+}

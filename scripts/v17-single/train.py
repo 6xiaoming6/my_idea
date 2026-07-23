@@ -124,6 +124,21 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--cpu-threads", type=int, default=4)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--ablation", choices=("none", *ABLATIONS), default="none")
+    parser.add_argument(
+        "--variant-config",
+        default=None,
+        help="Optional minimal JSON patch applied after the V17 dataset config.",
+    )
+    parser.add_argument(
+        "--output-dir",
+        default=None,
+        help="Override output_dir, for example outputs/v17.1-single.",
+    )
+    parser.add_argument(
+        "--model-version",
+        default=None,
+        help="Override model.version without changing the registered architecture.",
+    )
     parser.add_argument("--training-policy", default=None)
     parser.add_argument("--epochs", type=int, default=None)
     parser.add_argument("--run-name", default="full")
@@ -181,6 +196,15 @@ def main() -> None:
     if args.ablation != "none":
         ablation_path = ROOT / "configs" / "v17-single" / "ablations" / ABLATIONS[args.ablation]
         patch = _deep_update(patch, _load(ablation_path))
+    if args.variant_config:
+        patch = _deep_update(patch, _load(_resolve(args.variant_config)))
+    if args.output_dir:
+        patch["output_dir"] = args.output_dir
+    if args.model_version:
+        patch = _deep_update(
+            patch,
+            {"model": {"version": args.model_version}},
+        )
 
     env = _environment(args.gpu, args.cpu_threads)
     mask_dir = _ensure_masks(args, spec, env)

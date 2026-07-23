@@ -229,6 +229,36 @@ def _append_model_diagnostics(logs: dict[str, list[float]], outputs: dict) -> No
             values = scale_entropy.detach().float()
             logs["v17_scale_entropy_mean"].append(float(values.mean().cpu()))
             logs["v17_scale_entropy_std"].append(float(values.std(unbiased=False).cpu()))
+            logs["v17_effective_scale_count"].append(float(values.exp().mean().cpu()))
+
+        for weight_name in ("routed_scale_weight", "shared_scale_weight"):
+            weight = v17.get(weight_name)
+            if not torch.is_tensor(weight):
+                continue
+            weight_f = weight.detach().float()
+            prefix = "routed" if weight_name.startswith("routed") else "shared"
+            for index, label in enumerate(("f", "m", "c")):
+                values = weight_f[:, index]
+                logs[f"v17_{prefix}_scale_{label}_mean"].append(
+                    float(values.mean().cpu())
+                )
+                logs[f"v17_{prefix}_scale_{label}_std"].append(
+                    float(values.std(unbiased=False).cpu())
+                )
+
+        for metric_name in (
+            "shared_scale_entropy",
+            "shared_routed_scale_l1",
+            "shared_routed_scale_cosine",
+            "fine_floor_adjustment_l1",
+        ):
+            metric = v17.get(metric_name)
+            if torch.is_tensor(metric):
+                values = metric.detach().float()
+                logs[f"v17_{metric_name}_mean"].append(float(values.mean().cpu()))
+                logs[f"v17_{metric_name}_std"].append(
+                    float(values.std(unbiased=False).cpu())
+                )
 
         scale_top1 = v17.get("scale_top1")
         if torch.is_tensor(scale_top1):
@@ -256,6 +286,12 @@ def _append_model_diagnostics(logs: dict[str, list[float]], outputs: dict) -> No
             logs["v17_route_gate_std"].append(float(route.std(unbiased=False).cpu()))
             logs["v17_route_gate_min"].append(float(route.min().cpu()))
             logs["v17_route_gate_max"].append(float(route.max().cpu()))
+            logs["v17_route_gate_high_saturation"].append(
+                float((route > 0.9).float().mean().cpu())
+            )
+            logs["v17_route_gate_low_saturation"].append(
+                float((route < 0.1).float().mean().cpu())
+            )
             missing_rate = v17.get("missing_rate")
             if torch.is_tensor(missing_rate):
                 logs["v17_route_gate_missing_rate_corr"].append(
@@ -293,6 +329,9 @@ def _append_model_diagnostics(logs: dict[str, list[float]], outputs: dict) -> No
             gate_f = gate.detach().float()
             entropy = -(gate_f * gate_f.clamp_min(1e-8).log()).sum(dim=1)
             logs[f"v17_expert_entropy_{scale}"].append(float(entropy.mean().cpu()))
+            logs[f"v17_effective_expert_count_{scale}"].append(
+                float(entropy.exp().mean().cpu())
+            )
             top1 = gate_f.argmax(dim=1)
             selected = outputs.get("selected_masks", {}).get(scale)
             selected_f = selected.detach().float() if torch.is_tensor(selected) else None
@@ -307,6 +346,65 @@ def _append_model_diagnostics(logs: dict[str, list[float]], outputs: dict) -> No
                     logs[f"v17_expert_topk_{scale}_{expert_index}_load"].append(
                         float(selected_f[:, expert_index].mean().cpu())
                     )
+
+            top_weights = outputs.get("topk", {}).get(f"{scale}_weights")
+            if torch.is_tensor(top_weights) and top_weights.ndim == 2:
+                sorted_weights = top_weights.detach().float().sort(
+                    dim=1, descending=True
+                ).values
+                first = sorted_weights[:, 0]
+                second = (
+                    sorted_weights[:, 1]
+                    if sorted_weights.shape[1] > 1
+                    else torch.zeros_like(first)
+                )
+                logs[f"v17_top2_first_weight_{scale}"].append(
+                    float(first.mean().cpu())
+                )
+                logs[f"v17_top2_second_weight_{scale}"].append(
+                    float(second.mean().cpu())
+                )
+                logs[f"v17_top2_weight_ratio_{scale}"].append(
+                    float((first / second.clamp_min(1e-8)).mean().cpu())
+                )
+
+        expert_top1 = {}
+        for scale in ("fine", "mid", "coarse"):
+            gate = outputs.get("gates", {}).get(scale)
+            if torch.is_tensor(gate):
+                expert_top1[scale] = gate.detach().argmax(dim=1)
+        active_scale_mask = v17.get("active_scale_mask")
+        if len(expert_top1) == 3 and torch.is_tensor(active_scale_mask):
+            active = active_scale_mask.detach().bool()
+            fine_mid_active = active[:, 0] & active[:, 1]
+            mid_coarse_active = active[:, 1] & active[:, 2]
+            all_active = active.all(dim=1)
+
+            def _agreement(left: str, right: str, valid: torch.Tensor) -> float:
+                if not valid.any():
+                    return 0.0
+                same = expert_top1[left][valid] == expert_top1[right][valid]
+                return float(same.float().mean().cpu())
+
+            logs["v17_same_top1_fine_mid_rate"].append(
+                _agreement("fine", "mid", fine_mid_active)
+            )
+            logs["v17_same_top1_mid_coarse_rate"].append(
+                _agreement("mid", "coarse", mid_coarse_active)
+            )
+            if all_active.any():
+                same_all = (
+                    (expert_top1["fine"][all_active] == expert_top1["mid"][all_active])
+                    & (
+                        expert_top1["mid"][all_active]
+                        == expert_top1["coarse"][all_active]
+                    )
+                )
+                logs["v17_same_top1_all_scales_rate"].append(
+                    float(same_all.float().mean().cpu())
+                )
+            else:
+                logs["v17_same_top1_all_scales_rate"].append(0.0)
 
     if isinstance(v14, dict) or isinstance(v15, dict):
         for scale in ("fine", "mid", "coarse"):
@@ -331,6 +429,20 @@ def _append_model_diagnostics(logs: dict[str, list[float]], outputs: dict) -> No
         logs["effective_shared_norm"].append(float(shared_norm.cpu()))
         logs["effective_route_norm"].append(float(route_norm.cpu()))
         logs["effective_route_ratio"].append(float((route_norm / shared_norm.clamp_min(1e-6)).cpu()))
+        if isinstance(v17, dict):
+            route_gate = v17.get("route_branch_gate")
+            if torch.is_tensor(route_gate):
+                effective_route = (
+                    route_gate.detach().float().view(-1, 1, 1, 1, 1)
+                    * h_route_proj.detach().float()
+                )
+                effective_norm = effective_route.square().mean().sqrt()
+                logs["v17_shared_feature_rms"].append(float(shared_norm.cpu()))
+                logs["v17_routed_feature_rms"].append(float(route_norm.cpu()))
+                logs["v17_effective_routed_rms"].append(float(effective_norm.cpu()))
+                logs["v17_effective_routed_ratio"].append(
+                    float((effective_norm / shared_norm.clamp_min(1e-6)).cpu())
+                )
 
 
 def _append_lr_logs(logs: dict[str, list[float]], optimizer: torch.optim.Optimizer) -> None:

@@ -147,6 +147,8 @@ def _experiment_parts(name: str) -> tuple[str, str]:
         return "full", "model"
     if safe_name.startswith("ablation_"):
         return "ablation", safe_name.removeprefix("ablation_")
+    if safe_name.startswith("combination_"):
+        return "combination", safe_name.removeprefix("combination_")
     if safe_name in {"smoke", "debug", "test"} or safe_name.startswith(("smoke_", "debug_", "test_")):
         return "debug", safe_name
     return "custom", safe_name
@@ -204,6 +206,58 @@ def _append_experiment_index(index_path: Path, row: dict[str, object]) -> None:
         if not exists:
             writer.writeheader()
         writer.writerow({key: row.get(key, "") for key in fieldnames})
+
+
+def _write_router_diagnostics(run_dir: Path, metrics: dict[str, float]) -> None:
+    """Persist compact V17 routing diagnostics for ablation summarization."""
+    diagnostic_metrics = {
+        key: float(value)
+        for key, value in metrics.items()
+        if key.startswith(("v17_", "scale_gate_", "branch_gate_", "effective_"))
+        and isinstance(value, (int, float))
+    }
+    if not diagnostic_metrics:
+        return
+
+    scale_means = [
+        diagnostic_metrics.get(f"v17_routed_scale_{scale}_mean", 0.0)
+        for scale in ("f", "m", "c")
+    ]
+    scale_entropy = diagnostic_metrics.get("v17_scale_entropy_mean", float("inf"))
+    expert_collapse = {}
+    for scale in ("fine", "mid", "coarse"):
+        probabilities = [
+            diagnostic_metrics.get(f"v17_expert_gate_{scale}_{index}_mean", 0.0)
+            for index in range(32)
+            if f"v17_expert_gate_{scale}_{index}_mean" in diagnostic_metrics
+        ]
+        effective_count = diagnostic_metrics.get(
+            f"v17_effective_expert_count_{scale}", float("inf")
+        )
+        expert_collapse[scale] = bool(
+            (probabilities and max(probabilities) > 0.95) or effective_count < 1.3
+        )
+
+    route_mean = diagnostic_metrics.get("v17_route_gate_mean", 0.0)
+    route_std = diagnostic_metrics.get("v17_route_gate_std", float("inf"))
+    payload = {
+        "stage": "test_best_checkpoint",
+        "thresholds": {
+            "scale_weight": 0.95,
+            "scale_entropy": 0.2,
+            "expert_probability": 0.95,
+            "effective_expert_count": 1.3,
+            "route_gate_mean": 0.9,
+            "route_gate_std": 0.03,
+        },
+        "collapse_flags": {
+            "scale": bool(max(scale_means, default=0.0) > 0.95 and scale_entropy < 0.2),
+            "expert": expert_collapse,
+            "route_gate": bool(route_mean > 0.9 and route_std < 0.03),
+        },
+        "metrics": diagnostic_metrics,
+    }
+    save_config(payload, run_dir / "router_diagnostics.json")
 
 
 def parse_args() -> argparse.Namespace:
@@ -284,6 +338,14 @@ def main() -> None:
     git_meta = _git_metadata()
     git_commit = git_meta["git_commit"]
     started_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    save_config(
+        {
+            **git_meta,
+            "config_sha256": _config_hash(cfg),
+            "started_at": started_at,
+        },
+        run_dir / "git_metadata.json",
+    )
     logger = TrainLogger(log_dir)
     logger.log_header(cfg, extra={
         "run_dir": str(run_dir),
@@ -429,6 +491,8 @@ def main() -> None:
             test_logs = evaluate(model, test_loader, device, cfg, desc=f"test best epoch {best_epoch}", epoch=best_epoch)
             _sync_device(device)
             test_time = time.perf_counter() - test_start
+            if cfg.get("model", {}).get("architecture") == "v17_hierarchical_scale_moe":
+                _write_router_diagnostics(run_dir, test_logs)
         logger.log_test(test_logs, {
             "checkpoint": str(best_path), "best_epoch": checkpoint.get("epoch", best_epoch),
             "best_val_mae": best_mae, "test_samples": len(test_ds) if test_ds is not None else 0,

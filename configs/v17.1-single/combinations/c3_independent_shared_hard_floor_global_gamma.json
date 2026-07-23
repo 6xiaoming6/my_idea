@@ -1,0 +1,13 @@
+{
+  "experiment": {
+    "group": "v17_exploratory_combination",
+    "variant": "c3_independent_shared_hard_floor_global_gamma"
+  },
+  "model": {
+    "v17": {
+      "unified_scale_weight": false,
+      "fine_floor_mode": "hard",
+      "sample_route_gate": false
+    }
+  }
+}

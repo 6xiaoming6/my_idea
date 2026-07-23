@@ -7,7 +7,6 @@ from ..embedding import ScaleTokenEncoder
 from ..experts import TopKRoutedExpertPool
 from ..fusion import (
     GatedCrossScaleSharedExpert,
-    ProgressiveRouteFusion,
     ReliabilityAwareScaleGate,
     SharedRoutedResidualFusion,
 )
@@ -17,6 +16,7 @@ from ..stats import compute_observation_stats
 from .fine_preserved_scale_fusion import (
     FinePreservedParallelRouteFusion,
     FinePreservedScaleWeight,
+    ScaleWeightedProgressiveRouteFusion,
 )
 from .hierarchical_scale_expert_router import HierarchicalScaleExpertRouter
 from .scale_specific_adapter import IdentityScaleAdapter, ScaleSpecificAdapter
@@ -66,10 +66,13 @@ class V17HierarchicalScaleMoEBackbone(nn.Module):
         reliability_prior_enabled: bool = True,
         reliability_prior_init: float = 1.0,
         unified_scale_expert_router: bool = True,
+        expert_router_mode: str | None = None,
+        unified_scale_weight: bool = True,
         sample_route_gate: bool = True,
         route_gate_bias: float = -3.0,
         route_gate_zero_init: bool = True,
         fine_floor: float = 0.25,
+        fine_floor_mode: str = "linear",
         mid_projection: bool = True,
         coarse_projection: bool = True,
         route_fusion: str = "fine_preserved_parallel",
@@ -91,6 +94,18 @@ class V17HierarchicalScaleMoEBackbone(nn.Module):
         self.enable_complementary_loss = enable_complementary_loss
         self.adapter_enabled = adapter_enabled
         self.unified_scale_expert_router = unified_scale_expert_router
+        if expert_router_mode is None:
+            expert_router_mode = (
+                "hierarchical_shared_head"
+                if unified_scale_expert_router
+                else "decoupled"
+            )
+        if expert_router_mode not in {"hierarchical_shared_head", "decoupled"}:
+            raise ValueError(
+                "expert_router_mode must be 'hierarchical_shared_head' or 'decoupled'"
+            )
+        self.expert_router_mode = expert_router_mode
+        self.unified_scale_weight = bool(unified_scale_weight)
         self.sample_route_gate = sample_route_gate
         self.route_fusion_mode = route_fusion
         if route_fusion not in {"fine_preserved_parallel", "progressive"}:
@@ -135,10 +150,11 @@ class V17HierarchicalScaleMoEBackbone(nn.Module):
             route_gate_bias=route_gate_bias,
             route_gate_zero_init=route_gate_zero_init,
         )
-        if not unified_scale_expert_router:
+        if self.expert_router_mode == "decoupled":
             self.router_f = QualityRouter(dim, q_dim, num_experts)
             self.router_m = QualityRouter(dim, q_dim, num_experts)
             self.router_c = QualityRouter(dim, q_dim, num_experts)
+        if not unified_scale_expert_router:
             self.decoupled_scale_gate = ReliabilityAwareScaleGate(
                 dim=dim,
                 stat_dim=q_dim,
@@ -160,7 +176,10 @@ class V17HierarchicalScaleMoEBackbone(nn.Module):
                 dim, num_experts, top_k=self.top_k, num_groups=num_groups, dropout=dropout
             )
 
-        self.fine_preserve_weight = FinePreservedScaleWeight(fine_floor=fine_floor)
+        self.fine_preserve_weight = FinePreservedScaleWeight(
+            fine_floor=fine_floor,
+            mode=fine_floor_mode,
+        )
         if route_fusion == "fine_preserved_parallel":
             self.route_fusion = FinePreservedParallelRouteFusion(
                 dim=dim,
@@ -170,7 +189,7 @@ class V17HierarchicalScaleMoEBackbone(nn.Module):
                 coarse_projection=coarse_projection,
             )
         else:
-            self.route_fusion = ProgressiveRouteFusion(
+            self.route_fusion = ScaleWeightedProgressiveRouteFusion(
                 dim=dim, num_groups=num_groups, dropout=dropout
             )
         self.cross_scale_shared_expert = GatedCrossScaleSharedExpert(
@@ -178,7 +197,7 @@ class V17HierarchicalScaleMoEBackbone(nn.Module):
             stat_dim=q_dim,
             num_groups=num_groups,
             dropout=dropout,
-            use_scale_gate=False,
+            use_scale_gate=not self.unified_scale_weight,
         )
         self.branch_fusion = SharedRoutedResidualFusion(
             dim=dim,
@@ -245,10 +264,13 @@ class V17HierarchicalScaleMoEBackbone(nn.Module):
             unified_scale_expert_router=v17_cfg.get(
                 "unified_scale_expert_router", True
             ),
+            expert_router_mode=v17_cfg.get("expert_router_mode"),
+            unified_scale_weight=v17_cfg.get("unified_scale_weight", True),
             sample_route_gate=v17_cfg.get("sample_route_gate", True),
             route_gate_bias=v17_cfg.get("route_gate_bias", -3.0),
             route_gate_zero_init=v17_cfg.get("route_gate_zero_init", True),
             fine_floor=v17_cfg.get("fine_floor", 0.25),
+            fine_floor_mode=v17_cfg.get("fine_floor_mode", "linear"),
             mid_projection=v17_cfg.get("mid_projection", True),
             coarse_projection=v17_cfg.get("coarse_projection", True),
             route_fusion=v17_cfg.get("route_fusion", "fine_preserved_parallel"),
@@ -299,11 +321,10 @@ class V17HierarchicalScaleMoEBackbone(nn.Module):
             active_scale_mask=active_mask,
         )
 
-        if self.unified_scale_expert_router:
+        if self.expert_router_mode == "hierarchical_shared_head":
             gate_f = routing["expert_gate_f"]
             gate_m = routing["expert_gate_m"]
             gate_c = routing["expert_gate_c"]
-            scale_weight_raw = routing["scale_weight"]
         else:
             gate_f = self.router_f(
                 h_f, q_f, self._scale_embed_vec(self.embed_f, batch_size)
@@ -314,6 +335,10 @@ class V17HierarchicalScaleMoEBackbone(nn.Module):
             gate_c = self.router_c(
                 h_c, q_c, self._scale_embed_vec(self.embed_c, batch_size)
             )
+
+        if self.unified_scale_expert_router:
+            scale_weight_raw = routing["scale_weight"]
+        else:
             active_f = active_mask[:, 0].to(h_f.dtype).view(batch_size, 1, 1, 1, 1)
             active_m = active_mask[:, 1].to(h_f.dtype).view(batch_size, 1, 1, 1, 1)
             active_c = active_mask[:, 2].to(h_f.dtype).view(batch_size, 1, 1, 1, 1)
@@ -356,14 +381,15 @@ class V17HierarchicalScaleMoEBackbone(nn.Module):
                 z_f=z_f,
                 z_m=z_m,
                 z_c=z_c,
-                scale_mode=self.scale_mode,
+                scale_weight=scale_weight,
             )
             route_feature_outputs = {
                 "z_m_to_f": route_outputs["z_m_to_f"],
-                "z_c_to_f": route_outputs["z_mc_to_f"],
-                "h_route_mix": route_outputs["h_route"],
+                "z_c_to_f": route_outputs["z_c_to_f"],
+                "h_route_mix": route_outputs["h_route_mix"],
             }
-        z_shared, h_m_up, h_c_up, _ = self.cross_scale_shared_expert(
+        shared_external_weight = scale_weight if self.unified_scale_weight else None
+        z_shared, h_m_up, h_c_up, shared_scale_weight = self.cross_scale_shared_expert(
             h_f=h_f,
             h_m=h_m,
             h_c=h_c,
@@ -373,7 +399,7 @@ class V17HierarchicalScaleMoEBackbone(nn.Module):
             r_m=r_m,
             r_c=r_c,
             active_mask=active_mask,
-            external_scale_weight=scale_weight,
+            external_scale_weight=shared_external_weight,
         )
         predicted_route_gate = routing["route_branch_gate"]
         external_route_gate = predicted_route_gate if self.sample_route_gate else None
@@ -413,6 +439,13 @@ class V17HierarchicalScaleMoEBackbone(nn.Module):
         scale_entropy = -(
             scale_weight * scale_weight.clamp_min(1e-8).log()
         ).sum(dim=1)
+        shared_scale_entropy = -(
+            shared_scale_weight * shared_scale_weight.clamp_min(1e-8).log()
+        ).sum(dim=1)
+        shared_routed_scale_l1 = (shared_scale_weight - scale_weight).abs().sum(dim=1)
+        shared_routed_scale_cosine = torch.nn.functional.cosine_similarity(
+            shared_scale_weight, scale_weight, dim=1, eps=1e-8
+        )
         joint_scale_expert = torch.stack(
             [
                 scale_weight[:, 0:1] * gate_f,
@@ -477,14 +510,29 @@ class V17HierarchicalScaleMoEBackbone(nn.Module):
             "v17_router_mode": (
                 "hierarchical" if self.unified_scale_expert_router else "decoupled"
             ),
+            "v17_scale_router_mode": (
+                "hierarchical" if self.unified_scale_expert_router else "decoupled"
+            ),
+            "v17_expert_router_mode": self.expert_router_mode,
+            "v17_fine_floor_mode": self.fine_preserve_weight.mode,
+            "v17_unified_scale_weight": self.unified_scale_weight,
             "v17_route_fusion": self.route_fusion_mode,
             "diagnostics": {
                 "v17": {
                     "active_scale_mask": active_mask,
                     "scale_weight_raw": scale_weight_raw,
                     "scale_weight": scale_weight,
+                    "routed_scale_weight": scale_weight,
+                    "shared_scale_weight": shared_scale_weight,
                     "scale_entropy": scale_entropy,
+                    "shared_scale_entropy": shared_scale_entropy,
                     "scale_top1": scale_weight.argmax(dim=1),
+                    "shared_scale_top1": shared_scale_weight.argmax(dim=1),
+                    "shared_routed_scale_l1": shared_routed_scale_l1,
+                    "shared_routed_scale_cosine": shared_routed_scale_cosine,
+                    "fine_floor_adjustment_l1": (
+                        scale_weight - scale_weight_raw
+                    ).abs().sum(dim=1),
                     "route_branch_gate": route_branch_gate.flatten(1)[:, 0],
                     "missing_rate": q_f[:, 0],
                     "reliability_strength": routing["reliability_strength"],

@@ -1,0 +1,12 @@
+{
+  "experiment": {
+    "group": "v17_exploratory_combination",
+    "variant": "c2_independent_shared_hard_floor"
+  },
+  "model": {
+    "v17": {
+      "unified_scale_weight": false,
+      "fine_floor_mode": "hard"
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "experiment": {
+    "group": "v17_exploratory_ablation",
+    "variant": "no_adapter"
+  },
+  "model": {
+    "v17": {
+      "adapter_enabled": false
+    }
+  }
+}
