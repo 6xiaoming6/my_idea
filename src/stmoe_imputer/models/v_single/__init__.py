@@ -11,6 +11,9 @@ from .fine_preserved_scale_fusion import (
 )
 from .hierarchical_scale_expert_router import HierarchicalScaleExpertRouter
 from .scale_specific_adapter import ScaleSpecificAdapter
+from .v17_2_no_adapter_hierarchical_scale_moe import (
+    V17_2NoAdapterHierarchicalScaleMoEBackbone,
+)
 from .v17_hierarchical_scale_moe import V17HierarchicalScaleMoEBackbone
 
 __all__ = [
@@ -27,6 +30,7 @@ __all__ = [
     "FinePreservedScaleWeight",
     "HierarchicalScaleExpertRouter",
     "ScaleSpecificAdapter",
+    "V17_2NoAdapterHierarchicalScaleMoEBackbone",
     "V17HierarchicalScaleMoEBackbone",
     "compute_raw_difficulty_stats",
 ]

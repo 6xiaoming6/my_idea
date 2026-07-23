@@ -8,6 +8,7 @@ from .main_branch import MultiScaleMoEBackbone
 from .v_single import (
     V14SafeC2FMoE,
     V15CompactResidualMoE,
+    V17_2NoAdapterHierarchicalScaleMoEBackbone,
     V17HierarchicalScaleMoEBackbone,
 )
 
@@ -20,6 +21,9 @@ MODEL_REGISTRY: dict[str, ModelBuilder] = {
     "v14_safe_c2f_moe": V14SafeC2FMoE.from_config,
     "v15_compact_residual_moe": V15CompactResidualMoE.from_config,
     "v17_hierarchical_scale_moe": V17HierarchicalScaleMoEBackbone.from_config,
+    "v17_2_no_adapter_hierarchical_scale_moe": (
+        V17_2NoAdapterHierarchicalScaleMoEBackbone.from_config
+    ),
 }
 
 

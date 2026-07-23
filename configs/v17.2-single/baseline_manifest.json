@@ -1,0 +1,264 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-23T11:05:28",
+  "description": "Explicit Full V17/V17.1 baselines compatible with the V17.2 training protocol.",
+  "entries": {
+    "TaxiBJ/fixed/0.2/seed42": {
+      "run_dir": "outputs/v17-single/TaxiBJ/full/model/fixed/rate0.2/20260719_191538_seed42_bs32",
+      "config_sha256": "41036eed545e08319d03cfce7a47c7994e8588d95c9ddbbefb9d69b37325cb05",
+      "test_mae": 8.69606870153676,
+      "test_rmse": 15.092877761177395,
+      "test_loss": 9.74280135527901,
+      "protocol_audit_passed": true
+    },
+    "TaxiBJ/fixed/0.4/seed42": {
+      "run_dir": "outputs/v17.1-single/TaxiBJ/ablation/full/fixed/rate0.4/20260720_163918_seed42_bs32",
+      "config_sha256": "ce174ff81bb406eb3ad086a968f851ed3c764c0e4a31594e5592f87bc2f88d8b",
+      "test_mae": 9.496150431425676,
+      "test_rmse": 15.711021340411643,
+      "test_loss": 10.75670337677002,
+      "protocol_audit_passed": true
+    },
+    "TaxiBJ/fixed/0.6/seed42": {
+      "run_dir": "outputs/v17-single/TaxiBJ/full/model/fixed/rate0.6/20260719_214302_seed42_bs32",
+      "config_sha256": "0fb12488732cda6047040ebed5c7482483814e86212aebbd72c01c5cf4cb989e",
+      "test_mae": 8.128872892130977,
+      "test_rmse": 12.906565914983334,
+      "test_loss": 9.376843804898469,
+      "protocol_audit_passed": true
+    },
+    "TaxiBJ/fixed/0.8/seed42": {
+      "run_dir": "outputs/v17-single/TaxiBJ/full/model/fixed/rate0.8/20260719_225648_seed42_bs32",
+      "config_sha256": "2d07b881eb9fad95005e067a17eafa468a8abbd332bc105e1d6b1f6fb321be7f",
+      "test_mae": 8.270308245783268,
+      "test_rmse": 13.280118569083836,
+      "test_loss": 9.260987675708273,
+      "protocol_audit_passed": true
+    },
+    "TaxiBJ/random/0.2/seed42": {
+      "run_dir": "outputs/v17-single/TaxiBJ/full/model/random/rate0.2/20260720_032642_seed42_bs32",
+      "config_sha256": "0179ec1801c923abe33768e606bd3335286a108c664185d11dbdb98b7cf22da2",
+      "test_mae": 12.83048443172289,
+      "test_rmse": 22.2267833792645,
+      "test_loss": 14.805197010869565,
+      "protocol_audit_passed": true
+    },
+    "TaxiBJ/random/0.4/seed42": {
+      "run_dir": "outputs/v17.1-single/TaxiBJ/ablation/full/random/rate0.4/20260720_152013_seed42_bs32",
+      "config_sha256": "e3a4dff283ee949b40b7320a912f270fcd8b334421694b9b7f15d7da42d74a9c",
+      "test_mae": 13.04519217947255,
+      "test_rmse": 22.29364594169285,
+      "test_loss": 15.24129112907078,
+      "protocol_audit_passed": true
+    },
+    "TaxiBJ/random/0.6/seed42": {
+      "run_dir": "outputs/v17-single/TaxiBJ/full/model/random/rate0.6/20260720_055347_seed42_bs32",
+      "config_sha256": "9335a028f06d130a10c9e6e0a96956632187119b2b5c05b6604a043e54a06cb3",
+      "test_mae": 9.334867912790049,
+      "test_rmse": 15.186514854431152,
+      "test_loss": 11.106687027475107,
+      "protocol_audit_passed": true
+    },
+    "TaxiBJ/random/0.8/seed42": {
+      "run_dir": "outputs/v17-single/TaxiBJ/full/model/random/rate0.8/20260720_070717_seed42_bs32",
+      "config_sha256": "d7f56286cf4303dd0262ae3787720f13cff2849f7f0d2936ed4b78ff1fd436d4",
+      "test_mae": 10.171706241110098,
+      "test_rmse": 16.6063348935998,
+      "test_loss": 12.072914206463357,
+      "protocol_audit_passed": true
+    },
+    "BikeNYC/fixed/0.2/seed42": {
+      "run_dir": "outputs/v17-single/BikeNYC/full/model/fixed/rate0.2/20260720_001033_seed42_bs16",
+      "config_sha256": "be139a77959ede2b74f3c34ec7d03d59c28a87aafb1002a8f10d51dff71983f8",
+      "test_mae": 2.631747269630432,
+      "test_rmse": 6.4301951885223385,
+      "test_loss": 2.7287375688552857,
+      "protocol_audit_passed": true
+    },
+    "BikeNYC/fixed/0.4/seed42": {
+      "run_dir": "outputs/v17-single/BikeNYC/full/model/fixed/rate0.4/20260720_001538_seed42_bs16",
+      "config_sha256": "39e576271e8459d4c7ad38ed8507717fc7f2cfad2d33d6ce00fcca01242da599",
+      "test_mae": 1.7145630836486816,
+      "test_rmse": 4.946290349960327,
+      "test_loss": 1.7634467959403992,
+      "protocol_audit_passed": true
+    },
+    "BikeNYC/fixed/0.6/seed42": {
+      "run_dir": "outputs/v17-single/BikeNYC/full/model/fixed/rate0.6/20260720_002044_seed42_bs16",
+      "config_sha256": "226a6d694ab625f8a11f6dde47dd0a69f070ffcd01ec923d54aa7cf8e5288b5c",
+      "test_mae": 1.4774619817733765,
+      "test_rmse": 4.281180691719055,
+      "test_loss": 1.6070311665534973,
+      "protocol_audit_passed": true
+    },
+    "BikeNYC/fixed/0.8/seed42": {
+      "run_dir": "outputs/v17.1-single/BikeNYC/ablation/full/fixed/rate0.8/20260720_163407_seed42_bs16",
+      "config_sha256": "91f55b20030b0a7f2a98ce3e45166d5ca57c3f64a818c7ab1fc8d60d9d443c8e",
+      "test_mae": 1.798183846473694,
+      "test_rmse": 5.137295341491699,
+      "test_loss": 1.9170892715454102,
+      "protocol_audit_passed": true
+    },
+    "BikeNYC/random/0.2/seed42": {
+      "run_dir": "outputs/v17-single/BikeNYC/full/model/random/rate0.2/20260720_082048_seed42_bs16",
+      "config_sha256": "54528078078e0639337cb5d19a45392486fe95d988c628b0c1019e45c481e13f",
+      "test_mae": 2.0680610060691835,
+      "test_rmse": 6.183513021469116,
+      "test_loss": 2.1912200689315795,
+      "protocol_audit_passed": true
+    },
+    "BikeNYC/random/0.4/seed42": {
+      "run_dir": "outputs/v17-single/BikeNYC/full/model/random/rate0.4/20260720_082448_seed42_bs16",
+      "config_sha256": "000499c02aba53e4668320a1fa36a29eea0f0ebdb6a0be1bcaf69b6305bd730b",
+      "test_mae": 2.0100815057754517,
+      "test_rmse": 5.92489595413208,
+      "test_loss": 2.203094553947449,
+      "protocol_audit_passed": true
+    },
+    "BikeNYC/random/0.6/seed42": {
+      "run_dir": "outputs/v17-single/BikeNYC/full/model/random/rate0.6/20260720_082923_seed42_bs16",
+      "config_sha256": "e542ef9567b08c6e5417676a2c89e27a4413033602b01beb22d2546028afa968",
+      "test_mae": 2.0321081280708313,
+      "test_rmse": 6.10566029548645,
+      "test_loss": 2.293774163722992,
+      "protocol_audit_passed": true
+    },
+    "BikeNYC/random/0.8/seed42": {
+      "run_dir": "outputs/v17-single/BikeNYC/full/model/random/rate0.8/20260720_083407_seed42_bs16",
+      "config_sha256": "fc78f442fad64c99435dbc3e918e9fbf34775c5cca72da7c846d0601ca85ca0d",
+      "test_mae": 2.135505759716034,
+      "test_rmse": 6.4238190174102785,
+      "test_loss": 2.537912201881409,
+      "protocol_audit_passed": true
+    },
+    "CHAP/fixed/0.2/seed42": {
+      "run_dir": "outputs/v17-single/CHAP_Beijing/full/model/fixed/rate0.2/20260720_003055_seed42_bs32",
+      "config_sha256": "fbc181da90973658645134d4fc579aeac665c6c3afdf72aeb1542199f9e46c3e",
+      "test_mae": 0.6168771955099973,
+      "test_rmse": 0.9194454930045388,
+      "test_loss": 0.37941124628890643,
+      "protocol_audit_passed": true
+    },
+    "CHAP/fixed/0.4/seed42": {
+      "run_dir": "outputs/v17.1-single/CHAP_Beijing/ablation/full/fixed/rate0.4/20260720_175315_seed42_bs32",
+      "config_sha256": "612c1c0dfd05eced24592e1fa813e0a45500ae037bce04e8bbbda4b88a2c642e",
+      "test_mae": 0.6527205380526456,
+      "test_rmse": 0.9326650283553384,
+      "test_loss": 0.41466992822560395,
+      "protocol_audit_passed": true
+    },
+    "CHAP/fixed/0.6/seed42": {
+      "run_dir": "outputs/v17-single/CHAP_Beijing/full/model/fixed/rate0.6/20260720_015846_seed42_bs32",
+      "config_sha256": "ae8ab1483de184416651b5731e7a1a867450d0d44f7953733808f768c874120a",
+      "test_mae": 0.6250028285113248,
+      "test_rmse": 0.9020738520405509,
+      "test_loss": 0.3901668001304973,
+      "protocol_audit_passed": true
+    },
+    "CHAP/fixed/0.8/seed42": {
+      "run_dir": "outputs/v17-single/CHAP_Beijing/full/model/fixed/rate0.8/20260720_024244_seed42_bs32",
+      "config_sha256": "8961f504ae56dea31d87e3fa3b6f33473c67fa695898e774a9c5be6a9c43e414",
+      "test_mae": 0.6791594705798409,
+      "test_rmse": 1.0080739964138379,
+      "test_loss": 0.4382155212489041,
+      "protocol_audit_passed": true
+    },
+    "CHAP/random/0.2/seed42": {
+      "run_dir": "outputs/v17-single/CHAP_Beijing/full/model/random/rate0.2/20260720_083833_seed42_bs32",
+      "config_sha256": "1f8d2da5d69082e3b206fd910018becc2610b4fb3de6cf5002d08b1afc377c84",
+      "test_mae": 0.6565374027598988,
+      "test_rmse": 0.9516663659702648,
+      "test_loss": 0.41668801686980506,
+      "protocol_audit_passed": true
+    },
+    "CHAP/random/0.4/seed42": {
+      "run_dir": "outputs/v17-single/CHAP_Beijing/full/model/random/rate0.4/20260720_092227_seed42_bs32",
+      "config_sha256": "ea882e449c5ec4016ae59702494403023193abff469066bdf5863358f4b86438",
+      "test_mae": 0.6954457705671137,
+      "test_rmse": 1.0016795776107095,
+      "test_loss": 0.4548322626135566,
+      "protocol_audit_passed": true
+    },
+    "CHAP/random/0.6/seed42": {
+      "run_dir": "outputs/v17-single/CHAP_Beijing/full/model/random/rate0.6/20260720_100622_seed42_bs32",
+      "config_sha256": "f409fd7479607d6baa14b117c46d9ecab00f46596a87dea69bf07ba43966c2a3",
+      "test_mae": 0.6932698000561107,
+      "test_rmse": 1.0116392861713062,
+      "test_loss": 0.454633504152298,
+      "protocol_audit_passed": true
+    },
+    "CHAP/random/0.8/seed42": {
+      "run_dir": "outputs/v17-single/CHAP_Beijing/full/model/random/rate0.8/20260720_105021_seed42_bs32",
+      "config_sha256": "0493b0075ed218df2095b5159dfd2417a36290b3f112d9f701e25590c6184efc",
+      "test_mae": 0.7494844550436194,
+      "test_rmse": 1.1029138944365762,
+      "test_loss": 0.5004950924353166,
+      "protocol_audit_passed": true
+    },
+    "TaxiBJ/random/0.4/seed2026": {
+      "run_dir": "outputs/v17.1-single/TaxiBJ/ablation/full/random/rate0.4/20260722_091553_seed2026_bs32",
+      "config_sha256": "d4486a875a15a55afd5c11fec8c8e011e98ddd44ef6c304feb30fa8010866c84",
+      "test_mae": 11.62432510956474,
+      "test_rmse": 19.481127282847527,
+      "test_loss": 13.557802117389182,
+      "protocol_audit_passed": true
+    },
+    "BikeNYC/fixed/0.8/seed2026": {
+      "run_dir": "outputs/v17.1-single/BikeNYC/ablation/full/fixed/rate0.8/20260722_114346_seed2026_bs16",
+      "config_sha256": "7a0bdc8e0420c1cc637d78bf310eaf4d9d826bcb56cdb5cfc9426b17a2f6e3c4",
+      "test_mae": 1.7852203369140625,
+      "test_rmse": 5.110133695602417,
+      "test_loss": 1.9097339749336242,
+      "protocol_audit_passed": true
+    },
+    "TaxiBJ/fixed/0.4/seed2026": {
+      "run_dir": "outputs/v17.1-single/TaxiBJ/ablation/full/fixed/rate0.4/20260722_115200_seed2026_bs32",
+      "config_sha256": "db0db21dd71941d5e097e5699b50d2e5622d7b51ad070a83de207561e16220ca",
+      "test_mae": 8.912322479745615,
+      "test_rmse": 14.384361225625742,
+      "test_loss": 10.1501667395882,
+      "protocol_audit_passed": true
+    },
+    "CHAP/fixed/0.4/seed2026": {
+      "run_dir": "outputs/v17.1-single/CHAP_Beijing/ablation/full/fixed/rate0.4/20260722_141956_seed2026_bs32",
+      "config_sha256": "7fdc02cf0d5fd01375e09d90a7809e38f4d576ddfdbb10161ac5fc17841bef03",
+      "test_mae": 0.638502912087874,
+      "test_rmse": 0.9134762801907279,
+      "test_loss": 0.40893836454911664,
+      "protocol_audit_passed": true
+    },
+    "TaxiBJ/random/0.4/seed3407": {
+      "run_dir": "outputs/v17.1-single/TaxiBJ/ablation/full/random/rate0.4/20260722_102950_seed3407_bs32",
+      "config_sha256": "8116998e8ac8938806795248e856a54ec1a9421446bd31f9a59464458d0097ba",
+      "test_mae": 11.530990393265434,
+      "test_rmse": 19.788490088089652,
+      "test_loss": 13.426482034766156,
+      "protocol_audit_passed": true
+    },
+    "BikeNYC/fixed/0.8/seed3407": {
+      "run_dir": "outputs/v17.1-single/BikeNYC/ablation/full/fixed/rate0.8/20260722_114857_seed3407_bs16",
+      "config_sha256": "e10be21ee14a991de9cdb8a4398c8823e7ffe3b76cc27b27be5a3bdeace7d6a9",
+      "test_mae": 1.858310914039612,
+      "test_rmse": 5.3031257629394535,
+      "test_loss": 2.0090442419052126,
+      "protocol_audit_passed": true
+    },
+    "TaxiBJ/fixed/0.4/seed3407": {
+      "run_dir": "outputs/v17.1-single/TaxiBJ/ablation/full/fixed/rate0.4/20260722_130603_seed3407_bs32",
+      "config_sha256": "cff65bf121b072150cde267b3111575107c172602ac75309151fbd38985c5284",
+      "test_mae": 8.019272057906441,
+      "test_rmse": 12.796440663545027,
+      "test_loss": 9.067834149236264,
+      "protocol_audit_passed": true
+    },
+    "CHAP/fixed/0.4/seed3407": {
+      "run_dir": "outputs/v17.1-single/CHAP_Beijing/ablation/full/fixed/rate0.4/20260722_150408_seed3407_bs32",
+      "config_sha256": "8310e4c3e66e88e3c48119bf4ffb42accda1babc91ee5e98b1278f4a43181ea9",
+      "test_mae": 0.6698297506028955,
+      "test_rmse": 0.9629981951280073,
+      "test_loss": 0.4360496401786804,
+      "protocol_audit_passed": true
+    }
+  },
+  "missing": []
+}

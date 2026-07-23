@@ -1,0 +1,62 @@
+{
+  "output_dir": "outputs/v17.2-single",
+  "model": {
+    "version": "v17.2-single",
+    "architecture": "v17_2_no_adapter_hierarchical_scale_moe",
+    "main": {
+      "dim": 16,
+      "num_experts": 2,
+      "top_k": 1,
+      "num_groups": 4,
+      "dropout": 0.0,
+      "route_dropout": 0.0,
+      "scale_mode": "fine_mid_coarse"
+    },
+    "v17": {
+      "enabled": true,
+      "adapter_enabled": false,
+      "adapter_dim": 4,
+      "adapter_dropout": 0.0,
+      "adapter_zero_init": true,
+      "router_local_dim": 8,
+      "router_global_dim": 16,
+      "router_scale_embed_dim": 4,
+      "scale_temperature": 1.0,
+      "reliability_prior_enabled": true,
+      "reliability_prior_init": 1.0,
+      "unified_scale_expert_router": true,
+      "expert_router_mode": "hierarchical_shared_head",
+      "sample_route_gate": true,
+      "route_gate_bias": -3.0,
+      "route_gate_zero_init": true,
+      "route_fusion": "fine_preserved_parallel",
+      "fine_floor": 0.25,
+      "fine_floor_mode": "linear",
+      "mid_projection": true,
+      "coarse_projection": true,
+      "unified_scale_weight": true,
+      "lambda_scale_entropy": 0.0
+    },
+    "v17_2": {
+      "enabled": true,
+      "source_ablation": "E1_no_adapter",
+      "remove_scale_adapter": true
+    }
+  },
+  "loss": {
+    "lambda_scale_entropy": 0.0,
+    "scale_entropy_min": 0.5
+  },
+  "train": {
+    "epochs": 1,
+    "val_epoch": 1,
+    "lr_main": 0.001,
+    "lr_aux": 0.001,
+    "early_stopping": {
+      "enabled": false,
+      "monitor": "val_mae",
+      "patience": 1,
+      "mode": "min"
+    }
+  }
+}

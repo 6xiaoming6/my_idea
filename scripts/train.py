@@ -73,6 +73,82 @@ def _config_hash(cfg: dict) -> str:
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
 
+def _file_sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as file:
+        for chunk in iter(lambda: file.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _parameter_report(model: torch.nn.Module) -> dict[str, object]:
+    categories = {
+        "adapter": 0,
+        "router": 0,
+        "expert": 0,
+        "fusion": 0,
+        "other": 0,
+    }
+    trainable_categories = dict.fromkeys(categories, 0)
+    adapter_names: list[str] = []
+    for name, parameter in model.named_parameters():
+        name_lower = name.lower()
+        if any(
+            token in name_lower
+            for token in (
+                "main_branch.adapter_f.",
+                "main_branch.adapter_m.",
+                "main_branch.adapter_c.",
+            )
+        ):
+            category = "adapter"
+            adapter_names.append(name)
+        elif "router" in name_lower:
+            category = "router"
+        elif "expert" in name_lower:
+            category = "expert"
+        elif "fusion" in name_lower:
+            category = "fusion"
+        else:
+            category = "other"
+        categories[category] += parameter.numel()
+        if parameter.requires_grad:
+            trainable_categories[category] += parameter.numel()
+    return {
+        "total_parameters": sum(parameter.numel() for parameter in model.parameters()),
+        "trainable_parameters": sum(
+            parameter.numel() for parameter in model.parameters()
+            if parameter.requires_grad
+        ),
+        "parameters_by_category": categories,
+        "trainable_parameters_by_category": trainable_categories,
+        "adapter_parameter_count": categories["adapter"],
+        "adapter_parameter_names": adapter_names,
+    }
+
+
+def _mask_metadata(cfg: dict) -> dict[str, object]:
+    mask_cfg = cfg.get("data", {}).get("mask", {})
+    files = {}
+    for split in ("train", "val", "test"):
+        configured = mask_cfg.get(f"{split}_csv")
+        if not configured:
+            continue
+        path = Path(configured).expanduser()
+        if not path.is_absolute():
+            path = ROOT / path
+        files[split] = {
+            "path": str(path),
+            "exists": path.is_file(),
+            "sha256": _file_sha256(path) if path.is_file() else None,
+        }
+    return {
+        "pattern": mask_cfg.get("pattern"),
+        "missing_rate": mask_cfg.get("missing_rate"),
+        "files": files,
+    }
+
+
 def _device_name(device: torch.device) -> str:
     if device.type == "cuda" and torch.cuda.is_available():
         return torch.cuda.get_device_name(device)
@@ -321,6 +397,12 @@ def main() -> None:
     ckpt_dir.mkdir(parents=True, exist_ok=True)
     log_dir.mkdir(parents=True, exist_ok=True)
     save_config(cfg, run_dir / "config.json")
+    save_config(cfg, run_dir / "resolved_config.json")
+    (run_dir / "config_sha256.txt").write_text(
+        _config_hash(cfg) + "\n",
+        encoding="utf-8",
+    )
+    save_config(_mask_metadata(cfg), run_dir / "mask_metadata.json")
 
     device = get_device(cfg.get("device", "auto"))
     train_ds, val_ds = build_datasets(cfg, args.train_npz, args.val_npz, synthetic=args.synthetic)
@@ -330,6 +412,16 @@ def main() -> None:
     test_loader = build_loader(test_ds, cfg, shuffle=False) if test_ds is not None else None
 
     model = DualBranchSTImputer.from_config(cfg).to(device)
+    parameter_report = _parameter_report(model)
+    if cfg.get("model", {}).get("architecture") == (
+        "v17_2_no_adapter_hierarchical_scale_moe"
+    ):
+        if parameter_report["adapter_parameter_count"] != 0:
+            raise RuntimeError("V17.2 unexpectedly contains trainable Adapter parameters")
+        main_branch = getattr(model, "main_branch", None)
+        if getattr(main_branch, "adapter_enabled", True):
+            raise RuntimeError("V17.2 main branch unexpectedly enabled Scale Adapter")
+    save_config(parameter_report, run_dir / "parameter_report.json")
     optimizer = build_optimizer(model, cfg)
     scheduler = build_scheduler(optimizer, cfg)
 
@@ -491,7 +583,10 @@ def main() -> None:
             test_logs = evaluate(model, test_loader, device, cfg, desc=f"test best epoch {best_epoch}", epoch=best_epoch)
             _sync_device(device)
             test_time = time.perf_counter() - test_start
-            if cfg.get("model", {}).get("architecture") == "v17_hierarchical_scale_moe":
+            if cfg.get("model", {}).get("architecture") in {
+                "v17_hierarchical_scale_moe",
+                "v17_2_no_adapter_hierarchical_scale_moe",
+            }:
                 _write_router_diagnostics(run_dir, test_logs)
         logger.log_test(test_logs, {
             "checkpoint": str(best_path), "best_epoch": checkpoint.get("epoch", best_epoch),
