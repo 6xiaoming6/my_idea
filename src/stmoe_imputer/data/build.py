@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import torch
 from torch.utils.data import DataLoader
 
 from .npz_dataset import FlowNPZDataset
@@ -121,6 +122,8 @@ def build_test_dataset(cfg: dict, test_npz: str | None = None, synthetic: bool =
 
 def build_loader(dataset, cfg: dict, shuffle: bool) -> DataLoader:
     data_cfg = cfg["data"]
+    generator = torch.Generator()
+    generator.manual_seed(int(cfg.get("seed", 42)))
     return DataLoader(
         dataset,
         batch_size=data_cfg["batch_size"],
@@ -128,4 +131,5 @@ def build_loader(dataset, cfg: dict, shuffle: bool) -> DataLoader:
         num_workers=data_cfg["num_workers"],
         pin_memory=data_cfg.get("pin_memory", True),
         drop_last=data_cfg.get("drop_last", False) and shuffle,
+        generator=generator,
     )

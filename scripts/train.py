@@ -55,7 +55,14 @@ def _git_metadata() -> dict[str, str]:
             stderr=subprocess.STDOUT,
         ).strip() or "detached"
         status = subprocess.check_output(
-            [git_executable, "status", "--porcelain"], cwd=ROOT, text=True,
+            [
+                git_executable,
+                "status",
+                "--porcelain",
+                "--ignore-submodules=dirty",
+            ],
+            cwd=ROOT,
+            text=True,
             stderr=subprocess.STDOUT,
         )
         return {"git_commit": commit, "git_branch": branch, "git_dirty": str(bool(status.strip()))}
@@ -278,6 +285,9 @@ def main() -> None:
     model = DualBranchSTImputer.from_config(cfg).to(device)
     optimizer = build_optimizer(model, cfg)
     scheduler = build_scheduler(optimizer, cfg)
+    # Keep the stochastic training stream independent of architecture-specific
+    # parameter initialization so matched variants share dropout/randomness.
+    set_seed(cfg.get("seed", 42))
 
     total_params = sum(p.numel() for p in model.parameters())
     trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)

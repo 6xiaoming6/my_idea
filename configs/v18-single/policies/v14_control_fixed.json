@@ -1,0 +1,53 @@
+{
+  "name": "v18_matched_v14_control_fixed",
+  "datasets": {
+    "TaxiBJ": {
+      "evaluation": {
+        "masked_metric_aggregation": "global_missing_elements",
+        "selection_metric": "val_mae"
+      },
+      "train": {
+        "epochs": 160,
+        "val_epoch": 5,
+        "early_stopping": {
+          "enabled": false,
+          "monitor": "val_mae",
+          "patience": 10,
+          "mode": "min"
+        }
+      }
+    },
+    "BikeNYC": {
+      "evaluation": {
+        "masked_metric_aggregation": "global_missing_elements",
+        "selection_metric": "val_mae"
+      },
+      "train": {
+        "epochs": 140,
+        "val_epoch": 2,
+        "early_stopping": {
+          "enabled": true,
+          "monitor": "val_mae",
+          "patience": 12,
+          "mode": "min"
+        }
+      }
+    },
+    "CHAP": {
+      "evaluation": {
+        "masked_metric_aggregation": "global_missing_elements",
+        "selection_metric": "val_mae"
+      },
+      "train": {
+        "epochs": 150,
+        "val_epoch": 5,
+        "early_stopping": {
+          "enabled": false,
+          "monitor": "val_mae",
+          "patience": 10,
+          "mode": "min"
+        }
+      }
+    }
+  }
+}

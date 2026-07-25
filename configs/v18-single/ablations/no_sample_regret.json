@@ -1,0 +1,5 @@
+{
+  "loss": {
+    "lambda_v18_sample_regret": 0.0
+  }
+}

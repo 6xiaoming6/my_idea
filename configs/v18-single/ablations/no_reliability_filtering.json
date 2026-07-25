@@ -1,0 +1,7 @@
+{
+  "model": {
+    "v18": {
+      "use_reliability_filtered_propagation": false
+    }
+  }
+}

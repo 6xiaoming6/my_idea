@@ -1,0 +1,8 @@
+{
+  "model": {
+    "v18": {
+      "pyramid_mode": "absolute_c2f",
+      "bounded_directions": false
+    }
+  }
+}

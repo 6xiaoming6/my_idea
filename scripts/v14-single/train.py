@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import subprocess
@@ -13,6 +14,13 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[2]
+SCRIPTS_ROOT = ROOT / "scripts"
+if str(SCRIPTS_ROOT) not in sys.path:
+    sys.path.insert(0, str(SCRIPTS_ROOT))
+
+from experiment_fingerprint import source_tree_sha256
+
+
 RATES = ("0.2", "0.4", "0.6", "0.8")
 DATASETS = {
     "TaxiBJ": {
@@ -72,6 +80,14 @@ def _load(path: Path) -> dict:
 def _resolve(path_text: str) -> Path:
     path = Path(path_text).expanduser()
     return path if path.is_absolute() else ROOT / path
+
+
+def _sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as file:
+        for chunk in iter(lambda: file.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
 
 
 def _env(gpu: str, cpu_threads: int) -> dict[str, str]:
@@ -165,15 +181,33 @@ def main() -> None:
 
     env = _env(args.gpu, args.cpu_threads)
     mask_dir = _ensure_masks(args, spec, env)
+    mask_fingerprints = {
+        split: _sha256(mask_dir / f"{split}.csv")
+        for split in ("train", "val", "test")
+        if (mask_dir / f"{split}.csv").is_file()
+    }
+    mask_patch = {
+        "pattern": args.mask,
+        "missing_rate": float(args.rate),
+        "train_csv": str((mask_dir / "train.csv").relative_to(ROOT)),
+        "val_csv": str((mask_dir / "val.csv").relative_to(ROOT)),
+        "test_csv": str((mask_dir / "test.csv").relative_to(ROOT)),
+    }
+    if len(mask_fingerprints) == 3:
+        mask_patch["sha256"] = mask_fingerprints
     patch = _deep_update(patch, {
         "seed": args.seed,
-        "data": {"mask": {
-            "pattern": args.mask,
-            "missing_rate": float(args.rate),
-            "train_csv": str((mask_dir / "train.csv").relative_to(ROOT)),
-            "val_csv": str((mask_dir / "val.csv").relative_to(ROOT)),
-            "test_csv": str((mask_dir / "test.csv").relative_to(ROOT)),
-        }},
+        "data": {
+            "mask": mask_patch,
+            "sha256": {
+                split: _sha256(ROOT / spec[split])
+                for split in ("train", "val", "test")
+                if (ROOT / spec[split]).is_file()
+            },
+        },
+        "reproducibility": {
+            "source_sha256": source_tree_sha256(ROOT),
+        },
     })
     run_name = "full" if args.ablation == "none" else f"ablation_v14_{args.ablation}"
     with tempfile.TemporaryDirectory(prefix="v14_single_") as directory:

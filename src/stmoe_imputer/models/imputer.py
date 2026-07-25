@@ -19,7 +19,10 @@ class DualBranchSTImputer(nn.Module):
         self.main_branch = main_branch
         self.aux_branch = aux_branch
         self.aux_enabled = aux_enabled
-        self.alpha = nn.Parameter(torch.tensor(float(alpha_init)))
+        self.alpha = nn.Parameter(
+            torch.tensor(float(alpha_init)),
+            requires_grad=aux_enabled,
+        )
 
     @classmethod
     def from_config(cls, cfg: dict) -> "DualBranchSTImputer":

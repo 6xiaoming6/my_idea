@@ -1,0 +1,11 @@
+{
+  "model": {
+    "v18": {
+      "fine_only_residual": true
+    }
+  },
+  "loss": {
+    "lambda_v18_mid": 0.0,
+    "lambda_v18_coarse": 0.0
+  }
+}

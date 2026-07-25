@@ -1,0 +1,85 @@
+{
+  "output_dir": "outputs/v18-single",
+  "evaluation": {
+    "masked_metric_aggregation": "global_missing_elements",
+    "selection_metric": "val_mae"
+  },
+  "model": {
+    "version": "v18-single",
+    "architecture": "v18_base_anchored_residual_moe",
+    "v18": {
+      "enabled": true,
+      "pyramid_mode": "base_anchored_direction",
+      "bounded_directions": true,
+      "reuse_main_features": true,
+      "main_bypass_required": true,
+      "difficulty_enabled": true,
+      "difficulty_hidden": 32,
+      "difficulty_out_dim": 32,
+      "difficulty_use_spatial_block": true,
+      "difficulty_use_cross_scale_consistency": true,
+      "residual_hidden": 32,
+      "anchor_embed_dim": 16,
+      "direction_embed_dim": 16,
+      "residual_dropout": 0.0,
+      "direction_zero_init": true,
+      "controller_hidden": 64,
+      "controller_dropout": 0.1,
+      "controller_zero_init": true,
+      "rho_coarse_max": 0.15,
+      "rho_mid_max": 0.15,
+      "rho_fine_max": 0.20,
+      "rho_init": 0.02,
+      "rho_probe": 0.05,
+      "scale_eps": 0.001,
+      "use_reliability_filtered_propagation": true,
+      "use_observed_relative_utility": true
+    }
+  },
+  "loss": {
+    "lambda_v18_base": 0.25,
+    "lambda_v18_mid": 0.05,
+    "lambda_v18_coarse": 0.03,
+    "lambda_v18_sample_regret": 0.10,
+    "lambda_v18_observed_guard": 0.02,
+    "lambda_v18_budget": 0.0001
+  },
+  "train": {
+    "epochs": 160,
+    "val_epoch": 5,
+    "lr_main": 0.001,
+    "lr_v18_refiner": 0.001,
+    "lr_v18_controller": 0.0005,
+    "weight_decay": 0.0001,
+    "grad_clip_norm": 1.0,
+    "amp": true,
+    "scheduler": {
+      "type": "cosine",
+      "eta_min": 0.000001
+    },
+    "early_stopping": {
+      "enabled": false,
+      "monitor": "val_mae",
+      "patience": 10,
+      "mode": "min"
+    }
+  },
+  "train_policy_by_mask": {
+    "fixed": {
+      "early_stopping": {
+        "enabled": false,
+        "monitor": "val_mae",
+        "patience": 10,
+        "mode": "min"
+      }
+    },
+    "random": {
+      "early_stopping": {
+        "enabled": true,
+        "monitor": "val_mae",
+        "patience": 10,
+        "mode": "min"
+      }
+    }
+  }
+}

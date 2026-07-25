@@ -152,6 +152,113 @@ def v14_regret_loss(
     return regret, violation
 
 
+def sample_masked_mae(
+    pred: torch.Tensor,
+    target: torch.Tensor,
+    mask: torch.Tensor,
+) -> torch.Tensor:
+    """Return one missing-region MAE value per sample."""
+    missing = expand_mask_as(1.0 - mask.float(), pred)
+    count = missing.flatten(1).sum(dim=1).clamp_min(1.0)
+    error = (pred - target).abs() * missing
+    return error.flatten(1).sum(dim=1) / count
+
+
+def observed_masked_mae(
+    pred: torch.Tensor,
+    target: torch.Tensor,
+    mask: torch.Tensor,
+) -> torch.Tensor:
+    """Return one observed-region MAE value per sample."""
+    observed = expand_mask_as(mask.float(), pred)
+    count = observed.flatten(1).sum(dim=1).clamp_min(1.0)
+    error = (pred - target).abs() * observed
+    return error.flatten(1).sum(dim=1) / count
+
+
+def _v18_losses(
+    outputs: dict,
+    batch: dict[str, torch.Tensor],
+    loss_type: str,
+    scale_cfg: dict,
+) -> dict[str, torch.Tensor]:
+    """Compute BARP-MoE losses and non-regression diagnostics.
+
+    The base prediction is detached only when it is used as the regret/guard
+    reference.  Its auxiliary reconstruction loss still trains the stable
+    backbone.
+    """
+    target = batch["x_f_gt"]
+    mask = batch["m_f"]
+    pred_base = outputs["x_hat_base"]
+    pred_final = outputs["x_hat_main"]
+
+    l_base = masked_loss(pred_base, target, mask, loss_type=loss_type)
+    l_mid, l_coarse = multi_resolution_supervision_loss(
+        outputs,
+        target,
+        batch["m_m"],
+        batch["m_c"],
+        fine_to_mid=scale_cfg["fine_to_mid"],
+        fine_to_coarse=scale_cfg["fine_to_coarse"],
+        pooling_mode=scale_cfg.get("pooling_mode", "avg"),
+        loss_type=loss_type,
+    )
+
+    base_sample_mae = sample_masked_mae(pred_base.detach(), target, mask)
+    final_sample_mae = sample_masked_mae(pred_final, target, mask)
+    l_sample_regret = F.relu(final_sample_mae - base_sample_mae).mean()
+    sample_violation = (final_sample_mae > base_sample_mae).to(pred_final.dtype).mean()
+
+    observed_target = batch.get("x_f_obs", target)
+    base_obs_mae = observed_masked_mae(
+        pred_base.detach(), observed_target, mask
+    )
+    final_obs_mae = observed_masked_mae(pred_final, observed_target, mask)
+    l_observed_guard = F.relu(final_obs_mae - base_obs_mae).mean()
+
+    diagnostics = outputs.get("diagnostics", {})
+    v18_diagnostics = diagnostics.get("v18", {}) if isinstance(diagnostics, dict) else {}
+    rho_f = v18_diagnostics.get("rho_f")
+    l_budget = rho_f.mean() if torch.is_tensor(rho_f) else _empty_loss_like(pred_final)
+
+    base_error, denom = _missing_absolute_error(pred_base.detach(), target, mask)
+    final_error, _ = _missing_absolute_error(pred_final, target, mask)
+    missing = expand_mask_as(1.0 - mask.float(), pred_final)
+    point_violation = (
+        (final_error > base_error).to(pred_final.dtype) * missing
+    ).sum() / denom
+
+    base_mae = base_error.sum() / denom
+    final_mae = final_error.sum() / denom
+    base_squared_error = (pred_base.detach() - target).square() * missing
+    final_squared_error = (pred_final - target).square() * missing
+    base_rmse = (base_squared_error.sum() / denom).clamp_min(0.0).sqrt()
+    final_rmse = (final_squared_error.sum() / denom).clamp_min(0.0).sqrt()
+
+    return {
+        "l_v18_base": l_base,
+        "l_v18_mid": l_mid,
+        "l_v18_coarse": l_coarse,
+        "l_v18_sample_regret": l_sample_regret,
+        "l_v18_observed_guard": l_observed_guard,
+        "l_v18_budget": l_budget,
+        "v18_base_hidden_mae": base_mae,
+        "v18_final_hidden_mae": final_mae,
+        "v18_base_hidden_rmse": base_rmse,
+        "v18_final_hidden_rmse": final_rmse,
+        "v18_final_base_mae_gain": base_mae - final_mae,
+        "v18_final_base_mae_gain_ratio": (
+            (base_mae - final_mae) / base_mae.clamp_min(1e-6)
+        ),
+        "v18_final_base_rmse_gain": base_rmse - final_rmse,
+        "v18_sample_violation_rate": sample_violation,
+        "v18_point_violation_rate": point_violation,
+        "v18_base_observed_mae": base_obs_mae.mean(),
+        "v18_final_observed_mae": final_obs_mae.mean(),
+    }
+
+
 def _empty_loss_like(tensor: torch.Tensor) -> torch.Tensor:
     return tensor.sum() * 0.0
 
@@ -238,7 +345,8 @@ def compute_main_stage_loss(
     )
     x_hat_base = outputs.get("x_hat_base")
     x_hat_ctf = outputs.get("x_hat_ctf")
-    if x_hat_base is not None:
+    is_v18 = bool(outputs.get("v18_enabled", False))
+    if x_hat_base is not None and not is_v18:
         l_v14_base = masked_loss(x_hat_base, x_f_gt, m_f, loss_type=loss_type)
         l_v14_mid, l_v14_coarse = multi_resolution_supervision_loss(
             outputs,
@@ -275,6 +383,11 @@ def compute_main_stage_loss(
         v14_base_hidden_mae = _empty_loss_like(l_main)
         v14_ctf_hidden_mae = _empty_loss_like(l_main)
         v14_final_hidden_mae = _empty_loss_like(l_main)
+    v18_values = (
+        _v18_losses(outputs, batch, loss_type, scale_cfg)
+        if is_v18
+        else {}
+    )
     routing_mode = outputs.get("routing_mode", "topk")
     if scale_mode == "fine":
         balance_scales = ("fine",)
@@ -352,6 +465,19 @@ def compute_main_stage_loss(
     loss = loss + loss_cfg.get("lambda_v14_coarse", v14_cfg.get("lambda_coarse", 0.0)) * l_v14_coarse
     loss = loss + loss_cfg.get("lambda_v14_regret", v14_cfg.get("lambda_regret", 0.0)) * l_v14_regret
     loss = loss + loss_cfg.get("lambda_v14_gate", v14_cfg.get("lambda_gate", 0.0)) * l_v14_gate
+    if is_v18:
+        loss = loss + loss_cfg.get("lambda_v18_base", 0.25) * v18_values["l_v18_base"]
+        loss = loss + loss_cfg.get("lambda_v18_mid", 0.05) * v18_values["l_v18_mid"]
+        loss = loss + loss_cfg.get("lambda_v18_coarse", 0.03) * v18_values["l_v18_coarse"]
+        loss = loss + loss_cfg.get(
+            "lambda_v18_sample_regret", 0.10
+        ) * v18_values["l_v18_sample_regret"]
+        loss = loss + loss_cfg.get(
+            "lambda_v18_observed_guard", 0.02
+        ) * v18_values["l_v18_observed_guard"]
+        loss = loss + loss_cfg.get(
+            "lambda_v18_budget", 1e-4
+        ) * v18_values["l_v18_budget"]
     if loss_cfg.get("lambda_final", 0.0) > 0:
         loss = loss + loss_cfg["lambda_final"] * l_final
     loss_logs = {
@@ -370,15 +496,21 @@ def compute_main_stage_loss(
         "aux_loss_warmup": torch.as_tensor(warmup_factor, device=l_main.device).detach(),
     }
     if x_hat_base is not None:
-        loss_logs.update({
-            "l_v14_base": l_v14_base.detach(),
-            "l_v14_mid": l_v14_mid.detach(),
-            "l_v14_coarse": l_v14_coarse.detach(),
-            "l_v14_regret": l_v14_regret.detach(),
-            "l_v14_gate": l_v14_gate.detach(),
-            "v14_base_hidden_mae": v14_base_hidden_mae.detach(),
-            "v14_ctf_hidden_mae": v14_ctf_hidden_mae.detach(),
-            "v14_final_hidden_mae": v14_final_hidden_mae.detach(),
-            "v14_non_regression_violation_rate": v14_violation_rate.detach(),
-        })
+        if is_v18:
+            loss_logs.update({
+                key: value.detach()
+                for key, value in v18_values.items()
+            })
+        else:
+            loss_logs.update({
+                "l_v14_base": l_v14_base.detach(),
+                "l_v14_mid": l_v14_mid.detach(),
+                "l_v14_coarse": l_v14_coarse.detach(),
+                "l_v14_regret": l_v14_regret.detach(),
+                "l_v14_gate": l_v14_gate.detach(),
+                "v14_base_hidden_mae": v14_base_hidden_mae.detach(),
+                "v14_ctf_hidden_mae": v14_ctf_hidden_mae.detach(),
+                "v14_final_hidden_mae": v14_final_hidden_mae.detach(),
+                "v14_non_regression_violation_rate": v14_violation_rate.detach(),
+            })
     return loss, loss_logs

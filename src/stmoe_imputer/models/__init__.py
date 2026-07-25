@@ -19,16 +19,27 @@ from .main_branch import (
 )
 from .registry import MODEL_REGISTRY, build_model_backbone, resolve_architecture
 from .v_single import (
+    AbsoluteCoarseToFinePyramid,
+    BaseAnchoredResidualPyramid,
+    BoundedResidualBudgetController,
     DifficultyConditionEncoder,
+    DirectionHead,
     ObservedConsistencyEvaluator,
+    ObservedRelativeUtilityEvaluator,
     SafeCoarseToFineRefiner,
     SafetyController,
     V14SafeC2FMoE,
+    V18BaseAnchoredResidualMoE,
+    masked_channel_rms,
 )
 
 __all__ = [
+    "AbsoluteCoarseToFinePyramid",
+    "BaseAnchoredResidualPyramid",
+    "BoundedResidualBudgetController",
     "DualBranchSTImputer",
     "DifficultyConditionEncoder",
+    "DirectionHead",
     "AdaptiveBranchGate",
     "ExpertEnhancedSharedInput",
     "GatedFusion2",
@@ -40,6 +51,7 @@ __all__ = [
     "OAMSBackbone",
     "ObservationAwareMultiScaleMoEImputer",
     "ObservedConsistencyEvaluator",
+    "ObservedRelativeUtilityEvaluator",
     "ParallelTwoBranchImputer",
     "ProgressiveRouteFusion",
     "ProgressiveScaleGatedFusion",
@@ -48,9 +60,11 @@ __all__ = [
     "SafeCoarseToFineRefiner",
     "SafetyController",
     "V14SafeC2FMoE",
+    "V18BaseAnchoredResidualMoE",
     "build_model_backbone",
     "build_scale_active_mask",
     "get_active_scales",
     "is_scale_active",
+    "masked_channel_rms",
     "resolve_architecture",
 ]
