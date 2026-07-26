@@ -152,6 +152,19 @@ def v14_regret_loss(
     return regret, violation
 
 
+def sample_masked_mae(
+    pred: torch.Tensor,
+    target: torch.Tensor,
+    mask: torch.Tensor,
+) -> torch.Tensor:
+    missing = expand_mask_as(1.0 - mask, pred)
+    denominator = missing.flatten(1).sum(dim=1).clamp_min(1.0)
+    return (
+        ((pred - target).abs() * missing).flatten(1).sum(dim=1)
+        / denominator
+    )
+
+
 def _empty_loss_like(tensor: torch.Tensor) -> torch.Tensor:
     return tensor.sum() * 0.0
 
@@ -238,6 +251,7 @@ def compute_main_stage_loss(
     )
     x_hat_base = outputs.get("x_hat_base")
     x_hat_ctf = outputs.get("x_hat_ctf")
+    x_hat_v14 = outputs.get("x_hat_v14")
     if x_hat_base is not None:
         l_v14_base = masked_loss(x_hat_base, x_f_gt, m_f, loss_type=loss_type)
         l_v14_mid, l_v14_coarse = multi_resolution_supervision_loss(
@@ -250,15 +264,20 @@ def compute_main_stage_loss(
             pooling_mode=scale_cfg.get("pooling_mode", "avg"),
             loss_type=loss_type,
         )
+        v14_prediction = (
+            x_hat_v14 if torch.is_tensor(x_hat_v14) else outputs["x_hat_main"]
+        )
         l_v14_regret, v14_violation_rate = v14_regret_loss(
-            outputs["x_hat_main"], x_hat_base, x_f_gt, m_f
+            v14_prediction, x_hat_base, x_f_gt, m_f
         )
         v14_diagnostics = outputs.get("diagnostics", {}).get("v14", {})
         alpha_final = v14_diagnostics.get("alpha_final")
         l_v14_gate = alpha_final.mean() if torch.is_tensor(alpha_final) else _empty_loss_like(l_main)
         base_error, base_denom = _missing_absolute_error(x_hat_base, x_f_gt, m_f)
         v14_base_hidden_mae = base_error.sum() / base_denom
-        final_error, final_denom = _missing_absolute_error(outputs["x_hat_main"], x_f_gt, m_f)
+        final_error, final_denom = _missing_absolute_error(
+            v14_prediction, x_f_gt, m_f
+        )
         v14_final_hidden_mae = final_error.sum() / final_denom
         if x_hat_ctf is not None:
             ctf_error, ctf_denom = _missing_absolute_error(x_hat_ctf, x_f_gt, m_f)
@@ -275,6 +294,35 @@ def compute_main_stage_loss(
         v14_base_hidden_mae = _empty_loss_like(l_main)
         v14_ctf_hidden_mae = _empty_loss_like(l_main)
         v14_final_hidden_mae = _empty_loss_like(l_main)
+    is_v19 = bool(outputs.get("v19_enabled", False))
+    if is_v19 and torch.is_tensor(x_hat_v14):
+        v19_sample_mae = sample_masked_mae(
+            outputs["x_hat_main"], x_f_gt, m_f
+        )
+        v14_anchor_sample_mae = sample_masked_mae(
+            x_hat_v14.detach(), x_f_gt, m_f
+        )
+        l_v19_anchor_regret = F.relu(
+            v19_sample_mae - v14_anchor_sample_mae
+        ).mean()
+        v19_diagnostics = outputs.get("diagnostics", {}).get("v19", {})
+        gain = v19_diagnostics.get("gain")
+        l_v19_gain = (
+            (gain - 1.0).square().mean()
+            if torch.is_tensor(gain)
+            else _empty_loss_like(l_main)
+        )
+        v19_violation_rate = (
+            v19_sample_mae > v14_anchor_sample_mae
+        ).to(l_main.dtype).mean()
+        v19_anchor_hidden_mae = v14_anchor_sample_mae.mean()
+        v19_final_hidden_mae = v19_sample_mae.mean()
+    else:
+        l_v19_anchor_regret = _empty_loss_like(l_main)
+        l_v19_gain = _empty_loss_like(l_main)
+        v19_violation_rate = _empty_loss_like(l_main)
+        v19_anchor_hidden_mae = _empty_loss_like(l_main)
+        v19_final_hidden_mae = _empty_loss_like(l_main)
     routing_mode = outputs.get("routing_mode", "topk")
     if scale_mode == "fine":
         balance_scales = ("fine",)
@@ -352,6 +400,13 @@ def compute_main_stage_loss(
     loss = loss + loss_cfg.get("lambda_v14_coarse", v14_cfg.get("lambda_coarse", 0.0)) * l_v14_coarse
     loss = loss + loss_cfg.get("lambda_v14_regret", v14_cfg.get("lambda_regret", 0.0)) * l_v14_regret
     loss = loss + loss_cfg.get("lambda_v14_gate", v14_cfg.get("lambda_gate", 0.0)) * l_v14_gate
+    if is_v19:
+        loss = loss + loss_cfg.get(
+            "lambda_v19_anchor_regret", 0.05
+        ) * l_v19_anchor_regret
+        loss = loss + loss_cfg.get(
+            "lambda_v19_gain", 0.001
+        ) * l_v19_gain
     if loss_cfg.get("lambda_final", 0.0) > 0:
         loss = loss + loss_cfg["lambda_final"] * l_final
     loss_logs = {
@@ -380,5 +435,13 @@ def compute_main_stage_loss(
             "v14_ctf_hidden_mae": v14_ctf_hidden_mae.detach(),
             "v14_final_hidden_mae": v14_final_hidden_mae.detach(),
             "v14_non_regression_violation_rate": v14_violation_rate.detach(),
+        })
+    if is_v19:
+        loss_logs.update({
+            "l_v19_anchor_regret": l_v19_anchor_regret.detach(),
+            "l_v19_gain": l_v19_gain.detach(),
+            "v19_anchor_hidden_mae": v19_anchor_hidden_mae.detach(),
+            "v19_final_hidden_mae": v19_final_hidden_mae.detach(),
+            "v19_anchor_violation_rate": v19_violation_rate.detach(),
         })
     return loss, loss_logs

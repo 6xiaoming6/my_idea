@@ -19,15 +19,18 @@ from .main_branch import (
 )
 from .registry import MODEL_REGISTRY, build_model_backbone, resolve_architecture
 from .v_single import (
+    ChannelResidualGain,
     DifficultyConditionEncoder,
     ObservedConsistencyEvaluator,
     SafeCoarseToFineRefiner,
     SafetyController,
     V14SafeC2FMoE,
+    V19ChannelCalibratedV14MoE,
 )
 
 __all__ = [
     "DualBranchSTImputer",
+    "ChannelResidualGain",
     "DifficultyConditionEncoder",
     "AdaptiveBranchGate",
     "ExpertEnhancedSharedInput",
@@ -48,6 +51,7 @@ __all__ = [
     "SafeCoarseToFineRefiner",
     "SafetyController",
     "V14SafeC2FMoE",
+    "V19ChannelCalibratedV14MoE",
     "build_model_backbone",
     "build_scale_active_mask",
     "get_active_scales",

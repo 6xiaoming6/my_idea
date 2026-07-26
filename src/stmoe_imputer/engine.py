@@ -6,7 +6,7 @@ import torch
 from tqdm import tqdm
 
 from .losses import compute_main_stage_loss
-from .metrics import masked_metrics
+from .metrics import MaskedMetricAccumulator
 from .utils.device import move_batch_to_device
 
 
@@ -18,6 +18,7 @@ def build_optimizer(model: torch.nn.Module, cfg: dict) -> torch.optim.Optimizer:
     gate_lr_mult = train_cfg.get("gate_lr_mult", 1.0)
     scalar_lr_mult = train_cfg.get("scalar_lr_mult", 2.0)
     v14_lr = train_cfg.get("lr_v14", base_lr)
+    v19_lr = train_cfg.get("lr_v19_gain", base_lr * 0.5)
 
     grouped: dict[str, dict] = {
         "main": {"params": [], "lr": base_lr, "weight_decay": weight_decay},
@@ -26,6 +27,16 @@ def build_optimizer(model: torch.nn.Module, cfg: dict) -> torch.optim.Optimizer:
         "no_decay": {"params": [], "lr": base_lr, "weight_decay": 0.0},
         "v14": {"params": [], "lr": v14_lr, "weight_decay": weight_decay},
         "v14_no_decay": {"params": [], "lr": v14_lr, "weight_decay": 0.0},
+        "v19_gain": {
+            "params": [],
+            "lr": v19_lr,
+            "weight_decay": weight_decay,
+        },
+        "v19_gain_no_decay": {
+            "params": [],
+            "lr": v19_lr,
+            "weight_decay": 0.0,
+        },
         "other": {"params": [], "lr": aux_lr, "weight_decay": weight_decay},
     }
 
@@ -39,9 +50,17 @@ def build_optimizer(model: torch.nn.Module, cfg: dict) -> torch.optim.Optimizer:
                 "main_branch.condition_encoder",
                 "main_branch.controller",
                 "main_branch.refiner",
+                "main_branch.v14_model.condition_encoder",
+                "main_branch.v14_model.controller",
+                "main_branch.v14_model.refiner",
             )
         )
-        if is_v14_new and (name_l.endswith(".bias") or "norm" in name_l):
+        is_v19_gain = "main_branch.gain_controller" in name_l
+        if is_v19_gain and (name_l.endswith(".bias") or "norm" in name_l):
+            grouped["v19_gain_no_decay"]["params"].append(param)
+        elif is_v19_gain:
+            grouped["v19_gain"]["params"].append(param)
+        elif is_v14_new and (name_l.endswith(".bias") or "norm" in name_l):
             grouped["v14_no_decay"]["params"].append(param)
         elif is_v14_new:
             grouped["v14"]["params"].append(param)
@@ -125,7 +144,82 @@ def build_scheduler(optimizer: torch.optim.Optimizer, cfg: dict) -> torch.optim.
 
 
 def _mean_logs(accumulator: dict[str, list[float]]) -> dict[str, float]:
-    return {key: sum(values) / max(1, len(values)) for key, values in accumulator.items()}
+    batch_weights = accumulator.get("__batch_size__", [])
+    result: dict[str, float] = {}
+    for key, values in accumulator.items():
+        if key == "__batch_size__":
+            continue
+        if batch_weights and len(values) == len(batch_weights):
+            denominator = max(sum(batch_weights), 1.0)
+            result[key] = sum(
+                value * weight
+                for value, weight in zip(values, batch_weights)
+            ) / denominator
+        else:
+            result[key] = sum(values) / max(1, len(values))
+    return result
+
+
+def _update_metric_accumulators(
+    accumulators: dict[str, MaskedMetricAccumulator],
+    outputs: dict,
+    batch: dict,
+) -> dict[str, torch.Tensor]:
+    target = batch["x_f_gt"]
+    mask = batch["m_f"]
+    metrics = accumulators[""].update(
+        outputs["x_hat_final"], target, mask
+    )
+    auxiliary_predictions = (
+        ("shared_aux", "x_hat_shared"),
+        ("route_aux", "x_hat_route"),
+    )
+    if bool(outputs.get("v19_enabled", False)):
+        auxiliary_predictions += (
+            ("v19_anchor", "x_hat_v14"),
+            ("v19_base", "x_hat_base"),
+        )
+    for suffix, key in auxiliary_predictions:
+        prediction = outputs.get(key)
+        if prediction is None or not torch.is_tensor(prediction):
+            continue
+        values = accumulators.setdefault(
+            suffix, MaskedMetricAccumulator()
+        ).update(prediction, target, mask)
+        if suffix in {"shared_aux", "route_aux"}:
+            metrics.update({
+                f"{metric}_{suffix}": value
+                for metric, value in values.items()
+            })
+    return metrics
+
+
+def _finalize_logs(
+    logs: dict[str, list[float]],
+    accumulators: dict[str, MaskedMetricAccumulator],
+) -> dict[str, float]:
+    result = _mean_logs(logs)
+    for suffix, accumulator in accumulators.items():
+        for metric, value in accumulator.compute().items():
+            if not suffix:
+                key = metric
+            elif suffix.startswith("v19_"):
+                key = f"{suffix}_{metric}"
+            else:
+                key = f"{metric}_{suffix}"
+            result[key] = value
+    if "v19_anchor_mae" in result:
+        result["v19_final_anchor_mae_gain"] = (
+            result["v19_anchor_mae"] - result["mae"]
+        )
+        result["v19_final_anchor_mae_gain_ratio"] = (
+            result["v19_final_anchor_mae_gain"]
+            / max(result["v19_anchor_mae"], 1e-6)
+        )
+        result["v19_final_anchor_rmse_gain"] = (
+            result["v19_anchor_rmse"] - result["rmse"]
+        )
+    return result
 
 
 def _append_model_diagnostics(logs: dict[str, list[float]], outputs: dict) -> None:
@@ -186,6 +280,20 @@ def _append_model_diagnostics(logs: dict[str, list[float]], outputs: dict) -> No
                 for index, value in enumerate(usage):
                     logs[f"expert_usage_{scale}_{index}"].append(float(value.cpu()))
 
+    v19 = diagnostics.get("v19") if isinstance(diagnostics, dict) else None
+    if isinstance(v19, dict):
+        for key, value in v19.items():
+            if not torch.is_tensor(value):
+                continue
+            value_f = value.detach().float()
+            logs[f"v19_{key}_mean"].append(float(value_f.mean().cpu()))
+            if key in {"gain", "raw_gain"}:
+                logs[f"v19_{key}_std"].append(
+                    float(value_f.std(unbiased=False).cpu())
+                )
+                logs[f"v19_{key}_min"].append(float(value_f.min().cpu()))
+                logs[f"v19_{key}_max"].append(float(value_f.max().cpu()))
+
     features = outputs.get("features", {})
     h_shared = features.get("h_shared") if isinstance(features, dict) else None
     h_route_proj = features.get("h_route_proj") if isinstance(features, dict) else None
@@ -213,6 +321,7 @@ def train_one_epoch(
 ) -> dict[str, float]:
     model.train()
     logs: dict[str, list[float]] = defaultdict(list)
+    metric_accumulators = {"": MaskedMetricAccumulator()}
     use_amp = cfg["train"].get("amp", True) and device.type == "cuda"
     scaler = torch.amp.GradScaler(device.type, enabled=use_amp)
     progress = tqdm(loader, desc=f"train epoch {epoch}", leave=False)
@@ -230,19 +339,16 @@ def train_one_epoch(
         scaler.step(optimizer)
         scaler.update()
 
-        metrics = masked_metrics(outputs["x_hat_final"], batch["x_f_gt"], batch["m_f"])
-        if outputs.get("x_hat_shared") is not None:
-            shared_metrics = masked_metrics(outputs["x_hat_shared"], batch["x_f_gt"], batch["m_f"])
-            metrics.update({f"{key}_shared_aux": value for key, value in shared_metrics.items()})
-        if outputs.get("x_hat_route") is not None:
-            route_metrics = masked_metrics(outputs["x_hat_route"], batch["x_f_gt"], batch["m_f"])
-            metrics.update({f"{key}_route_aux": value for key, value in route_metrics.items()})
+        logs["__batch_size__"].append(float(batch["x_f_gt"].shape[0]))
+        metrics = _update_metric_accumulators(
+            metric_accumulators, outputs, batch
+        )
         for key, value in {**loss_dict, **metrics}.items():
             logs[key].append(float(value.detach().cpu()))
         _append_model_diagnostics(logs, outputs)
         _append_lr_logs(logs, optimizer)
         progress.set_postfix(loss=logs["loss"][-1], mae=logs["mae"][-1], rmse=logs["rmse"][-1])
-    return _mean_logs(logs)
+    return _finalize_logs(logs, metric_accumulators)
 
 
 @torch.no_grad()
@@ -256,18 +362,16 @@ def evaluate(
 ) -> dict[str, float]:
     model.eval()
     logs: dict[str, list[float]] = defaultdict(list)
+    metric_accumulators = {"": MaskedMetricAccumulator()}
     for batch in tqdm(loader, desc=desc, leave=False):
         batch = move_batch_to_device(batch, device)
         outputs = model(batch)
         _, loss_dict = compute_main_stage_loss(outputs, batch, cfg, epoch=epoch)
-        metrics = masked_metrics(outputs["x_hat_final"], batch["x_f_gt"], batch["m_f"])
-        if outputs.get("x_hat_shared") is not None:
-            shared_metrics = masked_metrics(outputs["x_hat_shared"], batch["x_f_gt"], batch["m_f"])
-            metrics.update({f"{key}_shared_aux": value for key, value in shared_metrics.items()})
-        if outputs.get("x_hat_route") is not None:
-            route_metrics = masked_metrics(outputs["x_hat_route"], batch["x_f_gt"], batch["m_f"])
-            metrics.update({f"{key}_route_aux": value for key, value in route_metrics.items()})
+        logs["__batch_size__"].append(float(batch["x_f_gt"].shape[0]))
+        metrics = _update_metric_accumulators(
+            metric_accumulators, outputs, batch
+        )
         for key, value in {**loss_dict, **metrics}.items():
             logs[key].append(float(value.detach().cpu()))
         _append_model_diagnostics(logs, outputs)
-    return _mean_logs(logs)
+    return _finalize_logs(logs, metric_accumulators)
