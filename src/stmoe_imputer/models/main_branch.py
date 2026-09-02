@@ -48,6 +48,10 @@ class MultiScaleMoEBackbone(nn.Module):
         route_dropout: float = 0.0,
         enable_branch_aux: bool = True,
         enable_complementary_loss: bool = True,
+        scale_evidence_mode: str = "legacy",
+        scale_evidence_gain: float = 0.0,
+        scale_gate_temperature: float = 1.0,
+        scale_gate_uniform_floor: float = 0.0,
     ) -> None:
         super().__init__()
         self.dim = dim
@@ -72,6 +76,10 @@ class MultiScaleMoEBackbone(nn.Module):
         self.route_dropout = route_dropout
         self.enable_branch_aux = enable_branch_aux
         self.enable_complementary_loss = enable_complementary_loss
+        self.scale_evidence_mode = scale_evidence_mode
+        self.scale_evidence_gain = float(scale_evidence_gain)
+        self.scale_gate_temperature = float(scale_gate_temperature)
+        self.scale_gate_uniform_floor = float(scale_gate_uniform_floor)
 
         self.embed_f = ScaleTokenEncoder(c_in, dim, max_t, h, w, num_groups=num_groups)
         self.embed_m = ScaleTokenEncoder(c_in, dim, max_t, h // 2, w // 2, num_groups=num_groups)
@@ -101,6 +109,10 @@ class MultiScaleMoEBackbone(nn.Module):
             num_groups=num_groups,
             dropout=dropout,
             use_scale_gate=use_scale_gate,
+            scale_evidence_mode=scale_evidence_mode,
+            scale_evidence_gain=scale_evidence_gain,
+            scale_gate_temperature=scale_gate_temperature,
+            scale_gate_uniform_floor=scale_gate_uniform_floor,
         )
         self.shared_input_adapter = ExpertEnhancedSharedInput(
             dim=dim,
@@ -180,6 +192,10 @@ class MultiScaleMoEBackbone(nn.Module):
             route_dropout=main_cfg.get("route_dropout", 0.0),
             enable_branch_aux=main_cfg.get("enable_branch_aux", True),
             enable_complementary_loss=main_cfg.get("enable_complementary_loss", True),
+            scale_evidence_mode=main_cfg.get("scale_evidence_mode", "legacy"),
+            scale_evidence_gain=main_cfg.get("scale_evidence_gain", 0.0),
+            scale_gate_temperature=main_cfg.get("scale_gate_temperature", 1.0),
+            scale_gate_uniform_floor=main_cfg.get("scale_gate_uniform_floor", 0.0),
         )
 
     def get_scale_embed_vec(self, embed_module: ScaleTokenEncoder, batch_size: int) -> torch.Tensor:
@@ -274,7 +290,7 @@ class MultiScaleMoEBackbone(nn.Module):
                 z_m=z_m_for_shared,
                 z_c=z_c_for_shared,
             )
-            z_shared, h_m_up, h_c_up, scale_gate = self.cross_scale_shared_expert(
+            z_shared, h_m_up, h_c_up, scale_gate, scale_evidence = self.cross_scale_shared_expert(
                 h_f=h_f_shared,
                 h_m=h_m_shared,
                 h_c=h_c_shared,
@@ -292,6 +308,7 @@ class MultiScaleMoEBackbone(nn.Module):
             h_f_shared = torch.zeros_like(h_f)
             h_m_shared = torch.zeros_like(h_m)
             h_c_shared = torch.zeros_like(h_c)
+            scale_evidence = scale_gate
 
         if not self.use_multiscale:
             z_m = torch.zeros_like(h_m)
@@ -377,6 +394,7 @@ class MultiScaleMoEBackbone(nn.Module):
                 "mid": gate_m,
                 "coarse": gate_c,
                 "scale_gate": scale_gate,
+                "scale_evidence": scale_evidence,
                 "branch_gate": branch_gate,
                 "route_fusion_16": route_outputs["gate_16"],
                 "route_fusion_32": route_outputs["gate_32_route"],
@@ -421,6 +439,10 @@ class MultiScaleMoEBackbone(nn.Module):
             "scale_mode": self.scale_mode,
             "use_scale_gate": self.use_scale_gate,
             "use_reliability_gate": self.use_reliability_gate,
+            "scale_evidence_mode": self.scale_evidence_mode,
+            "scale_evidence_gain": self.scale_evidence_gain,
+            "scale_gate_temperature": self.scale_gate_temperature,
+            "scale_gate_uniform_floor": self.scale_gate_uniform_floor,
             "shared_input_mode": self.shared_input_mode,
             "detach_shared_expert_input": self.detach_shared_expert_input,
             "enable_branch_aux": self.enable_branch_aux,

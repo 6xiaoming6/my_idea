@@ -65,6 +65,7 @@
   },
   "loss": {
     "type": "smooth_l1",
+    "load_balance_mode": "legacy_hard",
     "lambda_cross": 0.05,
     "lambda_balance": 0.01,
     "lambda_importance_balance": 0.001,

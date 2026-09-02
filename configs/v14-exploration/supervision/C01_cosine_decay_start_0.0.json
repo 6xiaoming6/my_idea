@@ -1,0 +1,16 @@
+{
+  "output_dir": "outputs/v14-exploration",
+  "experiment": {
+    "id": "C01",
+    "revision": 1,
+    "family": "CSAS",
+    "description": "Cosine stage-aux decay from the first epoch"
+  },
+  "loss": {
+    "v14_stage_aux_schedule": {
+      "mode": "cosine",
+      "start_fraction": 0.0,
+      "final_scale": 0.0
+    }
+  }
+}

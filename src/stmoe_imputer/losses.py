@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import math
+
 import torch
 import torch.nn.functional as F
 
@@ -152,8 +154,98 @@ def v14_regret_loss(
     return regret, violation
 
 
+def v14_sample_rmse_regret_loss(
+    pred_final: torch.Tensor,
+    pred_base: torch.Tensor,
+    target: torch.Tensor,
+    mask: torch.Tensor,
+    eps: float = 1e-6,
+) -> tuple[torch.Tensor, torch.Tensor]:
+    """Penalize sample-level RMSE regressions relative to detached V14 base."""
+    missing = expand_mask_as(1.0 - mask, pred_final)
+    reduce_dims = tuple(range(1, pred_final.ndim))
+    denom = missing.sum(dim=reduce_dims).clamp_min(1.0)
+    final_mse = ((pred_final - target).square() * missing).sum(dim=reduce_dims) / denom
+    base_mse = (
+        ((pred_base.detach() - target).square() * missing).sum(dim=reduce_dims) / denom
+    )
+    # Adding eps before sqrt keeps the derivative finite when the zero-initialized
+    # V14 residual makes final_mse and base_mse exactly zero/equal.
+    final_rmse = (final_mse.clamp_min(0.0) + eps).sqrt()
+    base_rmse = (base_mse.clamp_min(0.0) + eps).sqrt()
+    regret = F.relu(final_rmse - base_rmse)
+    return regret.mean(), (regret > 0).to(pred_final.dtype).mean()
+
+
+def v14_delta_scale_loss(
+    delta: torch.Tensor,
+    observed: torch.Tensor,
+    mask: torch.Tensor,
+    eps: float = 1e-6,
+) -> tuple[torch.Tensor, torch.Tensor]:
+    """Regularize raw residual scale relative to each sample's observed RMS."""
+    reduce_dims = tuple(range(1, delta.ndim))
+    observed_mask = expand_mask_as(mask, observed)
+    observed_count = observed_mask.sum(dim=reduce_dims).clamp_min(1.0)
+    observed_rms = (
+        (
+            (observed.square() * observed_mask).sum(dim=reduce_dims)
+            / observed_count
+        ).clamp_min(0.0)
+        + eps
+    ).sqrt()
+    # The residual head is intentionally zero-initialized.  sqrt(x + eps)
+    # avoids an infinite derivative at its first optimization step.
+    delta_rms = (delta.square().mean(dim=reduce_dims).clamp_min(0.0) + eps).sqrt()
+    ratio = delta_rms / observed_rms.clamp_min(eps)
+    return torch.log1p(ratio).square().mean(), ratio.mean()
+
+
 def _empty_loss_like(tensor: torch.Tensor) -> torch.Tensor:
     return tensor.sum() * 0.0
+
+
+def v14_stage_aux_schedule_scale(
+    cfg: dict,
+    epoch: int | None,
+) -> float:
+    """Return the single-stage V14 mid/coarse supervision schedule scale.
+
+    The default ``constant`` mode exactly preserves legacy V14.  ``cosine``
+    keeps the original supervision during an optional initial fraction and
+    then decays it smoothly to ``final_scale`` without freezing parameters or
+    creating a second training stage.
+    """
+    schedule = cfg.get("loss", {}).get("v14_stage_aux_schedule", {})
+    if schedule is None:
+        schedule = {}
+    if not isinstance(schedule, dict):
+        raise ValueError("loss.v14_stage_aux_schedule must be an object")
+    mode = str(schedule.get("mode", "constant"))
+    if mode == "constant":
+        return 1.0
+    if mode != "cosine":
+        raise ValueError(
+            "loss.v14_stage_aux_schedule.mode must be 'constant' or 'cosine', "
+            f"got {mode!r}"
+        )
+    final_scale = float(schedule.get("final_scale", 0.0))
+    start_fraction = float(schedule.get("start_fraction", 0.0))
+    if not 0.0 <= final_scale <= 1.0:
+        raise ValueError("v14 stage auxiliary final_scale must be in [0,1]")
+    if not 0.0 <= start_fraction < 1.0:
+        raise ValueError("v14 stage auxiliary start_fraction must be in [0,1)")
+    max_epochs = max(1, int(cfg.get("train", {}).get("epochs", 1)))
+    current_epoch = max_epochs if epoch is None else min(max(1, int(epoch)), max_epochs)
+    if max_epochs == 1:
+        progress = 0.0
+    else:
+        progress = (current_epoch - 1) / (max_epochs - 1)
+    if progress <= start_fraction:
+        return 1.0
+    decay_progress = (progress - start_fraction) / (1.0 - start_fraction)
+    cosine = 0.5 * (1.0 + math.cos(math.pi * decay_progress))
+    return final_scale + (1.0 - final_scale) * cosine
 
 
 def gate_balance_loss(gates: dict[str, torch.Tensor]) -> torch.Tensor:
@@ -168,7 +260,25 @@ def moe_balance_loss(
     selected_masks: dict[str, torch.Tensor] | None,
     use_load_balance: bool = True,
     scale_names: tuple[str, ...] = ("fine", "mid", "coarse"),
+    load_balance_mode: str = "legacy_hard",
+    eps: float = 1e-8,
 ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+    """Compute soft-importance and optional hard-load-aware routing losses.
+
+    ``legacy_hard`` exactly preserves the original V14 implementation.  Its
+    hard Top-K variance is useful as a diagnostic, but the discrete mask has no
+    gradient to the router.  ``switch_topk`` uses the detached, normalized
+    hard load to weight differentiable mean gate probabilities.  This gives
+    overloaded experts a training signal without changing Top-K inference.
+    """
+    if load_balance_mode not in {"legacy_hard", "switch_topk"}:
+        raise ValueError(
+            "loss.load_balance_mode must be 'legacy_hard' or 'switch_topk', "
+            f"got {load_balance_mode!r}"
+        )
+    if not scale_names:
+        raise ValueError("scale_names must contain at least one active scale")
+
     gate_all = torch.cat([gates[name] for name in scale_names], dim=0)
     num_experts = gate_all.shape[1]
 
@@ -181,8 +291,14 @@ def moe_balance_loss(
     else:
         mask_all = torch.cat([selected_masks[name] for name in scale_names], dim=0)
         load = mask_all.mean(dim=0)
-        target_load = torch.ones_like(load) * load.mean().detach()
-        l_load = ((load - target_load) ** 2).sum()
+        if load_balance_mode == "legacy_hard":
+            target_load = torch.ones_like(load) * load.mean().detach()
+            l_load = ((load - target_load) ** 2).sum()
+        else:
+            load_distribution = (
+                load.detach() / load.detach().sum().clamp_min(eps)
+            )
+            l_load = num_experts * (importance * load_distribution).sum()
 
     return l_importance + l_load, l_importance, l_load
 
@@ -211,6 +327,8 @@ def compute_main_stage_loss(
 ) -> tuple[torch.Tensor, dict[str, torch.Tensor]]:
     loss_cfg = cfg["loss"]
     loss_type = loss_cfg.get("type", "smooth_l1")
+    v14_rmse_regret_weight = float(loss_cfg.get("lambda_v14_rmse_regret", 0.0))
+    v14_delta_scale_weight = float(loss_cfg.get("lambda_v14_delta_scale", 0.0))
     x_f_gt = batch["x_f_gt"]
     m_f = batch["m_f"]
     l_main = masked_loss(outputs["x_hat_main"], x_f_gt, m_f, loss_type=loss_type)
@@ -256,6 +374,23 @@ def compute_main_stage_loss(
         v14_diagnostics = outputs.get("diagnostics", {}).get("v14", {})
         alpha_final = v14_diagnostics.get("alpha_final")
         l_v14_gate = alpha_final.mean() if torch.is_tensor(alpha_final) else _empty_loss_like(l_main)
+        if v14_rmse_regret_weight != 0.0:
+            l_v14_rmse_regret, v14_rmse_violation_rate = (
+                v14_sample_rmse_regret_loss(
+                    outputs["x_hat_main"], x_hat_base, x_f_gt, m_f
+                )
+            )
+        else:
+            l_v14_rmse_regret = _empty_loss_like(l_main)
+            v14_rmse_violation_rate = _empty_loss_like(l_main)
+        delta_ctf = outputs.get("features", {}).get("delta_ctf")
+        if v14_delta_scale_weight != 0.0 and torch.is_tensor(delta_ctf):
+            l_v14_delta_scale, v14_delta_scale_ratio = v14_delta_scale_loss(
+                delta_ctf, batch["x_f_obs"], m_f
+            )
+        else:
+            l_v14_delta_scale = _empty_loss_like(l_main)
+            v14_delta_scale_ratio = _empty_loss_like(l_main)
         base_error, base_denom = _missing_absolute_error(x_hat_base, x_f_gt, m_f)
         v14_base_hidden_mae = base_error.sum() / base_denom
         final_error, final_denom = _missing_absolute_error(outputs["x_hat_main"], x_f_gt, m_f)
@@ -271,7 +406,11 @@ def compute_main_stage_loss(
         l_v14_coarse = _empty_loss_like(l_main)
         l_v14_regret = _empty_loss_like(l_main)
         l_v14_gate = _empty_loss_like(l_main)
+        l_v14_rmse_regret = _empty_loss_like(l_main)
+        l_v14_delta_scale = _empty_loss_like(l_main)
         v14_violation_rate = _empty_loss_like(l_main)
+        v14_rmse_violation_rate = _empty_loss_like(l_main)
+        v14_delta_scale_ratio = _empty_loss_like(l_main)
         v14_base_hidden_mae = _empty_loss_like(l_main)
         v14_ctf_hidden_mae = _empty_loss_like(l_main)
         v14_final_hidden_mae = _empty_loss_like(l_main)
@@ -288,11 +427,13 @@ def compute_main_stage_loss(
     use_routed_branch = cfg["model"]["main"].get("use_routed_branch", True)
     use_router = cfg["model"]["main"].get("use_router", True)
     use_load_balance = use_routed_branch and use_router and routing_mode != "dense"
+    load_balance_mode = str(loss_cfg.get("load_balance_mode", "legacy_hard"))
     l_balance, l_importance_balance, l_load_balance = moe_balance_loss(
         outputs["gates"],
         outputs.get("selected_masks"),
         use_load_balance=use_load_balance,
         scale_names=balance_scales,
+        load_balance_mode=load_balance_mode,
     )
     if not use_routed_branch or (routing_mode == "dense" and not use_router):
         l_balance = _empty_loss_like(l_balance)
@@ -348,10 +489,20 @@ def compute_main_stage_loss(
     loss = loss + loss_cfg.get("lambda_complementary", 0.0) * l_complementary
     v14_cfg = cfg.get("model", {}).get("v14", {})
     loss = loss + loss_cfg.get("lambda_v14_base", v14_cfg.get("lambda_base", 0.0)) * l_v14_base
-    loss = loss + loss_cfg.get("lambda_v14_mid", v14_cfg.get("lambda_mid", 0.0)) * l_v14_mid
-    loss = loss + loss_cfg.get("lambda_v14_coarse", v14_cfg.get("lambda_coarse", 0.0)) * l_v14_coarse
+    v14_stage_aux_scale = v14_stage_aux_schedule_scale(cfg, epoch)
+    v14_mid_weight = loss_cfg.get(
+        "lambda_v14_mid", v14_cfg.get("lambda_mid", 0.0)
+    )
+    v14_coarse_weight = loss_cfg.get(
+        "lambda_v14_coarse", v14_cfg.get("lambda_coarse", 0.0)
+    )
+    loss = loss + v14_stage_aux_scale * (
+        v14_mid_weight * l_v14_mid + v14_coarse_weight * l_v14_coarse
+    )
     loss = loss + loss_cfg.get("lambda_v14_regret", v14_cfg.get("lambda_regret", 0.0)) * l_v14_regret
     loss = loss + loss_cfg.get("lambda_v14_gate", v14_cfg.get("lambda_gate", 0.0)) * l_v14_gate
+    loss = loss + v14_rmse_regret_weight * l_v14_rmse_regret
+    loss = loss + v14_delta_scale_weight * l_v14_delta_scale
     if loss_cfg.get("lambda_final", 0.0) > 0:
         loss = loss + loss_cfg["lambda_final"] * l_final
     loss_logs = {
@@ -376,9 +527,16 @@ def compute_main_stage_loss(
             "l_v14_coarse": l_v14_coarse.detach(),
             "l_v14_regret": l_v14_regret.detach(),
             "l_v14_gate": l_v14_gate.detach(),
+            "l_v14_rmse_regret": l_v14_rmse_regret.detach(),
+            "l_v14_delta_scale": l_v14_delta_scale.detach(),
             "v14_base_hidden_mae": v14_base_hidden_mae.detach(),
             "v14_ctf_hidden_mae": v14_ctf_hidden_mae.detach(),
             "v14_final_hidden_mae": v14_final_hidden_mae.detach(),
             "v14_non_regression_violation_rate": v14_violation_rate.detach(),
+            "v14_rmse_non_regression_violation_rate": v14_rmse_violation_rate.detach(),
+            "v14_delta_scale_ratio": v14_delta_scale_ratio.detach(),
+            "v14_stage_aux_scale": torch.as_tensor(
+                v14_stage_aux_scale, device=l_main.device
+            ).detach(),
         })
     return loss, loss_logs

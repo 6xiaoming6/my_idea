@@ -1,0 +1,14 @@
+{
+  "output_dir": "outputs/v14-exploration",
+  "model": {"main": {"top_k": 1}},
+  "experiment": {
+    "route": "V14-HPARAM",
+    "candidate": "H06",
+    "name": "top_k_1",
+    "field": "model.main.top_k",
+    "value": 1,
+    "base": "original_v14",
+    "training": "single_stage_end_to_end",
+    "selection": "validation_only"
+  }
+}

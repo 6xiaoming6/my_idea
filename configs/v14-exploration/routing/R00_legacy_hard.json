@@ -1,0 +1,12 @@
+{
+  "output_dir": "outputs/v14-exploration",
+  "experiment": {
+    "id": "R00",
+    "revision": 1,
+    "family": "RLB",
+    "description": "Exact V14 legacy hard-load control"
+  },
+  "loss": {
+    "load_balance_mode": "legacy_hard"
+  }
+}

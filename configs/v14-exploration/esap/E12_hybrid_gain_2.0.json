@@ -1,0 +1,20 @@
+{
+  "output_dir": "outputs/v14-exploration",
+  "model": {
+    "main": {
+      "scale_evidence_mode": "hybrid",
+      "scale_evidence_gain": 2,
+      "scale_gate_temperature": 1,
+      "scale_gate_uniform_floor": 0
+    }
+  },
+  "experiment": {
+    "route": "ESAP",
+    "candidate": "E12",
+    "name": "hybrid_gain_2.0",
+    "base": "original_v14",
+    "training": "single_stage_end_to_end",
+    "selection": "validation_only"
+  }
+}
+

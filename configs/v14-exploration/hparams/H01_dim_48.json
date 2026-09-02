@@ -1,0 +1,14 @@
+{
+  "output_dir": "outputs/v14-exploration",
+  "model": {"main": {"dim": 48}},
+  "experiment": {
+    "route": "V14-HPARAM",
+    "candidate": "H01",
+    "name": "dim_48",
+    "field": "model.main.dim",
+    "value": 48,
+    "base": "original_v14",
+    "training": "single_stage_end_to_end",
+    "selection": "validation_only"
+  }
+}

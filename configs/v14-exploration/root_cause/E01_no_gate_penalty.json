@@ -1,0 +1,13 @@
+{
+  "output_dir": "outputs/v14-exploration",
+  "experiment": {
+    "id": "E01",
+    "revision": 2,
+    "description": "V14 with final-gate magnitude penalty removed"
+  },
+  "loss": {
+    "lambda_v14_gate": 0.0,
+    "lambda_v14_delta_scale": 0.0,
+    "lambda_v14_rmse_regret": 0.0
+  }
+}

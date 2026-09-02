@@ -1,0 +1,13 @@
+{
+  "output_dir": "outputs/v14-exploration",
+  "experiment": {
+    "id": "G03",
+    "revision": 1,
+    "family": "GSA",
+    "description": "Attenuate V14 mid/coarse stage supervision by 1e-2"
+  },
+  "loss": {
+    "lambda_v14_mid": 0.0005,
+    "lambda_v14_coarse": 0.0003
+  }
+}

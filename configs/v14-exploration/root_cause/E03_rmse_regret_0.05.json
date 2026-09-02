@@ -1,0 +1,13 @@
+{
+  "output_dir": "outputs/v14-exploration",
+  "experiment": {
+    "id": "E03",
+    "revision": 2,
+    "description": "V14 sample-level RMSE non-regression loss, weight=0.05"
+  },
+  "loss": {
+    "lambda_v14_gate": 0.0001,
+    "lambda_v14_delta_scale": 0.0,
+    "lambda_v14_rmse_regret": 0.05
+  }
+}

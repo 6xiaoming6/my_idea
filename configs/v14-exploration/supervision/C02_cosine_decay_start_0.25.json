@@ -1,0 +1,16 @@
+{
+  "output_dir": "outputs/v14-exploration",
+  "experiment": {
+    "id": "C02",
+    "revision": 1,
+    "family": "CSAS",
+    "description": "Keep full stage supervision for 25%, then cosine decay"
+  },
+  "loss": {
+    "v14_stage_aux_schedule": {
+      "mode": "cosine",
+      "start_fraction": 0.25,
+      "final_scale": 0.0
+    }
+  }
+}

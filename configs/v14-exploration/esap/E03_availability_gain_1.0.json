@@ -1,0 +1,20 @@
+{
+  "output_dir": "outputs/v14-exploration",
+  "model": {
+    "main": {
+      "scale_evidence_mode": "availability",
+      "scale_evidence_gain": 1,
+      "scale_gate_temperature": 1,
+      "scale_gate_uniform_floor": 0
+    }
+  },
+  "experiment": {
+    "route": "ESAP",
+    "candidate": "E03",
+    "name": "availability_gain_1.0",
+    "base": "original_v14",
+    "training": "single_stage_end_to_end",
+    "selection": "validation_only"
+  }
+}
+

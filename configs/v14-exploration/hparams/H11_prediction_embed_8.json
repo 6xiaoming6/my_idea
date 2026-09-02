@@ -1,0 +1,14 @@
+{
+  "output_dir": "outputs/v14-exploration",
+  "model": {"v14": {"prediction_embed_dim": 8}},
+  "experiment": {
+    "route": "V14-HPARAM",
+    "candidate": "H11",
+    "name": "prediction_embed_8",
+    "field": "model.v14.prediction_embed_dim",
+    "value": 8,
+    "base": "original_v14",
+    "training": "single_stage_end_to_end",
+    "selection": "validation_only"
+  }
+}

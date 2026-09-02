@@ -1,0 +1,13 @@
+{
+  "output_dir": "outputs/v14-exploration",
+  "experiment": {
+    "id": "R01",
+    "revision": 1,
+    "family": "RLB",
+    "description": "Differentiable Top-K load-aware routing, weight=1e-4"
+  },
+  "loss": {
+    "load_balance_mode": "switch_topk",
+    "lambda_load_balance": 0.0001
+  }
+}

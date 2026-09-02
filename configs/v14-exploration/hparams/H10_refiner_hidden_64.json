@@ -1,0 +1,14 @@
+{
+  "output_dir": "outputs/v14-exploration",
+  "model": {"v14": {"refiner_hidden": 64}},
+  "experiment": {
+    "route": "V14-HPARAM",
+    "candidate": "H10",
+    "name": "refiner_hidden_64",
+    "field": "model.v14.refiner_hidden",
+    "value": 64,
+    "base": "original_v14",
+    "training": "single_stage_end_to_end",
+    "selection": "validation_only"
+  }
+}

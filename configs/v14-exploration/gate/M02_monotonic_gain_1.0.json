@@ -1,0 +1,16 @@
+{
+  "output_dir": "outputs/v14-exploration",
+  "experiment": {
+    "id": "M02",
+    "revision": 1,
+    "family": "MCG",
+    "description": "Bounded monotonic observed-consistency gate, gain=1.0"
+  },
+  "model": {
+    "v14": {
+      "final_gate_mode": "monotonic_consistency",
+      "monotonic_advantage_gain": 1.0,
+      "monotonic_context_bound": 0.5
+    }
+  }
+}

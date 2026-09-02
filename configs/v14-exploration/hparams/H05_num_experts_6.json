@@ -1,0 +1,14 @@
+{
+  "output_dir": "outputs/v14-exploration",
+  "model": {"main": {"num_experts": 6}},
+  "experiment": {
+    "route": "V14-HPARAM",
+    "candidate": "H05",
+    "name": "num_experts_6",
+    "field": "model.main.num_experts",
+    "value": 6,
+    "base": "original_v14",
+    "training": "single_stage_end_to_end",
+    "selection": "validation_only"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "output_dir": "outputs/v14-exploration",
+  "model": {
+    "v14": {
+      "local_final_gate_mode": "regional",
+      "local_gate_max_relative_delta": 0.1,
+      "local_gate_hidden": 16,
+      "local_gate_spatial_divisor": 4,
+      "local_gate_detach_inputs": true
+    }
+  },
+  "experiment": {
+    "route": "BRLG",
+    "candidate": "B04",
+    "name": "regional_delta_0.10",
+    "base": "original_v14",
+    "training": "single_stage_end_to_end",
+    "selection": "validation_only"
+  }
+}
+

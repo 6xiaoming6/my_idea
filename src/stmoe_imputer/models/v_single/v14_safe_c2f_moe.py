@@ -5,6 +5,7 @@ from torch import nn
 
 from ..main_branch import MultiScaleMoEBackbone
 from .difficulty_condition import DifficultyConditionEncoder
+from .local_residual_gate import BoundedLocalResidualGate
 from .safe_c2f_refiner import SafeCoarseToFineRefiner
 from .safety_controller import ObservedConsistencyEvaluator, SafetyController
 
@@ -29,6 +30,23 @@ class V14SafeC2FMoE(nn.Module):
         self.use_observed_consistency = bool(v14_cfg.get("use_observed_consistency", True))
         self.use_geometry_descriptor = bool(v14_cfg.get("use_geometry_descriptor", True))
         self.use_scale_reliability = bool(v14_cfg.get("use_scale_reliability", True))
+        self.effective_residual_mode = str(
+            v14_cfg.get("effective_residual_mode", "legacy")
+        )
+        if self.effective_residual_mode not in {"legacy", "identifiable"}:
+            raise ValueError(
+                "model.v14.effective_residual_mode must be 'legacy' or "
+                f"'identifiable', got {self.effective_residual_mode!r}"
+            )
+        self.identifiable_eps = float(v14_cfg.get("identifiable_eps", 1e-6))
+        self.local_final_gate_mode = str(
+            v14_cfg.get("local_final_gate_mode", "legacy")
+        )
+        if self.local_final_gate_mode not in {"legacy", "temporal", "regional"}:
+            raise ValueError(
+                "model.v14.local_final_gate_mode must be legacy/temporal/regional, "
+                f"got {self.local_final_gate_mode!r}"
+            )
 
         difficulty_out = int(v14_cfg.get("difficulty_out_dim", 32))
         self.condition_encoder = DifficultyConditionEncoder(
@@ -56,6 +74,18 @@ class V14SafeC2FMoE(nn.Module):
             alpha_final_max=float(v14_cfg.get("alpha_final_max", 0.5)),
             zero_init=bool(v14_cfg.get("controller_zero_init", True)),
             dynamic_gate=bool(v14_cfg.get("dynamic_gate", True)),
+            c_out=int(model_cfg["c_in"]),
+            channel_final_gate=bool(v14_cfg.get("channel_final_gate", False)),
+            channel_stats_dim=5,
+            channel_gain_delta=float(v14_cfg.get("channel_gain_delta", 0.2)),
+            final_gate_mode=str(v14_cfg.get("final_gate_mode", "legacy")),
+            monotonic_advantage_gain=float(
+                v14_cfg.get("monotonic_advantage_gain", 1.0)
+            ),
+            monotonic_context_bound=float(
+                v14_cfg.get("monotonic_context_bound", 0.5)
+            ),
+            monotonic_eps=float(v14_cfg.get("monotonic_eps", 1e-6)),
         )
         self.refiner = SafeCoarseToFineRefiner(
             dim=int(main_cfg["dim"]),
@@ -68,6 +98,37 @@ class V14SafeC2FMoE(nn.Module):
             correction_zero_init=bool(v14_cfg.get("correction_zero_init", True)),
             fine_uses_main_feature=bool(v14_cfg.get("fine_uses_main_feature", True)),
         )
+        self.local_residual_gate: BoundedLocalResidualGate | None = None
+        if self.local_final_gate_mode != "legacy":
+            if self.controller.channel_final_gate:
+                raise ValueError(
+                    "BRLG and channel_final_gate are separate structural candidates "
+                    "and cannot be enabled together"
+                )
+            if self.controller.final_gate_mode != "legacy":
+                raise ValueError(
+                    "BRLG requires the original legacy global final gate so that "
+                    "the exploration changes one structural variable"
+                )
+            # Do not advance the outer RNG state. Common V14 parameters and
+            # subsequent data-loader/dropout randomness remain seed-matched.
+            with torch.random.fork_rng(devices=[]):
+                torch.manual_seed(1419)
+                self.local_residual_gate = BoundedLocalResidualGate(
+                    feature_dim=int(main_cfg["dim"]),
+                    hidden_dim=int(v14_cfg.get("local_gate_hidden", 16)),
+                    mode=self.local_final_gate_mode,
+                    max_relative_delta=float(
+                        v14_cfg.get("local_gate_max_relative_delta", 0.2)
+                    ),
+                    spatial_divisor=int(
+                        v14_cfg.get("local_gate_spatial_divisor", 4)
+                    ),
+                    num_groups=int(main_cfg.get("num_groups", 8)),
+                    detach_inputs=bool(
+                        v14_cfg.get("local_gate_detach_inputs", True)
+                    ),
+                )
         if bool(v14_cfg.get("freeze_main", False)):
             for parameter in self.main_backbone.parameters():
                 parameter.requires_grad_(False)
@@ -103,6 +164,54 @@ class V14SafeC2FMoE(nn.Module):
     @staticmethod
     def _rms(value: torch.Tensor) -> torch.Tensor:
         return value.detach().float().square().mean(dim=(1, 2, 3, 4)).sqrt()
+
+    @staticmethod
+    def _channel_observed_stats(
+        x_base: torch.Tensor,
+        x_ctf: torch.Tensor,
+        x_obs: torch.Tensor,
+        mask: torch.Tensor,
+    ) -> torch.Tensor:
+        base = x_base.detach().float()
+        ctf = x_ctf.detach().float()
+        obs = x_obs.detach().float()
+        observed = mask.detach().float().expand_as(base)
+        reduce_dims = (2, 3, 4)
+        count = observed.sum(dim=reduce_dims).clamp_min(1.0)
+        observed_abs_mean = (obs.abs() * observed).sum(dim=reduce_dims) / count
+        observed_rms = (
+            (obs.square() * observed).sum(dim=reduce_dims) / count + 1e-6
+        ).sqrt()
+        base_error = ((base - obs).abs() * observed).sum(dim=reduce_dims) / count
+        ctf_error = ((ctf - obs).abs() * observed).sum(dim=reduce_dims) / count
+        delta_mean = ((ctf - base).abs() * observed).sum(dim=reduce_dims) / count
+        return torch.stack(
+            (observed_abs_mean, observed_rms, base_error, ctf_error, delta_mean),
+            dim=-1,
+        ).to(dtype=x_base.dtype)
+
+    @staticmethod
+    def _identifiable_effective_residual(
+        delta: torch.Tensor,
+        alpha: torch.Tensor,
+        x_obs: torch.Tensor,
+        mask: torch.Tensor,
+        eps: float = 1e-6,
+    ) -> tuple[torch.Tensor, torch.Tensor]:
+        reduce_dims = tuple(range(1, delta.ndim))
+        delta_rms = (
+            delta.float().square().mean(dim=reduce_dims) + eps
+        ).sqrt()
+        direction = delta / delta_rms.to(dtype=delta.dtype).view(-1, 1, 1, 1, 1)
+        observed = mask.float().expand_as(x_obs)
+        observed_count = observed.sum(dim=reduce_dims).clamp_min(1.0)
+        observed_rms = (
+            (x_obs.float().square() * observed).sum(dim=reduce_dims)
+            / observed_count
+            + eps
+        ).sqrt()
+        magnitude = alpha * observed_rms.to(dtype=alpha.dtype).view(-1, 1, 1, 1, 1)
+        return magnitude * direction, observed_rms
 
     def forward(
         self,
@@ -183,12 +292,51 @@ class V14SafeC2FMoE(nn.Module):
                 device=x_f.device,
                 dtype=x_f.dtype,
             )
-        alpha_final = self.controller.final_gate(precondition, consistency)
+        channel_stats = (
+            self._channel_observed_stats(x_base, refine["x_hat_ctf"], x_f, m_f)
+            if self.controller.channel_final_gate
+            else None
+        )
+        alpha_final_global, final_gate_diagnostics = self.controller.final_gate(
+            precondition, consistency, channel_stats=channel_stats
+        )
+        alpha_final = alpha_final_global
+        if self.local_residual_gate is not None:
+            alpha_final, local_gate_diagnostics = self.local_residual_gate(
+                alpha_global=alpha_final_global,
+                h_main=h_main,
+                delta_ctf=refine["delta_ctf"],
+                x_ctf=refine["x_hat_ctf"],
+                x_base=x_base,
+                x_obs=x_f,
+                mask=m_f,
+                alpha_max=self.controller.alpha_final_max,
+            )
+            final_gate_diagnostics.update(local_gate_diagnostics)
         if self.use_main_bypass:
-            x_final = x_base + alpha_final * refine["delta_ctf"]
+            if self.effective_residual_mode == "identifiable":
+                effective_residual, observed_scale = (
+                    self._identifiable_effective_residual(
+                        refine["delta_ctf"],
+                        alpha_final,
+                        x_f,
+                        m_f,
+                        eps=self.identifiable_eps,
+                    )
+                )
+            else:
+                effective_residual = alpha_final * refine["delta_ctf"]
+                observed_scale = torch.zeros(
+                    batch_size, device=x_f.device, dtype=torch.float32
+                )
+            x_final = x_base + effective_residual
         else:
             x_final = refine["x_hat_ctf"]
             alpha_final = torch.ones_like(alpha_final)
+            effective_residual = x_final - x_base
+            observed_scale = torch.zeros(
+                batch_size, device=x_f.device, dtype=torch.float32
+            )
 
         outputs = dict(base_outputs)
         output_features = dict(features)
@@ -203,6 +351,7 @@ class V14SafeC2FMoE(nn.Module):
             "alpha_mid": alpha_mid.flatten(1).mean(dim=1),
             "alpha_fine": alpha_fine.flatten(1).mean(dim=1),
             "alpha_final": alpha_final.flatten(1).mean(dim=1),
+            "alpha_final_global": alpha_final_global.flatten(1).mean(dim=1),
             "difficulty_f": difficulty["score_f"],
             "difficulty_m": difficulty["score_m"],
             "difficulty_c": difficulty["score_c"],
@@ -217,7 +366,30 @@ class V14SafeC2FMoE(nn.Module):
             "delta_mid_norm": self._rms(refine["delta_mid"]),
             "delta_fine_norm": self._rms(refine["delta_fine"]),
             "delta_ctf_norm": self._rms(refine["delta_ctf"]),
+            "effective_residual_norm": self._rms(effective_residual),
+            "identifiable_observed_scale": observed_scale,
         }
+        channel_gain = final_gate_diagnostics.get("channel_gain")
+        if torch.is_tensor(channel_gain):
+            for channel_index in range(channel_gain.shape[1]):
+                output_diagnostics["v14"][
+                    f"channel_gain_{channel_index}"
+                ] = channel_gain[:, channel_index]
+            output_diagnostics["v14"]["channel_gain_saturation"] = (
+                final_gate_diagnostics["channel_gain_saturation"].mean(dim=1)
+            )
+        for key in ("final_gate_context", "relative_observed_advantage"):
+            value = final_gate_diagnostics.get(key)
+            if torch.is_tensor(value):
+                output_diagnostics["v14"][key] = value
+        for key in (
+            "local_gate_logits",
+            "local_gate_modulation",
+            "local_gate_modulation_lowres",
+        ):
+            value = final_gate_diagnostics.get(key)
+            if torch.is_tensor(value):
+                output_diagnostics["v14"][key] = value
         outputs.update({
             "x_hat_main": x_final,
             "x_hat_base": x_base,

@@ -1,0 +1,14 @@
+{
+  "output_dir": "outputs/v14-exploration",
+  "model": {"v14": {"controller_hidden": 32}},
+  "experiment": {
+    "route": "V14-HPARAM",
+    "candidate": "H13",
+    "name": "controller_hidden_32",
+    "field": "model.v14.controller_hidden",
+    "value": 32,
+    "base": "original_v14",
+    "training": "single_stage_end_to_end",
+    "selection": "validation_only"
+  }
+}

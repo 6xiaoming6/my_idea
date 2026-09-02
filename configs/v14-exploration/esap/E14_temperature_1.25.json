@@ -1,0 +1,20 @@
+{
+  "output_dir": "outputs/v14-exploration",
+  "model": {
+    "main": {
+      "scale_evidence_mode": "legacy",
+      "scale_evidence_gain": 0,
+      "scale_gate_temperature": 1.25,
+      "scale_gate_uniform_floor": 0
+    }
+  },
+  "experiment": {
+    "route": "ESAP",
+    "candidate": "E14",
+    "name": "temperature_1.25",
+    "base": "original_v14",
+    "training": "single_stage_end_to_end",
+    "selection": "validation_only"
+  }
+}
+

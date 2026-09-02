@@ -1,0 +1,16 @@
+{
+  "output_dir": "outputs/v14-exploration",
+  "experiment": {
+    "id": "C03",
+    "revision": 1,
+    "family": "CSAS",
+    "description": "Keep full stage supervision for 50%, then cosine decay"
+  },
+  "loss": {
+    "v14_stage_aux_schedule": {
+      "mode": "cosine",
+      "start_fraction": 0.5,
+      "final_scale": 0.0
+    }
+  }
+}

@@ -26,6 +26,9 @@ class V14ConfigTest(unittest.TestCase):
                 cfg = deep_update(base, patch)
                 self.assertEqual(cfg["output_dir"], "outputs/v14-single")
                 self.assertEqual(cfg["model"]["architecture"], "v14_safe_c2f_moe")
+                self.assertEqual(
+                    cfg["loss"]["load_balance_mode"], "legacy_hard"
+                )
                 self.assertEqual(cfg["train"]["epochs"], epochs)
                 self.assertEqual(cfg["train"]["val_epoch"], val_epoch)
                 self.assertFalse(cfg["train"]["early_stopping"]["enabled"])

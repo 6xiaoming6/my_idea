@@ -60,9 +60,32 @@ class ReliabilityAwareScaleGate(nn.Module):
         hidden_dim: int = 128,
         num_scales: int = 3,
         dropout: float = 0.1,
+        evidence_mode: str = "legacy",
+        evidence_gain: float = 0.0,
+        temperature: float = 1.0,
+        uniform_floor: float = 0.0,
+        evidence_eps: float = 1e-6,
     ) -> None:
         super().__init__()
         self.num_scales = num_scales
+        if evidence_mode not in {"legacy", "availability", "purity", "hybrid"}:
+            raise ValueError(
+                "scale evidence mode must be legacy/availability/purity/hybrid, "
+                f"got {evidence_mode!r}"
+            )
+        if evidence_gain < 0.0:
+            raise ValueError("scale evidence gain must be non-negative")
+        if temperature <= 0.0:
+            raise ValueError("scale gate temperature must be positive")
+        if not 0.0 <= uniform_floor < 1.0:
+            raise ValueError("scale gate uniform floor must be in [0, 1)")
+        if evidence_eps <= 0.0:
+            raise ValueError("scale evidence epsilon must be positive")
+        self.evidence_mode = evidence_mode
+        self.evidence_gain = float(evidence_gain)
+        self.temperature = float(temperature)
+        self.uniform_floor = float(uniform_floor)
+        self.evidence_eps = float(evidence_eps)
         input_dim = dim * 3 + stat_dim * 3 + 2
         self.mlp = nn.Sequential(
             nn.Linear(input_dim, hidden_dim),
@@ -70,6 +93,43 @@ class ReliabilityAwareScaleGate(nn.Module):
             nn.Dropout(dropout),
             nn.Linear(hidden_dim, num_scales),
         )
+
+    def _scale_evidence(
+        self,
+        q_f: torch.Tensor,
+        q_m: torch.Tensor,
+        q_c: torch.Tensor,
+        active_mask: torch.Tensor,
+    ) -> torch.Tensor:
+        """Return target-free evidence for fine/mid/coarse observations.
+
+        Availability measures how many cells are usable at each resolution.
+        Purity measures how much original fine-grid evidence is represented by
+        each usable aggregate.  Their arithmetic mean is deliberately used for
+        the hybrid: a geometric mean would cancel to an almost scale-invariant
+        value because availability * purity equals the fine observed ratio.
+        """
+        availability = torch.stack(
+            (q_f[:, 1], q_m[:, 1], q_c[:, 1]), dim=-1
+        ).clamp(0.0, 1.0)
+        fine_observed = q_f[:, 1:2]
+        purity = torch.cat(
+            (
+                torch.ones_like(fine_observed),
+                fine_observed / q_m[:, 1:2].clamp_min(self.evidence_eps),
+                fine_observed / q_c[:, 1:2].clamp_min(self.evidence_eps),
+            ),
+            dim=-1,
+        ).clamp(0.0, 1.0)
+        if self.evidence_mode == "availability":
+            evidence = availability
+        elif self.evidence_mode == "purity":
+            evidence = purity
+        elif self.evidence_mode == "hybrid":
+            evidence = 0.5 * (availability + purity)
+        else:
+            evidence = torch.ones_like(availability)
+        return torch.where(active_mask, evidence, torch.zeros_like(evidence))
 
     def forward(
         self,
@@ -82,7 +142,7 @@ class ReliabilityAwareScaleGate(nn.Module):
         r_m: torch.Tensor | None = None,
         r_c: torch.Tensor | None = None,
         active_mask: torch.Tensor | None = None,
-    ) -> torch.Tensor:
+    ) -> tuple[torch.Tensor, torch.Tensor]:
         batch_size = h_f.shape[0]
         device = h_f.device
         p_f = h_f.mean(dim=(2, 3, 4))
@@ -101,9 +161,23 @@ class ReliabilityAwareScaleGate(nn.Module):
 
         gate_input = torch.cat([p_f, p_m, p_c, q_f, q_m, q_c, r_m_mean, r_c_mean], dim=-1)
         logits = self.mlp(gate_input)
-        if active_mask is not None:
-            logits = logits.masked_fill(~active_mask, torch.finfo(logits.dtype).min)
-        return torch.softmax(logits, dim=-1)
+        if active_mask is None:
+            active_mask = torch.ones_like(logits, dtype=torch.bool)
+        evidence = self._scale_evidence(q_f, q_m, q_c, active_mask)
+        adjusted_logits = logits / self.temperature
+        if self.evidence_mode != "legacy" and self.evidence_gain != 0.0:
+            adjusted_logits = adjusted_logits + self.evidence_gain * torch.log(
+                evidence.clamp_min(self.evidence_eps)
+            )
+        adjusted_logits = adjusted_logits.masked_fill(
+            ~active_mask, torch.finfo(adjusted_logits.dtype).min
+        )
+        weights = torch.softmax(adjusted_logits, dim=-1)
+        if self.uniform_floor != 0.0:
+            uniform = active_mask.to(dtype=weights.dtype)
+            uniform = uniform / uniform.sum(dim=-1, keepdim=True).clamp_min(1.0)
+            weights = (1.0 - self.uniform_floor) * weights + self.uniform_floor * uniform
+        return weights, evidence
 
 
 class GatedCrossScaleSharedExpert(nn.Module):
@@ -114,6 +188,10 @@ class GatedCrossScaleSharedExpert(nn.Module):
         num_groups: int = 8,
         dropout: float = 0.0,
         use_scale_gate: bool = True,
+        scale_evidence_mode: str = "legacy",
+        scale_evidence_gain: float = 0.0,
+        scale_gate_temperature: float = 1.0,
+        scale_gate_uniform_floor: float = 0.0,
     ) -> None:
         super().__init__()
         self.use_scale_gate = use_scale_gate
@@ -122,6 +200,10 @@ class GatedCrossScaleSharedExpert(nn.Module):
             stat_dim=stat_dim,
             hidden_dim=max(dim * 2, 32),
             dropout=dropout,
+            evidence_mode=scale_evidence_mode,
+            evidence_gain=scale_evidence_gain,
+            temperature=scale_gate_temperature,
+            uniform_floor=scale_gate_uniform_floor,
         )
         self.fuse = nn.Sequential(
             nn.Conv3d(dim * 3, dim, kernel_size=1),
@@ -140,7 +222,7 @@ class GatedCrossScaleSharedExpert(nn.Module):
         r_m: torch.Tensor | None = None,
         r_c: torch.Tensor | None = None,
         active_mask: torch.Tensor | None = None,
-    ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
+    ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
         batch_size = h_f.shape[0]
         target_size = h_f.shape[-3:]
         h_m_up = F.interpolate(h_m, size=target_size, mode="trilinear", align_corners=False)
@@ -150,7 +232,7 @@ class GatedCrossScaleSharedExpert(nn.Module):
             active_mask = torch.ones(batch_size, 3, device=h_f.device, dtype=torch.bool)
 
         if self.use_scale_gate:
-            scale_weight = self.scale_gate(
+            scale_weight, scale_evidence = self.scale_gate(
                 h_f=h_f,
                 h_m=h_m,
                 h_c=h_c,
@@ -164,12 +246,13 @@ class GatedCrossScaleSharedExpert(nn.Module):
         else:
             scale_weight = active_mask.to(dtype=h_f.dtype)
             scale_weight = scale_weight / scale_weight.sum(dim=-1, keepdim=True).clamp_min(1e-6)
+            scale_evidence = scale_weight
 
         w_f = scale_weight[:, 0].view(batch_size, 1, 1, 1, 1)
         w_m = scale_weight[:, 1].view(batch_size, 1, 1, 1, 1)
         w_c = scale_weight[:, 2].view(batch_size, 1, 1, 1, 1)
         z_shared = self.fuse(torch.cat([w_f * h_f, w_m * h_m_up, w_c * h_c_up], dim=1))
-        return z_shared, h_m_up, h_c_up, scale_weight
+        return z_shared, h_m_up, h_c_up, scale_weight, scale_evidence
 
 
 class ExpertEnhancedSharedInput(nn.Module):

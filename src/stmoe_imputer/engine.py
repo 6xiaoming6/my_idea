@@ -6,7 +6,8 @@ import torch
 from tqdm import tqdm
 
 from .losses import compute_main_stage_loss
-from .metrics import masked_metrics
+from .metrics import MaskedMetricAccumulator, masked_metrics
+from .routing_metrics import RoutingMetricAccumulator, active_routing_scales
 from .utils.device import move_batch_to_device
 
 
@@ -39,6 +40,7 @@ def build_optimizer(model: torch.nn.Module, cfg: dict) -> torch.optim.Optimizer:
                 "main_branch.condition_encoder",
                 "main_branch.controller",
                 "main_branch.refiner",
+                "main_branch.local_residual_gate",
             )
         )
         if is_v14_new and (name_l.endswith(".bias") or "norm" in name_l):
@@ -137,6 +139,14 @@ def _append_model_diagnostics(logs: dict[str, list[float]], outputs: dict) -> No
             logs[f"scale_gate_{label}_mean"].append(float(values.mean().detach().cpu()))
             logs[f"scale_gate_{label}_std"].append(float(values.std(unbiased=False).detach().cpu()))
 
+    scale_evidence = outputs.get("gates", {}).get("scale_evidence")
+    if scale_evidence is not None:
+        for idx, label in enumerate(("f", "m", "c")):
+            values = scale_evidence[:, idx]
+            logs[f"scale_evidence_{label}_mean"].append(
+                float(values.mean().detach().cpu())
+            )
+
     route_gamma = outputs.get("route_gamma")
     if route_gamma is not None and torch.is_tensor(route_gamma):
         gamma_value = float(route_gamma.detach().cpu())
@@ -171,6 +181,16 @@ def _append_model_diagnostics(logs: dict[str, list[float]], outputs: dict) -> No
                 logs[f"v14_{key}_std"].append(float(value_f.std(unbiased=False).cpu()))
                 logs[f"v14_{key}_min"].append(float(value_f.min().cpu()))
                 logs[f"v14_{key}_max"].append(float(value_f.max().cpu()))
+            if key == "local_gate_modulation":
+                logs["v14_local_gate_modulation_std"].append(
+                    float(value_f.std(unbiased=False).cpu())
+                )
+                logs["v14_local_gate_modulation_min"].append(
+                    float(value_f.min().cpu())
+                )
+                logs["v14_local_gate_modulation_max"].append(
+                    float(value_f.max().cpu())
+                )
 
     if isinstance(v14, dict):
         for scale in ("fine", "mid", "coarse"):
@@ -203,6 +223,20 @@ def _append_lr_logs(logs: dict[str, list[float]], optimizer: torch.optim.Optimiz
         logs[f"lr_group_{name}"].append(float(group["lr"]))
 
 
+def _routing_accumulator(cfg: dict) -> RoutingMetricAccumulator | None:
+    main_cfg = cfg["model"]["main"]
+    if (
+        not main_cfg.get("use_routed_branch", True)
+        or not main_cfg.get("use_router", True)
+        or main_cfg.get("routing_mode", "topk") == "dense"
+    ):
+        return None
+    scale_mode = main_cfg.get(
+        "scale_mode", cfg["model"].get("scale_mode", "fine_mid_coarse")
+    )
+    return RoutingMetricAccumulator(active_routing_scales(scale_mode))
+
+
 def train_one_epoch(
     model: torch.nn.Module,
     loader,
@@ -213,6 +247,13 @@ def train_one_epoch(
 ) -> dict[str, float]:
     model.train()
     logs: dict[str, list[float]] = defaultdict(list)
+    exact_metrics = {
+        "": MaskedMetricAccumulator(),
+        "_shared_aux": MaskedMetricAccumulator(),
+        "_route_aux": MaskedMetricAccumulator(),
+    }
+    active_exact_metrics = {""}
+    routing_metrics = _routing_accumulator(cfg)
     use_amp = cfg["train"].get("amp", True) and device.type == "cuda"
     scaler = torch.amp.GradScaler(device.type, enabled=use_amp)
     progress = tqdm(loader, desc=f"train epoch {epoch}", leave=False)
@@ -231,18 +272,37 @@ def train_one_epoch(
         scaler.update()
 
         metrics = masked_metrics(outputs["x_hat_final"], batch["x_f_gt"], batch["m_f"])
+        exact_metrics[""].update(outputs["x_hat_final"], batch["x_f_gt"], batch["m_f"])
         if outputs.get("x_hat_shared") is not None:
             shared_metrics = masked_metrics(outputs["x_hat_shared"], batch["x_f_gt"], batch["m_f"])
             metrics.update({f"{key}_shared_aux": value for key, value in shared_metrics.items()})
+            exact_metrics["_shared_aux"].update(
+                outputs["x_hat_shared"], batch["x_f_gt"], batch["m_f"]
+            )
+            active_exact_metrics.add("_shared_aux")
         if outputs.get("x_hat_route") is not None:
             route_metrics = masked_metrics(outputs["x_hat_route"], batch["x_f_gt"], batch["m_f"])
             metrics.update({f"{key}_route_aux": value for key, value in route_metrics.items()})
+            exact_metrics["_route_aux"].update(
+                outputs["x_hat_route"], batch["x_f_gt"], batch["m_f"]
+            )
+            active_exact_metrics.add("_route_aux")
         for key, value in {**loss_dict, **metrics}.items():
             logs[key].append(float(value.detach().cpu()))
         _append_model_diagnostics(logs, outputs)
+        if routing_metrics is not None:
+            routing_metrics.update(
+                outputs.get("gates", {}), outputs.get("selected_masks")
+            )
         _append_lr_logs(logs, optimizer)
         progress.set_postfix(loss=logs["loss"][-1], mae=logs["mae"][-1], rmse=logs["rmse"][-1])
-    return _mean_logs(logs)
+    result = _mean_logs(logs)
+    for suffix in active_exact_metrics:
+        for key, value in exact_metrics[suffix].compute().items():
+            result[f"{key}{suffix}"] = value
+    if routing_metrics is not None:
+        result.update(routing_metrics.compute())
+    return result
 
 
 @torch.no_grad()
@@ -256,18 +316,44 @@ def evaluate(
 ) -> dict[str, float]:
     model.eval()
     logs: dict[str, list[float]] = defaultdict(list)
+    exact_metrics = {
+        "": MaskedMetricAccumulator(),
+        "_shared_aux": MaskedMetricAccumulator(),
+        "_route_aux": MaskedMetricAccumulator(),
+    }
+    active_exact_metrics = {""}
+    routing_metrics = _routing_accumulator(cfg)
     for batch in tqdm(loader, desc=desc, leave=False):
         batch = move_batch_to_device(batch, device)
         outputs = model(batch)
         _, loss_dict = compute_main_stage_loss(outputs, batch, cfg, epoch=epoch)
         metrics = masked_metrics(outputs["x_hat_final"], batch["x_f_gt"], batch["m_f"])
+        exact_metrics[""].update(outputs["x_hat_final"], batch["x_f_gt"], batch["m_f"])
         if outputs.get("x_hat_shared") is not None:
             shared_metrics = masked_metrics(outputs["x_hat_shared"], batch["x_f_gt"], batch["m_f"])
             metrics.update({f"{key}_shared_aux": value for key, value in shared_metrics.items()})
+            exact_metrics["_shared_aux"].update(
+                outputs["x_hat_shared"], batch["x_f_gt"], batch["m_f"]
+            )
+            active_exact_metrics.add("_shared_aux")
         if outputs.get("x_hat_route") is not None:
             route_metrics = masked_metrics(outputs["x_hat_route"], batch["x_f_gt"], batch["m_f"])
             metrics.update({f"{key}_route_aux": value for key, value in route_metrics.items()})
+            exact_metrics["_route_aux"].update(
+                outputs["x_hat_route"], batch["x_f_gt"], batch["m_f"]
+            )
+            active_exact_metrics.add("_route_aux")
         for key, value in {**loss_dict, **metrics}.items():
             logs[key].append(float(value.detach().cpu()))
         _append_model_diagnostics(logs, outputs)
-    return _mean_logs(logs)
+        if routing_metrics is not None:
+            routing_metrics.update(
+                outputs.get("gates", {}), outputs.get("selected_masks")
+            )
+    result = _mean_logs(logs)
+    for suffix in active_exact_metrics:
+        for key, value in exact_metrics[suffix].compute().items():
+            result[f"{key}{suffix}"] = value
+    if routing_metrics is not None:
+        result.update(routing_metrics.compute())
+    return result

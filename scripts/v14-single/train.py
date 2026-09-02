@@ -123,6 +123,16 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--cpu-threads", type=int, default=4)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--ablation", choices=("none", *ABLATIONS), default="none")
+    parser.add_argument(
+        "--experiment-config",
+        default=None,
+        help="Optional JSON patch applied after the dataset V14 config.",
+    )
+    parser.add_argument(
+        "--run-name",
+        default=None,
+        help="Optional output run name; defaults to the experiment config stem.",
+    )
     parser.add_argument("--training-policy", default=None)
     parser.add_argument("--epochs", type=int, default=None)
     parser.add_argument("--regenerate-masks", action="store_true")
@@ -143,6 +153,10 @@ def main() -> None:
             raise FileNotFoundError(path)
 
     patch = _load(ROOT / spec["model"])
+    experiment_path = None
+    if args.experiment_config:
+        experiment_path = _resolve(args.experiment_config)
+        patch = _deep_update(patch, _load(experiment_path))
     if args.training_policy:
         policy_path = _resolve(args.training_policy)
         policy = _load(policy_path)
@@ -175,7 +189,12 @@ def main() -> None:
             "test_csv": str((mask_dir / "test.csv").relative_to(ROOT)),
         }},
     })
-    run_name = "full" if args.ablation == "none" else f"ablation_v14_{args.ablation}"
+    if args.run_name:
+        run_name = args.run_name
+    elif experiment_path is not None:
+        run_name = f"ablation_v14_exploration_{experiment_path.stem}"
+    else:
+        run_name = "full" if args.ablation == "none" else f"ablation_v14_{args.ablation}"
     with tempfile.TemporaryDirectory(prefix="v14_single_") as directory:
         override = Path(directory) / "override.json"
         override.write_text(json.dumps(patch, indent=2, ensure_ascii=False), encoding="utf-8")

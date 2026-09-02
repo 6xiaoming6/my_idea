@@ -1,0 +1,13 @@
+{
+  "output_dir": "outputs/v14-exploration",
+  "experiment": {
+    "id": "E04",
+    "revision": 1,
+    "description": "Combine validated E02 delta-scale and E03 RMSE-regret terms"
+  },
+  "loss": {
+    "lambda_v14_gate": 0.0,
+    "lambda_v14_delta_scale": 0.0001,
+    "lambda_v14_rmse_regret": 0.01
+  }
+}
