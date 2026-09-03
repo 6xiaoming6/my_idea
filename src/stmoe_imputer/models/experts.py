@@ -40,19 +40,40 @@ class TopKRoutedExpertPool(nn.Module):
             [STExpert(dim, num_groups=num_groups, dropout=dropout) for _ in range(num_experts)]
         )
 
-    def forward(
+    def forward_all(self, h: torch.Tensor) -> torch.Tensor:
+        """Evaluate every expert and keep the expert axis explicit."""
+        return torch.stack([expert(h) for expert in self.experts], dim=1)
+
+    def mix_from_outputs(
         self,
-        h: torch.Tensor,
+        expert_outputs: torch.Tensor,
         gate: torch.Tensor,
         routing_mode: str = "topk",
     ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
-        expert_outputs = torch.stack([expert(h) for expert in self.experts], dim=1)
-        batch_size = h.shape[0]
+        """Mix precomputed expert outputs with the original routing semantics."""
+        if expert_outputs.ndim != 6:
+            raise ValueError(
+                "expert_outputs must have shape [B,E,D,T,H,W], got "
+                f"{tuple(expert_outputs.shape)}"
+            )
+        if expert_outputs.shape[1] != self.num_experts:
+            raise ValueError(
+                f"Expected {self.num_experts} expert outputs, got "
+                f"{expert_outputs.shape[1]}"
+            )
+        if gate.shape != expert_outputs.shape[:2]:
+            raise ValueError(
+                f"gate must have shape {tuple(expert_outputs.shape[:2])}, got "
+                f"{tuple(gate.shape)}"
+            )
+        batch_size = expert_outputs.shape[0]
 
         if routing_mode == "dense":
             weights = gate / gate.sum(dim=-1, keepdim=True).clamp_min(1e-6)
             z = (weights[:, :, None, None, None, None] * expert_outputs).sum(dim=1)
-            expert_range = torch.arange(self.num_experts, device=h.device, dtype=torch.long)
+            expert_range = torch.arange(
+                self.num_experts, device=expert_outputs.device, dtype=torch.long
+            )
             top_indices = expert_range.view(1, -1).expand(batch_size, -1)
             selected_mask = torch.ones_like(weights)
             return z, top_indices, weights, selected_mask
@@ -74,11 +95,26 @@ class TopKRoutedExpertPool(nn.Module):
                 indices = top_indices[:, slot]
                 weights = top_weights[:, slot].view(batch_size, 1, 1, 1, 1)
                 for expert_idx in range(self.num_experts):
-                    selected = (indices == expert_idx).to(h.dtype).view(batch_size, 1, 1, 1, 1)
+                    selected = (indices == expert_idx).to(expert_outputs.dtype).view(
+                        batch_size, 1, 1, 1, 1
+                    )
                     z = z + selected * weights * expert_outputs[:, expert_idx]
             return z, top_indices, top_weights, selected_mask
 
         raise ValueError(f"Unsupported routing_mode: {routing_mode}")
+
+    def forward(
+        self,
+        h: torch.Tensor,
+        gate: torch.Tensor,
+        routing_mode: str = "topk",
+    ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
+        expert_outputs = self.forward_all(h)
+        return self.mix_from_outputs(
+            expert_outputs,
+            gate,
+            routing_mode=routing_mode,
+        )
 
 
 class CrossScaleSharedExpert(nn.Module):

@@ -1,0 +1,1 @@
+{"model":{"v20":{"probe_mode":"geometry_matched","routing_fusion":"exam_only","apply_evidence_during_training":true,"routing_evidence_scales":["fine","mid","coarse"]}},"experiment":{"variant":"v20_geometry_exam_only"}}

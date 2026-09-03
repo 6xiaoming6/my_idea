@@ -1,0 +1,21 @@
+{
+  "model": {
+    "v20": {
+      "probe_mode": "geometry_matched",
+      "routing_fusion": "hybrid",
+      "confidence_mode": "legacy_best",
+      "probe_eta_max": 0.85,
+      "routing_evidence_scales": ["fine", "mid", "coarse"],
+      "apply_evidence_during_training": true,
+      "validation_calibration": {
+        "enabled": false
+      }
+    }
+  },
+  "train": {
+    "grad_clip_isolate_groups": []
+  },
+  "experiment": {
+    "variant": "v20_legacy_geometry_hybrid"
+  }
+}

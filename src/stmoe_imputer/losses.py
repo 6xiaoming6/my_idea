@@ -503,6 +503,14 @@ def compute_main_stage_loss(
     loss = loss + loss_cfg.get("lambda_v14_gate", v14_cfg.get("lambda_gate", 0.0)) * l_v14_gate
     loss = loss + v14_rmse_regret_weight * l_v14_rmse_regret
     loss = loss + v14_delta_scale_weight * l_v14_delta_scale
+    v20_probe = outputs.get("v20_probe")
+    if outputs.get("v20_enabled", False) and isinstance(v20_probe, dict):
+        l_v20_probe = v20_probe.get("probe_loss")
+        if not torch.is_tensor(l_v20_probe):
+            l_v20_probe = _empty_loss_like(l_main)
+        loss = loss + float(loss_cfg.get("lambda_v20_probe", 0.05)) * l_v20_probe
+    else:
+        l_v20_probe = _empty_loss_like(l_main)
     if loss_cfg.get("lambda_final", 0.0) > 0:
         loss = loss + loss_cfg["lambda_final"] * l_final
     loss_logs = {
@@ -539,4 +547,6 @@ def compute_main_stage_loss(
                 v14_stage_aux_scale, device=l_main.device
             ).detach(),
         })
+    if outputs.get("v20_enabled", False):
+        loss_logs["l_v20_probe"] = l_v20_probe.detach()
     return loss, loss_logs

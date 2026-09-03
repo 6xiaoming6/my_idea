@@ -238,6 +238,80 @@ def _plot_history(history: dict[str, list[float]], output_dir: Path) -> None:
     print(f"[info] curves saved to {save_path}")
 
 
+def _v20_probe_evaluator(model: torch.nn.Module):
+    main_branch = getattr(model, "main_branch", None)
+    evaluator = getattr(main_branch, "probe_evaluator", None)
+    return evaluator if hasattr(evaluator, "eta_max") else None
+
+
+def _v20_calibrated_validation(
+    model: torch.nn.Module,
+    loader,
+    device: torch.device,
+    cfg: dict,
+    *,
+    epoch: int,
+) -> tuple[dict[str, float], float | None]:
+    """Select the safest V20 evidence strength using validation data only.
+
+    Eta=0 is always retained as the exact V14-routing fallback.  This makes the
+    probe an accepted correction only when it improves the configured validation
+    metric, instead of forcing uncertain evidence into every sample.
+    """
+    evaluator = _v20_probe_evaluator(model)
+    calibration = cfg.get("model", {}).get("v20", {}).get(
+        "validation_calibration", {}
+    )
+    if evaluator is None or not bool(calibration.get("enabled", False)):
+        return evaluate(
+            model, loader, device, cfg, desc=f"val epoch {epoch}", epoch=epoch
+        ), None
+
+    candidates = [float(value) for value in calibration.get(
+        "eta_candidates", (0.0, float(evaluator.eta_max))
+    )]
+    candidates.append(0.0)
+    candidates = sorted(set(candidates))
+    if any(value < 0.0 or value > 1.0 for value in candidates):
+        raise ValueError("V20 validation eta candidates must be in [0,1]")
+    monitor = str(calibration.get("monitor", "mae"))
+    mode = str(calibration.get("mode", "min"))
+    if mode not in {"min", "max"}:
+        raise ValueError("V20 validation calibration mode must be min or max")
+
+    evaluated: list[tuple[float, dict[str, float]]] = []
+    for eta in candidates:
+        evaluator.eta_max = eta
+        metrics = evaluate(
+            model,
+            loader,
+            device,
+            cfg,
+            desc=f"val epoch {epoch} eta={eta:g}",
+            epoch=epoch,
+        )
+        if monitor not in metrics:
+            raise KeyError(f"V20 validation calibration metric is missing: {monitor}")
+        evaluated.append((eta, metrics))
+
+    key = lambda item: float(item[1][monitor])
+    selected_eta, selected = (
+        min(evaluated, key=key) if mode == "min" else max(evaluated, key=key)
+    )
+    evaluator.eta_max = selected_eta
+    selected = dict(selected)
+    selected["v20_selected_eta"] = selected_eta
+    for eta, metrics in evaluated:
+        eta_label = f"{eta:.2f}".replace(".", "p")
+        selected[f"v20_calibration_{monitor}_eta_{eta_label}"] = float(metrics[monitor])
+    print(
+        f"[calibration] epoch={epoch} selected_eta={selected_eta:g} "
+        f"{monitor}={selected[monitor]:.6f}",
+        flush=True,
+    )
+    return selected, selected_eta
+
+
 def main() -> None:
     args = parse_args()
     cfg = load_config(args.config)
@@ -320,6 +394,7 @@ def main() -> None:
 
     best_mae = float("inf")
     best_epoch = 0
+    best_v20_eta: float | None = None
     val_epoch = int(cfg["train"].get("val_epoch", 1))
     if val_epoch < 1:
         raise ValueError("train.val_epoch must be at least 1")
@@ -350,10 +425,13 @@ def main() -> None:
 
             should_validate = epoch % val_epoch == 0 or epoch == cfg["train"]["epochs"]
             val_logs = None
+            selected_v20_eta = None
             val_time = 0.0
             if should_validate:
                 val_start = time.perf_counter()
-                val_logs = evaluate(model, val_loader, device, cfg, desc=f"val epoch {epoch}", epoch=epoch)
+                val_logs, selected_v20_eta = _v20_calibrated_validation(
+                    model, val_loader, device, cfg, epoch=epoch
+                )
                 _sync_device(device)
                 val_time = time.perf_counter() - val_start
                 validation_count += 1
@@ -403,6 +481,9 @@ def main() -> None:
             if is_best:
                 best_mae = val_logs["mae"]
                 best_epoch = epoch
+                if selected_v20_eta is not None:
+                    best_v20_eta = selected_v20_eta
+                    cfg["model"]["v20"]["probe_eta_max"] = best_v20_eta
                 save_checkpoint(ckpt_dir / "best.pt", model, optimizer, epoch, metrics, cfg)
                 logger.log_best(epoch, best_mae)
 
@@ -424,6 +505,12 @@ def main() -> None:
         if not best_path.is_file():
             raise RuntimeError("Training completed without a validation checkpoint.")
         checkpoint = load_checkpoint(best_path, model, map_location=device)
+        effective_cfg = checkpoint.get("config", cfg)
+        save_config(effective_cfg, run_dir / "effective_config.json")
+        if best_v20_eta is not None:
+            evaluator = _v20_probe_evaluator(model)
+            if evaluator is not None:
+                evaluator.eta_max = best_v20_eta
         if test_loader is not None:
             test_start = time.perf_counter()
             test_logs = evaluate(model, test_loader, device, cfg, desc=f"test best epoch {best_epoch}", epoch=best_epoch)
@@ -433,6 +520,7 @@ def main() -> None:
             "checkpoint": str(best_path), "best_epoch": checkpoint.get("epoch", best_epoch),
             "best_val_mae": best_mae, "test_samples": len(test_ds) if test_ds is not None else 0,
             "test_steps": len(test_loader) if test_loader is not None else 0, "test_time_sec": f"{test_time:.2f}",
+            "v20_selected_eta": best_v20_eta if best_v20_eta is not None else "n/a",
         })
     except KeyboardInterrupt:
         status = "interrupted"
@@ -451,6 +539,7 @@ def main() -> None:
             "completed_epochs": completed_epochs,
             "best_epoch": best_epoch or "n/a",
             "best_val_mae": f"{best_mae:.6f}" if best_epoch else "n/a",
+            "v20_selected_eta": best_v20_eta if best_v20_eta is not None else "n/a",
             "val_epoch": val_epoch,
             "validation_count": validation_count,
             "final_train_loss": f"{history['train_loss'][-1]:.6f}" if history["train_loss"] else "n/a",

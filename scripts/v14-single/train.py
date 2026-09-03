@@ -172,9 +172,10 @@ def main() -> None:
             "train": {"epochs": args.epochs, "val_epoch": 1, "early_stopping": {"enabled": False}}
         })
     if args.ablation != "none":
+        version_dir = str(patch.get("model", {}).get("version", "v14-single"))
         patch = _deep_update(
             patch,
-            _load(ROOT / "configs" / "v14-single" / "ablations" / ABLATIONS[args.ablation]),
+            _load(ROOT / "configs" / version_dir / "ablations" / ABLATIONS[args.ablation]),
         )
 
     env = _env(args.gpu, args.cpu_threads)
@@ -192,9 +193,11 @@ def main() -> None:
     if args.run_name:
         run_name = args.run_name
     elif experiment_path is not None:
-        run_name = f"ablation_v14_exploration_{experiment_path.stem}"
+        version_name = str(patch.get("model", {}).get("version", "v14-single")).removesuffix("-single")
+        run_name = f"ablation_{version_name}_exploration_{experiment_path.stem}"
     else:
-        run_name = "full" if args.ablation == "none" else f"ablation_v14_{args.ablation}"
+        version_name = str(patch.get("model", {}).get("version", "v14-single")).removesuffix("-single")
+        run_name = "full" if args.ablation == "none" else f"ablation_{version_name}_{args.ablation}"
     with tempfile.TemporaryDirectory(prefix="v14_single_") as directory:
         override = Path(directory) / "override.json"
         override.write_text(json.dumps(patch, indent=2, ensure_ascii=False), encoding="utf-8")

@@ -19,6 +19,7 @@ def build_optimizer(model: torch.nn.Module, cfg: dict) -> torch.optim.Optimizer:
     gate_lr_mult = train_cfg.get("gate_lr_mult", 1.0)
     scalar_lr_mult = train_cfg.get("scalar_lr_mult", 2.0)
     v14_lr = train_cfg.get("lr_v14", base_lr)
+    v20_lr = train_cfg.get("lr_v20", v14_lr)
 
     grouped: dict[str, dict] = {
         "main": {"params": [], "lr": base_lr, "weight_decay": weight_decay},
@@ -27,6 +28,8 @@ def build_optimizer(model: torch.nn.Module, cfg: dict) -> torch.optim.Optimizer:
         "no_decay": {"params": [], "lr": base_lr, "weight_decay": 0.0},
         "v14": {"params": [], "lr": v14_lr, "weight_decay": weight_decay},
         "v14_no_decay": {"params": [], "lr": v14_lr, "weight_decay": 0.0},
+        "v20": {"params": [], "lr": v20_lr, "weight_decay": weight_decay},
+        "v20_no_decay": {"params": [], "lr": v20_lr, "weight_decay": 0.0},
         "other": {"params": [], "lr": aux_lr, "weight_decay": weight_decay},
     }
 
@@ -43,7 +46,12 @@ def build_optimizer(model: torch.nn.Module, cfg: dict) -> torch.optim.Optimizer:
                 "main_branch.local_residual_gate",
             )
         )
-        if is_v14_new and (name_l.endswith(".bias") or "norm" in name_l):
+        is_v20_new = "main_branch.probe_evaluator" in name_l
+        if is_v20_new and (name_l.endswith(".bias") or "norm" in name_l):
+            grouped["v20_no_decay"]["params"].append(param)
+        elif is_v20_new:
+            grouped["v20"]["params"].append(param)
+        elif is_v14_new and (name_l.endswith(".bias") or "norm" in name_l):
             grouped["v14_no_decay"]["params"].append(param)
         elif is_v14_new:
             grouped["v14"]["params"].append(param)
@@ -216,11 +224,106 @@ def _append_model_diagnostics(logs: dict[str, list[float]], outputs: dict) -> No
         logs["effective_route_norm"].append(float(route_norm.cpu()))
         logs["effective_route_ratio"].append(float((route_norm / shared_norm.clamp_min(1e-6)).cpu()))
 
+    v20_probe = outputs.get("v20_probe")
+    if isinstance(v20_probe, dict):
+        active_match_distances = []
+        for scale in ("fine", "mid", "coarse"):
+            scale_result = v20_probe.get(scale)
+            if not isinstance(scale_result, dict):
+                continue
+            scalar_fields = {
+                "valid": "probe_valid_ratio",
+                "realized_ratio": "probe_realized_ratio",
+                "match_distance": "probe_match_distance",
+                "confidence": "probe_confidence",
+                "eta": "eta",
+                "proposed_eta": "proposed_eta",
+                "competence_certainty": "competence_certainty",
+                "rank_margin": "probe_rank_margin",
+                "legacy_confidence": "legacy_probe_confidence",
+                "prior_gate_entropy": "prior_gate_entropy",
+                "competence_entropy": "competence_entropy",
+                "final_gate_entropy": "final_gate_entropy",
+                "prior_top1": "prior_top1",
+                "probe_top1": "probe_top1",
+                "final_top1": "final_top1",
+                "prior_probe_top1_agreement": "prior_probe_agreement",
+                "prior_final_topk_overlap": "prior_final_topk_overlap",
+                "probe_final_topk_overlap": "probe_final_topk_overlap",
+            }
+            for source, label in scalar_fields.items():
+                value = scale_result.get(source)
+                if torch.is_tensor(value):
+                    value_f = value.detach().float()
+                    logs[f"v20_{scale}_{label}"].append(float(value_f.mean().cpu()))
+                    if source == "match_distance":
+                        active_match_distances.append(value_f.mean())
+            for source, label in (
+                ("raw_error", "probe_error"),
+                ("competence", "probe_competence"),
+            ):
+                value = scale_result.get(source)
+                if torch.is_tensor(value):
+                    value_f = value.detach().float().mean(dim=0)
+                    for index, expert_value in enumerate(value_f):
+                        logs[f"v20_{scale}_{label}_e{index}"].append(
+                            float(expert_value.cpu())
+                        )
+        if active_match_distances:
+            logs["v20_probe_match_distance"].append(
+                float(torch.stack(active_match_distances).mean().cpu())
+            )
+
 
 def _append_lr_logs(logs: dict[str, list[float]], optimizer: torch.optim.Optimizer) -> None:
     for group in optimizer.param_groups:
         name = group.get("name", "group")
         logs[f"lr_group_{name}"].append(float(group["lr"]))
+
+
+def _clip_optimizer_gradients(
+    optimizer: torch.optim.Optimizer,
+    max_norm: float,
+    *,
+    isolated_group_names: set[str] | None = None,
+    isolated_max_norm: float | None = None,
+) -> None:
+    """Clip auxiliary groups without letting them rescale main-model gradients.
+
+    By default this is exactly the historical whole-model clipping operation.
+    V20 opts into isolating its probe groups so the detached probe objective cannot
+    alter the V14 update merely by contributing to the global gradient norm.
+    """
+    isolated_group_names = isolated_group_names or set()
+    if not isolated_group_names:
+        parameters = [
+            parameter
+            for group in optimizer.param_groups
+            for parameter in group["params"]
+            if parameter.grad is not None
+        ]
+        if parameters:
+            torch.nn.utils.clip_grad_norm_(parameters, max_norm)
+        return
+
+    main_parameters = []
+    isolated_parameters = []
+    for group in optimizer.param_groups:
+        destination = (
+            isolated_parameters
+            if str(group.get("name", "")) in isolated_group_names
+            else main_parameters
+        )
+        destination.extend(
+            parameter for parameter in group["params"] if parameter.grad is not None
+        )
+    if main_parameters:
+        torch.nn.utils.clip_grad_norm_(main_parameters, max_norm)
+    if isolated_parameters:
+        torch.nn.utils.clip_grad_norm_(
+            isolated_parameters,
+            max_norm if isolated_max_norm is None else isolated_max_norm,
+        )
 
 
 def _routing_accumulator(cfg: dict) -> RoutingMetricAccumulator | None:
@@ -267,7 +370,16 @@ def train_one_epoch(
         grad_clip = cfg["train"].get("grad_clip_norm")
         if grad_clip:
             scaler.unscale_(optimizer)
-            torch.nn.utils.clip_grad_norm_(model.parameters(), grad_clip)
+            isolated_groups = {
+                str(name)
+                for name in cfg["train"].get("grad_clip_isolate_groups", ())
+            }
+            _clip_optimizer_gradients(
+                optimizer,
+                float(grad_clip),
+                isolated_group_names=isolated_groups,
+                isolated_max_norm=cfg["train"].get("grad_clip_norm_isolated"),
+            )
         scaler.step(optimizer)
         scaler.update()
 

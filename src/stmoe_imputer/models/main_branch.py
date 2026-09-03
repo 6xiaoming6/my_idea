@@ -217,6 +217,50 @@ class MultiScaleMoEBackbone(nn.Module):
             return self.routing_mode
         return self.routing_mode_when_no_router
 
+    @staticmethod
+    def _apply_routing_evidence(
+        prior_gate: torch.Tensor,
+        evidence: dict[str, object] | None,
+        eps: float = 1e-8,
+    ) -> torch.Tensor:
+        """Confidence-adaptively fuse a learned prior with measured competence."""
+        if evidence is None:
+            return prior_gate
+        competence = evidence["competence"].detach().to(
+            device=prior_gate.device, dtype=prior_gate.dtype
+        )
+        eta = evidence["eta"].detach().to(
+            device=prior_gate.device, dtype=prior_gate.dtype
+        )
+        if competence.shape != prior_gate.shape:
+            raise ValueError(
+                f"competence must have shape {tuple(prior_gate.shape)}, got "
+                f"{tuple(competence.shape)}"
+            )
+        if eta.ndim == 1:
+            eta = eta.unsqueeze(-1)
+        if eta.shape != (prior_gate.shape[0], 1):
+            raise ValueError(
+                f"eta must have shape {(prior_gate.shape[0], 1)}, got "
+                f"{tuple(eta.shape)}"
+            )
+        prior_log = torch.log(prior_gate.clamp_min(eps))
+        competence_log = torch.log(competence.clamp_min(eps))
+        fusion_mode = str(evidence.get("fusion_mode", "convex_geometric"))
+        if fusion_mode == "neutral_multiplicative":
+            # A uniform competence distribution contributes only an additive
+            # constant and therefore leaves the learned V14 prior *exactly*
+            # unchanged after softmax. This is the safe evidence-neutral form.
+            uniform_log = -torch.log(
+                prior_gate.new_tensor(float(prior_gate.shape[-1]))
+            )
+            mixed_log = prior_log + eta * (competence_log - uniform_log)
+        elif fusion_mode == "convex_geometric":
+            mixed_log = (1.0 - eta) * prior_log + eta * competence_log
+        else:
+            raise ValueError(f"Unsupported routing evidence fusion_mode: {fusion_mode}")
+        return torch.softmax(mixed_log, dim=-1)
+
     def forward(
         self,
         x_f: torch.Tensor,
@@ -227,6 +271,7 @@ class MultiScaleMoEBackbone(nn.Module):
         m_c: torch.Tensor,
         r_m: torch.Tensor | None = None,
         r_c: torch.Tensor | None = None,
+        routing_evidence: dict[str, dict[str, object]] | None = None,
     ) -> dict[str, torch.Tensor | dict[str, torch.Tensor]]:
         batch_size = x_f.shape[0]
         if r_m is None:
@@ -242,9 +287,27 @@ class MultiScaleMoEBackbone(nn.Module):
         q_m = compute_observation_stats(m_m)
         q_c = compute_observation_stats(m_c)
 
-        gate_f = self._route(self.router_f, h_f, m_f, self.get_scale_embed_vec(self.embed_f, batch_size))
-        gate_m = self._route(self.router_m, h_m, m_m, self.get_scale_embed_vec(self.embed_m, batch_size))
-        gate_c = self._route(self.router_c, h_c, m_c, self.get_scale_embed_vec(self.embed_c, batch_size))
+        prior_gate_f = self._route(
+            self.router_f, h_f, m_f, self.get_scale_embed_vec(self.embed_f, batch_size)
+        )
+        prior_gate_m = self._route(
+            self.router_m, h_m, m_m, self.get_scale_embed_vec(self.embed_m, batch_size)
+        )
+        prior_gate_c = self._route(
+            self.router_c, h_c, m_c, self.get_scale_embed_vec(self.embed_c, batch_size)
+        )
+        gate_f = self._apply_routing_evidence(
+            prior_gate_f,
+            None if routing_evidence is None else routing_evidence.get("fine"),
+        )
+        gate_m = self._apply_routing_evidence(
+            prior_gate_m,
+            None if routing_evidence is None else routing_evidence.get("mid"),
+        )
+        gate_c = self._apply_routing_evidence(
+            prior_gate_c,
+            None if routing_evidence is None else routing_evidence.get("coarse"),
+        )
 
         routing_mode = self._effective_routing_mode()
         need_expert_features = self.use_routed_branch or (
@@ -384,7 +447,7 @@ class MultiScaleMoEBackbone(nn.Module):
         else:
             x_hat_shared = None
             x_hat_route = None
-        return {
+        outputs = {
             "x_hat_main": x_hat_main,
             "x_hat_shared": x_hat_shared,
             "x_hat_route": x_hat_route,
@@ -453,6 +516,13 @@ class MultiScaleMoEBackbone(nn.Module):
                 "branch_gate": branch_gate.detach(),
             },
         }
+        if routing_evidence is not None:
+            outputs["prior_gates"] = {
+                "fine": prior_gate_f,
+                "mid": prior_gate_m,
+                "coarse": prior_gate_c,
+            }
+        return outputs
 
 
 OAMSBackbone = MultiScaleMoEBackbone

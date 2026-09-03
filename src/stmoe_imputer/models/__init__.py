@@ -24,6 +24,7 @@ from .v_single import (
     SafeCoarseToFineRefiner,
     SafetyController,
     V14SafeC2FMoE,
+    V20ProbeValidatedC2FMoE,
 )
 
 __all__ = [
@@ -48,6 +49,7 @@ __all__ = [
     "SafeCoarseToFineRefiner",
     "SafetyController",
     "V14SafeC2FMoE",
+    "V20ProbeValidatedC2FMoE",
     "build_model_backbone",
     "build_scale_active_mask",
     "get_active_scales",
