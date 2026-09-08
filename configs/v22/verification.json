@@ -1,0 +1,13 @@
+{
+  "suite": "configs/v22/experiments.json",
+  "profile": "quick",
+  "epochs": 120,
+  "seeds": [42, 2026, 3407],
+  "variants": ["fixed_stats", "uniform", "moe"],
+  "control_seeds": [42, 2026, 3407],
+  "controls": ["uniform_fixed_shared", "uniform_fixed_independent"],
+  "diagnostic_variants": ["moe"],
+  "diagnostic_batch_size": 4,
+  "diagnostic_shuffle_seed": 17022,
+  "reference_tolerance": {"relative": 0.0001, "absolute": 0.00001}
+}

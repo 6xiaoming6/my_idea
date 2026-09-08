@@ -1,0 +1,17 @@
+{
+  "output_dir": "outputs/v21-single",
+  "model": {
+    "version": "v21-single-legacy-control",
+    "main": {
+      "evidence_dim": 0
+    }
+  },
+  "data": {
+    "scales": {
+      "pyramid_mode": "legacy"
+    }
+  },
+  "experiment_policy": {
+    "name": "v14_legacy_pyramid_control"
+  }
+}

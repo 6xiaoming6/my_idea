@@ -223,6 +223,9 @@ class V14SafeC2FMoE(nn.Module):
         m_c: torch.Tensor,
         r_m: torch.Tensor | None = None,
         r_c: torch.Tensor | None = None,
+        e_f: torch.Tensor | None = None,
+        e_m: torch.Tensor | None = None,
+        e_c: torch.Tensor | None = None,
     ) -> dict:
         base_outputs = self.main_backbone(
             x_f=x_f,
@@ -233,6 +236,9 @@ class V14SafeC2FMoE(nn.Module):
             m_c=m_c,
             r_m=r_m,
             r_c=r_c,
+            e_f=e_f,
+            e_m=e_m,
+            e_c=e_c,
         )
         if not self.enabled:
             return base_outputs

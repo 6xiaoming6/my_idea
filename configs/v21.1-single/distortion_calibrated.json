@@ -1,0 +1,29 @@
+{
+  "output_dir": "outputs/v21.1-single",
+  "model": {
+    "version": "v21.1-single",
+    "architecture": "v21_distortion_calibrated_moe",
+    "main": {
+      "evidence_dim": 0
+    },
+    "v21_1": {
+      "use_explicit_distortion": true,
+      "evidence_dim": 7,
+      "gate_hidden": 16,
+      "alpha_max": 0.5,
+      "alpha_init": 0.01,
+      "module_seed": 2111
+    }
+  },
+  "data": {
+    "scales": {
+      "pyramid_mode": "dual_observation_moment"
+    }
+  },
+  "experiment_policy": {
+    "name": "distortion_adaptive_dual_pyramid",
+    "anchor": "v14_legacy_pyramid",
+    "candidate": "measure_preserving_pyramid",
+    "calibration": "bounded_local_distortion_acceptance"
+  }
+}

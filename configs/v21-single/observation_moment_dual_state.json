@@ -1,0 +1,28 @@
+{
+  "output_dir": "outputs/v21-single",
+  "model": {
+    "version": "v21-single",
+    "main": {
+      "evidence_dim": 7,
+      "evidence_zero_init": true
+    }
+  },
+  "data": {
+    "scales": {
+      "pyramid_mode": "observation_moment"
+    }
+  },
+  "experiment_policy": {
+    "name": "observation_moment_dual_state",
+    "content_path": "fine_observation_sum_count",
+    "evidence_channels": [
+      "coverage",
+      "relative_value_variance",
+      "centroid_y",
+      "centroid_x",
+      "spread_y",
+      "spread_x",
+      "covariance_yx"
+    ]
+  }
+}

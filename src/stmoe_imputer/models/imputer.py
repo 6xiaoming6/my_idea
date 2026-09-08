@@ -34,7 +34,7 @@ class DualBranchSTImputer(nn.Module):
         )
 
     def forward(self, batch: dict[str, torch.Tensor]) -> dict:
-        main_outputs = self.main_branch(
+        main_inputs = dict(
             x_f=batch["x_f_obs"],
             m_f=batch["m_f"],
             x_m=batch["x_m_obs"],
@@ -43,7 +43,21 @@ class DualBranchSTImputer(nn.Module):
             m_c=batch["m_c"],
             r_m=batch.get("r_m"),
             r_c=batch.get("r_c"),
+            e_f=batch.get("e_f"),
+            e_m=batch.get("e_m"),
+            e_c=batch.get("e_c"),
         )
+        for key in (
+            "x_m_measure",
+            "m_m_measure",
+            "r_m_measure",
+            "x_c_measure",
+            "m_c_measure",
+            "r_c_measure",
+        ):
+            if key in batch:
+                main_inputs[key] = batch[key]
+        main_outputs = self.main_branch(**main_inputs)
         x_hat_main = main_outputs["x_hat_main"]
         h_st_aux = main_outputs["h_st_aux"]
         if self.aux_enabled:

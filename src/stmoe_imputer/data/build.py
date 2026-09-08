@@ -27,6 +27,7 @@ def build_datasets(
             fine_to_mid=scale_cfg["fine_to_mid"],
             fine_to_coarse=scale_cfg["fine_to_coarse"],
             pooling_mode=scale_cfg.get("pooling_mode", "avg"),
+            pyramid_mode=scale_cfg.get("pyramid_mode", "legacy"),
             seed=cfg.get("seed", 42),
         )
         val_ds = SyntheticFlowDataset(
@@ -39,6 +40,7 @@ def build_datasets(
             fine_to_mid=scale_cfg["fine_to_mid"],
             fine_to_coarse=scale_cfg["fine_to_coarse"],
             pooling_mode=scale_cfg.get("pooling_mode", "avg"),
+            pyramid_mode=scale_cfg.get("pyramid_mode", "legacy"),
             seed=cfg.get("seed", 42) + 10000,
         )
         return train_ds, val_ds
@@ -78,6 +80,7 @@ def build_datasets(
         fine_to_mid=scale_cfg["fine_to_mid"],
         fine_to_coarse=scale_cfg["fine_to_coarse"],
         pooling_mode=scale_cfg.get("pooling_mode", "avg"),
+        pyramid_mode=scale_cfg.get("pyramid_mode", "legacy"),
         seed=cfg.get("seed", 42),
         mask_csv=train_csv,
     )
@@ -87,6 +90,7 @@ def build_datasets(
         fine_to_mid=scale_cfg["fine_to_mid"],
         fine_to_coarse=scale_cfg["fine_to_coarse"],
         pooling_mode=scale_cfg.get("pooling_mode", "avg"),
+        pyramid_mode=scale_cfg.get("pyramid_mode", "legacy"),
         seed=cfg.get("seed", 42) + 20000,
         mask_csv=val_csv,
     )
@@ -104,6 +108,7 @@ def build_test_dataset(cfg: dict, test_npz: str | None = None, synthetic: bool =
             c_in=cfg["model"]["c_in"], mask_cfg=mask_cfg,
             fine_to_mid=scale_cfg["fine_to_mid"], fine_to_coarse=scale_cfg["fine_to_coarse"],
             pooling_mode=scale_cfg.get("pooling_mode", "avg"), seed=cfg.get("seed", 42) + 30000,
+            pyramid_mode=scale_cfg.get("pyramid_mode", "legacy"),
         )
     if test_npz is None:
         return None
@@ -115,6 +120,7 @@ def build_test_dataset(cfg: dict, test_npz: str | None = None, synthetic: bool =
         test_npz, mask_cfg=mask_cfg,
         fine_to_mid=scale_cfg["fine_to_mid"], fine_to_coarse=scale_cfg["fine_to_coarse"],
         pooling_mode=scale_cfg.get("pooling_mode", "avg"),
+        pyramid_mode=scale_cfg.get("pyramid_mode", "legacy"),
         seed=cfg.get("seed", 42) + 30000, mask_csv=test_csv,
     )
 

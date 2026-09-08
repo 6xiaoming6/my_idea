@@ -20,15 +20,18 @@ from .main_branch import (
 from .registry import MODEL_REGISTRY, build_model_backbone, resolve_architecture
 from .v_single import (
     DifficultyConditionEncoder,
+    DistortionAcceptanceGate,
     ObservedConsistencyEvaluator,
     SafeCoarseToFineRefiner,
     SafetyController,
     V14SafeC2FMoE,
+    V21DistortionCalibratedMoE,
 )
 
 __all__ = [
     "DualBranchSTImputer",
     "DifficultyConditionEncoder",
+    "DistortionAcceptanceGate",
     "AdaptiveBranchGate",
     "ExpertEnhancedSharedInput",
     "GatedFusion2",
@@ -48,6 +51,7 @@ __all__ = [
     "SafeCoarseToFineRefiner",
     "SafetyController",
     "V14SafeC2FMoE",
+    "V21DistortionCalibratedMoE",
     "build_model_backbone",
     "build_scale_active_mask",
     "get_active_scales",

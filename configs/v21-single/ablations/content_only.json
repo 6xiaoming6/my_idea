@@ -1,0 +1,17 @@
+{
+  "output_dir": "outputs/v21-single",
+  "model": {
+    "version": "v21-single-content-only",
+    "main": {
+      "evidence_dim": 0
+    }
+  },
+  "data": {
+    "scales": {
+      "pyramid_mode": "observation_moment"
+    }
+  },
+  "experiment_policy": {
+    "name": "path_consistent_content_only"
+  }
+}

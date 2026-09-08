@@ -325,6 +325,19 @@ def compute_main_stage_loss(
     cfg: dict,
     epoch: int | None = None,
 ) -> tuple[torch.Tensor, dict[str, torch.Tensor]]:
+    if "v22_scale" in outputs:
+        # Latent irregular regions have no fixed-grid physical coarse target.
+        # Apply the same observation-only normalization to prediction and target.
+        center, scale = outputs["v22_center"], outputs["v22_scale"]
+        pred = (outputs["x_hat_final"] - center) / scale
+        target = (batch["x_f_gt"] - center) / scale
+        opt = cfg.get("loss", {})
+        main = masked_loss(pred, target, batch["m_f"], opt.get("type", "smooth_l1"))
+        mass, balance = outputs["v22_mass_loss"], outputs["v22_balance_loss"]
+        loss = main + float(opt.get("lambda_v22_mass", 0.001)) * mass
+        loss = loss + float(opt.get("lambda_v22_balance", 0.001)) * balance
+        return loss, {"loss": loss.detach(), "l_main": main.detach(),
+                      "l_v22_mass": mass.detach(), "l_v22_balance": balance.detach()}
     loss_cfg = cfg["loss"]
     loss_type = loss_cfg.get("type", "smooth_l1")
     v14_rmse_regret_weight = float(loss_cfg.get("lambda_v14_rmse_regret", 0.0))
@@ -505,6 +518,9 @@ def compute_main_stage_loss(
     loss = loss + v14_delta_scale_weight * l_v14_delta_scale
     if loss_cfg.get("lambda_final", 0.0) > 0:
         loss = loss + loss_cfg["lambda_final"] * l_final
+    proxy_loss = outputs.get("v21_2_proxy_loss")
+    if proxy_loss is not None:
+        loss = loss + cfg["model"]["v21_2"].get("proxy_weight", 1.0) * proxy_loss
     loss_logs = {
         "loss": loss.detach(),
         "l_final": l_final.detach(),
@@ -539,4 +555,6 @@ def compute_main_stage_loss(
                 v14_stage_aux_scale, device=l_main.device
             ).detach(),
         })
+    if proxy_loss is not None:
+        loss_logs["l_v21_2_proxy"] = proxy_loss.detach()
     return loss, loss_logs

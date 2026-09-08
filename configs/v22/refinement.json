@@ -1,0 +1,28 @@
+{
+  "suite": "configs/v22/experiments.json",
+  "profile": "quick",
+  "output_dir": "outputs/v22/refinement",
+  "epochs": 60,
+  "seeds": [42],
+  "points": [
+    ["BikeNYC", "fixed", "0.4"],
+    ["BikeNYC", "random", "0.4"],
+    ["TaxiBJ", "fixed", "0.4"],
+    ["TaxiBJ", "random", "0.4"],
+    ["CHAP", "fixed", "0.4"],
+    ["CHAP", "random", "0.4"]
+  ],
+  "baselines": ["uniform", "moe"],
+  "variants": {
+    "bounded": {
+      "max_strength": 0.5,
+      "initial_strength": 0.1,
+      "fallback_probability": 0.0
+    },
+    "bounded_fallback": {
+      "max_strength": 0.5,
+      "initial_strength": 0.1,
+      "fallback_probability": 0.25
+    }
+  }
+}

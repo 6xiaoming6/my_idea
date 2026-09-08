@@ -20,6 +20,7 @@ class SyntheticFlowDataset(Dataset):
         fine_to_mid: int = 2,
         fine_to_coarse: int = 4,
         pooling_mode: str = "avg",
+        pyramid_mode: str = "legacy",
         seed: int = 42,
     ) -> None:
         self.num_samples = num_samples
@@ -31,6 +32,7 @@ class SyntheticFlowDataset(Dataset):
         self.fine_to_mid = fine_to_mid
         self.fine_to_coarse = fine_to_coarse
         self.pooling_mode = pooling_mode
+        self.pyramid_mode = pyramid_mode
         self.generator = torch.Generator().manual_seed(seed)
 
         pattern = self.mask_cfg.get("pattern", "random")
@@ -74,7 +76,13 @@ class SyntheticFlowDataset(Dataset):
         mask_idx = 0 if self.masks.shape[0] == 1 else idx
         m_f = self.masks[mask_idx].clone()
         sample = {"x_f_gt": x_f_gt, "m_f": m_f}
-        return ensure_multiscale(sample, self.fine_to_mid, self.fine_to_coarse, self.pooling_mode)
+        return ensure_multiscale(
+            sample,
+            self.fine_to_mid,
+            self.fine_to_coarse,
+            self.pooling_mode,
+            self.pyramid_mode,
+        )
 
 
 SyntheticSpatioTemporalDataset = SyntheticFlowDataset

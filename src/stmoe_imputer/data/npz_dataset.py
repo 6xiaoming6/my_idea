@@ -25,6 +25,7 @@ class FlowNPZDataset(Dataset):
         fine_to_mid: int = 2,
         fine_to_coarse: int = 4,
         pooling_mode: str = "avg",
+        pyramid_mode: str = "legacy",
         seed: int = 42,
         mask_csv: str | Path | None = None,
         fixed_mask_csv: str | Path | None = None,
@@ -40,6 +41,7 @@ class FlowNPZDataset(Dataset):
         self.fine_to_mid = fine_to_mid
         self.fine_to_coarse = fine_to_coarse
         self.pooling_mode = pooling_mode
+        self.pyramid_mode = pyramid_mode
         self.seed = seed
 
         self.loaded_masks: torch.Tensor | None = None
@@ -132,7 +134,13 @@ class FlowNPZDataset(Dataset):
                     self._tensor_at(r_key, idx).unsqueeze(0), channels=1
                 ).squeeze(0)
 
-        return ensure_multiscale(sample, self.fine_to_mid, self.fine_to_coarse, self.pooling_mode)
+        return ensure_multiscale(
+            sample,
+            self.fine_to_mid,
+            self.fine_to_coarse,
+            self.pooling_mode,
+            self.pyramid_mode,
+        )
 
 
 NPZSpatioTemporalDataset = FlowNPZDataset

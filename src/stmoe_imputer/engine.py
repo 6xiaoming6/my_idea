@@ -41,6 +41,7 @@ def build_optimizer(model: torch.nn.Module, cfg: dict) -> torch.optim.Optimizer:
                 "main_branch.controller",
                 "main_branch.refiner",
                 "main_branch.local_residual_gate",
+                "main_branch.coarse_acceptance",
             )
         )
         if is_v14_new and (name_l.endswith(".bias") or "norm" in name_l):
@@ -163,6 +164,11 @@ def _append_model_diagnostics(logs: dict[str, list[float]], outputs: dict) -> No
         logs["branch_gate_route_std"].append(float(route.std(unbiased=False).detach().cpu()))
 
     diagnostics = outputs.get("diagnostics", {})
+    v22 = diagnostics.get("v22") if isinstance(diagnostics, dict) else None
+    if isinstance(v22, dict):
+        for key, value in v22.items():
+            if torch.is_tensor(value):
+                logs[f"v22_{key}"].append(float(value.detach().float().mean().cpu()))
     beta = diagnostics.get("shared_input_beta") if isinstance(diagnostics, dict) else None
     if beta is not None and torch.is_tensor(beta):
         logs["shared_input_beta_f"].append(float(beta[0].detach().cpu()))
@@ -191,6 +197,26 @@ def _append_model_diagnostics(logs: dict[str, list[float]], outputs: dict) -> No
                 logs["v14_local_gate_modulation_max"].append(
                     float(value_f.max().cpu())
                 )
+
+    v21_2 = diagnostics.get("v21_2") if isinstance(diagnostics, dict) else None
+    if isinstance(v21_2, dict):
+        for key, value in v21_2.items():
+            if torch.is_tensor(value):
+                logs[f"v21_2_{key}_mean"].append(float(value.detach().float().mean().cpu()))
+
+    v21_1 = diagnostics.get("v21_1") if isinstance(diagnostics, dict) else None
+    if isinstance(v21_1, dict):
+        for key, value in v21_1.items():
+            if value is None or not torch.is_tensor(value):
+                continue
+            value_f = value.detach().float()
+            logs[f"v21_1_{key}_mean"].append(float(value_f.mean().cpu()))
+            if key in {"alpha_mid", "alpha_coarse", "distortion_mid", "distortion_coarse"}:
+                logs[f"v21_1_{key}_std"].append(
+                    float(value_f.std(unbiased=False).cpu())
+                )
+                logs[f"v21_1_{key}_min"].append(float(value_f.min().cpu()))
+                logs[f"v21_1_{key}_max"].append(float(value_f.max().cpu()))
 
     if isinstance(v14, dict):
         for scale in ("fine", "mid", "coarse"):

@@ -1,0 +1,64 @@
+{
+  "common": {
+    "output_dir": "outputs/v22",
+    "data": {
+      "batch_size": 8, "num_workers": 0, "drop_last": false,
+      "scales": {"pyramid_mode": "legacy"}
+    },
+    "model": {
+      "version": "v22", "architecture": "v22_coarsening_moe",
+      "aux": {"enabled": false},
+      "main": {"use_router": false, "use_routed_branch": false, "enable_branch_aux": false},
+      "v22": {
+        "mode": "moe", "dim": 48, "num_groups": 8, "dropout": 0.1,
+        "strides": [2, 4], "radii": [0, 1, 2], "temperature": 1.0,
+        "normalization_floor": 1.0
+      }
+    },
+    "loss": {
+      "type": "smooth_l1", "lambda_v22_mass": 0.001, "lambda_v22_balance": 0.001,
+      "lambda_cross": 0.0, "lambda_balance": 0.0, "lambda_importance_balance": 0.0,
+      "lambda_load_balance": 0.0, "lambda_shared_aux": 0.0, "lambda_route_aux": 0.0,
+      "lambda_complementary": 0.0
+    },
+    "train": {
+      "lr_main": 0.001, "weight_decay": 0.0001, "amp": false,
+      "grad_clip_norm": 1.0,
+      "scheduler": {"type": "cosine", "eta_min": 0.000001},
+      "early_stopping": {"enabled": false, "monitor": "val_mae", "mode": "min"}
+    }
+  },
+  "datasets": {
+    "TaxiBJ": {"train": {"epochs": 160, "val_epoch": 5}},
+    "BikeNYC": {"train": {"epochs": 140, "val_epoch": 2}},
+    "CHAP": {"train": {"epochs": 150, "val_epoch": 5}}
+  },
+  "variants": {
+    "fixed": {"model": {"v22": {"mode": "fixed"}}},
+    "fixed_stats": {"model": {"v22": {"mode": "fixed_stats"}}},
+    "single_local": {"model": {"v22": {"mode": "single_local"}}},
+    "single_wide": {"model": {"v22": {"mode": "single_wide"}}},
+    "uniform": {"model": {"v22": {"mode": "uniform"}}},
+    "moe": {"model": {"v22": {"mode": "moe"}}},
+    "moe_no_stats": {"model": {"v22": {"mode": "moe_no_stats"}}}
+  },
+  "distributed": {"per_rank_batch_size": 4, "timeout_seconds": 1800},
+  "profiles": {
+    "quick": {
+      "common": {"output_dir": "outputs/v22/quick"},
+      "datasets": {
+        "TaxiBJ": {"train": {"epochs": 120, "val_epoch": 2}},
+        "BikeNYC": {"train": {"epochs": 120, "val_epoch": 2}},
+        "CHAP": {"train": {"epochs": 120, "val_epoch": 2}}
+      },
+      "default_variants": ["fixed_stats", "single_local", "uniform", "moe"],
+      "default_points": [["BikeNYC", "fixed", "0.4"], ["BikeNYC", "random", "0.4"]]
+    }
+  },
+  "default_variants": ["fixed", "fixed_stats", "single_local", "uniform", "moe"],
+  "core6": [
+    ["TaxiBJ", "fixed", "0.6"], ["TaxiBJ", "random", "0.6"],
+    ["BikeNYC", "fixed", "0.4"], ["BikeNYC", "random", "0.4"],
+    ["CHAP", "fixed", "0.4"], ["CHAP", "random", "0.4"]
+  ]
+}

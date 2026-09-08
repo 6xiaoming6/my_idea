@@ -1,0 +1,25 @@
+{
+  "suite": "configs/v22/experiments.json",
+  "output_dir": "outputs/v22/full_idea",
+  "train": {"epochs": 60, "val_epoch": 2, "lr_main": 0.001, "weight_decay": 0.0001, "amp": false},
+  "batch_size": 4,
+  "model": {
+    "dim": 48, "num_groups": 8, "dropout": 0.1,
+    "strides": [2, 4], "radii": [0, 1, 2], "temperature": 1.0,
+    "normalization_floor": 1.0, "exchange_rounds": 2, "top_k": 3
+  },
+  "variants": {
+    "full": {"routing": "moe"},
+    "uniform": {"routing": "uniform"},
+    "fixed": {"routing": "fixed"},
+    "top2": {"routing": "moe", "top_k": 2},
+    "one_exchange": {"routing": "moe", "exchange_rounds": 1}
+  },
+  "default_variants": ["full"],
+  "seeds": [42],
+  "points": [
+    ["BikeNYC", "fixed", "0.4"], ["BikeNYC", "random", "0.4"],
+    ["TaxiBJ", "fixed", "0.4"], ["TaxiBJ", "random", "0.4"],
+    ["CHAP", "fixed", "0.4"], ["CHAP", "random", "0.4"]
+  ]
+}

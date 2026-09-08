@@ -159,9 +159,17 @@ class DifficultyConditionEncoder(nn.Module):
 
     @staticmethod
     def _condition_ready(stats: torch.Tensor) -> torch.Tensor:
-        normalized = stats.clone()
-        normalized[:, 5:7] = torch.log1p(normalized[:, 5:7].clamp_min(0.0))
-        return normalized
+        # Keep this transform out-of-place.  V14 receives data tensors here,
+        # whereas V21.1 feeds a differentiable calibrated pyramid; slice
+        # assignment would invalidate autograd's saved view during backward.
+        return torch.cat(
+            (
+                stats[:, :5],
+                torch.log1p(stats[:, 5:7].clamp_min(0.0)),
+                stats[:, 7:],
+            ),
+            dim=1,
+        )
 
     def forward(
         self,

@@ -52,6 +52,8 @@ class MultiScaleMoEBackbone(nn.Module):
         scale_evidence_gain: float = 0.0,
         scale_gate_temperature: float = 1.0,
         scale_gate_uniform_floor: float = 0.0,
+        evidence_dim: int = 0,
+        evidence_zero_init: bool = True,
     ) -> None:
         super().__init__()
         self.dim = dim
@@ -80,10 +82,16 @@ class MultiScaleMoEBackbone(nn.Module):
         self.scale_evidence_gain = float(scale_evidence_gain)
         self.scale_gate_temperature = float(scale_gate_temperature)
         self.scale_gate_uniform_floor = float(scale_gate_uniform_floor)
+        self.evidence_dim = int(evidence_dim)
 
-        self.embed_f = ScaleTokenEncoder(c_in, dim, max_t, h, w, num_groups=num_groups)
-        self.embed_m = ScaleTokenEncoder(c_in, dim, max_t, h // 2, w // 2, num_groups=num_groups)
-        self.embed_c = ScaleTokenEncoder(c_in, dim, max_t, h // 4, w // 4, num_groups=num_groups)
+        encoder_kwargs = {
+            "num_groups": num_groups,
+            "evidence_dim": self.evidence_dim,
+            "evidence_zero_init": evidence_zero_init,
+        }
+        self.embed_f = ScaleTokenEncoder(c_in, dim, max_t, h, w, **encoder_kwargs)
+        self.embed_m = ScaleTokenEncoder(c_in, dim, max_t, h // 2, w // 2, **encoder_kwargs)
+        self.embed_c = ScaleTokenEncoder(c_in, dim, max_t, h // 4, w // 4, **encoder_kwargs)
 
         self.router_f = QualityRouter(dim, q_dim, num_experts)
         self.router_m = QualityRouter(dim, q_dim, num_experts)
@@ -196,6 +204,8 @@ class MultiScaleMoEBackbone(nn.Module):
             scale_evidence_gain=main_cfg.get("scale_evidence_gain", 0.0),
             scale_gate_temperature=main_cfg.get("scale_gate_temperature", 1.0),
             scale_gate_uniform_floor=main_cfg.get("scale_gate_uniform_floor", 0.0),
+            evidence_dim=main_cfg.get("evidence_dim", 0),
+            evidence_zero_init=main_cfg.get("evidence_zero_init", True),
         )
 
     def get_scale_embed_vec(self, embed_module: ScaleTokenEncoder, batch_size: int) -> torch.Tensor:
@@ -227,6 +237,9 @@ class MultiScaleMoEBackbone(nn.Module):
         m_c: torch.Tensor,
         r_m: torch.Tensor | None = None,
         r_c: torch.Tensor | None = None,
+        e_f: torch.Tensor | None = None,
+        e_m: torch.Tensor | None = None,
+        e_c: torch.Tensor | None = None,
     ) -> dict[str, torch.Tensor | dict[str, torch.Tensor]]:
         batch_size = x_f.shape[0]
         if r_m is None:
@@ -234,9 +247,9 @@ class MultiScaleMoEBackbone(nn.Module):
         if r_c is None:
             r_c = m_c.float()
 
-        h_f = self.embed_f(x_f, m_f)
-        h_m = self.embed_m(x_m, m_m)
-        h_c = self.embed_c(x_c, m_c)
+        h_f = self.embed_f(x_f, m_f, e_f)
+        h_m = self.embed_m(x_m, m_m, e_m)
+        h_c = self.embed_c(x_c, m_c, e_c)
 
         q_f = compute_observation_stats(m_f)
         q_m = compute_observation_stats(m_m)

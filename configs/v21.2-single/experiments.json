@@ -1,0 +1,37 @@
+{
+  "common": {
+    "output_dir": "outputs/v21.2-single",
+    "data": {"scales": {"pyramid_mode": "dual_observation_moment"}},
+    "model": {
+      "version": "v21.2-single",
+      "architecture": "v21_paired_risk_moe",
+      "main": {"evidence_dim": 0},
+      "v21_2": {
+        "mode": "risk", "hidden": 16, "module_seed": 2121,
+        "candidate_alphas": [0.125, 0.25],
+        "risk_margin": 0.02, "acceptance_temperature": 0.1,
+        "use_distortion": true, "shuffle_targets": false,
+        "holdout_fraction": 0.25, "min_holdout_count": 2,
+        "proxy_weight": 1.0, "constant_alpha": 0.05
+      }
+    }
+  },
+  "datasets": {
+    "TaxiBJ": {"train": {"epochs": 160, "val_epoch": 5, "early_stopping": {"enabled": false}}},
+    "BikeNYC": {"train": {"epochs": 140, "val_epoch": 2, "early_stopping": {"enabled": false}}},
+    "CHAP": {"train": {"epochs": 150, "val_epoch": 5, "early_stopping": {"enabled": false}}}
+  },
+  "variants": {
+    "risk": {},
+    "no_distortion": {"model": {"v21_2": {"use_distortion": false}}},
+    "constant": {"model": {"v21_2": {"mode": "constant"}}},
+    "constant_mid": {"model": {"v21_2": {"mode": "constant", "constant_alpha": 0.125}}},
+    "constant_max": {"model": {"v21_2": {"mode": "constant", "constant_alpha": 0.25}}},
+    "shuffled": {"model": {"v21_2": {"shuffle_targets": true}}},
+    "anchor": {"model": {"v21_2": {"mode": "anchor"}}},
+    "risk_three_scale": {"model": {"main": {"scale_mode": "fine_mid_coarse"}}},
+    "anchor_three_scale": {"model": {"main": {"scale_mode": "fine_mid_coarse"}, "v21_2": {"mode": "anchor"}}}
+  },
+  "default_variants": ["risk", "no_distortion", "constant"],
+  "core6": [["TaxiBJ", "fixed", "0.6"], ["TaxiBJ", "random", "0.6"], ["BikeNYC", "fixed", "0.4"], ["BikeNYC", "random", "0.4"], ["CHAP", "fixed", "0.4"], ["CHAP", "random", "0.4"]]
+}
