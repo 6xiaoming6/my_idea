@@ -1,0 +1,31 @@
+{
+  "device": "cpu",
+  "output_dir": "outputs/v23/learned_regions/smoke",
+  "data": {
+    "batch_size": 2,
+    "pin_memory": false,
+    "synthetic": {
+      "num_train": 4,
+      "num_val": 3,
+      "t": 3,
+      "h": 8,
+      "w": 12
+    }
+  },
+  "model": {
+    "dual_moe": {
+      "dim": 8,
+      "key_dim": 4,
+      "num_groups": 2,
+      "coarse_nodes": [
+        8,
+        2
+      ]
+    }
+  },
+  "train": {
+    "epochs": 2,
+    "val_epoch": 1,
+    "amp": false
+  }
+}

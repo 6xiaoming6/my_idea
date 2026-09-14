@@ -1,0 +1,43 @@
+{
+  "protocol": "target-readout-three-dataset-v1",
+  "output_dir": "outputs/v23/target_dual_moe/replication",
+  "datasets": ["TaxiBJ", "BikeNYC"],
+  "patterns": ["random"],
+  "rate": 0.4,
+  "seeds": [2026],
+  "ablation_seed": 2026,
+  "train_windows": 2048,
+  "expected_train_samples": {"TaxiBJ": 2048, "BikeNYC": 511},
+  "dataset_epochs": {"TaxiBJ": 140, "BikeNYC": 100},
+  "val_epoch": 2,
+  "save_best_checkpoint": false,
+  "batch_size": 4,
+  "cpu_threads": 2,
+  "timing_safety_factor": 1.20,
+  "deadline": "2026-09-11 20:00",
+  "deadline_mode": "advisory",
+  "seed42_reference_suite": "outputs/v23/target_dual_moe/comparison/59b0fbd6ce70214f",
+  "analysis_note": "This queue only trains seed2026. Compare with the recorded seed42 suite after checking model/loss/data/budgets. It does not import or rerun seed42. CHAP's previous negative result remains part of the evidence; this is targeted replication, not three-dataset confirmation or statistical significance.",
+  "variants": {
+    "Q01": {
+      "role": "main", "description": "前端E8等权，后端Top-2：匹配seed42参考",
+      "patch": {"model": {"dual_moe": {"aggregation_mode": "uniform", "completion_mode": "topk"}},
+                "loss": {"dual_moe_aggregation_balance_weight": 0, "dual_moe_completion_balance_weight": 0.01}}
+    },
+    "Q11": {
+      "role": "main", "description": "前端目标Top-4，后端Top-2：独立种子复现双MoE收益",
+      "patch": {"model": {"dual_moe": {"aggregation_mode": "topk", "completion_mode": "topk"}},
+                "loss": {"dual_moe_aggregation_balance_weight": 0.001, "dual_moe_completion_balance_weight": 0.01}}
+    },
+    "Q10": {
+      "role": "main", "description": "前端目标Top-4，后端等权：复现后端的条件增益",
+      "patch": {"model": {"dual_moe": {"aggregation_mode": "topk", "completion_mode": "uniform"}},
+                "loss": {"dual_moe_aggregation_balance_weight": 0.001, "dual_moe_completion_balance_weight": 0}}
+    },
+    "Q00": {
+      "role": "main", "description": "前后端等权：检查双MoE是否真正优于简单融合",
+      "patch": {"model": {"dual_moe": {"aggregation_mode": "uniform", "completion_mode": "uniform"}},
+                "loss": {"dual_moe_aggregation_balance_weight": 0, "dual_moe_completion_balance_weight": 0}}
+    }
+  }
+}

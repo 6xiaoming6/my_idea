@@ -1,4 +1,5 @@
 from .imputer import DualBranchSTImputer, ParallelTwoBranchImputer
+from .dual_moe import DualMoEBackbone, ObservationAggregationMoE, AnchoredScaleMoEBackbone
 from .fusion import (
     AdaptiveBranchGate,
     ExpertEnhancedSharedInput,
@@ -27,6 +28,9 @@ from .v_single import (
 )
 
 __all__ = [
+    "DualMoEBackbone",
+    "AnchoredScaleMoEBackbone",
+    "ObservationAggregationMoE",
     "DualBranchSTImputer",
     "DifficultyConditionEncoder",
     "AdaptiveBranchGate",

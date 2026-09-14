@@ -1,0 +1,40 @@
+{
+  "protocol": "target-readout-three-dataset-v1",
+  "output_dir": "outputs/v23/target_dual_moe/comparison",
+  "datasets": ["TaxiBJ", "BikeNYC", "CHAP"],
+  "patterns": ["random"],
+  "rate": 0.4,
+  "seeds": [42],
+  "ablation_seed": 42,
+  "train_windows": 2048,
+  "expected_train_samples": {"TaxiBJ": 2048, "BikeNYC": 511, "CHAP": 2048},
+  "dataset_epochs": {"TaxiBJ": 140, "BikeNYC": 100, "CHAP": 150},
+  "val_epoch": 2,
+  "save_best_checkpoint": false,
+  "batch_size": 4,
+  "cpu_threads": 2,
+  "timing_safety_factor": 1.20,
+  "deadline": "2026-09-11 16:30",
+  "variants": {
+    "Q01": {
+      "role": "main", "description": "前端E8等权，后端3尺度Top-2：既有等权参考机制",
+      "patch": {"model": {"dual_moe": {"aggregation_mode": "uniform", "completion_mode": "topk"}},
+                "loss": {"dual_moe_aggregation_balance_weight": 0, "dual_moe_completion_balance_weight": 0.01}}
+    },
+    "Q11": {
+      "role": "main", "description": "前端目标Top-4，后端Top-2：本轮主候选",
+      "patch": {"model": {"dual_moe": {"aggregation_mode": "topk", "completion_mode": "topk"}},
+                "loss": {"dual_moe_aggregation_balance_weight": 0.001, "dual_moe_completion_balance_weight": 0.01}}
+    },
+    "Q10": {
+      "role": "main", "description": "前端目标Top-4，后端等权：检验后端作用",
+      "patch": {"model": {"dual_moe": {"aggregation_mode": "topk", "completion_mode": "uniform"}},
+                "loss": {"dual_moe_aggregation_balance_weight": 0.001, "dual_moe_completion_balance_weight": 0}}
+    },
+    "Q00": {
+      "role": "main", "description": "前后端等权：保留全部可学习专家的同容量参考",
+      "patch": {"model": {"dual_moe": {"aggregation_mode": "uniform", "completion_mode": "uniform"}},
+                "loss": {"dual_moe_aggregation_balance_weight": 0, "dual_moe_completion_balance_weight": 0}}
+    }
+  }
+}

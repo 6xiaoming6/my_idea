@@ -1,0 +1,182 @@
+{
+  "protocol": "dual-moe-coverage-v1",
+  "output_dir": "outputs/v23/target_dual_moe/coverage",
+  "datasets": [
+    "TaxiBJ",
+    "BikeNYC",
+    "CHAP"
+  ],
+  "patterns": [
+    "fixed",
+    "random"
+  ],
+  "rates": [
+    0.2,
+    0.4,
+    0.6,
+    0.8
+  ],
+  "seeds": [
+    42,
+    2026
+  ],
+  "ablation_seed": 42,
+  "mechanism_points": [
+    {
+      "pattern": "random",
+      "rate": 0.4
+    }
+  ],
+  "default_budget": "full",
+  "budgets": {
+    "full": {
+      "train_windows": 2626,
+      "expected_train_samples": {
+        "TaxiBJ": 2491,
+        "BikeNYC": 511,
+        "CHAP": 2626
+      },
+      "dataset_epochs": {"TaxiBJ": 70, "BikeNYC": 100, "CHAP": 80},
+      "deadline": "2026-09-13 09:00",
+      "deadline_mode": "strict"
+    },
+    "extended": {
+      "train_windows": 2626,
+      "expected_train_samples": {
+        "TaxiBJ": 2491,
+        "BikeNYC": 511,
+        "CHAP": 2626
+      },
+      "deadline": null,
+      "dataset_epochs": {"TaxiBJ": 140, "BikeNYC": 100, "CHAP": 150},
+      "deadline_mode": "strict"
+    }
+  },
+  "val_epoch": 2,
+  "save_best_checkpoint": false,
+  "batch_size": 16,
+  "cpu_threads": 2,
+  "timing_safety_factor": 1.2,
+  "analysis_note": "117 jobs, ALL source TRAIN/VAL/TEST samples: 96 coverage controls seed42; 12 seed2026 controls at random0.4 across all datasets; 9 global-weight/dense-front controls seed42 at the same points. Full profile uses matched 70/100/80 epochs and batch16, extended uses 140/100/150 without deadline. Neither profile truncates individual jobs. CPU best-state testing, no saved checkpoints. Primary endpoints Q11 vs Q01 and Q11 vs Q10. Minimum practical gain 1% MAE; report RMSE tradeoffs, negative cases and late-best flags. Underconverged runs are inconclusive, not evidence against the idea. Front ablation includes balance removal; FD vs SF controls density and balance for conditionality. Do not directly compare absolute scores with prior batch4/subset experiments.",
+  "variants": {
+    "Q00": {
+      "role": "main",
+      "patch": {
+        "model": {
+          "dual_moe": {
+            "aggregation_mode": "uniform",
+            "aggregation_top_k": 4,
+            "completion_mode": "uniform",
+            "completion_top_k": 3
+          }
+        },
+        "loss": {
+          "dual_moe_aggregation_balance_weight": 0,
+          "dual_moe_completion_balance_weight": 0
+        }
+      }
+    },
+    "Q10": {
+      "role": "main",
+      "patch": {
+        "model": {
+          "dual_moe": {
+            "aggregation_mode": "topk",
+            "aggregation_top_k": 4,
+            "completion_mode": "uniform",
+            "completion_top_k": 3
+          }
+        },
+        "loss": {
+          "dual_moe_aggregation_balance_weight": 0.001,
+          "dual_moe_completion_balance_weight": 0
+        }
+      }
+    },
+    "Q01": {
+      "role": "main",
+      "patch": {
+        "model": {
+          "dual_moe": {
+            "aggregation_mode": "uniform",
+            "aggregation_top_k": 4,
+            "completion_mode": "topk",
+            "completion_top_k": 3
+          }
+        },
+        "loss": {
+          "dual_moe_aggregation_balance_weight": 0,
+          "dual_moe_completion_balance_weight": 0
+        }
+      }
+    },
+    "Q11": {
+      "role": "main",
+      "patch": {
+        "model": {
+          "dual_moe": {
+            "aggregation_mode": "topk",
+            "aggregation_top_k": 4,
+            "completion_mode": "topk",
+            "completion_top_k": 3
+          }
+        },
+        "loss": {
+          "dual_moe_aggregation_balance_weight": 0.001,
+          "dual_moe_completion_balance_weight": 0
+        }
+      }
+    },
+    "SF": {
+      "role": "ablation",
+      "patch": {
+        "model": {
+          "dual_moe": {
+            "aggregation_mode": "static",
+            "aggregation_top_k": 8,
+            "completion_mode": "topk",
+            "completion_top_k": 3
+          }
+        },
+        "loss": {
+          "dual_moe_aggregation_balance_weight": 0,
+          "dual_moe_completion_balance_weight": 0
+        }
+      }
+    },
+    "FD": {
+      "role": "ablation",
+      "patch": {
+        "model": {
+          "dual_moe": {
+            "aggregation_mode": "topk",
+            "aggregation_top_k": 8,
+            "completion_mode": "topk",
+            "completion_top_k": 3
+          }
+        },
+        "loss": {
+          "dual_moe_aggregation_balance_weight": 0,
+          "dual_moe_completion_balance_weight": 0
+        }
+      }
+    },
+    "SB": {
+      "role": "ablation",
+      "patch": {
+        "model": {
+          "dual_moe": {
+            "aggregation_mode": "topk",
+            "aggregation_top_k": 4,
+            "completion_mode": "static",
+            "completion_top_k": 3
+          }
+        },
+        "loss": {
+          "dual_moe_aggregation_balance_weight": 0.001,
+          "dual_moe_completion_balance_weight": 0
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "output_dir": "outputs/v14-exploration/aggregation_probe",
+  "datasets": ["BikeNYC", "TaxiBJ", "CHAP"],
+  "patterns": ["scattered", "block"],
+  "missing_rate": 0.4,
+  "seeds": [42],
+  "stages": {
+    "base": ["fine_local", "fine_wide", "fixed", "geometry", "adaptive"],
+    "moe": ["adaptive", "uniform", "moe"],
+    "all": ["fine_local", "fine_wide", "fixed", "geometry", "adaptive", "uniform", "moe"]
+  },
+  "samples": {"train": 128, "val": 32, "test": 32},
+  "model": {"dim": 16, "strides": [2, 4], "wide_dilations": [2, 4]},
+  "train": {
+    "epochs": 20, "val_epoch": 2, "batch_size": 8,
+    "lr": 0.001, "weight_decay": 0.0001, "grad_clip": 1.0
+  }
+}

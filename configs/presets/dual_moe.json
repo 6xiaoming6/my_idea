@@ -1,33 +1,11 @@
 {
-  "seed": 42,
   "output_dir": "outputs/v23/learned_regions",
-  "device": "cuda:0",
   "data": {
-    "dataset_name": "Synthetic",
     "batch_size": 4,
-    "num_workers": 0,
-    "pin_memory": true,
-    "drop_last": false,
-    "scales": {
-      "fine_to_mid": 2,
-      "fine_to_coarse": 4,
-      "pooling_mode": "avg"
-    },
-    "mask": {
-      "pattern": "random",
-      "missing_rate": 0.4
-    },
-    "synthetic": {
-      "num_train": 128,
-      "num_val": 32,
-      "t": 12,
-      "h": 32,
-      "w": 32
-    }
+    "drop_last": false
   },
   "model": {
     "architecture": "dual_moe",
-    "c_in": 2,
     "dual_moe": {
       "dim": 32,
       "key_dim": 8,

@@ -319,12 +319,91 @@ def complementary_loss(h_shared: torch.Tensor, h_route: torch.Tensor) -> torch.T
     return (cos ** 2).mean()
 
 
+def token_topk_balance_loss(routing: dict, valid_mask: torch.Tensor) -> torch.Tensor:
+    """Switch-style E*sum(P_e*stopgrad(f_e)), normalized for Top-K.
+
+    P: full-softmax importance on VALID tokens (differentiable).
+    f: actual selected assignment share, sum(f)=1, not a soft proxy.
+    Empty valid sets contribute zero; channels are NOT counted as extra tokens.
+    """
+    probs, selected = routing['probabilities'].float(), routing['selected'].detach().float()
+    if probs.shape != selected.shape or valid_mask.shape != (probs.shape[0], 1, *probs.shape[2:]):
+        raise ValueError('Top-K balance needs [B,E,T,H,W] routing and [B,1,T,H,W] mask')
+    valid = valid_mask.float()
+    count = valid.sum()
+    importance = (probs*valid).sum((0, 2, 3, 4))/count.clamp_min(1)
+    load = (selected*valid).sum((0, 2, 3, 4))
+    load = load/load.sum().clamp_min(1)
+    return probs.shape[1]*(importance*load).sum()
+
+
+def compute_dual_moe_loss(outputs: dict, batch: dict, cfg: dict):
+    """One-stage observed-normalized reconstruction; no inherited V14 losses.
+
+    Optional per-expert supervision is an explicit ablation (default OFF), not
+    an implicit requirement to make every scale predict every location well.
+    """
+    loss_cfg = cfg.get("loss", {})
+    loss_type = loss_cfg.get("type", "smooth_l1")
+    weight = float(loss_cfg.get("dual_moe_expert_weight", 0.0))
+    if not math.isfinite(weight) or weight < 0:
+        raise ValueError("dual_moe_expert_weight must be finite and nonnegative")
+    target = batch["x_f_gt"].float()
+    missing = (~batch["m_f"].bool()).expand_as(target)
+    if not torch.isfinite(torch.where(missing, target, torch.zeros_like(target))).all():
+        raise ValueError("Missing-position training/evaluation targets must be finite")
+    scale = outputs["normalization"]["scale"].float()
+
+    def reconstruction(pred):
+        # Mask BEFORE loss evaluation; NaN at excluded target positions is safe.
+        error = torch.where(missing, (pred.float()-target)/scale, torch.zeros_like(target))
+        if loss_type == "smooth_l1":
+            values = F.smooth_l1_loss(error, torch.zeros_like(error), reduction="none")
+        elif loss_type == "l1":
+            values = error.abs()
+        elif loss_type == "mse":
+            values = error.square()
+        else:
+            raise ValueError(f"Unsupported loss_type: {loss_type}")
+        return values.sum()/missing.sum().clamp_min(1)
+
+    main = reconstruction(outputs["x_hat_final"])
+    expert = main*0.0
+    if weight:
+        expert = torch.stack([reconstruction(p) for p in outputs["scale_predictions"].values()]).mean()
+    partition_weight = float(loss_cfg.get("dual_moe_partition_weight", 0.0))
+    if not math.isfinite(partition_weight) or partition_weight < 0:
+        raise ValueError("dual_moe_partition_weight must be finite and nonnegative")
+    partition = outputs.get("partition_loss", main*0.)*(missing.sum()>0)
+    loss = main+weight*expert+partition_weight*partition
+    logs = {"l_main": main.detach(), "l_dual_expert": expert.detach(), "l_partition": partition.detach()}
+    routing = outputs.get('routing_details', {})
+    for side, names, valid in [('aggregation', ('aggregation_mid', 'aggregation_coarse'), batch['m_f']),
+                                ('completion', ('completion',), 1-batch['m_f'])]:
+        coefficient = float(loss_cfg.get(f'dual_moe_{side}_balance_weight', 0.))
+        if not math.isfinite(coefficient) or coefficient < 0:
+            raise ValueError(f'dual_moe_{side}_balance_weight must be finite and nonnegative')
+        present = [name for name in names if name in routing]
+        if coefficient and len(present) != len(names):
+            raise ValueError(f'{side} balance is enabled but its Top-K routing metadata is missing; check model modes')
+        if present:
+            terms = [token_topk_balance_loss(routing[name], 1-batch['m_f']
+                     if routing[name].get('valid_domain') == 'missing' else valid) for name in present]
+            balance = torch.stack(terms).mean()
+            loss = loss+coefficient*balance
+            logs[f'l_balance_{side}'] = balance.detach()
+            logs[f'l_balance_{side}_weighted'] = (coefficient*balance).detach()
+    return loss, {'loss': loss.detach(), **logs}
+
+
 def compute_main_stage_loss(
     outputs: dict,
     batch: dict[str, torch.Tensor],
     cfg: dict,
     epoch: int | None = None,
 ) -> tuple[torch.Tensor, dict[str, torch.Tensor]]:
+    if outputs.get("architecture") == "dual_moe":
+        return compute_dual_moe_loss(outputs, batch, cfg)
     loss_cfg = cfg["loss"]
     loss_type = loss_cfg.get("type", "smooth_l1")
     v14_rmse_regret_weight = float(loss_cfg.get("lambda_v14_rmse_regret", 0.0))

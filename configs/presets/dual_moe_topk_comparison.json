@@ -1,0 +1,37 @@
+{
+  "protocol": "dual-topk-full-2x2-v1",
+  "output_dir": "outputs/v23/topk_dual_moe/comparison",
+  "datasets": ["TaxiBJ"],
+  "patterns": ["random"],
+  "rate": 0.4,
+  "seeds": [42],
+  "ablation_seed": 42,
+  "train_windows": 2491,
+  "epochs": 120,
+  "val_epoch": 2,
+  "batch_size": 4,
+  "cpu_threads": 2,
+  "timing_safety_factor": 1.3,
+  "variants": {
+    "T00": {
+      "role": "main", "description": "前后端专家均等权融合；关闭路由均衡损失",
+      "patch": {"model": {"dual_moe": {"aggregation_mode": "uniform", "completion_mode": "uniform"}}, "loss": {"dual_moe_aggregation_balance_weight": 0, "dual_moe_completion_balance_weight": 0}}
+    },
+    "T10": {
+      "role": "main", "description": "前端Top-2及其均衡损失；后端等权融合",
+      "patch": {"model": {"dual_moe": {"aggregation_mode": "topk", "completion_mode": "uniform"}}, "loss": {"dual_moe_aggregation_balance_weight": 0.01, "dual_moe_completion_balance_weight": 0}}
+    },
+    "T01": {
+      "role": "main", "description": "前端等权融合；后端Top-2及其均衡损失",
+      "patch": {"model": {"dual_moe": {"aggregation_mode": "uniform", "completion_mode": "topk"}}, "loss": {"dual_moe_aggregation_balance_weight": 0, "dual_moe_completion_balance_weight": 0.01}}
+    },
+    "T11": {
+      "role": "main", "description": "双Top-2及双均衡损失；与此前全量候选相同设置，重新训练以建立本轮源码指纹",
+      "patch": {"model": {"dual_moe": {"aggregation_mode": "topk", "completion_mode": "topk"}}, "loss": {"dual_moe_aggregation_balance_weight": 0.01, "dual_moe_completion_balance_weight": 0.01}}
+    },
+    "T11_NB": {
+      "role": "main", "description": "双Top-2，但关闭前后端负载均衡损失",
+      "patch": {"model": {"dual_moe": {"aggregation_mode": "topk", "completion_mode": "topk"}}, "loss": {"dual_moe_aggregation_balance_weight": 0, "dual_moe_completion_balance_weight": 0}}
+    }
+  }
+}

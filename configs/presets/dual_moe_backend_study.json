@@ -1,0 +1,43 @@
+{
+  "protocol": "backend-routing-matched-v1",
+  "output_dir": "outputs/v23/target_dual_moe/backend_study",
+  "datasets": ["BikeNYC", "TaxiBJ"],
+  "patterns": ["random"],
+  "rate": 0.4,
+  "seeds": [42, 2026],
+  "ablation_seed": 42,
+  "dataset_seeds": {"BikeNYC": [42, 2026], "TaxiBJ": [42]},
+  "train_windows": 1280,
+  "expected_train_samples": {"BikeNYC": 511, "TaxiBJ": 1280},
+  "dataset_epochs": {"BikeNYC": 100, "TaxiBJ": 140},
+  "val_epoch": 2,
+  "save_best_checkpoint": false,
+  "batch_size": 4,
+  "cpu_threads": 2,
+  "timing_safety_factor": 1.20,
+  "deadline": "2026-09-11 23:00",
+  "deadline_mode": "strict",
+  "analysis_note": "Keep frontend E8/Top4 and .001 balance fixed in all groups; weights still train jointly. BikeNYC is the primary two-seed mechanism test. TaxiBJ uses 1280 train windows as a matched single-seed regression check, not a direct comparison to prior 2048-window scores. No checkpoint persistence; full validation/test.",
+  "variants": {
+    "BU": {
+      "role": "main", "description": "后端等权融合，关闭后端均衡",
+      "patch": {"model": {"dual_moe": {"completion_mode": "uniform", "completion_top_k": 2}},
+                "loss": {"dual_moe_completion_balance_weight": 0}}
+    },
+    "BD": {
+      "role": "main", "description": "后端密集softmax（3选3），关闭恒定硬计数均衡，匹配Top2初始化",
+      "patch": {"model": {"dual_moe": {"completion_mode": "topk", "completion_top_k": 3}},
+                "loss": {"dual_moe_completion_balance_weight": 0}}
+    },
+    "BK0": {
+      "role": "main", "description": "后端Top2，无后端负载均衡",
+      "patch": {"model": {"dual_moe": {"completion_mode": "topk", "completion_top_k": 2}},
+                "loss": {"dual_moe_completion_balance_weight": 0}}
+    },
+    "BK1": {
+      "role": "main", "description": "后端Top2，0.01后端负载均衡（当前双MoE后端）",
+      "patch": {"model": {"dual_moe": {"completion_mode": "topk", "completion_top_k": 2}},
+                "loss": {"dual_moe_completion_balance_weight": 0.01}}
+    }
+  }
+}

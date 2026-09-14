@@ -7,7 +7,7 @@ from tqdm import tqdm
 
 from .losses import compute_main_stage_loss
 from .metrics import MaskedMetricAccumulator, masked_metrics
-from .routing_metrics import RoutingMetricAccumulator, active_routing_scales
+from .routing_metrics import DualMoEMetricAccumulator, RoutingMetricAccumulator, active_routing_scales
 from .utils.device import move_batch_to_device
 
 
@@ -224,7 +224,9 @@ def _append_lr_logs(logs: dict[str, list[float]], optimizer: torch.optim.Optimiz
 
 
 def _routing_accumulator(cfg: dict) -> RoutingMetricAccumulator | None:
-    main_cfg = cfg["model"]["main"]
+    if cfg["model"].get("architecture") == "dual_moe":
+        return None
+    main_cfg = cfg["model"].get("main", {})
     if (
         not main_cfg.get("use_routed_branch", True)
         or not main_cfg.get("use_router", True)
@@ -254,6 +256,7 @@ def train_one_epoch(
     }
     active_exact_metrics = {""}
     routing_metrics = _routing_accumulator(cfg)
+    dual_metrics = DualMoEMetricAccumulator()
     use_amp = cfg["train"].get("amp", True) and device.type == "cuda"
     scaler = torch.amp.GradScaler(device.type, enabled=use_amp)
     progress = tqdm(loader, desc=f"train epoch {epoch}", leave=False)
@@ -263,10 +266,32 @@ def train_one_epoch(
         with torch.autocast(device_type=device.type, enabled=use_amp):
             outputs = model(batch)
             loss, loss_dict = compute_main_stage_loss(outputs, batch, cfg, epoch=epoch)
+        if outputs.get("architecture") == "dual_moe" and (
+            not torch.isfinite(loss) or not torch.isfinite(outputs["x_hat_final"]).all()
+        ):
+            raise FloatingPointError("Nonfinite dual-MoE prediction/loss; no optimizer update performed")
         scaler.scale(loss).backward()
         grad_clip = cfg["train"].get("grad_clip_norm")
-        if grad_clip:
+        diagnose_backend = outputs.get('backend_diagnostics', False)
+        if grad_clip or diagnose_backend:
             scaler.unscale_(optimizer)
+        if diagnose_backend:
+            # Total-objective gradients BEFORE clipping, not main-loss-only
+            # causal attribution. Epoch logs report mean batch L2 norms.
+            sums = defaultdict(list)
+            for name, parameter in model.named_parameters():
+                if parameter.grad is None:
+                    continue
+                group = next((g for g in ('fine_expert', 'fine_head', 'scale_experts.mid',
+                             'scale_experts.coarse', 'aggregation.mid', 'aggregation.coarse',
+                             'readout_routers', 'completion_router', 'completion_alpha_logit')
+                              if g in name), None)
+                if group:
+                    sums[group].append(parameter.grad.detach().float().square().sum())
+            for group, values in sums.items():
+                norm = torch.stack(values).sum().sqrt()
+                logs['backend_diag_grad_'+group.replace('.', '_')].append(float(norm.cpu()))
+        if grad_clip:
             torch.nn.utils.clip_grad_norm_(model.parameters(), grad_clip)
         scaler.step(optimizer)
         scaler.update()
@@ -290,6 +315,7 @@ def train_one_epoch(
         for key, value in {**loss_dict, **metrics}.items():
             logs[key].append(float(value.detach().cpu()))
         _append_model_diagnostics(logs, outputs)
+        dual_metrics.update(outputs, batch)
         if routing_metrics is not None:
             routing_metrics.update(
                 outputs.get("gates", {}), outputs.get("selected_masks")
@@ -302,6 +328,7 @@ def train_one_epoch(
             result[f"{key}{suffix}"] = value
     if routing_metrics is not None:
         result.update(routing_metrics.compute())
+    result.update(dual_metrics.compute())
     return result
 
 
@@ -323,10 +350,15 @@ def evaluate(
     }
     active_exact_metrics = {""}
     routing_metrics = _routing_accumulator(cfg)
+    dual_metrics = DualMoEMetricAccumulator()
     for batch in tqdm(loader, desc=desc, leave=False):
         batch = move_batch_to_device(batch, device)
         outputs = model(batch)
         _, loss_dict = compute_main_stage_loss(outputs, batch, cfg, epoch=epoch)
+        if outputs.get("architecture") == "dual_moe" and (
+            not torch.isfinite(loss_dict["loss"]) or not torch.isfinite(outputs["x_hat_final"]).all()
+        ):
+            raise FloatingPointError("Nonfinite dual-MoE evaluation; do not select this checkpoint")
         metrics = masked_metrics(outputs["x_hat_final"], batch["x_f_gt"], batch["m_f"])
         exact_metrics[""].update(outputs["x_hat_final"], batch["x_f_gt"], batch["m_f"])
         if outputs.get("x_hat_shared") is not None:
@@ -346,6 +378,7 @@ def evaluate(
         for key, value in {**loss_dict, **metrics}.items():
             logs[key].append(float(value.detach().cpu()))
         _append_model_diagnostics(logs, outputs)
+        dual_metrics.update(outputs, batch)
         if routing_metrics is not None:
             routing_metrics.update(
                 outputs.get("gates", {}), outputs.get("selected_masks")
@@ -356,4 +389,5 @@ def evaluate(
             result[f"{key}{suffix}"] = value
     if routing_metrics is not None:
         result.update(routing_metrics.compute())
+    result.update(dual_metrics.compute())
     return result

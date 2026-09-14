@@ -1,0 +1,32 @@
+{
+  "output_dir": "outputs/v23/topk_dual_moe",
+  "data": {"batch_size": 4, "drop_last": false},
+  "model": {
+    "architecture": "dual_moe",
+    "dual_moe": {
+      "design": "learned_regions_v2",
+      "dim": 32, "key_dim": 8, "depth": 1, "num_groups": 4,
+      "dropout": 0, "min_std": 1,
+      "aggregation_mode": "topk", "aggregation_top_k": 2,
+      "aggregation_experts": 3, "aggregation_geometry": true,
+      "completion_mode": "topk", "completion_top_k": 2,
+      "completion_use_support": true,
+      "coarse_nodes": [32, 8], "assignment_temperature": 0.5
+    },
+    "aux": {"enabled": false}
+  },
+  "loss": {
+    "type": "smooth_l1",
+    "dual_moe_expert_weight": 0.01,
+    "dual_moe_partition_weight": 0.001,
+    "dual_moe_aggregation_balance_weight": 0.01,
+    "dual_moe_completion_balance_weight": 0.01
+  },
+  "train": {
+    "epochs": 120, "val_epoch": 2,
+    "lr_main": 0.001, "weight_decay": 0.0001, "grad_clip_norm": 1,
+    "amp": true,
+    "scheduler": {"type": "cosine", "eta_min": 0.000001},
+    "early_stopping": {"enabled": false}
+  }
+}

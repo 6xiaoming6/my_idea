@@ -1,4 +1,271 @@
-# ST-MoE Imputer v6
+# ST-MoE Imputer — V23
+
+## 2026-09-13 后端稳定性验证（当前入口）
+
+根据18组结果，保留前端E8/Top4，比较U等权、D完全动态、H固定半动态、L全局可学习动态强度四组。
+BikeNYC random@0.4为100轮，TaxiBJ random@0.4/0.8为140轮；各跑42/2026/3407三个种子，共36组。
+使用全部TRAIN/VAL/TEST，batch16、每2轮验证、单GPU顺序运行，无默认截止、不自动降低预算。
+
+```bash
+conda activate difftdi
+python scripts/run_scale_completion_experiments.py \
+  --config configs/presets/dual_moe_backend_stability.json --gpu 0
+```
+
+先加`--dry-run`检查36组计划；`--calibrate`只做短时测速并估时；`--summary-only`只汇总。
+再次执行同一命令会跳过本套已经完整训练/验证/最佳测试的组；中断的单组从头重跑，不从中间epoch恢复。
+最优权重仍在CPU内存覆盖保留，最后恢复测试一次，不保存checkpoint。
+
+新增训练/验证/测试诊断：动态强度alpha、局部3×3观测比例分组误差、尺度专家误差相关性与胜率、权重集中比例、训练分支的裁剪前梯度范数。
+原尺度权重均值/标准差继续记录，全部写入各run的`logs/train.log`、`val.log`、`test.log`和`metrics.jsonl`。
+输出集中在`outputs/v23/target_dual_moe/backend_stability/<指纹>/`，包括`summary.csv/json`、分缺失率的`comparison.json`、`diagnostics.json`和`mechanism_summary.json`。
+
+**本次科学源码和诊断改变，36组均新训练，不复用旧分数。旧配置、旧模型默认行为和已有结果保留；不要在队列运行期间修改代码/配置/数据，否则身份保护会停止队列。**
+该实验检验受约束动态融合，不是完整双MoE的2×2证明，也不是新增创新点成立的保证。具体假设及日志字段说明见[全条件验证方案第9节](model_designs/20260911_V23双MoE全条件验证方案.md)。
+
+## 2026-09-13 后端长预算复核（历史入口）
+
+以下5组复用/13组新增描述对应当时源码状态；当前已增加稳定性功能，旧复用校验会因科学源码变化而拒绝复用。这不会删除或修改任何历史结果。
+
+冻结模型设计和前端配置，仍端到端训练，比较Q10后端等权、SB全局可学习权重、Q11目标条件密集权重。完整数据：TaxiBJ random@0.4/0.8各140轮，BikeNYC random@0.4为100轮；三个条件×三组×seed42/2026共18组。batch16、每2轮完整验证、最佳权重保存在CPU内存，训练后恢复并完整测试一次，不保存checkpoint。
+
+```bash
+conda activate difftdi
+python scripts/run_scale_completion_experiments.py \
+  --config configs/presets/dual_moe_backend_confirmation.json --gpu 0
+```
+
+已核实历史coverage实验可复用BikeNYC的Q10/Q11两seed和SB seed42共5组，所以当前只需新增13组：BikeNYC SB seed2026，随后TaxiBJ两缺失率的12组。**复用不是新增独立实验，也不复制旧权重或伪造新训练日志。** 若科学源码/预设、实际配置、完整数据/掩码或完成记录不匹配，则不复用，改为正常训练。
+
+输出统一放在`outputs/v23/target_dual_moe/backend_confirmation/<指纹>/`，含`plan.json`、`reuse_manifest.json`、新训练日志、带`result_origin/reference_suite/run_dir`的`summary.csv/json`、按缺失率隔离的`comparison.json`和收敛诊断。旧日志保留原位置，从汇总中的run_dir可定位。
+
+`--dry-run`检查18组RUN/REUSE列表；`--calibrate`仅短测并估算剩余任务；`--summary-only`汇总。默认无截止时间，不沿用已过期的上一轮期限。同一命令可跳过已完成任务；不完整的任务从头训练。`--no-reuse`强制18组全部重跑，会产生独立指纹队列。不要并行运行两个队列或在训练中修改源码/配置/数据。详见[验证方案新增的后端复核部分](model_designs/20260911_V23双MoE全条件验证方案.md#8-2026-09-13后端长预算复核18组)。
+
+## 2026-09-11 全条件双 MoE 验证（最新实验入口）
+
+使用**全部 TRAIN/VAL/TEST 样本**，单卡串行117组：三数据集 × fixed/random × 四缺失率 × 四个2×2对照共96组；三个 random@0.4 点追加独立种子12组、全局可学习权重/密集前端机制对照9组。后端改用无均衡密集 Softmax；不覆盖下方历史配置。
+
+```bash
+conda activate difftdi
+python scripts/run_scale_completion_experiments.py \
+  --config configs/presets/dual_moe_coverage.json --gpu 0
+```
+
+默认全数据预算：TaxiBJ70/BikeNYC100/CHAP80轮、batch16、每2轮完整验证、最佳权重只存CPU内存并恢复后完整测试。严格预测目标为**2026-09-13 09:00（北京时间）**，当前短测估算117组约31.42小时（已含20%余量），不是硬截止保证。若预计超时会在正式启动前拒绝，不临时缩减个别组预算。全条件只有seed42，额外seed2026仅在预先指定的random@0.4；不宣称全部条件多种子或保证收敛。
+
+支持 `--dry-run` / `--calibrate` / `--summary-only`；重新执行同一命令跳过完整任务。`--deadline "2026-09-13 18:00"` 仅明确放宽准入时间，不改实验指纹。`--budget extended` 使用全数据140/100/150轮的新队列，取消默认截止，预计明显更长；不要同时启动两个队列。
+
+所有产物放在 `outputs/v23/target_dual_moe/coverage/<指纹>/`，包括逐组 `.log`、`summary.csv/json`、按缺失率隔离的 `comparison.json` 和 `diagnostics.json`。代码/数据/配置改动会进入不同指纹目录；运行中不要修改。方案和可证伪判据见 [全条件验证方案](model_designs/20260911_V23双MoE全条件验证方案.md)。
+
+## 2026-09-11 最新候选：保留观测的目标条件双 MoE
+
+基于已完成的 E3–E8 容量实验和两数据集路由实验，新增可选预设 `configs/presets/dual_moe_target.json`。**不是已经证明提升的最终模型**：前端中/粗尺度各8个组织专家，所有专家先聚合可见观测，各自恢复到细网格后按目标位置 Top-4；后端 fine/mid/coarse 三专家 Top-2。前/后均衡系数0.001/0.01，维度32、120轮、每2轮验证、batch4，最佳验证权重仅保留CPU内存，最终恢复后完整测试。不覆盖以下历史模型或实验。
+
+```bash
+conda activate difftdi
+python scripts/train_scale_completion.py --preset dual_moe_target \
+  --dataset TaxiBJ --mask random --rate 0.4 --gpu 0 --seed 42 --train-windows 2048
+```
+
+此例与上一轮 TaxiBJ 的2048训练窗口口径一致；BikeNYC改为 `--dataset BikeNYC --train-windows 511`。省略窗口参数即完整训练集；任何训练窗口选择都不截断验证/测试。输出 `outputs/v23/target_dual_moe/`。每次单任务启动会新建运行记录，不自动跳过已完成任务。
+
+同一个入口支持 `--front-mode uniform/topk --back-mode uniform/topk` 四组对照，名称Q00/Q10/Q01/Q11分别表示关闭/开启前后路由，默认Q11。uniform保留全部可学习专家、只等权融合并关闭该侧均衡项；不是固定空间平均池化。推荐先将Q01与Q11同预算、同种子比较，按验证结果选候选；不能把更换训练子集后的分数与旧结果直接归因比较。未启用真正稀疏计算加速。
+
+改动依据、论文来源、公式和完整四组命令见 [本轮设计说明](model_designs/20260911_观测保留与目标条件双MoE改进依据.md)。
+
+### 三数据集对照队列（2026-09-11 16:30 预算）
+
+```bash
+python scripts/run_scale_completion_experiments.py \
+  --config configs/presets/dual_moe_target_comparison.json --gpu 0
+```
+
+单卡串行12组：TaxiBJ/BikeNYC/CHAP各Q01、Q11、Q10、Q00，random@0.4、seed42。**TaxiBJ 140轮/2048训练窗口，BikeNYC 100轮/全量511，CHAP 150轮/2048**；两个2048子集均等间隔取原训练集，并按相同行号同步抽取缺失掩码；所有组完整验证/测试、val每2轮、batch4。不同数据集轮数写在JSON的`dataset_epochs`，同一数据集四组预算必须相同。
+
+启动前仅用短训练更新测时，丢弃测时模型，估算整个剩余队列并增加20%余量；若预计超过**北京时间2026-09-11 16:30**，不启动正式任务。时限是预测准入，不是保证或强制中断；不会临时减少某组epoch。不要同时开第二个GPU训练任务。晚启动或机器负载变化可能导致拒绝开跑。
+
+`--dry-run`检查任务和样本数；`--calibrate`只测时；`--summary-only`只汇总。重复原命令会跳过配置匹配且训练/验证/最佳权重测试均完整的组，未完整的组从头重跑。参数不落盘，最佳模型保留CPU内存并在最后恢复测试；输出`outputs/v23/target_dual_moe/comparison/<指纹>/`，包含分组配置、train/val/test.log、原始控制台日志、summary.csv和comparison.json。运行中不要修改模型、脚本、数据或配置，否则触发源码指纹保护；完成组在截止时间过去后仍可跳过和汇总。
+
+本轮只检验一个缺失率和一种模式，不是全缺失率或多种子论文终评。等权组保留可学习空间组织，不等于固定平均池化。重点看Q11对Q01、Q10是否同时改善，配对变化与2×2交互项自动汇总；不跨数据集直接平均原始MAE，也不把单种子差异当作显著性证据。
+
+### 双 MoE 收益独立种子复现（2026-09-11 晚间）
+
+```bash
+python scripts/run_scale_completion_experiments.py \
+  --config configs/presets/dual_moe_target_replication.json --gpu 0
+```
+
+仅新增seed2026：TaxiBJ、BikeNYC各Q01/Q11/Q10/Q00，共8组；训练源码和超参数不改，TaxiBJ140轮/2048窗口、BikeNYC100轮/全511，random@0.4、batch4、val每2轮、完整val/test、内存最佳模型恢复测试。已有seed42不重跑、不覆盖；新结果在`outputs/v23/target_dual_moe/replication/<指纹>/`，其中summary仅包含本轮2026结果，分析时再与配置中`seed42_reference_suite`记录的旧目录配对，而不是假装本轮有两个种子。
+
+已有同预算8组耗时约3小时7分钟，20%余量后约3小时44分钟。JSON的`deadline_mode=advisory`将当天20:00设为软目标：预计超时只提醒，仍按全部epoch跑完；没有早停、预算缩短或20:00强制停止。旧配置未指定该字段时仍是strict准入保护。原命令重跑继续跳过本轮已完成组；运行中不要编辑训练代码/数据/配置。
+
+这次检验收益是否跨种子重复，不检验新的结构。CHAP上一轮的负面结果仍须保留，暂不扩展该数据集；两个种子的结果也不能当作统计显著性或全数据集普遍有效的证明。详细判定规则见[设计说明第8节](model_designs/20260911_观测保留与目标条件双MoE改进依据.md)。
+
+### 固定前端、检验后端融合与均衡（2026-09-11 23:00预算）
+
+```bash
+python scripts/run_scale_completion_experiments.py \
+  --config configs/presets/dual_moe_backend_study.json --gpu 0
+```
+
+前端结构和超参固定为各尺度E8/目标Top4、均衡0.001，权重仍端到端训练，并非冻结已有模型。后端只改变融合方式和均衡：BU等权、BD密集softmax、BK0无均衡Top2、BK1有0.01均衡Top2。BD用Top3-of-3确保与BK0/BK1路由头初始化匹配；关闭无效的硬计数均衡。三个补全专家及其辅助监督保持不变。
+
+先完成BikeNYC四后端×seed42/2026共8组（全511训练窗口、100轮），再跑TaxiBJ四后端×seed42共4组（统一1280训练窗口、140轮）。共12组，均random@0.4、batch4、val每2轮、完整验证/测试、内存最佳模型恢复后测试一次。TaxiBJ数据子集与此前2048窗口不同，只比较本轮匹配四组，不能拿旧绝对分数作同预算对照。
+
+GPU0短测约3.31小时（含20%余量）；JSON设置当天23:00、strict预测准入，预计超过时限不启动正式队列，不缩减epoch，不保证硬截止。原命令重跑跳过已完整组。输出`outputs/v23/target_dual_moe/backend_study/<指纹>/`，保留各组train/val/test.log、配置、原始控制台日志和配对汇总。重点比较BD对BU、BK0对BD、BK1对BK0；不是新的前后端2×2实验，不计算其交互项。具体判定见[设计说明第9节](model_designs/20260911_观测保留与目标条件双MoE改进依据.md)。
+
+## 历史候选与对照协议（保留原行为）
+
+当前新增 **B01基础双Top-K候选**：前端每尺度3聚合专家Top-2，后端3尺度专家Top-2，前/后端各加入0.01负载均衡。配置集中在 `configs/presets/dual_moe_topk.json`，不覆盖B01及已完成的实验。保留独立尺度预测，不使用硬残差限幅。
+
+```bash
+conda activate difftdi
+python scripts/train_scale_completion.py --preset dual_moe_topk --dataset TaxiBJ --mask random --rate 0.4 --gpu 0 --train-windows 512
+```
+
+默认120轮、val_epoch=2，验证/测试完整，省略窗口参数为完整训练集。输出 `outputs/v23/topk_dual_moe/`；旧命令不加preset仍是原行为。Top-K指路由权重稀疏，当前不跳过所有未选专家的计算。实现、负载损失和日志含义见[模型说明](model_designs/v23_双MoE聚合与尺度补全模型.md)。已完成一组 TaxiBJ random@0.4 全量训练（test MAE 13.1246、RMSE 20.4789），但旧 B01 使用512样本，不能据此归因于结构改进。
+
+### 全量2491样本的双Top-K公平对照
+
+```bash
+conda activate difftdi
+python scripts/run_scale_completion_experiments.py \
+  --config configs/presets/dual_moe_topk_comparison.json --gpu 0
+```
+
+沿用同一个统一脚本，不新建训练目录/入口。默认 TaxiBJ random@0.4、seed42、120 epoch、val每2轮、batch4；五组都读取原始2491训练样本、356验证样本、712测试样本，训练集数量不符直接报错，不截断也不填充。
+
+| 组别 | 前端专家融合 | 后端专家融合 | 前/后均衡系数 |
+|---|---|---|---|
+| T00 | 等权 | 等权 | 0 / 0 |
+| T10 | Top-2 | 等权 | 0.01 / 0 |
+| T01 | 等权 | Top-2 | 0 / 0.01 |
+| T11 | Top-2 | Top-2 | 0.01 / 0.01 |
+| T11_NB | Top-2 | Top-2 | 0 / 0 |
+
+保留相同的3聚合专家及fine/mid/coarse补全路径，分支辅助损失0.01、分区正则0.001一致；**等权融合仍保留可学习空间聚合器，不等于固定平均池化**。2×2检验“Top-K路由及对应均衡”的组合作用，T11_NB额外检验联合均衡约束；不是精确等训练参数量对照，关闭路由会冻结路由头。
+
+单GPU串行，先短测时再正式训练，不会根据截止时间缩短训练。只保存最佳验证参数，训练结束重载它测试一次。输出为 `outputs/v23/topk_dual_moe/comparison/<协议指纹>/`：`protocol.json`、`data_manifest.json`、`configs/`、`runs/`、`logs/`、`summary.csv`、`comparison.json`。协议包含代码哈希及数据文件路径/大小/mtime；每个任务前检查是否变化，避免混跑。此前独立Top-K结果保留作参考，不自动导入，本轮T11重新训练。
+
+重复同一命令自动跳过本轮已完整完成且配置匹配的实验；不完整实验从头重跑。`--dry-run`只检查数据量及任务列表，`--summary-only`只汇总，`--calibrate`只短测时。汇总包含六个成对比较和交互项 `T11-T10-T01+T00`；负交互项表示超加性误差下降，但单种子不能证明统计显著性。应看 T11 是否同时优于 T10/T01，不以测试集调整候选。
+
+### 前端专家数量探索（3 / 4 / 6 / 8）
+
+```bash
+python scripts/run_scale_completion_experiments.py \
+  --config configs/presets/dual_moe_expert_count.json --gpu 0
+```
+
+本轮只增加**前端每个尺度**的聚合专家数，不增加后端尺度数；后端始终是fine/mid/coarse三个专家Top-2、均衡系数0.01。前端E=3/4/6/8，每个E都安排等权融合U和Top-2路由K，默认共8组。前端K组均衡系数0.01，U组为0；分区正则0.001、分支监督0.01、每专家粗节点数32/8保持不变。四个E共享相同训练预算：TaxiBJ random@0.4、seed42、2491训练样本、完整356验证/712测试、120轮、val每2轮、batch4。
+
+本阶段不落盘模型权重：此队列JSON设置 `"save_best_checkpoint": false`，统一下发到每组 `train.save_best_checkpoint`。仅在CPU内存中保留一份独立的最佳验证模型参数/缓冲区，遇到更优验证结果就替换；训练后恢复该内存快照测试，而不是用最后一轮替代最佳轮。不会创建checkpoint目录或保存优化器状态，配置、train/val/test.log、metrics.jsonl和汇总仍照常保存。完成判断依据完整训练/验证记录、最佳epoch及明确的内存最佳权重测试记录，不因缺少best.pt而重跑成功组。若进程中断，内存权重丢失，未完成组从头训练；已完成组仍可跳过。恢复保存只需将该JSON字段改为true；未配置此开关的历史训练仍默认保存，不删除旧参数。
+
+已启动的进程不会热更新配置；源码/配置改变也会触发队列指纹保护。因此改开关后需要在自己的终端停止旧队列，再执行同一命令。新协议指纹会保留旧目录并使用新目录，不能把旧保存策略的任务自动认作新策略任务。
+
+代码支持任意正整数 `aggregation_experts`；此探索协议限制3..16且包含E3参照，并要求同一K满足1<K<最小E。配置内 `expert_counts` / `aggregation_top_k` 与每组patch必须一致，拒绝遗漏同容量的等权对照或单独改变训练预算。默认E3两组会在新源码指纹下重跑，不把历史结果混入当前队列。原有预设仍是3专家，旧结果不删除。
+
+输出在 `outputs/v23/topk_dual_moe/expert_count/<指纹>/`，沿用自动测时、单GPU串行、最佳验证参数重载测试、完整任务跳过和.log记录。`summary.csv`增加专家数量/前端模式；`comparison.json`同时给出同E的K对U、各E对E3的容量比较，以及 `front_routing_gain`：`uniform_minus_topk`为正表示路由有益，`gain_change_vs_E3`为正表示路由优势扩大。未完成的配对不会计算收益。
+
+解释限制：增加E也增加参数量、总粗节点容量及实际计算/显存；K固定为2时选中比例从2/3降至2/8。这不是纯等容量跨E实验，更不是稀疏计算加速实验。同E的U/K专家初始权重保持一致（路由头除外），但跨E只固定种子，不保证共享层初始权重逐元素相同。只有同E的K稳定优于U，才支持更大专家池中前端路由有额外价值；如果两者一起变好，主要证据是容量收益。不要为扩大消融差距而选择绝对精度更差的E；单种子仅用于探索，候选应按验证集确定后再做多种子确认。
+
+### 两数据集前端截断机制对照（明早9点预算）
+
+```bash
+conda activate difftdi
+python scripts/run_scale_completion_experiments.py \
+  --config configs/presets/dual_moe_routing_study.json --gpu 0
+```
+
+统一脚本和JSON，不另建训练入口。`deadline`默认北京时间2026-09-11 09:00，启动时先短测时再做截止准入；预算含15%测时余量及每组固定开销，不能保证硬截止。预计超过截止时间则不启动正式队列，不能通过临时缩减某一组epoch来凑时间。`--deadline "YYYY-MM-DD HH:MM"`覆盖截止时间；`--dry-run`只显示任务/数据量，`--calibrate`只测时，`--summary-only`只汇总。用户本地执行，未代为启动正式实验。
+
+数据：TaxiBJ训练窗口从2491等间隔取2048，所有候选和种子复用同一选择及对应mask行；BikeNYC仅511个训练窗口，保留全量。TaxiBJ验证/测试356/712、BikeNYC验证/测试73/147均完整，不参与筛选训练窗口。两数据集random@0.4、每个模型每尺度8聚合专家、120epoch、val每2轮、batch4、同优化器/调度器/辅助项、单GPU串行。CPU内存保留最佳验证权重后测试，不生成参数文件。
+
+| 组别 | 前端 | 后端 | 前/后均衡系数 | 每个数据集的种子 |
+|---|---|---|---|---|
+| U8 | 8专家等权 | 3尺度Top-2 | 0 / 0.01 | 42、2026 |
+| K2 | 8专家Top-2 | 3尺度Top-2 | 0.01 / 0.01 | 42、2026 |
+| K4 | 8专家Top-4 | 3尺度Top-2 | 0.01 / 0.01 | 42、2026 |
+| D8 | 8专家稠密可学习softmax | 3尺度Top-2 | 0 / 0.01 | 42、2026 |
+| K4_NB | 8专家Top-4 | 3尺度Top-2 | 0 / 0.01 | 42 |
+| D8_BU | 8专家稠密可学习softmax | 3尺度等权 | 0 / 0 | 42 |
+
+合计20组，16组主对照+4组机制对照，预计约6.5–7.5小时，实际取决于当次测时、起跑时刻和机器负载。D8通过现有Top-8-of-8实现，与完整softmax严格等价；保留与K2/K4一致的路由头初始化，不修改模型结构。选中全部专家时Switch-style硬计数均衡为常数，因此关闭前端该项；D8的硬分派负载天然均匀，不能据此判定权重未塌缩，应看原有门控权重均值/方差/熵及有效支持度。所有组仍实际计算全部专家，K改变不代表计算量按K下降。
+
+预先声明判断标准：
+
+- K4 vs K2：放宽硬截断是否改善验证精度及观测支持？
+- D8 vs U8：保留全部观测分派时，自适应权重是否优于等权融合？
+- D8 vs K2/K4：稠密路由是否更合适？此处同时有均衡项差异，不能完全归因为截断；K4_NB提供部分拆解。
+- K4 vs K4_NB：Top-4是否仍需要前端均衡？后端均衡保持不变。
+- D8 vs D8_BU：稠密前端基础上，后端路由及其均衡是否有作用？不是纯后端权重单变量。
+- 候选先看各数据集配对验证MAE、双种子方向一致性、误差幅度和原始量纲RMSE；测试只作最终描述，不根据测试值自动改参数。两个种子仍不能支持正式显著性主张。若需要证明双MoE缺一不可，必须确认D8优于U8且D8优于D8_BU，并跨种子/数据集复现；不能只挑一个有利点。
+
+输出 `outputs/v23/topk_dual_moe/routing_study/<协议指纹>/`，自动汇总 `summary.csv` 和 `comparison.json`；新增 `paired_groups`记录每项比较的预期/完成种子、配对百分比均值/样本标准差和获胜种子数。不合并不同数据集的原始MAE，不把未完成组当作结果，不把单种子机制组伪装成双种子结论。样本数变化后旧2491样本实验仅作背景，不混入本轮公平对照。运行时不要修改源码/预设，以免触发指纹保护。
+
+## 历史候选：有界尺度修正
+
+此前候选为 **共享细预测的有界尺度修正 MoE**（`design=anchored_scale_moe`）：取消前端动态门控，默认均匀组合三个可学习聚合器；中/粗路径产生有界修正，后端 MoE 决定使用程度，配合0.01分支监督。另提供规则、观测归一化金字塔。
+
+```bash
+conda activate difftdi
+python scripts/train_scale_completion.py --dataset TaxiBJ --mask random --rate 0.4 --gpu 0 --train-windows 512
+```
+
+`--aggregation regular_grid` 切换规则聚合；省略 `--train-windows` 使用全训练集，验证/测试始终完整。支持 `--dry-run`。配置在 `configs/presets/scale_completion.json` 和 `scale_completion_grid.json`；新输出在 `outputs/v23/scale_completion/`。完整结构与限制见 [模型说明](model_designs/v23_双MoE聚合与尺度补全模型.md)。只完成流程与约束检查，效果是否提升尚待实验。
+
+### 新模型的统一对照验证
+
+```bash
+python scripts/run_scale_completion_experiments.py --gpu 0 --deadline "2026-09-10 09:00"
+```
+
+三数据集 × fixed/random@0.4：三主方案各三种子 + 四消融各 seed42，共78组；统一120轮、每2轮验证、最多512训练窗口、完整验证/测试。单GPU顺序执行，先测时检查预算，自动跳过同协议完整任务。实测加余量约8.5小时，不保证硬截止。JSON配置：`configs/presets/scale_completion_experiments.json`；结果：`outputs/v23/scale_completion/comparison/`。支持 `--calibrate` / `--dry-run` / `--summary-only`。完整实验矩阵、限制及解读方法见 [验证方案](model_designs/v23_尺度修正MoE对照验证方案.md)。
+
+## 前一阶段：可学习区域双 MoE（保留）
+
+此前 `v23` 分支的模型为 **观测聚合 MoE + 多尺度补全 MoE**，实现位于
+`src/stmoe_imputer/models/dual_moe.py`，使用现有训练入口，不新增版本模型文件夹。
+
+前端根据细粒度观测和掩码，学习细节点到潜在粗节点的软分配；只固定中/粗节点数（32/8），不固定区域边界、邻域半径或成员。每个聚合专家独立组织区域，经节点注意力和时间处理后，按自身分配映射回到细网格，再组合专家。后端结合细上下文，在细、中、粗三个补全路径之间逐位置选择。一次端到端训练，不使用 V14 教师或安全残差控制器。这里是软区域，不保证连通或硬分区。
+
+- 默认入口配置：`configs/presets/default.json`，架构 `dual_moe`。
+- 合并已有数据集配置：`configs/presets/dual_moe.json`，保留各数据集通道数及 CSV 掩码设置。
+- 输出：`outputs/v23/learned_regions/`，只保存一个最佳参数，最终重载后测试；与早期固定半径 V23 输出区分。
+- 结构、数据流、统计含义与验证边界：[V23 说明](model_designs/v23_双MoE聚合与尺度补全模型.md)。
+
+CPU 两轮训练—验证—测试流程检查：
+
+```bash
+OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python scripts/train.py \
+  -c configs/presets/default.json \
+  --override_config configs/presets/dual_moe_smoke.json \
+  --synthetic --no_plot --name smoke_dual_moe
+```
+
+真实 V23 训练需要三份 NPZ 和 JSON 中的 train/val/test CSV；不再隐式回退到合成数据。
+旧数据集配置与 V14 launcher 保留原用途，使用它们时需显式选择新架构，不能把旧入口误认为已经在跑 V23。
+
+V23 四组路由对比（A00/A10/A01/A11，三数据集 × fixed/random @0.4，共 24 次）：
+
+```bash
+conda activate difftdi
+python scripts/run_dual_moe_comparison.py --gpu 0 --deadline "2026-09-09 20:00"
+```
+
+统一策略在 `configs/presets/dual_moe_comparison.json`：80 epoch、每 2 轮验证、seed=42、batch=4；训练集均匀选最多 512 个窗口，验证/测试完整。前端 uniform 仍然学习区域分配，只关闭动态专家门控。单卡顺序执行，不启用 DDP。
+`--calibrate` 仅测时，`--dry-run` 仅打印任务，`--summary-only` 汇总已有结果。原命令重跑自动跳过**同协议已完整训练并测试**的实验；失败实验重新训练，不从最佳参数假冒断点续训。
+日志/唯一 best.pt/summary.json 位于 `outputs/v23/learned_regions/comparison/<协议指纹>/`。代码、配置或数据文件状态改变会产生新指纹，避免混用实验；运行中不要修改源码。截止时间是估时准入与停止新增任务的检查，不是强制杀掉正在运行的实验，也不保证服务器负载变化时准时完成。
+
+### V23 三阶段机制诊断
+
+```bash
+python scripts/run_dual_moe_diagnostics.py --gpu 0
+```
+
+默认按 1→2→3 顺序：已有 A01/A11 检查点的验证集粗信息干预；单聚合器与三聚合器对比；A01/A11 的轻量分支监督对比。配置在 `configs/presets/dual_moe_diagnostics.json`，原数据/预算/seed 从已完成对照批次继承，不改动原模型源码或历史结果。默认新增 30 次训练，输出放在 `outputs/v23/learned_regions/diagnostics/<协议指纹>/`。
+`--dry-run` 查看计划；`--stages 1` 只做验证干预；`--summary-only` 更新汇总。原命令重跑会跳过完整任务。参考实验缺失或源码/数据改变时拒绝混用旧成绩，不会偷偷重跑或替换对照。
+
+## 历史 main / V6 说明（以下不是 V23 结构）
 
 面向时空网格数据补全任务的 PyTorch 项目（第 6 版）。核心模型 `DualBranchSTImputer` 以 `MultiScaleMoEBackbone` 为骨干，在 TaxiBJ（出租车流量）、BikeNYC（共享单车）、CHAP（PM2.5 浓度）三个数据集上，评估 fixed / random 两种离线缺失掩码策略下的补全性能。
 

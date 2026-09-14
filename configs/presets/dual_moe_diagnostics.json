@@ -1,0 +1,12 @@
+{
+  "source_suite": "outputs/v23/learned_regions/comparison/dfe542fd0c043206",
+  "output_dir": "outputs/v23/learned_regions/diagnostics",
+  "datasets": ["TaxiBJ", "BikeNYC", "CHAP"],
+  "patterns": ["fixed", "random"],
+  "reference_variants": ["A01", "A11"],
+  "shuffle_seeds": [17, 29, 43],
+  "expert_loss_weights": [0.01, 0.05],
+  "cpu_threads": 2,
+  "baseline_relative_tolerance": 0.0001,
+  "practical_change_percent": 0.5
+}

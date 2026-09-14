@@ -1,0 +1,175 @@
+{
+  "protocol": "front-expert-count-full-v1",
+  "output_dir": "outputs/v23/topk_dual_moe/expert_count",
+  "datasets": [
+    "TaxiBJ"
+  ],
+  "patterns": [
+    "random"
+  ],
+  "rate": 0.4,
+  "seeds": [
+    42
+  ],
+  "ablation_seed": 42,
+  "train_windows": 2491,
+  "epochs": 120,
+  "val_epoch": 2,
+  "save_best_checkpoint": false,
+  "batch_size": 4,
+  "cpu_threads": 2,
+  "timing_safety_factor": 1.3,
+  "expert_counts": [
+    3,
+    4,
+    6,
+    8
+  ],
+  "aggregation_top_k": 2,
+  "variants": {
+    "E3_U": {
+      "role": "main",
+      "description": "前端每尺度3专家，等权融合；后端固定3专家Top-2及均衡损失",
+      "patch": {
+        "model": {
+          "dual_moe": {
+            "aggregation_experts": 3,
+            "aggregation_top_k": 2,
+            "aggregation_mode": "uniform",
+            "completion_mode": "topk"
+          }
+        },
+        "loss": {
+          "dual_moe_aggregation_balance_weight": 0,
+          "dual_moe_completion_balance_weight": 0.01
+        }
+      }
+    },
+    "E3_K": {
+      "role": "main",
+      "description": "前端每尺度3专家，Top-2及均衡损失；后端固定3专家Top-2及均衡损失",
+      "patch": {
+        "model": {
+          "dual_moe": {
+            "aggregation_experts": 3,
+            "aggregation_top_k": 2,
+            "aggregation_mode": "topk",
+            "completion_mode": "topk"
+          }
+        },
+        "loss": {
+          "dual_moe_aggregation_balance_weight": 0.01,
+          "dual_moe_completion_balance_weight": 0.01
+        }
+      }
+    },
+    "E4_U": {
+      "role": "main",
+      "description": "前端每尺度4专家，等权融合；后端固定3专家Top-2及均衡损失",
+      "patch": {
+        "model": {
+          "dual_moe": {
+            "aggregation_experts": 4,
+            "aggregation_top_k": 2,
+            "aggregation_mode": "uniform",
+            "completion_mode": "topk"
+          }
+        },
+        "loss": {
+          "dual_moe_aggregation_balance_weight": 0,
+          "dual_moe_completion_balance_weight": 0.01
+        }
+      }
+    },
+    "E4_K": {
+      "role": "main",
+      "description": "前端每尺度4专家，Top-2及均衡损失；后端固定3专家Top-2及均衡损失",
+      "patch": {
+        "model": {
+          "dual_moe": {
+            "aggregation_experts": 4,
+            "aggregation_top_k": 2,
+            "aggregation_mode": "topk",
+            "completion_mode": "topk"
+          }
+        },
+        "loss": {
+          "dual_moe_aggregation_balance_weight": 0.01,
+          "dual_moe_completion_balance_weight": 0.01
+        }
+      }
+    },
+    "E6_U": {
+      "role": "main",
+      "description": "前端每尺度6专家，等权融合；后端固定3专家Top-2及均衡损失",
+      "patch": {
+        "model": {
+          "dual_moe": {
+            "aggregation_experts": 6,
+            "aggregation_top_k": 2,
+            "aggregation_mode": "uniform",
+            "completion_mode": "topk"
+          }
+        },
+        "loss": {
+          "dual_moe_aggregation_balance_weight": 0,
+          "dual_moe_completion_balance_weight": 0.01
+        }
+      }
+    },
+    "E6_K": {
+      "role": "main",
+      "description": "前端每尺度6专家，Top-2及均衡损失；后端固定3专家Top-2及均衡损失",
+      "patch": {
+        "model": {
+          "dual_moe": {
+            "aggregation_experts": 6,
+            "aggregation_top_k": 2,
+            "aggregation_mode": "topk",
+            "completion_mode": "topk"
+          }
+        },
+        "loss": {
+          "dual_moe_aggregation_balance_weight": 0.01,
+          "dual_moe_completion_balance_weight": 0.01
+        }
+      }
+    },
+    "E8_U": {
+      "role": "main",
+      "description": "前端每尺度8专家，等权融合；后端固定3专家Top-2及均衡损失",
+      "patch": {
+        "model": {
+          "dual_moe": {
+            "aggregation_experts": 8,
+            "aggregation_top_k": 2,
+            "aggregation_mode": "uniform",
+            "completion_mode": "topk"
+          }
+        },
+        "loss": {
+          "dual_moe_aggregation_balance_weight": 0,
+          "dual_moe_completion_balance_weight": 0.01
+        }
+      }
+    },
+    "E8_K": {
+      "role": "main",
+      "description": "前端每尺度8专家，Top-2及均衡损失；后端固定3专家Top-2及均衡损失",
+      "patch": {
+        "model": {
+          "dual_moe": {
+            "aggregation_experts": 8,
+            "aggregation_top_k": 2,
+            "aggregation_mode": "topk",
+            "completion_mode": "topk"
+          }
+        },
+        "loss": {
+          "dual_moe_aggregation_balance_weight": 0.01,
+          "dual_moe_completion_balance_weight": 0.01
+        }
+      }
+    }
+  }
+}

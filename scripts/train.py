@@ -26,7 +26,7 @@ from stmoe_imputer.data import build_datasets, build_loader, build_test_dataset
 from stmoe_imputer.engine import build_optimizer, build_scheduler, evaluate, train_one_epoch
 from stmoe_imputer.models import DualBranchSTImputer
 from stmoe_imputer.utils import get_device, set_seed
-from stmoe_imputer.utils.checkpoint import load_checkpoint, save_checkpoint
+from stmoe_imputer.utils.checkpoint import load_checkpoint, save_checkpoint, snapshot_model_state
 from stmoe_imputer.utils.train_logger import TrainLogger
 
 
@@ -243,6 +243,15 @@ def main() -> None:
     cfg = load_config(args.config)
     if args.override_config:
         cfg = deep_update(cfg, load_config(args.override_config))
+    save_best = cfg['train'].get('save_best_checkpoint', True)
+    if type(save_best) is not bool:
+        raise ValueError('train.save_best_checkpoint must be true or false')
+    if cfg.get("model", {}).get("architecture") == "dual_moe" and not args.synthetic:
+        if not all((args.train_npz, args.val_npz, args.test_npz)):
+            raise ValueError(
+                "dual_moe real-data training requires --train_npz, --val_npz and --test_npz. "
+                "Use --synthetic explicitly for a synthetic smoke test; no silent fallback."
+            )
     set_seed(cfg.get("seed", 42))
 
     dataset_name = cfg["data"].get("dataset_name", "unknown")
@@ -264,7 +273,8 @@ def main() -> None:
     run_dir = _unique_run_dir(run_base_dir, run_id)
     ckpt_dir = run_dir / "checkpoints"
     log_dir = run_dir / "logs"
-    ckpt_dir.mkdir(parents=True, exist_ok=True)
+    if save_best:
+        ckpt_dir.mkdir(parents=True, exist_ok=True)
     log_dir.mkdir(parents=True, exist_ok=True)
     save_config(cfg, run_dir / "config.json")
 
@@ -315,11 +325,13 @@ def main() -> None:
         "device_name": _device_name(device),
         "total_params": f"{total_params:,}",
         "trainable_params": f"{trainable_params:,}",
+        "best_model_storage": "disk" if save_best else "CPU memory only (no checkpoint files)",
     })
     logger.log_table_headers()
 
     best_mae = float("inf")
     best_epoch = 0
+    best_state = None
     val_epoch = int(cfg["train"].get("val_epoch", 1))
     if val_epoch < 1:
         raise ValueError("train.val_epoch must be at least 1")
@@ -403,7 +415,10 @@ def main() -> None:
             if is_best:
                 best_mae = val_logs["mae"]
                 best_epoch = epoch
-                save_checkpoint(ckpt_dir / "best.pt", model, optimizer, epoch, metrics, cfg)
+                if save_best:
+                    save_checkpoint(ckpt_dir / "best.pt", model, optimizer, epoch, metrics, cfg)
+                else:
+                    best_state = snapshot_model_state(model)
                 logger.log_best(epoch, best_mae)
 
             if val_logs is not None and early_cfg.get("enabled", False):
@@ -421,16 +436,24 @@ def main() -> None:
                     print(f"[info] early stopping at epoch {epoch} ({monitor}={current:.6f})")
                     break
         best_path = ckpt_dir / "best.pt"
-        if not best_path.is_file():
-            raise RuntimeError("Training completed without a validation checkpoint.")
-        checkpoint = load_checkpoint(best_path, model, map_location=device)
+        if save_best:
+            if not best_path.is_file():
+                raise RuntimeError("Training completed without a validation checkpoint.")
+            load_checkpoint(best_path, model, map_location=device)
+        else:
+            if best_state is None or not best_epoch:
+                raise RuntimeError("Training completed without a valid in-memory best model.")
+            model.load_state_dict(best_state)
+            best_state = None
         if test_loader is not None:
             test_start = time.perf_counter()
             test_logs = evaluate(model, test_loader, device, cfg, desc=f"test best epoch {best_epoch}", epoch=best_epoch)
             _sync_device(device)
             test_time = time.perf_counter() - test_start
         logger.log_test(test_logs, {
-            "checkpoint": str(best_path), "best_epoch": checkpoint.get("epoch", best_epoch),
+            "checkpoint": str(best_path) if save_best else "not_saved",
+            "best_model_source": "disk" if save_best else "memory", "best_weights_restored": True,
+            "best_epoch": best_epoch,
             "best_val_mae": best_mae, "test_samples": len(test_ds) if test_ds is not None else 0,
             "test_steps": len(test_loader) if test_loader is not None else 0, "test_time_sec": f"{test_time:.2f}",
         })
@@ -467,7 +490,7 @@ def main() -> None:
             "test_rmse": f"{test_logs['rmse']:.6f}" if test_logs else "n/a",
             "test_mape": f"{test_logs['mape']:.6f}" if test_logs and "mape" in test_logs else "n/a",
             "test_time_sec": f"{test_time:.2f}",
-            "best_checkpoint": str(ckpt_dir / "best.pt") if best_epoch else "n/a",
+            "best_checkpoint": (str(ckpt_dir / "best.pt") if save_best else "not_saved (CPU memory)") if best_epoch else "n/a",
             "metrics_jsonl": str(log_dir / "metrics.jsonl"),
         }
         logger.log_footer(summary=summary, status=status)
@@ -478,7 +501,7 @@ def main() -> None:
                 "started_at": started_at,
                 "finished_at": finished_at,
                 "status": status,
-                "run_dir": str(run_dir.relative_to(ROOT)),
+                "run_dir": os.path.relpath(run_dir, ROOT),
                 "dataset": dataset_name,
                 "experiment_type": experiment_type,
                 "variant": variant,

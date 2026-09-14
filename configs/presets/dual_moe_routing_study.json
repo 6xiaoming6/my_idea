@@ -1,0 +1,145 @@
+{
+  "protocol": "front-routing-matched-v1",
+  "output_dir": "outputs/v23/topk_dual_moe/routing_study",
+  "datasets": [
+    "TaxiBJ",
+    "BikeNYC"
+  ],
+  "patterns": [
+    "random"
+  ],
+  "rate": 0.4,
+  "seeds": [
+    42,
+    2026
+  ],
+  "ablation_seed": 42,
+  "train_windows": 2048,
+  "expected_train_samples": {
+    "TaxiBJ": 2048,
+    "BikeNYC": 511
+  },
+  "epochs": 120,
+  "val_epoch": 2,
+  "save_best_checkpoint": false,
+  "batch_size": 4,
+  "cpu_threads": 2,
+  "timing_safety_factor": 1.15,
+  "deadline": "2026-09-11 09:00",
+  "variants": {
+    "U8": {
+      "role": "main",
+      "description": "前端8专家等权融合，后端Top-2",
+      "patch": {
+        "model": {
+          "dual_moe": {
+            "aggregation_experts": 8,
+            "aggregation_mode": "uniform",
+            "aggregation_top_k": 8,
+            "completion_mode": "topk",
+            "completion_top_k": 2
+          }
+        },
+        "loss": {
+          "dual_moe_aggregation_balance_weight": 0,
+          "dual_moe_completion_balance_weight": 0.01
+        }
+      }
+    },
+    "K2": {
+      "role": "main",
+      "description": "前端8专家Top-2，前后均衡",
+      "patch": {
+        "model": {
+          "dual_moe": {
+            "aggregation_experts": 8,
+            "aggregation_mode": "topk",
+            "aggregation_top_k": 2,
+            "completion_mode": "topk",
+            "completion_top_k": 2
+          }
+        },
+        "loss": {
+          "dual_moe_aggregation_balance_weight": 0.01,
+          "dual_moe_completion_balance_weight": 0.01
+        }
+      }
+    },
+    "K4": {
+      "role": "main",
+      "description": "前端8专家Top-4，前后均衡",
+      "patch": {
+        "model": {
+          "dual_moe": {
+            "aggregation_experts": 8,
+            "aggregation_mode": "topk",
+            "aggregation_top_k": 4,
+            "completion_mode": "topk",
+            "completion_top_k": 2
+          }
+        },
+        "loss": {
+          "dual_moe_aggregation_balance_weight": 0.01,
+          "dual_moe_completion_balance_weight": 0.01
+        }
+      }
+    },
+    "D8": {
+      "role": "main",
+      "description": "前端8选8等价稠密可学习softmax，后端Top-2；关闭无梯度的前端硬计数均衡",
+      "patch": {
+        "model": {
+          "dual_moe": {
+            "aggregation_experts": 8,
+            "aggregation_mode": "topk",
+            "aggregation_top_k": 8,
+            "completion_mode": "topk",
+            "completion_top_k": 2
+          }
+        },
+        "loss": {
+          "dual_moe_aggregation_balance_weight": 0,
+          "dual_moe_completion_balance_weight": 0.01
+        }
+      }
+    },
+    "K4_NB": {
+      "role": "ablation",
+      "description": "Top-4仅关闭前端均衡，seed42机制对照",
+      "patch": {
+        "model": {
+          "dual_moe": {
+            "aggregation_experts": 8,
+            "aggregation_mode": "topk",
+            "aggregation_top_k": 4,
+            "completion_mode": "topk",
+            "completion_top_k": 2
+          }
+        },
+        "loss": {
+          "dual_moe_aggregation_balance_weight": 0,
+          "dual_moe_completion_balance_weight": 0.01
+        }
+      }
+    },
+    "D8_BU": {
+      "role": "ablation",
+      "description": "稠密前端配等权后端，seed42后端作用对照",
+      "patch": {
+        "model": {
+          "dual_moe": {
+            "aggregation_experts": 8,
+            "aggregation_mode": "topk",
+            "aggregation_top_k": 8,
+            "completion_mode": "uniform",
+            "completion_top_k": 2
+          }
+        },
+        "loss": {
+          "dual_moe_aggregation_balance_weight": 0,
+          "dual_moe_completion_balance_weight": 0
+        }
+      }
+    }
+  }
+}

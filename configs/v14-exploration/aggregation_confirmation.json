@@ -1,0 +1,18 @@
+{
+  "output_dir": "outputs/v14-exploration/aggregation_confirmation",
+  "datasets": ["BikeNYC", "TaxiBJ", "CHAP"],
+  "patterns": ["scattered", "block"],
+  "missing_rate": 0.4,
+  "seeds": [42, 2026, 3407],
+  "mask_seed": 1729,
+  "variants": ["single_wide", "uniform", "static_moe", "context_moe", "geometry_moe"],
+  "samples": {"train": 256, "val": 1000000000, "test": 1000000000},
+  "model": {"dim": 16, "strides": [2, 4], "wide_dilations": [2, 4]},
+  "train": {"epochs": 80, "val_epoch": 2, "batch_size": 16, "lr": 0.001, "weight_decay": 0.0001, "grad_clip": 1.0},
+  "deadline": "2026-09-09T13:00:00+08:00",
+  "timing_safety_factor": 1.35,
+  "deadline_reserve_seconds": 300,
+  "profiles": {
+    "full": {"samples": {"train": 1000000000, "val": 1000000000, "test": 1000000000}}
+  }
+}

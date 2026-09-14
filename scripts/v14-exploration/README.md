@@ -1,5 +1,24 @@
 # V14 root-cause exploration
 
+## Quick aggregation-necessity probe (separate small model)
+
+This exception is a controlled small model reusing V14 residual blocks, **not a
+full V14 run**. It tests fine-only / wider receptive field / fixed pooling /
+geometric soft pooling / learned soft pooling before optional MoE comparisons.
+Uses matched-count scattered/block masks and original split subsets; see
+`model_designs/V14聚合必要性快速机制验证.md` for scope and limitations.
+
+```bash
+python scripts/v14-exploration/run_aggregation_probe.py --gpu 0 --dry-run
+python scripts/v14-exploration/run_aggregation_probe.py --gpu 0
+python scripts/v14-exploration/run_aggregation_probe.py --gpu 0 --summary
+```
+
+The default is 30 small jobs, 20 epochs, 128/32/32 train/val/test windows per
+dataset. Outputs and configuration are isolated from all historical V14 runs.
+
+## Full V14 exploration scripts below
+
 All commands are run from the repository root.  Every candidate remains a
 single-stage, end-to-end V14 training run.  Validation selects one `best.pt`,
 which is loaded once for the final test.
@@ -528,3 +547,31 @@ fractions after viewing these results. C03 remains mechanism evidence that
 early full supervision plus late attenuation is better than fixed attenuation.
 The complete decision is in
 `outputs/v14-exploration/summary/csas_screen_summary.md`.
+
+## Aggregation confirmation: five controls, three seeds
+
+The independent entrypoint preserves the old probe and V14 source. It tests
+single-wide aggregation, uniform mixing, static learned mixing, context routing,
+and explicit geometry routing on three datasets and two matched-count mask
+geometries, with three seeds (90 runs). Each run trains 80 epochs, validates every
+2 epochs, overwrites one best checkpoint, then reloads it for one test pass.
+
+Default training is capped at 256 windows; validation/test are full splits.
+This is a controlled V14-block mechanism experiment, NOT the full V14 model.
+Measured estimates including 35% margin are about 3.4 hours for default, or
+24.3 hours for all training data. Neither fits a 13:00 deadline when starting
+after 11:00 on 2026-09-09; explicitly accept the later finish to launch:
+
+```bash
+python scripts/v14-exploration/run_aggregation_confirmation.py --gpu 0 --ignore-deadline
+# All training data, instead of the capped protocol:
+python scripts/v14-exploration/run_aggregation_confirmation.py --gpu 0 --profile full --ignore-deadline
+```
+
+Use `--dry-run`, `--calibrate`, or `--summary` to inspect the plan, measure
+runtime, or summarize matching completed jobs. Use the same `--profile full`
+for a full-profile summary. Without `--ignore-deadline`, insufficient time
+aborts before formal training rather than silently shrinking the protocol.
+Results and timestamped summaries live under
+`outputs/v14-exploration/aggregation_confirmation/`.
+Details: `model_designs/V14聚合机制多种子确认实验方案.md`.

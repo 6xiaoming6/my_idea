@@ -26,21 +26,25 @@ class DualBranchSTImputer(nn.Module):
         main_branch = build_model_backbone(cfg)
         aux_branch = NullResidualBranch(c_out=cfg["model"]["c_in"])
         aux_cfg = cfg["model"].get("aux", {})
-        return cls(
+        model = cls(
             main_branch=main_branch,
             aux_branch=aux_branch,
             aux_enabled=aux_cfg.get("enabled", False),
             alpha_init=aux_cfg.get("alpha_init", 0.0),
         )
+        if getattr(main_branch, "architecture", None) == "dual_moe":
+            # Compatibility wrapper only; no trainable unused legacy scalar.
+            model.alpha.requires_grad_(False)
+        return model
 
     def forward(self, batch: dict[str, torch.Tensor]) -> dict:
         main_outputs = self.main_branch(
             x_f=batch["x_f_obs"],
             m_f=batch["m_f"],
-            x_m=batch["x_m_obs"],
-            m_m=batch["m_m"],
-            x_c=batch["x_c_obs"],
-            m_c=batch["m_c"],
+            x_m=batch.get("x_m_obs"),
+            m_m=batch.get("m_m"),
+            x_c=batch.get("x_c_obs"),
+            m_c=batch.get("m_c"),
             r_m=batch.get("r_m"),
             r_c=batch.get("r_c"),
         )
@@ -53,8 +57,8 @@ class DualBranchSTImputer(nn.Module):
             delta_aux = torch.zeros_like(x_hat_main)
             x_hat_final = x_hat_main
 
-        x_gt_or_obs = batch.get("x_f_gt", batch["x_f_obs"])
-        x_comp = batch["m_f"] * x_gt_or_obs + (1.0 - batch["m_f"]) * x_hat_final
+        # Never read ground truth during inference, including observed overwrite.
+        x_comp = torch.where(batch["m_f"].bool(), batch["x_f_obs"], x_hat_final)
         outputs = {
             "x_hat_main": x_hat_main,
             "h_st_aux": h_st_aux,

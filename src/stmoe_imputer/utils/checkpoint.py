@@ -1,8 +1,21 @@
 from __future__ import annotations
 
 from pathlib import Path
+import os
+import copy
+from collections import OrderedDict
 
 import torch
+
+
+def snapshot_model_state(model: torch.nn.Module) -> dict:
+    """Independent CPU copy of parameters/buffers, without optimizer or files."""
+    state = model.state_dict()
+    snapshot = OrderedDict((key, value.detach().cpu().clone() if torch.is_tensor(value)
+                            else copy.deepcopy(value)) for key, value in state.items())
+    if hasattr(state, '_metadata'):
+        snapshot._metadata = copy.deepcopy(state._metadata)
+    return snapshot
 
 
 def save_checkpoint(
@@ -22,7 +35,12 @@ def save_checkpoint(
         "metrics": metrics,
         "config": cfg,
     }
-    torch.save(payload, path)
+    temporary = path.with_suffix(path.suffix + ".tmp")
+    try:
+        torch.save(payload, temporary)
+        os.replace(temporary, path)
+    finally:
+        temporary.unlink(missing_ok=True)
 
 
 def load_checkpoint(

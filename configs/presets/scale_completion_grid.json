@@ -1,33 +1,11 @@
 {
-  "seed": 42,
-  "output_dir": "outputs/v23/learned_regions",
-  "device": "cuda:0",
+  "output_dir": "outputs/v23/scale_completion/regular_grid",
   "data": {
-    "dataset_name": "Synthetic",
     "batch_size": 4,
-    "num_workers": 0,
-    "pin_memory": true,
-    "drop_last": false,
-    "scales": {
-      "fine_to_mid": 2,
-      "fine_to_coarse": 4,
-      "pooling_mode": "avg"
-    },
-    "mask": {
-      "pattern": "random",
-      "missing_rate": 0.4
-    },
-    "synthetic": {
-      "num_train": 128,
-      "num_val": 32,
-      "t": 12,
-      "h": 32,
-      "w": 32
-    }
+    "drop_last": false
   },
   "model": {
     "architecture": "dual_moe",
-    "c_in": 2,
     "dual_moe": {
       "dim": 32,
       "key_dim": 8,
@@ -35,7 +13,7 @@
       "num_groups": 4,
       "dropout": 0,
       "min_std": 1,
-      "aggregation_mode": "learned",
+      "aggregation_mode": "uniform",
       "aggregation_geometry": true,
       "completion_mode": "learned",
       "completion_use_support": true,
@@ -44,7 +22,14 @@
         8
       ],
       "aggregation_experts": 3,
-      "assignment_temperature": 0.5
+      "assignment_temperature": 0.5,
+      "design": "anchored_scale_moe",
+      "aggregation_kind": "regular_grid",
+      "residual_bound": 1,
+      "grid_strides": [
+        4,
+        8
+      ]
     },
     "aux": {
       "enabled": false
@@ -52,8 +37,8 @@
   },
   "loss": {
     "type": "smooth_l1",
-    "dual_moe_expert_weight": 0,
-    "dual_moe_partition_weight": 0.001
+    "dual_moe_expert_weight": 0.01,
+    "dual_moe_partition_weight": 0
   },
   "train": {
     "epochs": 80,

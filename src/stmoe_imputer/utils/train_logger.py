@@ -89,12 +89,14 @@ class TrainLogger:
             f"{epoch_s:>8.1f}  {mem_gb:>7.2f}  {best_mark:>5}"
         )
         self._train_f.write(t_line + "\n")
+        self._log_dual_moe(self._train_f, train)
         if val is not None:
             v_line = (
                 f"{epoch:>6}  {val['loss']:>11.5f}  {val['mae']:>10.4f}  {val['rmse']:>11.4f}  "
                 f"{train['mae']:>10.4f}  {epoch_s:>8.1f}  {best_mark:>5}"
             )
             self._val_f.write(v_line + "\n")
+            self._log_dual_moe(self._val_f, val)
         self._metrics_f.write(
             json.dumps(
                 {"epoch": epoch, "train": train, "val": val, "perf": perf, "is_best": is_best},
@@ -103,6 +105,35 @@ class TrainLogger:
             )
             + "\n"
         )
+
+    @staticmethod
+    def _log_dual_moe(stream, metrics):
+        if "mae_expert_fine" not in metrics:
+            return
+        diagnostics = {k: v for k, v in metrics.items() if k.startswith('backend_diag_')}
+        if diagnostics:
+            # Opt-in only; full machine-readable diagnostics also in .jsonl.
+            stream.write('  backend diagnostics: '+json.dumps(diagnostics, sort_keys=True)+'\n')
+        def fmt(keys):
+            return "/".join(f"{metrics[k]:.4f}" if k in metrics else "n/a" for k in keys)
+        def expert_order(key):
+            return int(key.rsplit('_e', 1)[1].split('_', 1)[0])
+        domain = 'missing' if 'aggregation_mid_missing_count' in metrics else 'observed'
+        front = " ".join(f"{s}="+fmt(sorted((k for k in metrics if k.startswith(f"aggregation_{s}_{domain}_e") and k.endswith("_mean")), key=expert_order)) for s in ("mid", "coarse"))
+        back = fmt([f"completion_missing_{s}_mean" for s in ("fine", "mid", "coarse")])
+        stream.write(f"  aggregation({domain},components): {front}; completion(missing,f/m/c): {back}\n")
+        errors = " ".join(f"{s}="+fmt([f"mae_expert_{s}", f"rmse_expert_{s}"]) for s in ("fine", "mid", "coarse"))
+        stream.write(f"  expert MAE/RMSE: {errors}\n")
+        regions = " ".join(f"{s}="+fmt([f"aggregation_{s}_assignment_entropy", f"aggregation_{s}_effective_regions"]) for s in ("mid", "coarse"))
+        stream.write(f"  regions(assignment entropy/effective count): {regions}\n")
+        if 'normalized_correction_abs_mean' in metrics:
+            stream.write(f"  bounded correction(abs mean/saturation): {fmt(['normalized_correction_abs_mean', 'residual_saturation_fraction'])}\n")
+        if 'l_balance_aggregation' in metrics or 'l_balance_completion' in metrics:
+            stream.write(f"  load balance(front/back): {fmt(['l_balance_aggregation', 'l_balance_completion'])}; weighted: {fmt(['l_balance_aggregation_weighted', 'l_balance_completion_weighted'])}\n")
+            for name in ('aggregation_mid', 'aggregation_coarse', 'completion'):
+                keys = sorted((k for k in metrics if k.startswith(f'topk_{name}_e') and k.endswith('_load')), key=expert_order)
+                if keys:
+                    stream.write(f"  topk {name}: load={fmt(keys)}; selected/token={fmt([f'topk_{name}_selected_per_token'])}\n")
 
     def log_test(self, metrics: dict[str, float] | None, extra: dict[str, Any] | None = None) -> None:
         ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
