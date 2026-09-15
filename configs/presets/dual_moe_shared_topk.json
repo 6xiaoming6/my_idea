@@ -1,0 +1,35 @@
+{
+  "output_dir": "outputs/v23/target_dual_moe/shared_topk",
+  "data": {"batch_size": 16, "drop_last": false, "num_workers": 0},
+  "model": {
+    "architecture": "dual_moe",
+    "dual_moe": {
+      "design": "target_readout_v1",
+      "dim": 32, "key_dim": 8, "depth": 1, "num_groups": 4,
+      "dropout": 0, "min_std": 1,
+      "aggregation_mode": "topk", "aggregation_top_k": 4,
+      "aggregation_experts": 8, "aggregation_geometry": true,
+      "coarse_nodes": [32, 8], "assignment_temperature": 0.5,
+      "completion_layout": "routed_shared", "completion_experts": 8,
+      "completion_mode": "topk", "completion_top_k": 3,
+      "completion_blend": "none", "completion_use_support": true,
+      "backend_diagnostics": true
+    },
+    "aux": {"enabled": false}
+  },
+  "loss": {
+    "type": "smooth_l1",
+    "dual_moe_expert_weight": 0.01,
+    "dual_moe_partition_weight": 0.001,
+    "dual_moe_aggregation_balance_weight": 0.001,
+    "dual_moe_completion_balance_weight": 0.001
+  },
+  "train": {
+    "epochs": 140, "dataset_epochs": {"TaxiBJ": 140, "BikeNYC": 100, "CHAP": 150},
+    "val_epoch": 2, "save_best_checkpoint": false,
+    "lr_main": 0.001, "weight_decay": 0.0001, "grad_clip_norm": 1,
+    "amp": true,
+    "scheduler": {"type": "cosine", "eta_min": 0.000001},
+    "early_stopping": {"enabled": false}
+  }
+}

@@ -260,6 +260,41 @@ class ScaleCompletionExpert(nn.Module):
         hidden = self.condition(torch.cat((aligned, fine), 1))
         return self.head(hidden), hidden, support
 
+class MultiScaleCompletionHead(nn.Module):
+    """Independent pointwise expert over already contextualized multi-scale features."""
+    def __init__(self, inputs, hidden, channels):
+        super().__init__()
+        self.net = nn.Sequential(nn.Conv3d(inputs, hidden, 1), nn.GELU(),
+                                 nn.Conv3d(hidden, channels, 1))
+
+    def forward(self, x):
+        return self.net(x).float()
+
+
+class ContextCompletionHead(MultiScaleCompletionHead):
+    """Local spatial + bidirectional temporal mixing of contextual hidden features.
+
+    Depthwise separable convolutions avoid quadratic attention on the fine grid.
+    The shared expert/router are unchanged; only routed experts opt into this.
+    Dilation changes receptive field without changing parameter count.
+    """
+    def __init__(self, inputs, hidden, channels, dilation=1):
+        super().__init__(inputs, hidden, channels)
+        # Preserve the base MLP and subsequent experts' initialization.
+        with torch.random.fork_rng(devices=[]):
+            self.context = nn.Sequential(
+                nn.Conv3d(hidden, hidden, (1, 3, 3),
+                          padding=(0, dilation, dilation), dilation=(1, dilation, dilation), groups=hidden),
+                nn.GELU(),
+                nn.Conv3d(hidden, hidden, (3, 1, 1),
+                          padding=(dilation, 0, 0), dilation=(dilation, 1, 1), groups=hidden),
+                nn.GELU(), nn.Conv3d(hidden, hidden, 1))
+
+    def forward(self, x):
+        hidden = self.net[1](self.net[0](x))
+        return self.net[2](hidden + 0.1*self.context(hidden)).float()
+
+
 class DualMoEBackbone(nn.Module):
     """V23: a new backbone, not a wrapper around the V14 correction network."""
     architecture = "dual_moe"
@@ -304,7 +339,32 @@ class DualMoEBackbone(nn.Module):
         ) for name, count in zip(("mid", "coarse"), nodes)})
         self.scale_experts = nn.ModuleDict({name: ScaleCompletionExpert(dim, channels, groups, dropout, depth)
                                            for name in ("mid", "coarse")})
-        self.completion_router = PointRouter(3*dim+7, 3, options.get("completion_mode", "learned"), options.get('completion_top_k'))
+        self.completion_layout = options.get('completion_layout', 'scale')
+        if self.completion_layout not in {'scale', 'routed_shared'}:
+            raise ValueError('completion_layout must be scale or routed_shared')
+        routed_shared = self.completion_layout == 'routed_shared'
+        expert_type = options.get('completion_expert_type', 'mlp')
+        expert_hidden = options.get('completion_expert_hidden', dim)
+        if expert_type not in {'mlp', 'st_local', 'st_dilated'}:
+            raise ValueError('completion_expert_type must be mlp, st_local or st_dilated')
+        if type(expert_hidden) is not int or expert_hidden < 1:
+            raise ValueError('completion_expert_hidden must be a positive integer')
+        if not routed_shared and (expert_type != 'mlp' or expert_hidden != dim):
+            raise ValueError('Custom completion experts require routed_shared layout')
+        routed_count = options.get('completion_experts', 8 if routed_shared else 3)
+        if type(routed_count) is not int or routed_count < 1:
+            raise ValueError('completion_experts must be a positive integer')
+        if routed_shared:
+            if not self.target_readout or options.get('completion_mode') != 'topk':
+                raise ValueError('routed_shared requires target_readout_v1 and topk completion')
+            if options.get('completion_blend', 'none') != 'none':
+                raise ValueError('Equal blending activates unselected experts; disable completion_blend for routed_shared')
+        elif routed_count != 3:
+            raise ValueError('The scale layout has exactly three heads; select routed_shared to change expert count')
+        # Preserve initialization of existing frontend modules. The new layout
+        # replaces this small reference router AFTER the frontend is initialized.
+        self.completion_router = PointRouter(3*dim+7, 3, options.get("completion_mode", "learned"),
+                                             3 if routed_shared else options.get('completion_top_k'))
         # Opt-in shrinkage only; historical configs/state dicts/RNG are unchanged.
         self.completion_blend = options.get('completion_blend', 'none')
         if self.completion_blend not in {'none', 'fixed', 'learned'}:
@@ -331,6 +391,15 @@ class DualMoEBackbone(nn.Module):
                 self.readout_routers = nn.ModuleDict({name: TargetReadoutRouter(
                     dim, key_dim, experts, options.get('aggregation_mode', 'topk'),
                     options.get('aggregation_top_k')) for name in ('mid', 'coarse')})
+        if routed_shared:
+            with torch.random.fork_rng(devices=[]):
+                self.completion_router = PointRouter(3*dim+7, routed_count, 'topk', options.get('completion_top_k'))
+                self.completion_shared = MultiScaleCompletionHead(3*dim+7, dim, channels)
+                self.completion_experts = nn.ModuleList([
+                    (MultiScaleCompletionHead(3*dim+7, expert_hidden, channels) if expert_type == 'mlp'
+                     else ContextCompletionHead(3*dim+7, expert_hidden, channels,
+                                                1 if expert_type == 'st_local' else 2))
+                    for _ in range(routed_count)])
 
     @classmethod
     def from_config(cls, cfg):
@@ -379,13 +448,28 @@ class DualMoEBackbone(nn.Module):
         support_input = torch.cat(aligned_support, 1)
         if not self.use_support:
             support_input = torch.zeros_like(support_input)
-        completion = self.completion_router(torch.cat((*hidden.values(), mask, support_input), 1))
+        completion_input = torch.cat((*hidden.values(), mask, support_input), 1)
+        completion = self.completion_router(completion_input)
         alpha = completion.new_tensor(0. if self.completion_router.mode == 'uniform' else 1.)
         if self.completion_blend != 'none':
             alpha = (self.completion_alpha_logit.sigmoid() if self.completion_blend == 'learned'
                      else self.completion_alpha_fixed)
             completion = (1-alpha)/3 + alpha*completion
-        pred_z = sum(completion[:, i:i+1]*normalized[name] for i, name in enumerate(("fine", "mid", "coarse")))
+        extra = {}
+        if self.completion_layout == 'routed_shared':
+            # Shared base is always active; ONLY K selected routed corrections
+            # contribute at each target. Experts are evaluated densely for now;
+            # this is sparse mixing, not a compute/memory speedup claim.
+            shared = self.completion_shared(completion_input)
+            residuals = torch.stack([expert(completion_input) for expert in self.completion_experts], dim=1)
+            correction = (completion.unsqueeze(2)*residuals).sum(1)
+            pred_z = shared+correction
+            extra = {'completion_layout': 'routed_shared',
+                     'shared_prediction': shared*scale+center,
+                     'completion_routed_predictions': {
+                         f'e{i}': (shared+residuals[:, i])*scale+center for i in range(len(self.completion_experts))}}
+        else:
+            pred_z = sum(completion[:, i:i+1]*normalized[name] for i, name in enumerate(("fine", "mid", "coarse")))
         prediction = pred_z*scale+center
         return {
             "architecture": self.architecture,
@@ -402,6 +486,7 @@ class DualMoEBackbone(nn.Module):
             "aggregation_mass": {name: value["mass"] for name, value in aggregated.items()},
             "aggregation_effective_count": {name: value["effective_count"] for name, value in aggregated.items()},
             "completion_gates": completion,
+            **extra,
             **({'backend_diagnostics': True, 'completion_alpha': alpha.detach()}
                if self.backend_diagnostics else {}),
             "routing_details": {

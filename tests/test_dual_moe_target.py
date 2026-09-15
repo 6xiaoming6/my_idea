@@ -335,4 +335,103 @@ class TargetMoETests(unittest.TestCase):
                 print(f'[target smoke] {folder} {pattern}: finite train/val/best-memory/test',flush=True)
 
 
+class SharedTopKCompletionTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls): torch.set_num_threads(1)
+
+    def cfg(self, channels=2):
+        return deep_update(config(channels),load_config(ROOT/'configs/presets/dual_moe_shared_topk.json'))
+
+    def test_eight_routed_plus_shared_and_exact_top_three(self):
+        cfg=self.cfg();model=DualBranchSTImputer.from_config(cfg)
+        self.assertEqual(len(model.main_branch.completion_experts),8)
+        data=batch(n=1,h=4,w=5);out=model(data);g=out['completion_gates']
+        self.assertEqual(g.shape,(1,8,3,4,5))
+        self.assertTrue(((g>0).sum(1)==3).all())
+        torch.testing.assert_close(g.sum(1),torch.ones_like(g[:,0]))
+        # Each routed candidate is shared+r_i; normalized routed weights sum1,
+        # so the shared base participates exactly once, not once per expert.
+        expected=sum(g[:,i:i+1]*out['completion_routed_predictions'][f'e{i}'] for i in range(8))
+        torch.testing.assert_close(out['x_hat_main'],expected)
+        self.assertEqual(out['routing_details']['completion']['probabilities'].shape[1],8)
+        self.assertEqual(set(out['scale_predictions']),{'fine','mid','coarse'})
+        loss,logs=compute_main_stage_loss(out,data,cfg,1)
+        expected_balance=token_topk_balance_loss(out['routing_details']['completion'],1-data['m_f'])
+        torch.testing.assert_close(logs['l_balance_completion'],expected_balance.detach())
+        torch.testing.assert_close(logs['l_balance_completion_weighted'],.001*expected_balance.detach())
+        self.assertTrue(torch.isfinite(loss))
+
+    def test_only_selected_experts_receive_main_gradient_shared_always_does(self):
+        model=DualBranchSTImputer.from_config(self.cfg())
+        router=model.main_branch.completion_router
+        with torch.no_grad():
+            router.head.weight.zero_();router.head.bias.copy_(torch.arange(8,dtype=torch.float))
+        out=model(batch(n=1,h=4,w=5));out['x_hat_main'].square().mean().backward()
+        for i,expert in enumerate(model.main_branch.completion_experts):
+            grad=sum(float(p.grad.abs().sum())for p in expert.parameters())
+            self.assertGreater(grad,0) if i>=5 else self.assertEqual(grad,0)
+        self.assertGreater(sum(float(p.grad.abs().sum())for p in model.main_branch.completion_shared.parameters()),0)
+        self.assertGreater(float(router.head.bias.grad.abs().sum()),0)
+
+    def test_shared_frontend_initialization_and_no_target_leakage(self):
+        cfg=self.cfg();old=copy.deepcopy(cfg)
+        old['model']['dual_moe'].update(completion_layout='scale',completion_experts=3)
+        torch.manual_seed(42);reference=DualBranchSTImputer.from_config(old)
+        torch.manual_seed(42);model=DualBranchSTImputer.from_config(cfg)
+        for name,value in reference.state_dict().items():
+            if 'completion_router.' not in name:
+                torch.testing.assert_close(value,model.state_dict()[name],rtol=0,atol=0)
+        data=batch(n=1,h=4,w=5);expected=model(data)['x_hat_main']
+        data['x_f_gt'].fill_(float('nan'))
+        data['x_f_obs']=torch.where(data['m_f'].bool(),data['x_f_obs'],float('nan'))
+        torch.testing.assert_close(model(data)['x_hat_main'],expected,rtol=0,atol=0)
+
+    def test_shared_metrics_labels_and_train_val_memory_restore(self):
+        cfg=self.cfg();cfg['train']['amp']=False
+        model=DualBranchSTImputer.from_config(cfg);opt=build_optimizer(model,cfg)
+        data=batch(n=1,h=4,w=5)
+        train=train_one_epoch(model,[data],opt,torch.device('cpu'),cfg,1)
+        state=snapshot_model_state(model)
+        with torch.no_grad():model.main_branch.completion_shared.net[-1].bias.add_(10)
+        model.load_state_dict(state)
+        val=evaluate(model,[data],torch.device('cpu'),cfg)
+        self.assertIn('backend_diag_grad_completion_shared',train)
+        self.assertIn('backend_diag_grad_completion_experts',train)
+        for result in (train,val):
+            self.assertTrue(all(math.isfinite(v) for v in result.values()))
+            self.assertAlmostEqual(result['topk_completion_selected_per_token'],3)
+            self.assertEqual(result['completion_shared_always_active'],1)
+            self.assertNotIn('completion_missing_fine_mean',result)
+            self.assertNotIn('backend_diag_alpha_mean',result)
+            for i in range(8):
+                self.assertIn(f'completion_missing_e{i}_mean',result)
+                self.assertIn(f'mae_completion_e{i}_with_shared',result)
+                self.assertIn(f'backend_diag_all_e{i}_win_fraction',result)
+            self.assertAlmostEqual(sum(result[f'backend_diag_all_e{i}_win_fraction']for i in range(8)),1,places=5)
+        stream=io.StringIO();TrainLogger._log_dual_moe(stream,val)
+        self.assertIn('routed experts',stream.getvalue())
+        self.assertIn('always on',stream.getvalue())
+        self.assertIn('e7=',stream.getvalue())
+
+    def test_shared_shapes_masks_and_invalid_options(self):
+        for c,t,h,w in [(2,12,32,32),(2,12,24,12),(1,7,32,32),(1,1,1,1)]:
+            cfg=self.cfg(c);model=DualBranchSTImputer.from_config(cfg)
+            data=batch(c,t,h,w,n=1);out=model(data)
+            self.assertEqual(out['x_hat_main'].shape,data['x_f_gt'].shape)
+            loss,_=compute_main_stage_loss(out,data,cfg,1);loss.backward()
+            self.assertTrue(torch.isfinite(loss))
+            self.assertTrue(all(p.grad is not None and torch.isfinite(p.grad).all() for p in model.parameters() if p.requires_grad))
+        for observed in (0.,1.):
+            cfg=self.cfg();model=DualBranchSTImputer.from_config(cfg)
+            data=batch(n=1,h=3,w=3);data['m_f'].fill_(observed);data['x_f_obs']=data['x_f_gt']*observed
+            out=model(data);loss,_=compute_main_stage_loss(out,data,cfg,1)
+            self.assertTrue(torch.isfinite(loss))
+            if observed:self.assertEqual(float(loss),0)
+        for patch in [{'completion_experts':True},{'completion_top_k':9},{'completion_top_k':0},
+                      {'completion_blend':'learned'},{'completion_mode':'uniform'},
+                      {'design':'learned_regions_v2'},{'completion_layout':'scale'}]:
+            cfg=self.cfg();cfg['model']['dual_moe'].update(patch)
+            with self.assertRaises(ValueError):DualBranchSTImputer.from_config(cfg)
+
+
 if __name__ == '__main__': unittest.main()

@@ -526,3 +526,59 @@ PYTHONPATH=src:tests OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 \
 ```
 
 </details>
+
+## 2026-09-14补充：多尺度条件的8路由＋1共享后端
+
+### 结构与可配置入口
+
+新增opt-in `completion_layout="routed_shared"`，并非把前端专家数改成8，也不是总共8个里包含共享专家。
+该后端默认8个独立路由专家、1个独立共享专家，每个位置选择3个路由专家；共享专家在每个位置始终参与，不占Top-K名额。
+
+输入`h=concat(h_fine,h_mid,h_coarse,mask,support_mid,support_coarse)`，维度`3*dim+7`。
+三条隐藏表示已经包含时空上下文，9个专家各自采用独立`1x1 Conv -> GELU -> 1x1 Conv`，不是重复同一个预测头或仅用8个权重混合同三个预测。
+共享头输出归一化基础预测`s(h)`，8个路由头分别输出修正`r_i(h)`。
+路由使用PointRouter，完整8维Softmax用于重要性统计，选出Top3后在选中专家内归一化，未选权重严格为0：
+
+`z_hat = s(h) + sum_{i in Top3} w_i(h) * r_i(h)`
+
+`y_hat = z_hat * observed_std + observed_mean`
+
+所有归一化统计仍只使用观测值。共享头不再额外重复添加center，修正也不是独立完整预测。
+前端的成员映射、粗节点32/8、E8/Top4目标读出、fine主干与中粗处理均保持原设计。三尺度预测头保留用于原辅助损失，不再被后端直接三选一融合。
+新模块初始化不改变已有前端/尺度模块同seed初始化；旧`scale`布局的模型键与初始化行为保留。
+
+### 与L的区别
+
+L的等权回退会让未选路由专家获得非零权重，因此新布局禁止`completion_blend=fixed/learned`。
+共享专家承担始终参与的公共预测，不等同于L的等权基底；这是结构改动，不是L仅增加一个参数。
+后端路由不把8个专家固定映射到细/中/粗标签，每个都能使用全部尺度。没有额外阶段训练、教师或真值可靠性输入。
+当前实现计算所有专家后再稀疏加权，并非稀疏dispatch，因此不能宣称8选3自动降低计算开销。
+
+### 损失、日志与解释边界
+
+主任务仍为缺失位置归一化SmoothL1；三个原尺度头的平均辅助损失权重0.01；分区权重0.001；前后端负载均衡默认各0.001。
+后端均衡只使用8个路由专家的概率和选择计数，在缺失目标位置累计；共享专家不计入分母，不需要被均衡。
+共享头和被选修正头从主任务获得梯度；未选修正头在该token上的主任务贡献为0，路由概率可通过均衡项获得梯度。
+没有新增对每个修正头拟合完整真值的损失，否则会混淆残差与完整预测。
+
+日志中：
+
+- `completion_missing_e0...e7_mean/std`表示8个路由专家的实际混合权重，不再误标fine/mid/coarse。
+- `topk_completion_*`为8专家负载，`selected_per_token=3`，共享不占名额。
+- `completion_shared_always_active=1`，`mae/rmse_completion_shared`记录基础预测。
+- `mae/rmse_completion_e{i}_with_shared`记录`s+r_i`的完整预测误差，不直接拿原始残差与真值相减。
+- `backend_diagnostics=true`时，分观测密度误差、胜率及误差相关改为8个`s+r_i`候选；不报告不存在的L参数alpha，不把其oracle当作可部署结果。
+- 三个旧尺度头的`mae_expert_fine/mid/coarse`仍是辅助头诊断，与8个后端专家不同。
+
+所有记录进入各run的train/val/test.log及metrics.jsonl。新增共享/路由模块总梯度范数；不据此保证专家互补性或性能提升。
+
+### 运行
+
+```bash
+python scripts/train_scale_completion.py --preset dual_moe_shared_topk \
+  --dataset TaxiBJ --mask random --rate 0.8 --gpu 0
+```
+
+同一入口支持BikeNYC/CHAP、fixed/random、0.2/0.4/0.6/0.8。中央配置`configs/presets/dual_moe_shared_topk.json`中设置节点/专家/TopK/损失/训练策略。
+默认TaxiBJ140、BikeNYC100、CHAP150epoch，batch16、val每2轮，单阶段训练、最佳CPU权重覆盖、恢复后完整TEST一次、不保存参数文件。数据集epoch映射由该启动器解析；直接调用scripts/train.py时应使用解析后的配置或自行明确epochs。
+可以加--dry-run只打印计划；不会自动更改旧稳定性队列，也不自动重跑全条件实验。新输出独立于历史36组结果，位于`outputs/v23/target_dual_moe/shared_topk/`。

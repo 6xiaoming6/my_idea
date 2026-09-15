@@ -22,6 +22,8 @@ class BackendDiagnosticAccumulator:
         self.bins = {}
         self.pairs = {}
         self.alpha = torch.zeros(3, dtype=torch.float64)
+        self.labels = None
+        self.shared_layout = False
 
     @torch.no_grad()
     def update(self, outputs, batch):
@@ -29,7 +31,11 @@ class BackendDiagnosticAccumulator:
         mask = batch['m_f'].detach().float()
         target = batch['x_f_gt'].detach().float()
         valid = (1-mask).bool().expand_as(target)
-        preds = [outputs['scale_predictions'][s].detach().float() for s in ('fine','mid','coarse')]
+        self.shared_layout = outputs.get('completion_layout') == 'routed_shared'
+        predictions = (outputs['completion_routed_predictions'] if self.shared_layout else outputs['scale_predictions'])
+        self.labels = tuple(predictions) if self.shared_layout else ('fine','mid','coarse')
+        preds = [predictions[s].detach().float() for s in self.labels]
+        experts = len(preds)
         errs = torch.stack([(p-target).abs() for p in preds])
         final = (outputs['x_hat_main'].detach().float()-target).abs()
         # Exclude padded cells, not treat outside-grid space as missing data.
@@ -40,7 +46,7 @@ class BackendDiagnosticAccumulator:
         ties = (errs == best.unsqueeze(0)).float()
         wins = ties/ties.sum(0, keepdim=True)
         chosen = outputs['completion_gates'].detach().argmax(1, keepdim=True).expand_as(target)
-        hit = (chosen.unsqueeze(0) == torch.arange(3, device=target.device).reshape(3,1,1,1,1,1)).float()*wins
+        hit = (chosen.unsqueeze(0) == torch.arange(experts, device=target.device).reshape(experts,1,1,1,1,1)).float()*wins
         dominant = (outputs['completion_gates'].detach().amax(1,keepdim=True) > .9).expand_as(target)
         for label, region in [('all', valid), ('low', valid & (density < 1/3)),
                               ('medium', valid & (density >= 1/3) & (density < 2/3)),
@@ -53,17 +59,18 @@ class BackendDiagnosticAccumulator:
             values += [w[region].sum() for w in wins]
             v = torch.stack(values).double().cpu()
             self.bins[label] = self.bins.get(label, torch.zeros_like(v))+v
-        for i,j in ((0,1),(0,2),(1,2)):
+        for i,j in ((i,j) for i in range(experts) for j in range(i+1,experts)):
             a,b = errs[i][valid],errs[j][valid]
             v = torch.stack((a.new_tensor(a.numel()),a.sum(),b.sum(),a.square().sum(),b.square().sum(),(a*b).sum(),(preds[i]-preds[j]).abs()[valid].sum())).double().cpu()
             self.pairs[(i,j)] = self.pairs.get((i,j),torch.zeros_like(v))+v
         n = valid.sum()
-        a = outputs['completion_alpha'].detach()
-        self.alpha += torch.stack((n, a*n, a.square()*n)).double().cpu()
+        if not self.shared_layout:
+            a = outputs['completion_alpha'].detach()
+            self.alpha += torch.stack((n, a*n, a.square()*n)).double().cpu()
 
     def compute(self):
         out = {}
-        labels = ('fine','mid','coarse')
+        labels = self.labels or ()
         for label,v in self.bins.items():
             prefix = 'backend_diag_'+label+'_'
             n = float(v[0]); out[prefix+'count'] = n
@@ -74,7 +81,7 @@ class BackendDiagnosticAccumulator:
                         prefix+'dominant_fraction': float(v[4]/n), prefix+'top_weight_expert_hit': float(v[5]/n)})
             for i,s in enumerate(labels):
                 out[prefix+s+'_mae'] = float(v[6+i]/n)
-                out[prefix+s+'_win_fraction'] = float(v[9+i]/n)
+                out[prefix+s+'_win_fraction'] = float(v[6+len(labels)+i]/n)
         for (i,j),v in self.pairs.items():
             n = float(v[0])
             if not n:
@@ -107,6 +114,9 @@ class DualMoEMetricAccumulator:
         self.topk = {}
         self.active = False
         self.backend = None
+        self.completion_experts = {}
+        self.shared = MaskedMetricAccumulator()
+        self.shared_active = False
 
     def _add(self, name, gate, mask):
         p, m = gate.detach().double(), mask.detach().double()
@@ -160,6 +170,13 @@ class DualMoEMetricAccumulator:
         self._add("completion_missing", outputs["completion_gates"], 1-batch["m_f"])
         for scale, pred in outputs["scale_predictions"].items():
             self.experts[scale].update(pred, batch["x_f_gt"], batch["m_f"])
+        if outputs.get('completion_layout') == 'routed_shared':
+            self.shared_active = True
+            self.shared.update(outputs['shared_prediction'], batch['x_f_gt'], batch['m_f'])
+            for name,pred in outputs['completion_routed_predictions'].items():
+                if name not in self.completion_experts:
+                    self.completion_experts[name] = MaskedMetricAccumulator()
+                self.completion_experts[name].update(pred, batch['x_f_gt'], batch['m_f'])
         for name, routing in outputs.get('routing_details', {}).items():
             valid = (batch['m_f'] if name.startswith('aggregation_') else 1-batch['m_f']).double()
             if routing.get('valid_domain') == 'missing':
@@ -193,7 +210,7 @@ class DualMoEMetricAccumulator:
             experts = (values.numel()-2)//2
             mean = values[1:1+experts]/count
             std = (values[1+experts:1+2*experts]/count-mean.square()).clamp_min(0).sqrt()
-            labels = ("fine", "mid", "coarse") if name == "completion_missing" else tuple(f"e{i}" for i in range(experts))
+            labels = ("fine", "mid", "coarse") if name == "completion_missing" and not self.shared_active else tuple(f"e{i}" for i in range(experts))
             for i, label in enumerate(labels):
                 result[f"{name}_{label}_mean"] = float(mean[i])
                 result[f"{name}_{label}_std"] = float(std[i])
@@ -204,6 +221,13 @@ class DualMoEMetricAccumulator:
         for scale, metrics in self.experts.items():
             for key, value in metrics.compute().items():
                 result[f"{key}_expert_{scale}"] = value
+        if self.shared_active:
+            result['completion_shared_always_active'] = 1.
+            for key,value in self.shared.compute().items():
+                result[f'{key}_completion_shared'] = value
+            for name,metrics in self.completion_experts.items():
+                for key,value in metrics.compute().items():
+                    result[f'{key}_completion_{name}_with_shared'] = value
         for scale, values in self.regions.items():
             if values[1] > 0:
                 result[f"aggregation_{scale}_assignment_entropy"] = float(values[0]/values[1])

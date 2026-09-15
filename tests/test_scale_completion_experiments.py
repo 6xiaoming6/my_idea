@@ -17,6 +17,41 @@ class ExperimentTests(unittest.TestCase):
     def setUp(self):
         self.p = runner.common.load(ROOT/'configs/presets/scale_completion_experiments.json')
 
+    def test_st_dilated_mainline_preserves_historical_mlp_and_training_policy(self):
+        import train_scale_completion as trainer
+        for dataset in ('TaxiBJ','BikeNYC','CHAP'):
+            old,paths=trainer.build_config(dataset,'random',.8,'learned_regions',42,preset='dual_moe_shared_topk')
+            new,new_paths=trainer.build_config(dataset,'random',.8,'learned_regions',42,preset='dual_moe_st_dilated')
+            expected=runner.common.merge(old,{'output_dir':'outputs/v23/target_dual_moe/st_dilated',
+                'model':{'dual_moe':{'completion_expert_type':'st_dilated','completion_expert_hidden':32}}})
+            self.assertEqual(new,expected)
+            self.assertEqual(paths,new_paths)
+            self.assertEqual(old['model']['dual_moe'].get('completion_expert_type','mlp'),'mlp')
+        result=subprocess.run([sys.executable,'scripts/train_scale_completion.py',
+            '--preset','dual_moe_st_dilated','--dataset','BikeNYC','--mask','fixed',
+            '--rate','0.4','--epochs','2','--dry-run'],cwd=ROOT,text=True,capture_output=True,timeout=30)
+        self.assertEqual(result.returncode,0,result.stderr)
+        self.assertIn('routed=st_dilated',result.stdout)
+        self.assertIn('epochs=2',result.stdout)
+        self.assertIn('ST_DILATED_shared1_E8_K3',result.stdout)
+
+    def test_shared_topk_preset_launcher_all_datasets(self):
+        import train_scale_completion as trainer
+        for dataset,epochs in [('TaxiBJ',140),('BikeNYC',100),('CHAP',150)]:
+            cfg,paths=trainer.build_config(dataset,'random',.4,'learned_regions',42,preset='dual_moe_shared_topk')
+            self.assertEqual(cfg['train']['epochs'],epochs)
+            self.assertEqual(cfg['train']['val_epoch'],2)
+            self.assertEqual(cfg['model']['dual_moe']['completion_experts'],8)
+            self.assertEqual(cfg['model']['dual_moe']['completion_top_k'],3)
+            self.assertEqual(cfg['model']['dual_moe']['completion_layout'],'routed_shared')
+            self.assertEqual(cfg['loss']['dual_moe_completion_balance_weight'],.001)
+            self.assertFalse(cfg['train']['save_best_checkpoint'])
+            self.assertNotIn('dataset_epochs',cfg['train'])
+            self.assertEqual(set(paths),{'train','val','test'})
+        cfg,_=trainer.build_config('TaxiBJ','fixed',.8,'learned_regions',42,2,'dual_moe_shared_topk')
+        self.assertEqual(cfg['train']['epochs'],2)
+        with self.assertRaises(ValueError):trainer.build_config('TaxiBJ','fixed',.4,'regular_grid',preset='dual_moe_shared_topk')
+
     def test_backend_stability_36_matched_fresh_jobs(self):
         p=runner.common.load(ROOT/'configs/presets/dual_moe_backend_stability.json')
         runner.validate(p)

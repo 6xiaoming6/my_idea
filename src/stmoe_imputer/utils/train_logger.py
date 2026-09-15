@@ -120,8 +120,14 @@ class TrainLogger:
             return int(key.rsplit('_e', 1)[1].split('_', 1)[0])
         domain = 'missing' if 'aggregation_mid_missing_count' in metrics else 'observed'
         front = " ".join(f"{s}="+fmt(sorted((k for k in metrics if k.startswith(f"aggregation_{s}_{domain}_e") and k.endswith("_mean")), key=expert_order)) for s in ("mid", "coarse"))
-        back = fmt([f"completion_missing_{s}_mean" for s in ("fine", "mid", "coarse")])
-        stream.write(f"  aggregation({domain},components): {front}; completion(missing,f/m/c): {back}\n")
+        completion_keys = sorted((k for k in metrics if k.startswith('completion_missing_e') and k.endswith('_mean')), key=expert_order)
+        labels = 'routed experts' if completion_keys else 'f/m/c'
+        back = fmt(completion_keys or [f"completion_missing_{s}_mean" for s in ("fine", "mid", "coarse")])
+        stream.write(f"  aggregation({domain},components): {front}; completion(missing,{labels}): {back}\n")
+        if 'completion_shared_always_active' in metrics:
+            stream.write('  completion shared(always on, excluded from Top-K/balance) MAE/RMSE: '+fmt(['mae_completion_shared','rmse_completion_shared'])+'\n')
+            routed = ' '.join(f'e{i}='+fmt([f'mae_completion_e{i}_with_shared', f'rmse_completion_e{i}_with_shared']) for i in range(len(completion_keys)))
+            stream.write('  completion routed+shared MAE/RMSE: '+routed+'\n')
         errors = " ".join(f"{s}="+fmt([f"mae_expert_{s}", f"rmse_expert_{s}"]) for s in ("fine", "mid", "coarse"))
         stream.write(f"  expert MAE/RMSE: {errors}\n")
         regions = " ".join(f"{s}="+fmt([f"aggregation_{s}_assignment_entropy", f"aggregation_{s}_effective_regions"]) for s in ("mid", "coarse"))

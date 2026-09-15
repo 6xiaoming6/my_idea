@@ -1,6 +1,86 @@
 # ST-MoE Imputer — V23
 
-## 2026-09-13 后端稳定性验证（当前入口）
+## 2026-09-15 当前主力：ST_DILATED 后端
+
+主力预设为 `configs/presets/dual_moe_st_dilated.json`：前端保持 E8/Top4，
+后端8个扩张时空卷积路由专家（hidden32、dilation2）＋1个逐点MLP共享专家，Top3。
+不修改模型类的历史默认行为；旧 `dual_moe_shared_topk` 仍为MLP，31组对照配置保持原定义。
+
+```bash
+python scripts/train_scale_completion.py --preset dual_moe_st_dilated \
+  --dataset TaxiBJ --mask random --rate 0.8 --gpu 0
+```
+
+输出独立放在 `outputs/v23/target_dual_moe/st_dilated/`。继承原主力完整预算
+TaxiBJ140/BikeNYC100/CHAP150轮（不是上一轮探索的80/100/80轮）、batch16、每2轮验证，
+最佳权重只保存在CPU内存，最后恢复测试一次，不保存checkpoint。不自动启动训练。
+可加 `--dry-run` 核对实际配置。入口脚本更新会改变旧实验队列的代码指纹；
+已完成31组结果保留在原目录，无需重新运行历史队列。
+
+## 2026-09-14 新旧后端验证＋时空专家结构探索（31组）
+
+```bash
+conda activate difftdi
+python scripts/run_backend_architecture_experiments.py --gpu 0
+```
+
+单GPU顺序执行两阶段，不启动多卡任务。统一配置：`configs/presets/dual_moe_backend_architecture.json`。
+覆盖TaxiBJ/BikeNYC/CHAP的fixed@0.4与random@0.8、seed42，保留全部原始TRAIN/VAL/TEST。
+TaxiBJ80、BikeNYC100、CHAP80轮，batch16，每2轮及最后一轮验证；以验证MAE选择最佳权重，
+CPU内存覆盖保留，最后恢复最佳权重测试一次，不保存checkpoint文件。80轮是匹配预算探索，不宣称充分收敛。
+
+| 阶段 | 对照 | 要回答的问题 |
+|---|---|---|
+| 新旧验证（13组） | OLD_D vs NEW_MLP；TaxiBJ random@0.8另加OLD_L | 新后端整体修改是否优于旧动态融合及该点历史强对照？ |
+| 结构探索（18组新增） | MLP_WIDE、ST_LOCAL、ST_DILATED；共用第一阶段NEW_MLP | 专家额外时空交互是否优于逐点MLP及近参数量控制？ |
+
+OLD_D为原3尺度动态融合，OLD_L为原全局可学习均匀/动态混合。
+NEW_MLP为8个路由专家＋1共享专家、Top3、隐藏宽32。MLP_WIDE仅把路由专家隐藏宽改为46，
+每专家参数量与两个时空候选相差不足1%。ST_LOCAL/ST_DILATED为宽32的逐点输入投影后，
+增加`hidden + 0.1 × PWConv(GELU(DWTemporalConv(GELU(DWSpatialConv(hidden)))))`再输出。
+空间卷积核1×3×3、时间核3×1×1；local dilation=1，dilated dilation=2（时间/空间有效范围5）。
+二者参数数量完全相同，时间双向交互适用于窗口内离线补全，不能用于宣称因果预测。
+共享专家保持原逐点MLP，前端E8/Top4、路由器、支持度输入、损失、数据、优化策略均固定。
+空间/时间交互仅使用观测构成的隐藏特征，不读取缺失真值。旧默认结构和历史配置保持不变。
+
+第一阶段是专家数量/共享分支/输出组织/均衡项的**整体升级对比**，不能独立归因于某一项；
+第二阶段仅探索路由专家结构。候选由验证集判断，测试集只做最终描述；不同数据集不混合原始量纲误差。
+单seed和6个条件只用于确定后续方向，非全条件多种子结论，也不是双MoE完整2×2证明。
+卷积专家是本项目的探索设计，参考的是局部时空建模原则，不声称直接复现某篇论文的专家。
+
+脚本首先对各数据集/候选短时测速，丢弃测速权重，打印含30%余量的总时长和北京时间ETA。
+目标为2026-09-15 10:00，**仅提示超时，不自动砍样本、epoch或跳过候选**。
+`--dry-run`只检查31组计划；`--calibrate`只测速；`--summary-only`重新汇总。
+`--stage upgrade`只跑阶段一；`--stage structure`跑阶段二并自动补齐/复用本套NEW_MLP锚点。
+同一命令重跑只跳过完整训练＋定期验证＋最佳模型最终测试的任务，中断单组从第1轮重新训练。
+运行期间不要修改代码/配置/数据；指纹变化会产生独立队列，不导入历史分数。
+
+输出统一在`outputs/v23/target_dual_moe/backend_architecture/<指纹>/`：
+`configs/`为逐组解析配置，`logs/`为控制台原始日志，`runs/`内保存各模型的train.log/val.log/test.log及metrics.jsonl，
+根目录有plan.json、data_manifest.json、timing.json、summary.csv/json、comparison.json。
+配对变化按相同数据集、模式、缺失率、seed计算，负数表示改善；不完整任务不计入有效配对。
+
+## 2026-09-14 后端8路由专家＋1共享专家（新增模型入口）
+
+前端仍为中/粗两个E8、Top4观测组织读出。新后端是**8个独立路由专家＋1个始终启用的共享专家**，每个位置在8个路由专家中选3个；共享专家不占Top3、不参加路由负载均衡。
+全部专家读取细/中/粗隐藏表示及mask/support，独立小型MLP输出；共享专家给基础预测，路由专家给修正，最终为`shared + sum(top3_weight * routed_residual)`。
+新布局不使用L的等权回退，避免未选中的专家也参与混合。现阶段是稀疏混合、密集计算，不能宣称只计算3个专家或一定提速。
+
+```bash
+conda activate difftdi
+python scripts/train_scale_completion.py \
+  --preset dual_moe_shared_topk \
+  --dataset TaxiBJ --mask random --rate 0.8 --gpu 0
+```
+
+配置集中在`configs/presets/dual_moe_shared_topk.json`，可加`--dry-run`只检查、`--epochs`统一覆盖单次预算。
+默认全量TRAIN/VAL/TEST、TaxiBJ140/BikeNYC100/CHAP150轮、batch16、每2轮验证、最佳CPU内存权重测试、不落checkpoint。
+前后端均衡权重均0.001；原来的三个尺度头保留0.01辅助监督，不把8个修正专家当作三个尺度头监督。
+输出`outputs/v23/target_dual_moe/shared_topk/`，日志分别记录e0–e7权重/负载、共享预测、共享加单专家预测误差。
+旧三尺度D/H/L配置和历史结果均保留；新模型容量与机制均有变化，不能把与旧模型的比较称作只改变专家数的纯消融。
+此入口是单次训练，不自动跳过已完成任务；旧36组稳定性队列仍是原U/D/H/L，并未被替换为新模型。
+
+## 2026-09-13 后端稳定性验证（历史四组入口）
 
 根据18组结果，保留前端E8/Top4，比较U等权、D完全动态、H固定半动态、L全局可学习动态强度四组。
 BikeNYC random@0.4为100轮，TaxiBJ random@0.4/0.8为140轮；各跑42/2026/3407三个种子，共36组。

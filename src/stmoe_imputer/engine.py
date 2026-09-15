@@ -284,7 +284,8 @@ def train_one_epoch(
                     continue
                 group = next((g for g in ('fine_expert', 'fine_head', 'scale_experts.mid',
                              'scale_experts.coarse', 'aggregation.mid', 'aggregation.coarse',
-                             'readout_routers', 'completion_router', 'completion_alpha_logit')
+                             'readout_routers', 'completion_router', 'completion_alpha_logit',
+                             'completion_shared', 'completion_experts')
                               if g in name), None)
                 if group:
                     sums[group].append(parameter.grad.detach().float().square().sum())

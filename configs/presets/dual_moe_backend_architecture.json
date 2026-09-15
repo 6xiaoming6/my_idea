@@ -1,0 +1,45 @@
+{
+  "protocol": "backend-architecture-v1",
+  "output_dir": "outputs/v23/target_dual_moe/backend_architecture",
+  "datasets": ["TaxiBJ", "BikeNYC", "CHAP"],
+  "patterns": ["fixed", "random"],
+  "rates": [0.4, 0.8],
+  "points": [
+    {"pattern": "fixed", "rate": 0.4},
+    {"pattern": "random", "rate": 0.8}
+  ],
+  "seeds": [42],
+  "dataset_epochs": {"TaxiBJ": 80, "BikeNYC": 100, "CHAP": 80},
+  "batch_size": 16,
+  "val_epoch": 2,
+  "cpu_threads": 2,
+  "timing_safety_factor": 1.3,
+  "target_time": "2026-09-15 10:00",
+  "extra_old_l": [{"dataset": "TaxiBJ", "pattern": "random", "rate": 0.8}],
+  "variants": {
+    "OLD_D": {
+      "stage": "upgrade",
+      "patch": {
+        "model": {"dual_moe": {"completion_layout": "scale", "completion_experts": 3,
+          "completion_mode": "topk", "completion_top_k": 3, "completion_blend": "none"}},
+        "loss": {"dual_moe_completion_balance_weight": 0.0}
+      }
+    },
+    "NEW_MLP": {
+      "stage": "upgrade",
+      "patch": {"model": {"dual_moe": {"completion_expert_type": "mlp", "completion_expert_hidden": 32}}}
+    },
+    "MLP_WIDE": {
+      "stage": "structure",
+      "patch": {"model": {"dual_moe": {"completion_expert_type": "mlp", "completion_expert_hidden": 46}}}
+    },
+    "ST_LOCAL": {
+      "stage": "structure",
+      "patch": {"model": {"dual_moe": {"completion_expert_type": "st_local", "completion_expert_hidden": 32}}}
+    },
+    "ST_DILATED": {
+      "stage": "structure",
+      "patch": {"model": {"dual_moe": {"completion_expert_type": "st_dilated", "completion_expert_hidden": 32}}}
+    }
+  }
+}
