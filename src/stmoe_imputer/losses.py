@@ -377,6 +377,16 @@ def compute_dual_moe_loss(outputs: dict, batch: dict, cfg: dict):
     partition = outputs.get("partition_loss", main*0.)*(missing.sum()>0)
     loss = main+weight*expert+partition_weight*partition
     logs = {"l_main": main.detach(), "l_dual_expert": expert.detach(), "l_partition": partition.detach()}
+    recovery_weight = float(loss_cfg.get('dual_moe_recoverability_weight', 0.))
+    if not math.isfinite(recovery_weight) or recovery_weight < 0:
+        raise ValueError('dual_moe_recoverability_weight must be finite and nonnegative')
+    if recovery_weight:
+        if not outputs.get('recoverability'):
+            raise ValueError('Recoverability supervision requires the enabled model branch')
+        term = torch.stack([reconstruction(v['prediction']) for v in outputs['recoverability'].values()]).mean()
+        loss = loss + recovery_weight*term
+        logs['l_recoverability'] = term.detach()
+        logs['l_recoverability_weighted'] = (recovery_weight*term).detach()
     routing = outputs.get('routing_details', {})
     for side, names, valid in [('aggregation', ('aggregation_mid', 'aggregation_coarse'), batch['m_f']),
                                 ('completion', ('completion',), 1-batch['m_f'])]:

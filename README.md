@@ -1,5 +1,66 @@
 # ST-MoE Imputer — V23
 
+## 当前主力确认（2026-09-15）：A_ST_DILATED
+
+根据已完成的30组对照，继续使用 **A_ST_DILATED**，暂不推进可恢复性模块及其他结构修改。
+主力配置保持 `configs/presets/dual_moe_st_dilated.json`：前端每尺度8专家/Top4，
+后端8个ST_DILATED路由专家/Top3＋1个共享专家。可恢复性分支默认关闭，相关辅助损失权重默认0。
+模型结构、超参数、历史实验代码和结果均保留。
+
+主力训练入口（需要训练时手动执行，不使用可恢复性实验队列）：
+
+```bash
+python scripts/train_scale_completion.py --preset dual_moe_st_dilated \
+  --dataset TaxiBJ --mask random --rate 0.8 --gpu 0
+```
+
+请显式指定 `--preset dual_moe_st_dilated`；省略preset仍是历史入口行为，不代表A。
+完整训练预算保持TaxiBJ140、BikeNYC100、CHAP150轮，batch16，每2轮验证；
+最佳验证权重仅保存在CPU内存，训练结束恢复后测试一次，不保存磁盘checkpoint。
+本轮40/60/50轮仅是探索预算，不覆盖主力完整预算。
+分析见[30组实验报告](experments_report/20260915_第23版_可恢复性双MoE三数据集30组实验分析.md)。
+
+## 历史探索（已暂停）：2026-09-15 可恢复性引导补全
+
+以下保留原方案与复现命令，不作为当前推荐训练流程，不继续启动新一轮探索。
+
+今晚22点看初筛结果，使用同一脚本的短预算（不是下面默认60组）：
+
+```bash
+python scripts/run_recoverability_experiments.py --profile tonight --gpu 0
+```
+
+共30组，五组对照 × 三数据集 × fixed/random@0.8，seed42。
+BikeNYC60、CHAP50、TaxiBJ40轮，按此数据集顺序运行；仍用全部TRAIN/VAL/TEST，每2轮验证。
+用户本机测速约12.37小时，较最初8～10小时估计更长。22:00仅为参考目标：
+先测速，预计完成时间加30分钟余量超过目标也只提醒，仍继续全部正式实验，不减少epoch、不停止任务。
+即使目标日期已过也可以启动/续跑。只有显式使用`--calibrate`才仅测速、不启动正式训练。
+短预算在同一JSON的`profiles.tonight`中，输出独立到`recoverability/tonight/<指纹>/`。
+只用于高缺失率下的方向筛选，不是收敛/全缺失率的最终证据。不传`--profile tonight`仍跑原60组。
+
+保留当前 ST_DILATED 主力，不覆盖历史配置。新增固定归一化时空基下的观测约束矩阵、
+局部岭回归与模式级先验软限制，并在前端目标对齐后传递给原 ST_DILATED 后端。
+这是待验证的研究候选，不是已证明的精确恢复保证或校准置信度。
+
+```bash
+conda activate difftdi
+python scripts/run_recoverability_experiments.py --dry-run
+python scripts/run_recoverability_experiments.py --gpu 0
+```
+
+默认60组：三个数据集 × fixed/random × 0.4/0.8 × 五组对照，seed42，全部原始TRAIN/VAL/TEST。
+TaxiBJ140/BikeNYC100/CHAP150轮，每2轮及最后一轮验证，最佳权重仅在CPU内存覆盖保存，
+训练后恢复最佳权重测试一次，不保存checkpoint。参数集中在
+`configs/presets/dual_moe_recoverability_experiments.json`，单卡顺序运行，不自动砍预算。
+五组为原模型A、标量支持B、矩阵表示C、模式约束D、无学习先验的局部拟合控制E。
+`--mechanism-only`仅运行CPU合成几何检查；`--calibrate`仅测速；`--summary-only`汇总。
+同一命令重新运行会跳过经审计完整完成的任务；中断单组从头训练，运行中不要修改代码/配置/数据。
+输出统一在 `outputs/v23/target_dual_moe/recoverability/comparison/<指纹>/`。
+
+完整结构、公式、对照边界与运行步骤见
+[可恢复性引导双MoE实现与验证](model_designs/v23_可恢复性引导双MoE实现与验证.md)。
+只训练新模型可用 `train_scale_completion.py --preset dual_moe_recoverability`，其余参数同原入口。
+
 ## 2026-09-15 当前主力：ST_DILATED 后端
 
 主力预设为 `configs/presets/dual_moe_st_dilated.json`：前端保持 E8/Top4，

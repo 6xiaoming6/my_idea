@@ -1,0 +1,42 @@
+{
+  "protocol": "recoverability-v1",
+  "output_dir": "outputs/v23/target_dual_moe/recoverability/comparison",
+  "datasets": ["TaxiBJ", "BikeNYC", "CHAP"],
+  "patterns": ["fixed", "random"],
+  "rates": [0.4, 0.8],
+  "points": [
+    {"pattern": "fixed", "rate": 0.4},
+    {"pattern": "random", "rate": 0.4},
+    {"pattern": "fixed", "rate": 0.8},
+    {"pattern": "random", "rate": 0.8}
+  ],
+  "seeds": [42],
+  "dataset_epochs": {"TaxiBJ": 140, "BikeNYC": 100, "CHAP": 150},
+  "batch_size": 16,
+  "val_epoch": 2,
+  "cpu_threads": 2,
+  "timing_safety_factor": 1.3,
+  "recoverability": {"ridge": 0.05, "strength": 0.1},
+  "auxiliary_weight": 0.01,
+  "variants": {
+    "A_ST_DILATED": "off",
+    "B_SCALAR": "scalar",
+    "C_MATRIX": "matrix",
+    "D_RECOVERY": "constrained",
+    "E_FIT": "fit_only"
+  },
+  "profiles": {
+    "tonight": {
+      "output_dir": "outputs/v23/target_dual_moe/recoverability/tonight",
+      "datasets": ["BikeNYC", "CHAP", "TaxiBJ"],
+      "rates": [0.8],
+      "points": [
+        {"pattern": "fixed", "rate": 0.8},
+        {"pattern": "random", "rate": 0.8}
+      ],
+      "dataset_epochs": {"TaxiBJ": 40, "BikeNYC": 60, "CHAP": 50},
+      "target_time": "2026-09-15 22:00",
+      "finish_buffer_minutes": 30
+    }
+  }
+}

@@ -238,9 +238,13 @@ class ScaleCompletionExpert(nn.Module):
         self.condition = nn.Sequential(nn.Conv3d(2*dim, dim, 1), nn.GELU())
         self.head = nn.Conv3d(dim, channels, 1)
 
-    def forward(self, aggregation, fine, readout_router=None):
+    def forward(self, aggregation, fine, readout_router=None, recoverability=None, mask=None, values=None):
         regions = self.blocks(self.input(torch.cat((aggregation["features"], aggregation["support"]), -1)))
         restored = restore_regions(aggregation["assignment"], regions)
+        recovery = None
+        if recoverability is not None:
+            delta, recovery = recoverability(aggregation, regions, mask, values)
+            restored = restored + delta
         prior = aggregation["prior"][..., None]
         restored_support = restore_regions(aggregation["assignment"].detach(), aggregation["support"])
         if readout_router is not None:
@@ -254,6 +258,10 @@ class ScaleCompletionExpert(nn.Module):
             aggregation['routing_info'] = readout_router.routing_info
         aligned = (restored*prior).sum(1)
         b, d, t, h, w = fine.shape
+        if recovery is not None:
+            aggregation['recoverability'] = {
+                key: (value*prior).sum(1).reshape(b, t, h, w, -1).permute(0, 4, 1, 2, 3).contiguous()
+                for key, value in recovery.items()}
         aligned = aligned.reshape(b, t, h, w, d).permute(0, 4, 1, 2, 3).contiguous()
         support = (restored_support*prior.detach()).sum(1)
         support = support.reshape(b, t, h, w, 3).permute(0, 4, 1, 2, 3).contiguous()
@@ -400,6 +408,19 @@ class DualMoEBackbone(nn.Module):
                      else ContextCompletionHead(3*dim+7, expert_hidden, channels,
                                                 1 if expert_type == 'st_local' else 2))
                     for _ in range(routed_count)])
+        recovery = options.get('recoverability', {})
+        if not isinstance(recovery, dict):
+            raise ValueError('recoverability must be an options dictionary')
+        self.recoverability_mode = recovery.get('mode', 'off')
+        if self.recoverability_mode != 'off':
+            if not self.target_readout or not routed_shared:
+                raise ValueError('recoverability requires target_readout_v1 and routed_shared')
+            from .recoverability import RecoverabilityReadout
+            # Off preserves historical state dict AND RNG exactly. Additional
+            # modules never shift initialization of existing front/back experts.
+            with torch.random.fork_rng(devices=[]):
+                self.recoverability = nn.ModuleDict({name: RecoverabilityReadout(dim, channels, recovery)
+                                                     for name in ('mid', 'coarse')})
 
     @classmethod
     def from_config(cls, cfg):
@@ -436,7 +457,10 @@ class DualMoEBackbone(nn.Module):
         aggregated, aligned_support = {}, []
         for name in ("mid", "coarse"):
             result = self.aggregation[name](fine, mask, z)
-            if self.target_readout:
+            if self.recoverability_mode != 'off':
+                normalized[name], hidden[name], support = self.scale_experts[name](
+                    result, fine, self.readout_routers[name], self.recoverability[name], mask, z)
+            elif self.target_readout:
                 normalized[name], hidden[name], support = self.scale_experts[name](result, fine, self.readout_routers[name])
             else:
                 # Historical grid/anchored variants override the two-input
@@ -486,6 +510,9 @@ class DualMoEBackbone(nn.Module):
             "aggregation_mass": {name: value["mass"] for name, value in aggregated.items()},
             "aggregation_effective_count": {name: value["effective_count"] for name, value in aggregated.items()},
             "completion_gates": completion,
+            **({'recoverability': {name: {**v['recoverability'],
+                 'prediction': v['recoverability']['prediction']*scale+center}
+                 for name, v in aggregated.items()}} if self.recoverability_mode != 'off' else {}),
             **extra,
             **({'backend_diagnostics': True, 'completion_alpha': alpha.detach()}
                if self.backend_diagnostics else {}),

@@ -16,7 +16,7 @@ ROOT = common.ROOT
 
 def build_config(dataset, pattern, rate, aggregation, seed=42, epochs=None, preset=None):
     folder, prefix, base = common.SPECS[dataset]
-    if preset is not None and (preset not in {'dual_moe_topk', 'dual_moe_target', 'dual_moe_shared_topk', 'dual_moe_st_dilated'} or aggregation != 'learned_regions'):
+    if preset is not None and (preset not in {'dual_moe_topk', 'dual_moe_target', 'dual_moe_shared_topk', 'dual_moe_st_dilated', 'dual_moe_recoverability'} or aggregation != 'learned_regions'):
         raise ValueError('Dual MoE presets require learned_regions aggregation')
     preset = preset+'.json' if preset else ('scale_completion_grid.json' if aggregation == 'regular_grid' else 'scale_completion.json')
     cfg = common.merge(common.load(ROOT/f'configs/datasets/{base}.json'), common.load(ROOT/'configs/presets'/preset))
@@ -41,7 +41,7 @@ def main():
     parser.add_argument('--mask',choices=('fixed','random'),required=True)
     parser.add_argument('--rate',type=float,choices=(.2,.4,.6,.8),default=.4)
     parser.add_argument('--aggregation',choices=('learned_regions','regular_grid'),default='learned_regions')
-    parser.add_argument('--preset',choices=('dual_moe_topk','dual_moe_target','dual_moe_shared_topk','dual_moe_st_dilated'),help='Current mainline: dual_moe_st_dilated; historical presets and omitted-preset behavior are preserved')
+    parser.add_argument('--preset',choices=('dual_moe_topk','dual_moe_target','dual_moe_shared_topk','dual_moe_st_dilated','dual_moe_recoverability'),help='Stable: dual_moe_st_dilated; experimental: dual_moe_recoverability; historical defaults preserved')
     parser.add_argument('--front-mode', choices=('uniform','topk'), help='Matched target-MoE ablation; all aggregation experts are retained')
     parser.add_argument('--back-mode', choices=('uniform','topk'), help='Matched target-MoE ablation; all three completion experts are retained')
     parser.add_argument('--gpu',default='0')
@@ -65,10 +65,13 @@ def main():
     run_name = 'full'
     if args.preset == 'dual_moe_target':
         run_name = 'ablation_Q'+str(int(options['aggregation_mode'] == 'topk'))+str(int(options['completion_mode'] == 'topk'))
-    elif args.preset in ('dual_moe_shared_topk', 'dual_moe_st_dilated'):
+    elif args.preset in ('dual_moe_shared_topk', 'dual_moe_st_dilated', 'dual_moe_recoverability'):
         run_name = f'shared1_E{options["completion_experts"]}_K{options["completion_top_k"]}'
         if args.preset == 'dual_moe_st_dilated':
             run_name = 'ST_DILATED_'+run_name
+        elif args.preset == 'dual_moe_recoverability':
+            run_name = 'RECOVERY_'+run_name
+            print(f'[recoverability] {options["recoverability"]}; local model-relative constraint, not calibrated uncertainty')
     print(f'[model] {options["design"]}, aggregation={args.aggregation}, E={options["aggregation_experts"] if args.aggregation=="learned_regions" else 1}')
     if args.preset:
         print(f'[routing] aggregation={options["aggregation_mode"]}, K={options["aggregation_top_k"]}; completion={options["completion_mode"]}, K={options["completion_top_k"]}')

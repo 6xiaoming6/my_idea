@@ -110,6 +110,9 @@ class TrainLogger:
     def _log_dual_moe(stream, metrics):
         if "mae_expert_fine" not in metrics:
             return
+        recovery = {k: v for k, v in metrics.items() if k.startswith(('recovery_', 'l_recoverability'))}
+        if recovery:
+            stream.write('  recoverability (model-relative, not calibrated): '+json.dumps(recovery, sort_keys=True)+'\n')
         diagnostics = {k: v for k, v in metrics.items() if k.startswith('backend_diag_')}
         if diagnostics:
             # Opt-in only; full machine-readable diagnostics also in .jsonl.

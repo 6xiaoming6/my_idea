@@ -99,6 +99,52 @@ class BackendDiagnosticAccumulator:
         return out
 
 
+class RecoverabilityMetricAccumulator:
+    """Missing-only, original-unit errors by predeclared target weakness bins.
+
+    Weakness is a local model-relative diagnostic, NOT calibrated uncertainty.
+    Bins use channel elements; exact sums make results independent of batches.
+    Correlation is descriptive and does not control for mask density/distance.
+    """
+    def __init__(self):
+        self.values = {}
+
+    @torch.no_grad()
+    def update(self, outputs, batch):
+        if not outputs.get('recoverability'):
+            return
+        target = batch['x_f_gt'].detach().double()
+        missing = (~batch['m_f'].bool()).expand_as(target)
+        final_error = (outputs['x_hat_main'].detach().double()-target).abs()
+        for scale, item in outputs.get('recoverability', {}).items():
+            weak = item['weakness'].detach().double().expand_as(target)
+            coverage = item['coverage'].detach().double().expand_as(target)
+            error = (item['prediction'].detach().double()-target).abs()
+            for label, valid in [('all', missing), ('low', missing & (weak < 1/3)),
+                                 ('medium', missing & (weak >= 1/3) & (weak < 2/3)),
+                                 ('high', missing & (weak >= 2/3))]:
+                w, e, fit, cov = weak[valid], final_error[valid], error[valid], coverage[valid]
+                v = torch.stack((valid.sum(), w.sum(), w.square().sum(), e.sum(), e.square().sum(),
+                                 (w*e).sum(), fit.sum(), fit.square().sum(), cov.sum())).cpu()
+                key = f'recovery_{scale}_{label}_'
+                self.values[key] = self.values.get(key, torch.zeros_like(v))+v
+
+    def compute(self):
+        result = {}
+        for prefix, v in self.values.items():
+            n = float(v[0]); result[prefix+'count'] = n
+            if not n:
+                continue
+            result.update({prefix+'weakness': float(v[1]/n), prefix+'coverage': float(v[8]/n),
+                           prefix+'mae': float(v[3]/n), prefix+'rmse': math.sqrt(float(v[4]/n)),
+                           prefix+'branch_mae': float(v[6]/n), prefix+'branch_rmse': math.sqrt(float(v[7]/n))})
+            va, vb = max(0., float(v[2]-v[1].square()/n)), max(0., float(v[4]-v[3].square()/n))
+            result[prefix+'corr_defined'] = float(va > 1e-12 and vb > 1e-12)
+            if va > 1e-12 and vb > 1e-12:
+                result[prefix+'weakness_error_corr'] = max(-1., min(1., float(v[5]-v[1]*v[3]/n)/math.sqrt(va*vb)))
+        return result
+
+
 class DualMoEMetricAccumulator:
     """Exact spatial gate moments: observed sources vs missing destinations.
 
@@ -117,6 +163,7 @@ class DualMoEMetricAccumulator:
         self.completion_experts = {}
         self.shared = MaskedMetricAccumulator()
         self.shared_active = False
+        self.recovery = RecoverabilityMetricAccumulator()
 
     def _add(self, name, gate, mask):
         p, m = gate.detach().double(), mask.detach().double()
@@ -131,6 +178,7 @@ class DualMoEMetricAccumulator:
         if outputs.get("architecture") != "dual_moe":
             return
         self.active = True
+        self.recovery.update(outputs, batch)
         if outputs.get('backend_diagnostics'):
             if self.backend is None:
                 self.backend = BackendDiagnosticAccumulator()
@@ -198,6 +246,7 @@ class DualMoEMetricAccumulator:
         if not self.active:
             return {}
         result = {}
+        result.update(self.recovery.compute())
         if self.backend is not None:
             result.update(self.backend.compute())
         for name, values in self.moments.items():
