@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "output_dir": "outputs/v24-COE/experiments",
+  "cpu_threads": 2,
+  "seeds": [
+    7
+  ],
+  "training": {
+    "epochs": 80,
+    "val_epoch": 2,
+    "save_best_checkpoint": false,
+    "early_stopping": {
+      "enabled": false
+    }
+  },
+  "studies": {
+    "pilot": {
+      "base_config": "configs/v24/bikenyc.json",
+      "stage": "pilot",
+      "sources": {
+        "train": "data/BikeNYC/bikenyc_train.npz",
+        "val": "data/BikeNYC/bikenyc_val.npz",
+        "test": "data/BikeNYC/bikenyc_test.npz"
+      },
+      "mask_root": "outputs/v24-COE/section13/bikenyc_masks_seed2026",
+      "patterns": [
+        "node_contiguous"
+      ],
+      "rates": [
+        0.4
+      ]
+    },
+    "core": {
+      "base_config": "configs/v24/bikenyc.json",
+      "stage": "core",
+      "sources": {
+        "train": "data/BikeNYC/bikenyc_train.npz",
+        "val": "data/BikeNYC/bikenyc_val.npz",
+        "test": "data/BikeNYC/bikenyc_test.npz"
+      },
+      "mask_root": "outputs/v24-COE/section13/bikenyc_masks_seed2026",
+      "patterns": [
+        "random_point",
+        "node_contiguous",
+        "spatial_region",
+        "spatiotemporal_block",
+        "mixed"
+      ],
+      "rates": [
+        0.4
+      ]
+    },
+    "chain4": {
+      "base_config": "configs/v24/taxibj.json",
+      "stage": "chain4",
+      "sources": {
+        "train": "data/TaxiBJ/taxibj_train.npz",
+        "val": "data/TaxiBJ/taxibj_val.npz",
+        "test": "data/TaxiBJ/taxibj_test.npz"
+      },
+      "mask_root": "outputs/v24-COE/section13/taxibj_masks_seed2026",
+      "patterns": [
+        "random_point",
+        "node_contiguous",
+        "spatial_region",
+        "spatiotemporal_block",
+        "mixed"
+      ],
+      "rates": [
+        0.4
+      ]
+    }
+  },
+  "default_study": "chain4",
+  "batch_size": 16
+}

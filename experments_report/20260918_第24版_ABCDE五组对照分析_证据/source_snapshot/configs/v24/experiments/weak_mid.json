@@ -1,0 +1,21 @@
+{
+  "model": {
+    "coe": {
+      "num_steps": 2,
+      "expert_pool": [
+        "T",
+        "S"
+      ],
+      "routing_mode": "hard",
+      "fixed_path": null,
+      "router_state": "dynamic",
+      "expert_state": "dynamic",
+      "use_shared": true,
+      "use_routed": true
+    }
+  },
+  "loss": {
+    "lambda_coe_mid": 0.1,
+    "lambda_coe_balance": 0
+  }
+}

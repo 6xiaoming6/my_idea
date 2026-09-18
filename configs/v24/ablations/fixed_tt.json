@@ -1,0 +1,11 @@
+{
+  "model": {
+    "coe": {
+      "routing_mode": "fixed",
+      "fixed_path": [
+        "T",
+        "T"
+      ]
+    }
+  }
+}

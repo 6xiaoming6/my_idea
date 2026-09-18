@@ -1,0 +1,15 @@
+{
+  "scripts/prepare_taxibj_npz.py": "49cec17afda8fd8457f7997ff409e8352d47f035d7ddf5fa900d34ac48f7e3b0",
+  "scripts/train.py": "8c1de3110a6f412deff7c1e0bac4e77e3f3eb69a87bbf7067c625ae53c5a3a07",
+  "scripts/v24/generate_structured_masks.py": "b7a0ed846b7b364864d1d6873e16161700f0f8d2d503bdc0d262416358b002b4",
+  "scripts/v24/run_experiments.py": "4218d7892c32a50c4537130d30b3fc11debd451a0ee014dbde8db218a060b397",
+  "src/stmoe_imputer/models/temporal_spatial_coe.py": "921c0b6c8ea5ac413898c7ca9be7ffb41570a66bcbaa7f3dfd5f3abd89301dea",
+  "src/stmoe_imputer/models/coe_pattern_experts.py": "b45acee9756bc2e4d9f7e5888b6cecda7df8bef2783b84f68e71ab908ba90492",
+  "src/stmoe_imputer/engine.py": "24944c4e4f70e8afcc50d16a998ac7521c2bed44d3b751d357c1b4c6a6905a4f",
+  "src/stmoe_imputer/losses.py": "cba71d2a8cf09f324cbbf57f1c93f97b0034cba8569d8bbbeab98bf7278e5df2",
+  "src/stmoe_imputer/data/npz_dataset.py": "a2a0efd46157467b9551a652dfbdc9fad0e4f6d8a4970503106fe1e3ebebb955",
+  "src/stmoe_imputer/data/transforms.py": "80b9b806577ae3cc7f647b014ddec1971349cb9b2819cf4e202b2706a660b17e",
+  "configs/v24/experiments.json": "5f02dd7e78b016617bd9e47a9bfd07ebaf1ea1a663fe189a3b3c7b28eb78f870",
+  "configs/v24/taxibj.json": "e5e6ea0114262d8ff16d3f492baa50d3614e1be0ae77361d6380c66dcce9df54",
+  "configs/v24/experiments/chain4_balance.json": "81e6afefc6999b81df55f9347804fa86acf5f78d54e5b2fb3147e863a2c7cb7e"
+}

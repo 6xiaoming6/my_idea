@@ -1,0 +1,997 @@
+{
+  "schema_version": 1,
+  "status": "planned_not_executed",
+  "repo_root": "/home/students/HuangMingYu/code/py/my_idea/my_idea",
+  "base_config": "/home/students/HuangMingYu/code/py/my_idea/my_idea/configs/v24/abc_base.json",
+  "stage": "abcde",
+  "seeds": [
+    7
+  ],
+  "paired_seeds": false,
+  "budget_regime": "updates",
+  "num_runs": 5,
+  "datasets": {
+    "train": {
+      "path": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/taxibj_train.npz",
+      "shape_ncthw": [
+        2452,
+        2,
+        12,
+        32,
+        32
+      ],
+      "stored_shape": [
+        2452,
+        2,
+        12,
+        32,
+        32
+      ],
+      "layout": "NCTHW",
+      "keys": [
+        "x_f_gt"
+      ]
+    },
+    "val": {
+      "path": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/taxibj_val.npz",
+      "shape_ncthw": [
+        342,
+        2,
+        12,
+        32,
+        32
+      ],
+      "stored_shape": [
+        342,
+        2,
+        12,
+        32,
+        32
+      ],
+      "layout": "NCTHW",
+      "keys": [
+        "x_f_gt"
+      ]
+    },
+    "test": {
+      "path": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/taxibj_test.npz",
+      "shape_ncthw": [
+        707,
+        2,
+        12,
+        32,
+        32
+      ],
+      "stored_shape": [
+        707,
+        2,
+        12,
+        32,
+        32
+      ],
+      "layout": "NCTHW",
+      "keys": [
+        "x_f_gt"
+      ]
+    }
+  },
+  "protocols": [
+    {
+      "name": "random_point_rate0.4",
+      "kind": "structured_csv",
+      "pattern": "random_point",
+      "requested_missing_rate": 0.4,
+      "metadata_file": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/masks/random_point/0.4/metadata.json",
+      "metadata": {
+        "schema_version": 1,
+        "pattern": "random_point",
+        "requested_missing_rate": 0.4,
+        "mask_seed": 2026,
+        "definition": "Uniformly sample round(rate*T*H*W) distinct cells in each window.",
+        "rounding": "Python round uses nearest integer with ties to even; cuboid chooses nearest achievable volume.",
+        "csv_semantics": "0=missing, 1=observed; one row per window; columns flattened T/H/W in C order; mask shared across channels",
+        "loader_pattern": "random",
+        "rate_scope": "Raw geometric mask rates before intersection with source availability or finite target values; effective supervised Q rates must be reported separately.",
+        "splits": {
+          "train": {
+            "source_npz": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/taxibj_train.npz",
+            "source_key": "x_f_gt",
+            "source_layout": "NCTHW",
+            "shape_ncthw": [
+              2452,
+              2,
+              12,
+              32,
+              32
+            ],
+            "has_available_mask": false,
+            "rows": 2452,
+            "columns": 12288,
+            "csv": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/masks/random_point/0.4/train.csv",
+            "actual_missing_rate_min": 0.39998372395833337,
+            "actual_missing_rate_mean": 0.3999837239583334,
+            "actual_missing_rate_max": 0.39998372395833337,
+            "sha256": "71b25f6f628361aef33b4a0d7d4fa99547827c7c9d84d0f69c6b7b582960a291",
+            "actual_minus_requested_missing_rate_min": -1.6276041666651864e-05,
+            "actual_minus_requested_missing_rate_mean": -1.6276041652163453e-05,
+            "actual_minus_requested_missing_rate_max": -1.6276041666651864e-05
+          },
+          "val": {
+            "source_npz": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/taxibj_val.npz",
+            "source_key": "x_f_gt",
+            "source_layout": "NCTHW",
+            "shape_ncthw": [
+              342,
+              2,
+              12,
+              32,
+              32
+            ],
+            "has_available_mask": false,
+            "rows": 342,
+            "columns": 12288,
+            "csv": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/masks/random_point/0.4/val.csv",
+            "actual_missing_rate_min": 0.39998372395833337,
+            "actual_missing_rate_mean": 0.3999837239583335,
+            "actual_missing_rate_max": 0.39998372395833337,
+            "sha256": "55894604c9dc82c026d60257ec8857e19d8d2d068462671e517490ba1db8d357",
+            "actual_minus_requested_missing_rate_min": -1.6276041666651864e-05,
+            "actual_minus_requested_missing_rate_mean": -1.627604166742902e-05,
+            "actual_minus_requested_missing_rate_max": -1.6276041666651864e-05
+          },
+          "test": {
+            "source_npz": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/taxibj_test.npz",
+            "source_key": "x_f_gt",
+            "source_layout": "NCTHW",
+            "shape_ncthw": [
+              707,
+              2,
+              12,
+              32,
+              32
+            ],
+            "has_available_mask": false,
+            "rows": 707,
+            "columns": 12288,
+            "csv": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/masks/random_point/0.4/test.csv",
+            "actual_missing_rate_min": 0.39998372395833337,
+            "actual_missing_rate_mean": 0.3999837239583334,
+            "actual_missing_rate_max": 0.39998372395833337,
+            "sha256": "2060f8f3df3942fe25644efcfbb2775878f7fd8bc6dda9839df078bc9214e40b",
+            "actual_minus_requested_missing_rate_min": -1.6276041666651864e-05,
+            "actual_minus_requested_missing_rate_mean": -1.6276041665208574e-05,
+            "actual_minus_requested_missing_rate_max": -1.6276041666651864e-05
+          }
+        },
+        "clean_protocol": true
+      },
+      "mask_patch": {
+        "pattern": "random",
+        "missing_rate": 0.4,
+        "train_csv": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/masks/random_point/0.4/train.csv",
+        "val_csv": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/masks/random_point/0.4/val.csv",
+        "test_csv": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/masks/random_point/0.4/test.csv"
+      }
+    }
+  ],
+  "comparison_policy": {
+    "same_dataset_and_masks_across_variants": false,
+    "same_evaluation_masks_across_variants": true,
+    "training_mask_intervention": {
+      "abc_d": {
+        "families": [
+          "random_point",
+          "node_outage",
+          "temporal_gap",
+          "spatial_region",
+          "spatiotemporal_block",
+          "stripe",
+          "moving_region",
+          "multi_block",
+          "composite"
+        ],
+        "rates": [
+          0.4
+        ],
+        "seed": 20260917
+      },
+      "abc_e": {
+        "families": [
+          "random_point",
+          "node_outage",
+          "temporal_gap",
+          "spatial_region",
+          "spatiotemporal_block",
+          "stripe",
+          "moving_region",
+          "multi_block",
+          "composite"
+        ],
+        "rates": [
+          0.4
+        ],
+        "seed": 20260917
+      }
+    },
+    "drop_last": false,
+    "early_stopping": false,
+    "route_balance_enabled_by_default": true,
+    "mask_pairing_note": "Evaluation CSVs are shared. Explicit training_mask_intervention replaces training CSV masks only for its variant; otherwise real-data CSVs are shared across model seeds. Synthetic data/masks vary by seed and are smoke checks only.",
+    "metrics": "MAE/RMSE over effective hidden targets; report original units only when scaling metadata is known",
+    "selection": "Choose checkpoints and fixed-path baseline using validation data; test data is for final evaluation"
+  },
+  "runs": [
+    {
+      "name": "v24_abcde_abc_a_random_point_rate0.4_updates_seed7",
+      "stage": "abcde",
+      "variant": "abc_a",
+      "seed": 7,
+      "question": "A：清洁数据，原始路由",
+      "protocol": "random_point_rate0.4",
+      "config_path": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/experiments/abcde/abcde/38027eefadf2a586/configs/v24_abcde_abc_a_random_point_rate0.4_updates_seed7.json",
+      "config": {
+        "seed": 7,
+        "output_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/experiments/abcde/abcde/38027eefadf2a586/runs/v24_abcde_abc_a_random_point_rate0.4_updates_seed7",
+        "device": "cuda",
+        "data": {
+          "dataset_name": "TaxiBJ",
+          "batch_size": 16,
+          "num_workers": 0,
+          "pin_memory": true,
+          "drop_last": false,
+          "mask": {
+            "pattern": "random",
+            "missing_rate": 0.4,
+            "train_csv": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/masks/random_point/0.4/train.csv",
+            "val_csv": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/masks/random_point/0.4/val.csv",
+            "test_csv": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/masks/random_point/0.4/test.csv"
+          },
+          "synthetic": {
+            "num_train": 128,
+            "num_val": 32,
+            "t": 12,
+            "h": 32,
+            "w": 32
+          },
+          "multiscale": false,
+          "loader_seed": 7
+        },
+        "model": {
+          "architecture": "v24_ts_coe",
+          "c_in": 2,
+          "main": {
+            "dim": 64,
+            "max_t": 12,
+            "h": 32,
+            "w": 32,
+            "scale_mode": "fine",
+            "use_multiscale": false
+          },
+          "coe": {
+            "num_steps": 4,
+            "routing_mode": "hard",
+            "fixed_path": null,
+            "router_state": "dynamic",
+            "use_shared": true,
+            "use_routed": true,
+            "temperature": 1.0,
+            "temporal_kernel": 3,
+            "spatial_kernel": 3,
+            "residual_init": 0.1,
+            "expert_pool": [
+              "T",
+              "S",
+              "TD",
+              "SD",
+              "TA",
+              "ST"
+            ],
+            "expert_state": "dynamic",
+            "temporal_dilation": 2,
+            "spatial_dilation": 2,
+            "attention_heads": 4
+          },
+          "aux": {
+            "enabled": false,
+            "alpha_init": 0.0
+          }
+        },
+        "loss": {
+          "type": "l1",
+          "lambda_coe_mid": 0.0,
+          "lambda_coe_balance": 0.01
+        },
+        "train": {
+          "epochs": 70,
+          "val_epoch": 2,
+          "lr_main": 0.001,
+          "weight_decay": 0.0001,
+          "grad_clip_norm": 1.0,
+          "amp": true,
+          "save_every": 10,
+          "scheduler": {
+            "type": "cosine",
+            "eta_min": 1e-06,
+            "total_epochs": 70
+          },
+          "early_stopping": {
+            "enabled": false,
+            "monitor": "val_mae",
+            "patience": 40,
+            "mode": "min"
+          },
+          "save_best_checkpoint": true,
+          "router_grad_diagnostic_every": 50
+        },
+        "experiment_plan": {
+          "stage": "abcde",
+          "variant": "abc_a",
+          "protocol": "random_point_rate0.4",
+          "protocol_kind": "structured_csv",
+          "budget_regime": "updates",
+          "mask_metadata": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/masks/random_point/0.4/metadata.json",
+          "training_mask_source": "protocol"
+        },
+        "experiment_suite_fingerprint": "38027eefadf2a586da0f4482ab5648bb693a0e8ce0632e7db273f1983ba84b61"
+      },
+      "budget": {
+        "epochs": 70,
+        "regime": "updates",
+        "expected_update_slots": 10780,
+        "actual_updates_note": "Empty-supervision batches are skipped; record actual optimizer updates during training"
+      },
+      "candidate_compute": {
+        "train_routed_calls_per_window": 24,
+        "inference_routed_calls_per_window": 4,
+        "shared_calls_per_window": 4,
+        "interpretation": "Call counts only; heterogeneous operators and dispatch overhead make these unequal to FLOPs/time"
+      },
+      "command_argv": [
+        "/home/students/HuangMingYu/anaconda3/envs/difftdi/bin/python",
+        "-u",
+        "/home/students/HuangMingYu/code/py/my_idea/my_idea/scripts/train.py",
+        "-c",
+        "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/experiments/abcde/abcde/38027eefadf2a586/configs/v24_abcde_abc_a_random_point_rate0.4_updates_seed7.json",
+        "--no_plot",
+        "--name",
+        "v24_abcde_abc_a_random_point_rate0.4_updates_seed7",
+        "--train_npz",
+        "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/taxibj_train.npz",
+        "--val_npz",
+        "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/taxibj_val.npz",
+        "--test_npz",
+        "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/taxibj_test.npz"
+      ]
+    },
+    {
+      "name": "v24_abcde_abc_b_random_point_rate0.4_updates_seed7",
+      "stage": "abcde",
+      "variant": "abc_b",
+      "seed": 7,
+      "question": "B：A + 分组路由输入与观测差分",
+      "protocol": "random_point_rate0.4",
+      "config_path": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/experiments/abcde/abcde/38027eefadf2a586/configs/v24_abcde_abc_b_random_point_rate0.4_updates_seed7.json",
+      "config": {
+        "seed": 7,
+        "output_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/experiments/abcde/abcde/38027eefadf2a586/runs/v24_abcde_abc_b_random_point_rate0.4_updates_seed7",
+        "device": "cuda",
+        "data": {
+          "dataset_name": "TaxiBJ",
+          "batch_size": 16,
+          "num_workers": 0,
+          "pin_memory": true,
+          "drop_last": false,
+          "mask": {
+            "pattern": "random",
+            "missing_rate": 0.4,
+            "train_csv": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/masks/random_point/0.4/train.csv",
+            "val_csv": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/masks/random_point/0.4/val.csv",
+            "test_csv": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/masks/random_point/0.4/test.csv"
+          },
+          "synthetic": {
+            "num_train": 128,
+            "num_val": 32,
+            "t": 12,
+            "h": 32,
+            "w": 32
+          },
+          "multiscale": false,
+          "loader_seed": 7
+        },
+        "model": {
+          "architecture": "v24_ts_coe",
+          "c_in": 2,
+          "main": {
+            "dim": 64,
+            "max_t": 12,
+            "h": 32,
+            "w": 32,
+            "scale_mode": "fine",
+            "use_multiscale": false
+          },
+          "coe": {
+            "num_steps": 4,
+            "routing_mode": "hard",
+            "fixed_path": null,
+            "router_state": "dynamic",
+            "use_shared": true,
+            "use_routed": true,
+            "temperature": 1.0,
+            "temporal_kernel": 3,
+            "spatial_kernel": 3,
+            "residual_init": 0.1,
+            "expert_pool": [
+              "T",
+              "S",
+              "TD",
+              "SD",
+              "TA",
+              "ST"
+            ],
+            "expert_state": "dynamic",
+            "temporal_dilation": 2,
+            "spatial_dilation": 2,
+            "attention_heads": 4,
+            "router_features": "grouped",
+            "value_mean": [
+              108.8073788550057,
+              108.8073788550057
+            ],
+            "value_std": [
+              135.23679702217615,
+              135.3215286772739
+            ]
+          },
+          "aux": {
+            "enabled": false,
+            "alpha_init": 0.0
+          }
+        },
+        "loss": {
+          "type": "l1",
+          "lambda_coe_mid": 0.0,
+          "lambda_coe_balance": 0.01
+        },
+        "train": {
+          "epochs": 70,
+          "val_epoch": 2,
+          "lr_main": 0.001,
+          "weight_decay": 0.0001,
+          "grad_clip_norm": 1.0,
+          "amp": true,
+          "save_every": 10,
+          "scheduler": {
+            "type": "cosine",
+            "eta_min": 1e-06,
+            "total_epochs": 70
+          },
+          "early_stopping": {
+            "enabled": false,
+            "monitor": "val_mae",
+            "patience": 40,
+            "mode": "min"
+          },
+          "save_best_checkpoint": true,
+          "router_grad_diagnostic_every": 50
+        },
+        "experiment_plan": {
+          "stage": "abcde",
+          "variant": "abc_b",
+          "protocol": "random_point_rate0.4",
+          "protocol_kind": "structured_csv",
+          "budget_regime": "updates",
+          "mask_metadata": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/masks/random_point/0.4/metadata.json",
+          "training_mask_source": "protocol"
+        },
+        "experiment_suite_fingerprint": "38027eefadf2a586da0f4482ab5648bb693a0e8ce0632e7db273f1983ba84b61"
+      },
+      "budget": {
+        "epochs": 70,
+        "regime": "updates",
+        "expected_update_slots": 10780,
+        "actual_updates_note": "Empty-supervision batches are skipped; record actual optimizer updates during training"
+      },
+      "candidate_compute": {
+        "train_routed_calls_per_window": 24,
+        "inference_routed_calls_per_window": 4,
+        "shared_calls_per_window": 4,
+        "interpretation": "Call counts only; heterogeneous operators and dispatch overhead make these unequal to FLOPs/time"
+      },
+      "command_argv": [
+        "/home/students/HuangMingYu/anaconda3/envs/difftdi/bin/python",
+        "-u",
+        "/home/students/HuangMingYu/code/py/my_idea/my_idea/scripts/train.py",
+        "-c",
+        "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/experiments/abcde/abcde/38027eefadf2a586/configs/v24_abcde_abc_b_random_point_rate0.4_updates_seed7.json",
+        "--no_plot",
+        "--name",
+        "v24_abcde_abc_b_random_point_rate0.4_updates_seed7",
+        "--train_npz",
+        "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/taxibj_train.npz",
+        "--val_npz",
+        "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/taxibj_val.npz",
+        "--test_npz",
+        "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/taxibj_test.npz"
+      ]
+    },
+    {
+      "name": "v24_abcde_abc_c_random_point_rate0.4_updates_seed7",
+      "stage": "abcde",
+      "variant": "abc_c",
+      "seed": 7,
+      "question": "C：B + FP32/低学习率/软到硬预热/z-loss",
+      "protocol": "random_point_rate0.4",
+      "config_path": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/experiments/abcde/abcde/38027eefadf2a586/configs/v24_abcde_abc_c_random_point_rate0.4_updates_seed7.json",
+      "config": {
+        "seed": 7,
+        "output_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/experiments/abcde/abcde/38027eefadf2a586/runs/v24_abcde_abc_c_random_point_rate0.4_updates_seed7",
+        "device": "cuda",
+        "data": {
+          "dataset_name": "TaxiBJ",
+          "batch_size": 16,
+          "num_workers": 0,
+          "pin_memory": true,
+          "drop_last": false,
+          "mask": {
+            "pattern": "random",
+            "missing_rate": 0.4,
+            "train_csv": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/masks/random_point/0.4/train.csv",
+            "val_csv": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/masks/random_point/0.4/val.csv",
+            "test_csv": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/masks/random_point/0.4/test.csv"
+          },
+          "synthetic": {
+            "num_train": 128,
+            "num_val": 32,
+            "t": 12,
+            "h": 32,
+            "w": 32
+          },
+          "multiscale": false,
+          "loader_seed": 7
+        },
+        "model": {
+          "architecture": "v24_ts_coe",
+          "c_in": 2,
+          "main": {
+            "dim": 64,
+            "max_t": 12,
+            "h": 32,
+            "w": 32,
+            "scale_mode": "fine",
+            "use_multiscale": false
+          },
+          "coe": {
+            "num_steps": 4,
+            "routing_mode": "hard",
+            "fixed_path": null,
+            "router_state": "dynamic",
+            "use_shared": true,
+            "use_routed": true,
+            "temperature": 1.0,
+            "temporal_kernel": 3,
+            "spatial_kernel": 3,
+            "residual_init": 0.1,
+            "expert_pool": [
+              "T",
+              "S",
+              "TD",
+              "SD",
+              "TA",
+              "ST"
+            ],
+            "expert_state": "dynamic",
+            "temporal_dilation": 2,
+            "spatial_dilation": 2,
+            "attention_heads": 4,
+            "router_features": "grouped",
+            "value_mean": [
+              108.8073788550057,
+              108.8073788550057
+            ],
+            "value_std": [
+              135.23679702217615,
+              135.3215286772739
+            ],
+            "router_fp32": true,
+            "router_init_std": 0.01,
+            "routing_warmup_epochs": 5,
+            "routing_transition_epochs": 5,
+            "sampling_temperature_start": 2.0,
+            "uniform_mix_start": 0.5
+          },
+          "aux": {
+            "enabled": false,
+            "alpha_init": 0.0
+          }
+        },
+        "loss": {
+          "type": "l1",
+          "lambda_coe_mid": 0.0,
+          "lambda_coe_balance": 0.01,
+          "lambda_coe_z": 0.001
+        },
+        "train": {
+          "epochs": 70,
+          "val_epoch": 2,
+          "lr_main": 0.001,
+          "weight_decay": 0.0001,
+          "grad_clip_norm": 1.0,
+          "amp": true,
+          "save_every": 10,
+          "scheduler": {
+            "type": "cosine",
+            "eta_min": 1e-06,
+            "total_epochs": 70
+          },
+          "early_stopping": {
+            "enabled": false,
+            "monitor": "val_mae",
+            "patience": 40,
+            "mode": "min"
+          },
+          "save_best_checkpoint": true,
+          "router_grad_diagnostic_every": 50,
+          "lr_router": 0.0001
+        },
+        "experiment_plan": {
+          "stage": "abcde",
+          "variant": "abc_c",
+          "protocol": "random_point_rate0.4",
+          "protocol_kind": "structured_csv",
+          "budget_regime": "updates",
+          "mask_metadata": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/masks/random_point/0.4/metadata.json",
+          "training_mask_source": "protocol"
+        },
+        "experiment_suite_fingerprint": "38027eefadf2a586da0f4482ab5648bb693a0e8ce0632e7db273f1983ba84b61"
+      },
+      "budget": {
+        "epochs": 70,
+        "regime": "updates",
+        "expected_update_slots": 10780,
+        "actual_updates_note": "Empty-supervision batches are skipped; record actual optimizer updates during training"
+      },
+      "candidate_compute": {
+        "train_routed_calls_per_window": 24,
+        "inference_routed_calls_per_window": 4,
+        "shared_calls_per_window": 4,
+        "interpretation": "Call counts only; heterogeneous operators and dispatch overhead make these unequal to FLOPs/time"
+      },
+      "command_argv": [
+        "/home/students/HuangMingYu/anaconda3/envs/difftdi/bin/python",
+        "-u",
+        "/home/students/HuangMingYu/code/py/my_idea/my_idea/scripts/train.py",
+        "-c",
+        "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/experiments/abcde/abcde/38027eefadf2a586/configs/v24_abcde_abc_c_random_point_rate0.4_updates_seed7.json",
+        "--no_plot",
+        "--name",
+        "v24_abcde_abc_c_random_point_rate0.4_updates_seed7",
+        "--train_npz",
+        "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/taxibj_train.npz",
+        "--val_npz",
+        "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/taxibj_val.npz",
+        "--test_npz",
+        "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/taxibj_test.npz"
+      ]
+    },
+    {
+      "name": "v24_abcde_abc_d_random_point_rate0.4_updates_seed7",
+      "stage": "abcde",
+      "variant": "abc_d",
+      "seed": 7,
+      "question": "D：A + 每轮重采样九类训练缺失模式；验证/测试保持与 A 相同",
+      "protocol": "random_point_rate0.4",
+      "config_path": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/experiments/abcde/abcde/38027eefadf2a586/configs/v24_abcde_abc_d_random_point_rate0.4_updates_seed7.json",
+      "config": {
+        "seed": 7,
+        "output_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/experiments/abcde/abcde/38027eefadf2a586/runs/v24_abcde_abc_d_random_point_rate0.4_updates_seed7",
+        "device": "cuda",
+        "data": {
+          "dataset_name": "TaxiBJ",
+          "batch_size": 16,
+          "num_workers": 0,
+          "pin_memory": true,
+          "drop_last": false,
+          "mask": {
+            "pattern": "random",
+            "missing_rate": 0.4,
+            "train_csv": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/masks/random_point/0.4/train.csv",
+            "val_csv": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/masks/random_point/0.4/val.csv",
+            "test_csv": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/masks/random_point/0.4/test.csv"
+          },
+          "synthetic": {
+            "num_train": 128,
+            "num_val": 32,
+            "t": 12,
+            "h": 32,
+            "w": 32
+          },
+          "multiscale": false,
+          "loader_seed": 7,
+          "train_mask_diversity": {
+            "families": [
+              "random_point",
+              "node_outage",
+              "temporal_gap",
+              "spatial_region",
+              "spatiotemporal_block",
+              "stripe",
+              "moving_region",
+              "multi_block",
+              "composite"
+            ],
+            "rates": [
+              0.4
+            ],
+            "seed": 20260917
+          }
+        },
+        "model": {
+          "architecture": "v24_ts_coe",
+          "c_in": 2,
+          "main": {
+            "dim": 64,
+            "max_t": 12,
+            "h": 32,
+            "w": 32,
+            "scale_mode": "fine",
+            "use_multiscale": false
+          },
+          "coe": {
+            "num_steps": 4,
+            "routing_mode": "hard",
+            "fixed_path": null,
+            "router_state": "dynamic",
+            "use_shared": true,
+            "use_routed": true,
+            "temperature": 1.0,
+            "temporal_kernel": 3,
+            "spatial_kernel": 3,
+            "residual_init": 0.1,
+            "expert_pool": [
+              "T",
+              "S",
+              "TD",
+              "SD",
+              "TA",
+              "ST"
+            ],
+            "expert_state": "dynamic",
+            "temporal_dilation": 2,
+            "spatial_dilation": 2,
+            "attention_heads": 4
+          },
+          "aux": {
+            "enabled": false,
+            "alpha_init": 0.0
+          }
+        },
+        "loss": {
+          "type": "l1",
+          "lambda_coe_mid": 0.0,
+          "lambda_coe_balance": 0.01
+        },
+        "train": {
+          "epochs": 70,
+          "val_epoch": 2,
+          "lr_main": 0.001,
+          "weight_decay": 0.0001,
+          "grad_clip_norm": 1.0,
+          "amp": true,
+          "save_every": 10,
+          "scheduler": {
+            "type": "cosine",
+            "eta_min": 1e-06,
+            "total_epochs": 70
+          },
+          "early_stopping": {
+            "enabled": false,
+            "monitor": "val_mae",
+            "patience": 40,
+            "mode": "min"
+          },
+          "save_best_checkpoint": true,
+          "router_grad_diagnostic_every": 50
+        },
+        "experiment_plan": {
+          "stage": "abcde",
+          "variant": "abc_d",
+          "protocol": "random_point_rate0.4",
+          "protocol_kind": "structured_csv",
+          "budget_regime": "updates",
+          "mask_metadata": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/masks/random_point/0.4/metadata.json",
+          "training_mask_source": "dynamic_diverse"
+        },
+        "experiment_suite_fingerprint": "38027eefadf2a586da0f4482ab5648bb693a0e8ce0632e7db273f1983ba84b61"
+      },
+      "budget": {
+        "epochs": 70,
+        "regime": "updates",
+        "expected_update_slots": 10780,
+        "actual_updates_note": "Empty-supervision batches are skipped; record actual optimizer updates during training"
+      },
+      "candidate_compute": {
+        "train_routed_calls_per_window": 24,
+        "inference_routed_calls_per_window": 4,
+        "shared_calls_per_window": 4,
+        "interpretation": "Call counts only; heterogeneous operators and dispatch overhead make these unequal to FLOPs/time"
+      },
+      "command_argv": [
+        "/home/students/HuangMingYu/anaconda3/envs/difftdi/bin/python",
+        "-u",
+        "/home/students/HuangMingYu/code/py/my_idea/my_idea/scripts/train.py",
+        "-c",
+        "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/experiments/abcde/abcde/38027eefadf2a586/configs/v24_abcde_abc_d_random_point_rate0.4_updates_seed7.json",
+        "--no_plot",
+        "--name",
+        "v24_abcde_abc_d_random_point_rate0.4_updates_seed7",
+        "--train_npz",
+        "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/taxibj_train.npz",
+        "--val_npz",
+        "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/taxibj_val.npz",
+        "--test_npz",
+        "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/taxibj_test.npz"
+      ]
+    },
+    {
+      "name": "v24_abcde_abc_e_random_point_rate0.4_updates_seed7",
+      "stage": "abcde",
+      "variant": "abc_e",
+      "seed": 7,
+      "question": "E：D + 向下一轮路由传递上一轮实际选择的专家身份",
+      "protocol": "random_point_rate0.4",
+      "config_path": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/experiments/abcde/abcde/38027eefadf2a586/configs/v24_abcde_abc_e_random_point_rate0.4_updates_seed7.json",
+      "config": {
+        "seed": 7,
+        "output_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/experiments/abcde/abcde/38027eefadf2a586/runs/v24_abcde_abc_e_random_point_rate0.4_updates_seed7",
+        "device": "cuda",
+        "data": {
+          "dataset_name": "TaxiBJ",
+          "batch_size": 16,
+          "num_workers": 0,
+          "pin_memory": true,
+          "drop_last": false,
+          "mask": {
+            "pattern": "random",
+            "missing_rate": 0.4,
+            "train_csv": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/masks/random_point/0.4/train.csv",
+            "val_csv": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/masks/random_point/0.4/val.csv",
+            "test_csv": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/masks/random_point/0.4/test.csv"
+          },
+          "synthetic": {
+            "num_train": 128,
+            "num_val": 32,
+            "t": 12,
+            "h": 32,
+            "w": 32
+          },
+          "multiscale": false,
+          "loader_seed": 7,
+          "train_mask_diversity": {
+            "families": [
+              "random_point",
+              "node_outage",
+              "temporal_gap",
+              "spatial_region",
+              "spatiotemporal_block",
+              "stripe",
+              "moving_region",
+              "multi_block",
+              "composite"
+            ],
+            "rates": [
+              0.4
+            ],
+            "seed": 20260917
+          }
+        },
+        "model": {
+          "architecture": "v24_ts_coe",
+          "c_in": 2,
+          "main": {
+            "dim": 64,
+            "max_t": 12,
+            "h": 32,
+            "w": 32,
+            "scale_mode": "fine",
+            "use_multiscale": false
+          },
+          "coe": {
+            "num_steps": 4,
+            "routing_mode": "hard",
+            "fixed_path": null,
+            "router_state": "dynamic",
+            "use_shared": true,
+            "use_routed": true,
+            "temperature": 1.0,
+            "temporal_kernel": 3,
+            "spatial_kernel": 3,
+            "residual_init": 0.1,
+            "expert_pool": [
+              "T",
+              "S",
+              "TD",
+              "SD",
+              "TA",
+              "ST"
+            ],
+            "expert_state": "dynamic",
+            "temporal_dilation": 2,
+            "spatial_dilation": 2,
+            "attention_heads": 4,
+            "previous_expert_context": true
+          },
+          "aux": {
+            "enabled": false,
+            "alpha_init": 0.0
+          }
+        },
+        "loss": {
+          "type": "l1",
+          "lambda_coe_mid": 0.0,
+          "lambda_coe_balance": 0.01
+        },
+        "train": {
+          "epochs": 70,
+          "val_epoch": 2,
+          "lr_main": 0.001,
+          "weight_decay": 0.0001,
+          "grad_clip_norm": 1.0,
+          "amp": true,
+          "save_every": 10,
+          "scheduler": {
+            "type": "cosine",
+            "eta_min": 1e-06,
+            "total_epochs": 70
+          },
+          "early_stopping": {
+            "enabled": false,
+            "monitor": "val_mae",
+            "patience": 40,
+            "mode": "min"
+          },
+          "save_best_checkpoint": true,
+          "router_grad_diagnostic_every": 50
+        },
+        "experiment_plan": {
+          "stage": "abcde",
+          "variant": "abc_e",
+          "protocol": "random_point_rate0.4",
+          "protocol_kind": "structured_csv",
+          "budget_regime": "updates",
+          "mask_metadata": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/masks/random_point/0.4/metadata.json",
+          "training_mask_source": "dynamic_diverse"
+        },
+        "experiment_suite_fingerprint": "38027eefadf2a586da0f4482ab5648bb693a0e8ce0632e7db273f1983ba84b61"
+      },
+      "budget": {
+        "epochs": 70,
+        "regime": "updates",
+        "expected_update_slots": 10780,
+        "actual_updates_note": "Empty-supervision batches are skipped; record actual optimizer updates during training"
+      },
+      "candidate_compute": {
+        "train_routed_calls_per_window": 24,
+        "inference_routed_calls_per_window": 4,
+        "shared_calls_per_window": 4,
+        "interpretation": "Call counts only; heterogeneous operators and dispatch overhead make these unequal to FLOPs/time"
+      },
+      "command_argv": [
+        "/home/students/HuangMingYu/anaconda3/envs/difftdi/bin/python",
+        "-u",
+        "/home/students/HuangMingYu/code/py/my_idea/my_idea/scripts/train.py",
+        "-c",
+        "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/experiments/abcde/abcde/38027eefadf2a586/configs/v24_abcde_abc_e_random_point_rate0.4_updates_seed7.json",
+        "--no_plot",
+        "--name",
+        "v24_abcde_abc_e_random_point_rate0.4_updates_seed7",
+        "--train_npz",
+        "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/taxibj_train.npz",
+        "--val_npz",
+        "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/taxibj_val.npz",
+        "--test_npz",
+        "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/taxibj_test.npz"
+      ]
+    }
+  ],
+  "suite_fingerprint": "38027eefadf2a586da0f4482ab5648bb693a0e8ce0632e7db273f1983ba84b61"
+}

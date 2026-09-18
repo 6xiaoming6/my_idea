@@ -7,7 +7,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from stmoe_imputer.config import deep_update, load_config
+from stmoe_imputer.config import deep_update, load_config, uses_multiscale
 from stmoe_imputer.data import FlowNPZDataset, build_datasets, build_loader
 from stmoe_imputer.engine import evaluate
 from stmoe_imputer.models import DualBranchSTImputer
@@ -36,7 +36,7 @@ def main() -> None:
     else:
         if args.data_npz is None:
             raise ValueError("--data_npz is required unless --synthetic is set")
-        scale_cfg = cfg["data"]["scales"]
+        scale_cfg = cfg["data"].get("scales", {})
         mask_cfg = cfg["data"]["mask"]
         pattern = mask_cfg.get("pattern", "random")
         mask_csv = (
@@ -50,9 +50,10 @@ def main() -> None:
         dataset = FlowNPZDataset(
             args.data_npz,
             mask_cfg=mask_cfg,
-            fine_to_mid=scale_cfg["fine_to_mid"],
-            fine_to_coarse=scale_cfg["fine_to_coarse"],
+            fine_to_mid=scale_cfg.get("fine_to_mid", 2),
+            fine_to_coarse=scale_cfg.get("fine_to_coarse", 4),
             pooling_mode=scale_cfg.get("pooling_mode", "avg"),
+            multiscale=uses_multiscale(cfg),
             seed=cfg.get("seed", 42),
             mask_csv=mask_csv,
         )

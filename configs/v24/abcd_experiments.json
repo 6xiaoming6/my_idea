@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "output_dir": "outputs/v24-COE/experiments/abcd",
+  "cpu_threads": 2,
+  "batch_size": 16,
+  "seeds": [
+    7
+  ],
+  "extra_inputs": [
+    "data/TaxiBJ/v24_clean_abc_20260917/manifest.json"
+  ],
+  "training": {
+    "epochs": 20,
+    "val_epoch": 2,
+    "save_best_checkpoint": true,
+    "early_stopping": {
+      "enabled": false
+    },
+    "scheduler": {
+      "type": "cosine",
+      "total_epochs": 80,
+      "eta_min": 1e-06
+    },
+    "router_grad_diagnostic_every": 50
+  },
+  "studies": {
+    "abcd": {
+      "base_config": "configs/v24/abc_base.json",
+      "stage": "abcd",
+      "sources": {
+        "train": "data/TaxiBJ/v24_clean_abc_20260917/taxibj_train.npz",
+        "val": "data/TaxiBJ/v24_clean_abc_20260917/taxibj_val.npz",
+        "test": "data/TaxiBJ/v24_clean_abc_20260917/taxibj_test.npz"
+      },
+      "mask_root": "data/TaxiBJ/v24_clean_abc_20260917/masks",
+      "patterns": [
+        "random_point"
+      ],
+      "rates": [
+        0.4
+      ]
+    },
+    "d": {
+      "base_config": "configs/v24/abc_base.json",
+      "stage": "abcd",
+      "sources": {
+        "train": "data/TaxiBJ/v24_clean_abc_20260917/taxibj_train.npz",
+        "val": "data/TaxiBJ/v24_clean_abc_20260917/taxibj_val.npz",
+        "test": "data/TaxiBJ/v24_clean_abc_20260917/taxibj_test.npz"
+      },
+      "mask_root": "data/TaxiBJ/v24_clean_abc_20260917/masks",
+      "patterns": [
+        "random_point"
+      ],
+      "rates": [
+        0.4
+      ],
+      "variants": [
+        "abc_d"
+      ]
+    },
+    "ad": {
+      "base_config": "configs/v24/abc_base.json",
+      "stage": "abcd",
+      "sources": {
+        "train": "data/TaxiBJ/v24_clean_abc_20260917/taxibj_train.npz",
+        "val": "data/TaxiBJ/v24_clean_abc_20260917/taxibj_val.npz",
+        "test": "data/TaxiBJ/v24_clean_abc_20260917/taxibj_test.npz"
+      },
+      "mask_root": "data/TaxiBJ/v24_clean_abc_20260917/masks",
+      "patterns": [
+        "random_point"
+      ],
+      "rates": [
+        0.4
+      ],
+      "variants": [
+        "abc_a",
+        "abc_d"
+      ]
+    }
+  },
+  "default_study": "ad"
+}

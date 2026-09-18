@@ -1,4 +1,52 @@
-# ST-MoE Imputer v6
+# v24-COE：Temporal-Spatial Chain-of-Experts
+
+最新 TaxiBJ 五组对照使用项目根目录中的 `scripts/v24/run_abcde.py`，按 A→B→C→D→E 在单卡上顺序运行，每组 70 epoch。配置位于 `configs/v24/abcde_experiments.json`，详见 [五组实验说明](scripts/v24/README_ABCDE.md)。`outputs/` 下的旧工作副本仅保留历史记录。
+
+```bash
+# 在项目根目录执行；默认使用 GPU 0，已有 GPU 计算任务时拒绝启动。
+python scripts/v24/run_abcde.py --gpu 0
+# 只检查计划，不启动训练：
+python scripts/v24/run_abcde.py --dry-run
+```
+
+ABCDE 完成后的诊断与候选实验（固定四轮路径、D-static、两轮三专家 F）位于
+[后续实验说明](scripts/v24/README_FOLLOWUP.md)，统一从 `scripts/v24/run_followup.py` 启动，仍按单卡顺序运行。
+
+当前分支新增单尺度 TS-CoE：两轮共享时间/空间专家池，根据观测支撑和更新后的补全状态逐轮路由。第一版按方案 10.4/10.5，仅以隐藏目标 MAE 训练，`lambda_coe_balance=0`、`lambda_coe_mid=0`；保留 ST Gumbel-Softmax 梯度估计和轻量点级共享专家。先监控专家使用率、路径、梯度及缺失条件下的选择，不要求时间/空间专家平均分工；不构造中/粗尺度。
+
+现另提供 **3 轮 / 4 类专家**与 **4 轮 / 6 类专家**候选，增加空洞时间、空洞空间、完整窗口时间注意力和局部时空联合专家，并提供轮数 × 专家池大小的九组消融。所有候选保持原始分辨率，详见 [深链候选说明](changes/v24_COE_deeper_candidates.md)。
+
+```bash
+python scripts/train.py -c configs/v24/smoke.json --synthetic --no_plot -n v24_smoke
+
+# 3 轮候选；替换 chain4.json / 运行名即可运行 4 轮候选
+python scripts/train.py -c configs/v24/smoke.json \
+  --override_config configs/v24/candidates/chain3.json \
+  --synthetic --no_plot -n v24_chain3_smoke
+```
+
+完整的可行性评价、方法边界、真实数据训练命令及消融配置见 [v24 实现说明](changes/v24_COE_implementation.md)。核心代码为 [temporal_spatial_coe.py](src/stmoe_imputer/models/temporal_spatial_coe.py)，设计来源为 [详细方案](model_designs/v24_Temporal-Spatial_Chain-of-Experts_详细方案.md)。
+
+按方案第 13 节整理的顺序、重路由、状态传递与深度对照，及共享缺失 mask、离线路径干预和运行清单生成方法见 [v24 实验设计](changes/v24_COE_experiment_design.md)。第一版 `pilot/core` 保持无路由正则；新一轮默认运行 **4 轮、6 个路由专家、路由均衡损失权重 0.01**，配置为 [chain4_balance.json](configs/v24/experiments/chain4_balance.json)。继续使用单尺度、单种子 `7`、`80 epoch`；轮数 × 专家池网格暂缓。
+
+v24 实验管理沿用 v23 的流程：每 2 轮完整验证，默认在 CPU 内存保留最佳权重，最后恢复它完整测试一次；重复运行跳过已完整完成的任务，未完成任务从头重跑。配置在 [experiments.json](configs/v24/experiments.json)，终端只显示训练进度条。
+
+```bash
+# 四轮六专家 + 路由损失，TaxiBJ 五种缺失结构各一组；只查看计划时加 --dry-run
+python scripts/v24/run_experiments.py --study chain4 --gpu 0
+
+# 原两轮无正则对照，显式选择 study
+python scripts/v24/run_experiments.py --study pilot --gpu 0
+python scripts/v24/run_experiments.py --study core --gpu 0
+```
+
+结果位于 `outputs/v24-COE/experiments/<chain4或pilot或core>/<指纹>/`，包含 `summary.csv`、`comparison.json`、`diagnostics.json` 及各任务完整日志。代码、数据或配置改变时使用新的指纹目录；旧 `section13/*/commands.sh` 不会自动升级，也不自动复用旧框架结果。新生成的计划命令会调用这一统一队列。需要离线路径分析时，将实验配置的 `training.save_best_checkpoint` 设为 `true`，每个任务只保留一个最佳 checkpoint。
+
+下面保留原 v6 / main 基线说明；运行 v24 请使用 `configs/v24/`，原默认配置仍对应旧模型。
+
+---
+
+## 原 v6 基线
 
 面向时空网格数据补全任务的 PyTorch 项目（第 6 版）。核心模型 `DualBranchSTImputer` 以 `MultiScaleMoEBackbone` 为骨干，在 TaxiBJ（出租车流量）、BikeNYC（共享单车）、CHAP（PM2.5 浓度）三个数据集上，评估 fixed / random 两种离线缺失掩码策略下的补全性能。
 
@@ -245,6 +293,8 @@ outputs/{dataset}/{experiment_type}/{variant}/{mask}/rate{rate}/{timestamp}_seed
 ```
 
 `--name` 自动归类：`full` → `full/model`，`ablation_*` → `ablation/*`，`smoke_*` → `debug/*`。
+
+训练终端只显示带 `loss / mae / rmse` 的训练进度条；每轮摘要和测试结果保存在 `logs/`，完整指标（含专家使用率、路径、梯度和缺失条件诊断）保存在 `metrics.jsonl`。无需额外参数，原有 `--quiet` 仍可兼容使用。
 
 汇总索引：`outputs/summary/experiment_index.csv` 记录每次训练的 run_dir、数据集、mask、缺失率、best epoch、best val MAE、耗时、显存等。
 

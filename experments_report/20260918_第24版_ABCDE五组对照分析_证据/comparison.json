@@ -1,0 +1,135 @@
+{
+  "suite_fingerprint": "38027eefadf2a586da0f4482ab5648bb693a0e8ce0632e7db273f1983ba84b61",
+  "complete": 5,
+  "total": 5,
+  "note": "Matched single-seed descriptive comparisons; negative delta means variant is better. No test-based model selection.",
+  "rows": [
+    {
+      "name": "v24_abcde_abc_a_random_point_rate0.4_updates_seed7",
+      "dataset": "TaxiBJ",
+      "protocol": "random_point_rate0.4",
+      "variant": "abc_a",
+      "seed": 7,
+      "status": "complete",
+      "best_epoch": 68,
+      "best_val_mae": 7.53729932983527,
+      "test_mae": 7.148066880605369,
+      "test_rmse": 11.324713584995603,
+      "seconds": 6410.222037247033,
+      "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/experiments/abcde/abcde/38027eefadf2a586/runs/v24_abcde_abc_a_random_point_rate0.4_updates_seed7/TaxiBJ/custom/v24_abcde_abc_a_random_point_rate0.4_updates_seed7/random/rate0.4/20260917_222345_seed7_bs16"
+    },
+    {
+      "name": "v24_abcde_abc_b_random_point_rate0.4_updates_seed7",
+      "dataset": "TaxiBJ",
+      "protocol": "random_point_rate0.4",
+      "variant": "abc_b",
+      "seed": 7,
+      "status": "complete",
+      "best_epoch": 68,
+      "best_val_mae": 7.540742643209414,
+      "test_mae": 7.1602549296311695,
+      "test_rmse": 11.337186761944446,
+      "seconds": 6410.352874886943,
+      "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/experiments/abcde/abcde/38027eefadf2a586/runs/v24_abcde_abc_b_random_point_rate0.4_updates_seed7/TaxiBJ/custom/v24_abcde_abc_b_random_point_rate0.4_updates_seed7/random/rate0.4/20260918_001039_seed7_bs16"
+    },
+    {
+      "name": "v24_abcde_abc_c_random_point_rate0.4_updates_seed7",
+      "dataset": "TaxiBJ",
+      "protocol": "random_point_rate0.4",
+      "variant": "abc_c",
+      "seed": 7,
+      "status": "complete",
+      "best_epoch": 70,
+      "best_val_mae": 7.818876380931984,
+      "test_mae": 7.442713397920231,
+      "test_rmse": 11.874354992301637,
+      "seconds": 6465.823485615896,
+      "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/experiments/abcde/abcde/38027eefadf2a586/runs/v24_abcde_abc_c_random_point_rate0.4_updates_seed7/TaxiBJ/custom/v24_abcde_abc_c_random_point_rate0.4_updates_seed7/random/rate0.4/20260918_015733_seed7_bs16"
+    },
+    {
+      "name": "v24_abcde_abc_d_random_point_rate0.4_updates_seed7",
+      "dataset": "TaxiBJ",
+      "protocol": "random_point_rate0.4",
+      "variant": "abc_d",
+      "seed": 7,
+      "status": "complete",
+      "best_epoch": 62,
+      "best_val_mae": 12.437022139529903,
+      "test_mae": 11.571430091254292,
+      "test_rmse": 21.430097153377268,
+      "seconds": 6562.874888262013,
+      "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/experiments/abcde/abcde/38027eefadf2a586/runs/v24_abcde_abc_d_random_point_rate0.4_updates_seed7/TaxiBJ/custom/v24_abcde_abc_d_random_point_rate0.4_updates_seed7/random/rate0.4/20260918_034523_seed7_bs16"
+    },
+    {
+      "name": "v24_abcde_abc_e_random_point_rate0.4_updates_seed7",
+      "dataset": "TaxiBJ",
+      "protocol": "random_point_rate0.4",
+      "variant": "abc_e",
+      "seed": 7,
+      "status": "complete",
+      "best_epoch": 68,
+      "best_val_mae": 12.886375362150714,
+      "test_mae": 12.074241296704514,
+      "test_rmse": 22.047786638876175,
+      "seconds": 6587.985984051018,
+      "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/experiments/abcde/abcde/38027eefadf2a586/runs/v24_abcde_abc_e_random_point_rate0.4_updates_seed7/TaxiBJ/custom/v24_abcde_abc_e_random_point_rate0.4_updates_seed7/random/rate0.4/20260918_053448_seed7_bs16"
+    }
+  ],
+  "paired": [
+    {
+      "dataset": "TaxiBJ",
+      "protocol": "random_point_rate0.4",
+      "seed": 7,
+      "reference": "abc_a",
+      "variant": "abc_b",
+      "test_mae_delta_vs_abc_a": 0.012188049025800396,
+      "test_rmse_delta_vs_abc_a": 0.01247317694884309
+    },
+    {
+      "dataset": "TaxiBJ",
+      "protocol": "random_point_rate0.4",
+      "seed": 7,
+      "reference": "abc_a",
+      "variant": "abc_c",
+      "test_mae_delta_vs_abc_a": 0.29464651731486224,
+      "test_rmse_delta_vs_abc_a": 0.5496414073060336
+    },
+    {
+      "dataset": "TaxiBJ",
+      "protocol": "random_point_rate0.4",
+      "seed": 7,
+      "reference": "abc_a",
+      "variant": "abc_d",
+      "test_mae_delta_vs_abc_a": 4.423363210648923,
+      "test_rmse_delta_vs_abc_a": 10.105383568381665
+    },
+    {
+      "dataset": "TaxiBJ",
+      "protocol": "random_point_rate0.4",
+      "seed": 7,
+      "reference": "abc_a",
+      "variant": "abc_e",
+      "test_mae_delta_vs_abc_a": 4.926174416099145,
+      "test_rmse_delta_vs_abc_a": 10.723073053880572
+    },
+    {
+      "dataset": "TaxiBJ",
+      "protocol": "random_point_rate0.4",
+      "seed": 7,
+      "reference": "abc_b",
+      "variant": "abc_c",
+      "test_mae_delta_vs_abc_b": 0.28245846828906185,
+      "test_rmse_delta_vs_abc_b": 0.5371682303571905
+    },
+    {
+      "dataset": "TaxiBJ",
+      "protocol": "random_point_rate0.4",
+      "seed": 7,
+      "reference": "abc_d",
+      "variant": "abc_e",
+      "test_mae_delta_vs_abc_d": 0.5028112054502216,
+      "test_rmse_delta_vs_abc_d": 0.6176894854989072
+    }
+  ],
+  "validation_selected_fixed_path": []
+}

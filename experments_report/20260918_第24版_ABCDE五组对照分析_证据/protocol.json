@@ -1,0 +1,757 @@
+{
+  "schema_version": 1,
+  "jobs": [
+    {
+      "name": "v24_abcde_abc_a_random_point_rate0.4_updates_seed7",
+      "variant": "abc_a",
+      "protocol": "random_point_rate0.4",
+      "config": {
+        "seed": 7,
+        "device": "cuda",
+        "data": {
+          "dataset_name": "TaxiBJ",
+          "batch_size": 16,
+          "num_workers": 0,
+          "pin_memory": true,
+          "drop_last": false,
+          "mask": {
+            "pattern": "random",
+            "missing_rate": 0.4,
+            "train_csv": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/masks/random_point/0.4/train.csv",
+            "val_csv": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/masks/random_point/0.4/val.csv",
+            "test_csv": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/masks/random_point/0.4/test.csv"
+          },
+          "synthetic": {
+            "num_train": 128,
+            "num_val": 32,
+            "t": 12,
+            "h": 32,
+            "w": 32
+          },
+          "multiscale": false,
+          "loader_seed": 7
+        },
+        "model": {
+          "architecture": "v24_ts_coe",
+          "c_in": 2,
+          "main": {
+            "dim": 64,
+            "max_t": 12,
+            "h": 32,
+            "w": 32,
+            "scale_mode": "fine",
+            "use_multiscale": false
+          },
+          "coe": {
+            "num_steps": 4,
+            "routing_mode": "hard",
+            "fixed_path": null,
+            "router_state": "dynamic",
+            "use_shared": true,
+            "use_routed": true,
+            "temperature": 1.0,
+            "temporal_kernel": 3,
+            "spatial_kernel": 3,
+            "residual_init": 0.1,
+            "expert_pool": [
+              "T",
+              "S",
+              "TD",
+              "SD",
+              "TA",
+              "ST"
+            ],
+            "expert_state": "dynamic",
+            "temporal_dilation": 2,
+            "spatial_dilation": 2,
+            "attention_heads": 4
+          },
+          "aux": {
+            "enabled": false,
+            "alpha_init": 0.0
+          }
+        },
+        "loss": {
+          "type": "l1",
+          "lambda_coe_mid": 0.0,
+          "lambda_coe_balance": 0.01
+        },
+        "train": {
+          "epochs": 70,
+          "val_epoch": 2,
+          "lr_main": 0.001,
+          "weight_decay": 0.0001,
+          "grad_clip_norm": 1.0,
+          "amp": true,
+          "save_every": 10,
+          "scheduler": {
+            "type": "cosine",
+            "eta_min": 1e-06,
+            "total_epochs": 70
+          },
+          "early_stopping": {
+            "enabled": false,
+            "monitor": "val_mae",
+            "patience": 40,
+            "mode": "min"
+          },
+          "save_best_checkpoint": true,
+          "router_grad_diagnostic_every": 50
+        },
+        "experiment_plan": {
+          "stage": "abcde",
+          "variant": "abc_a",
+          "protocol": "random_point_rate0.4",
+          "protocol_kind": "structured_csv",
+          "budget_regime": "updates",
+          "mask_metadata": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/masks/random_point/0.4/metadata.json",
+          "training_mask_source": "protocol"
+        }
+      }
+    },
+    {
+      "name": "v24_abcde_abc_b_random_point_rate0.4_updates_seed7",
+      "variant": "abc_b",
+      "protocol": "random_point_rate0.4",
+      "config": {
+        "seed": 7,
+        "device": "cuda",
+        "data": {
+          "dataset_name": "TaxiBJ",
+          "batch_size": 16,
+          "num_workers": 0,
+          "pin_memory": true,
+          "drop_last": false,
+          "mask": {
+            "pattern": "random",
+            "missing_rate": 0.4,
+            "train_csv": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/masks/random_point/0.4/train.csv",
+            "val_csv": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/masks/random_point/0.4/val.csv",
+            "test_csv": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/masks/random_point/0.4/test.csv"
+          },
+          "synthetic": {
+            "num_train": 128,
+            "num_val": 32,
+            "t": 12,
+            "h": 32,
+            "w": 32
+          },
+          "multiscale": false,
+          "loader_seed": 7
+        },
+        "model": {
+          "architecture": "v24_ts_coe",
+          "c_in": 2,
+          "main": {
+            "dim": 64,
+            "max_t": 12,
+            "h": 32,
+            "w": 32,
+            "scale_mode": "fine",
+            "use_multiscale": false
+          },
+          "coe": {
+            "num_steps": 4,
+            "routing_mode": "hard",
+            "fixed_path": null,
+            "router_state": "dynamic",
+            "use_shared": true,
+            "use_routed": true,
+            "temperature": 1.0,
+            "temporal_kernel": 3,
+            "spatial_kernel": 3,
+            "residual_init": 0.1,
+            "expert_pool": [
+              "T",
+              "S",
+              "TD",
+              "SD",
+              "TA",
+              "ST"
+            ],
+            "expert_state": "dynamic",
+            "temporal_dilation": 2,
+            "spatial_dilation": 2,
+            "attention_heads": 4,
+            "router_features": "grouped",
+            "value_mean": [
+              108.8073788550057,
+              108.8073788550057
+            ],
+            "value_std": [
+              135.23679702217615,
+              135.3215286772739
+            ]
+          },
+          "aux": {
+            "enabled": false,
+            "alpha_init": 0.0
+          }
+        },
+        "loss": {
+          "type": "l1",
+          "lambda_coe_mid": 0.0,
+          "lambda_coe_balance": 0.01
+        },
+        "train": {
+          "epochs": 70,
+          "val_epoch": 2,
+          "lr_main": 0.001,
+          "weight_decay": 0.0001,
+          "grad_clip_norm": 1.0,
+          "amp": true,
+          "save_every": 10,
+          "scheduler": {
+            "type": "cosine",
+            "eta_min": 1e-06,
+            "total_epochs": 70
+          },
+          "early_stopping": {
+            "enabled": false,
+            "monitor": "val_mae",
+            "patience": 40,
+            "mode": "min"
+          },
+          "save_best_checkpoint": true,
+          "router_grad_diagnostic_every": 50
+        },
+        "experiment_plan": {
+          "stage": "abcde",
+          "variant": "abc_b",
+          "protocol": "random_point_rate0.4",
+          "protocol_kind": "structured_csv",
+          "budget_regime": "updates",
+          "mask_metadata": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/masks/random_point/0.4/metadata.json",
+          "training_mask_source": "protocol"
+        }
+      }
+    },
+    {
+      "name": "v24_abcde_abc_c_random_point_rate0.4_updates_seed7",
+      "variant": "abc_c",
+      "protocol": "random_point_rate0.4",
+      "config": {
+        "seed": 7,
+        "device": "cuda",
+        "data": {
+          "dataset_name": "TaxiBJ",
+          "batch_size": 16,
+          "num_workers": 0,
+          "pin_memory": true,
+          "drop_last": false,
+          "mask": {
+            "pattern": "random",
+            "missing_rate": 0.4,
+            "train_csv": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/masks/random_point/0.4/train.csv",
+            "val_csv": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/masks/random_point/0.4/val.csv",
+            "test_csv": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/masks/random_point/0.4/test.csv"
+          },
+          "synthetic": {
+            "num_train": 128,
+            "num_val": 32,
+            "t": 12,
+            "h": 32,
+            "w": 32
+          },
+          "multiscale": false,
+          "loader_seed": 7
+        },
+        "model": {
+          "architecture": "v24_ts_coe",
+          "c_in": 2,
+          "main": {
+            "dim": 64,
+            "max_t": 12,
+            "h": 32,
+            "w": 32,
+            "scale_mode": "fine",
+            "use_multiscale": false
+          },
+          "coe": {
+            "num_steps": 4,
+            "routing_mode": "hard",
+            "fixed_path": null,
+            "router_state": "dynamic",
+            "use_shared": true,
+            "use_routed": true,
+            "temperature": 1.0,
+            "temporal_kernel": 3,
+            "spatial_kernel": 3,
+            "residual_init": 0.1,
+            "expert_pool": [
+              "T",
+              "S",
+              "TD",
+              "SD",
+              "TA",
+              "ST"
+            ],
+            "expert_state": "dynamic",
+            "temporal_dilation": 2,
+            "spatial_dilation": 2,
+            "attention_heads": 4,
+            "router_features": "grouped",
+            "value_mean": [
+              108.8073788550057,
+              108.8073788550057
+            ],
+            "value_std": [
+              135.23679702217615,
+              135.3215286772739
+            ],
+            "router_fp32": true,
+            "router_init_std": 0.01,
+            "routing_warmup_epochs": 5,
+            "routing_transition_epochs": 5,
+            "sampling_temperature_start": 2.0,
+            "uniform_mix_start": 0.5
+          },
+          "aux": {
+            "enabled": false,
+            "alpha_init": 0.0
+          }
+        },
+        "loss": {
+          "type": "l1",
+          "lambda_coe_mid": 0.0,
+          "lambda_coe_balance": 0.01,
+          "lambda_coe_z": 0.001
+        },
+        "train": {
+          "epochs": 70,
+          "val_epoch": 2,
+          "lr_main": 0.001,
+          "weight_decay": 0.0001,
+          "grad_clip_norm": 1.0,
+          "amp": true,
+          "save_every": 10,
+          "scheduler": {
+            "type": "cosine",
+            "eta_min": 1e-06,
+            "total_epochs": 70
+          },
+          "early_stopping": {
+            "enabled": false,
+            "monitor": "val_mae",
+            "patience": 40,
+            "mode": "min"
+          },
+          "save_best_checkpoint": true,
+          "router_grad_diagnostic_every": 50,
+          "lr_router": 0.0001
+        },
+        "experiment_plan": {
+          "stage": "abcde",
+          "variant": "abc_c",
+          "protocol": "random_point_rate0.4",
+          "protocol_kind": "structured_csv",
+          "budget_regime": "updates",
+          "mask_metadata": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/masks/random_point/0.4/metadata.json",
+          "training_mask_source": "protocol"
+        }
+      }
+    },
+    {
+      "name": "v24_abcde_abc_d_random_point_rate0.4_updates_seed7",
+      "variant": "abc_d",
+      "protocol": "random_point_rate0.4",
+      "config": {
+        "seed": 7,
+        "device": "cuda",
+        "data": {
+          "dataset_name": "TaxiBJ",
+          "batch_size": 16,
+          "num_workers": 0,
+          "pin_memory": true,
+          "drop_last": false,
+          "mask": {
+            "pattern": "random",
+            "missing_rate": 0.4,
+            "train_csv": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/masks/random_point/0.4/train.csv",
+            "val_csv": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/masks/random_point/0.4/val.csv",
+            "test_csv": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/masks/random_point/0.4/test.csv"
+          },
+          "synthetic": {
+            "num_train": 128,
+            "num_val": 32,
+            "t": 12,
+            "h": 32,
+            "w": 32
+          },
+          "multiscale": false,
+          "loader_seed": 7,
+          "train_mask_diversity": {
+            "families": [
+              "random_point",
+              "node_outage",
+              "temporal_gap",
+              "spatial_region",
+              "spatiotemporal_block",
+              "stripe",
+              "moving_region",
+              "multi_block",
+              "composite"
+            ],
+            "rates": [
+              0.4
+            ],
+            "seed": 20260917
+          }
+        },
+        "model": {
+          "architecture": "v24_ts_coe",
+          "c_in": 2,
+          "main": {
+            "dim": 64,
+            "max_t": 12,
+            "h": 32,
+            "w": 32,
+            "scale_mode": "fine",
+            "use_multiscale": false
+          },
+          "coe": {
+            "num_steps": 4,
+            "routing_mode": "hard",
+            "fixed_path": null,
+            "router_state": "dynamic",
+            "use_shared": true,
+            "use_routed": true,
+            "temperature": 1.0,
+            "temporal_kernel": 3,
+            "spatial_kernel": 3,
+            "residual_init": 0.1,
+            "expert_pool": [
+              "T",
+              "S",
+              "TD",
+              "SD",
+              "TA",
+              "ST"
+            ],
+            "expert_state": "dynamic",
+            "temporal_dilation": 2,
+            "spatial_dilation": 2,
+            "attention_heads": 4
+          },
+          "aux": {
+            "enabled": false,
+            "alpha_init": 0.0
+          }
+        },
+        "loss": {
+          "type": "l1",
+          "lambda_coe_mid": 0.0,
+          "lambda_coe_balance": 0.01
+        },
+        "train": {
+          "epochs": 70,
+          "val_epoch": 2,
+          "lr_main": 0.001,
+          "weight_decay": 0.0001,
+          "grad_clip_norm": 1.0,
+          "amp": true,
+          "save_every": 10,
+          "scheduler": {
+            "type": "cosine",
+            "eta_min": 1e-06,
+            "total_epochs": 70
+          },
+          "early_stopping": {
+            "enabled": false,
+            "monitor": "val_mae",
+            "patience": 40,
+            "mode": "min"
+          },
+          "save_best_checkpoint": true,
+          "router_grad_diagnostic_every": 50
+        },
+        "experiment_plan": {
+          "stage": "abcde",
+          "variant": "abc_d",
+          "protocol": "random_point_rate0.4",
+          "protocol_kind": "structured_csv",
+          "budget_regime": "updates",
+          "mask_metadata": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/masks/random_point/0.4/metadata.json",
+          "training_mask_source": "dynamic_diverse"
+        }
+      }
+    },
+    {
+      "name": "v24_abcde_abc_e_random_point_rate0.4_updates_seed7",
+      "variant": "abc_e",
+      "protocol": "random_point_rate0.4",
+      "config": {
+        "seed": 7,
+        "device": "cuda",
+        "data": {
+          "dataset_name": "TaxiBJ",
+          "batch_size": 16,
+          "num_workers": 0,
+          "pin_memory": true,
+          "drop_last": false,
+          "mask": {
+            "pattern": "random",
+            "missing_rate": 0.4,
+            "train_csv": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/masks/random_point/0.4/train.csv",
+            "val_csv": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/masks/random_point/0.4/val.csv",
+            "test_csv": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/masks/random_point/0.4/test.csv"
+          },
+          "synthetic": {
+            "num_train": 128,
+            "num_val": 32,
+            "t": 12,
+            "h": 32,
+            "w": 32
+          },
+          "multiscale": false,
+          "loader_seed": 7,
+          "train_mask_diversity": {
+            "families": [
+              "random_point",
+              "node_outage",
+              "temporal_gap",
+              "spatial_region",
+              "spatiotemporal_block",
+              "stripe",
+              "moving_region",
+              "multi_block",
+              "composite"
+            ],
+            "rates": [
+              0.4
+            ],
+            "seed": 20260917
+          }
+        },
+        "model": {
+          "architecture": "v24_ts_coe",
+          "c_in": 2,
+          "main": {
+            "dim": 64,
+            "max_t": 12,
+            "h": 32,
+            "w": 32,
+            "scale_mode": "fine",
+            "use_multiscale": false
+          },
+          "coe": {
+            "num_steps": 4,
+            "routing_mode": "hard",
+            "fixed_path": null,
+            "router_state": "dynamic",
+            "use_shared": true,
+            "use_routed": true,
+            "temperature": 1.0,
+            "temporal_kernel": 3,
+            "spatial_kernel": 3,
+            "residual_init": 0.1,
+            "expert_pool": [
+              "T",
+              "S",
+              "TD",
+              "SD",
+              "TA",
+              "ST"
+            ],
+            "expert_state": "dynamic",
+            "temporal_dilation": 2,
+            "spatial_dilation": 2,
+            "attention_heads": 4,
+            "previous_expert_context": true
+          },
+          "aux": {
+            "enabled": false,
+            "alpha_init": 0.0
+          }
+        },
+        "loss": {
+          "type": "l1",
+          "lambda_coe_mid": 0.0,
+          "lambda_coe_balance": 0.01
+        },
+        "train": {
+          "epochs": 70,
+          "val_epoch": 2,
+          "lr_main": 0.001,
+          "weight_decay": 0.0001,
+          "grad_clip_norm": 1.0,
+          "amp": true,
+          "save_every": 10,
+          "scheduler": {
+            "type": "cosine",
+            "eta_min": 1e-06,
+            "total_epochs": 70
+          },
+          "early_stopping": {
+            "enabled": false,
+            "monitor": "val_mae",
+            "patience": 40,
+            "mode": "min"
+          },
+          "save_best_checkpoint": true,
+          "router_grad_diagnostic_every": 50
+        },
+        "experiment_plan": {
+          "stage": "abcde",
+          "variant": "abc_e",
+          "protocol": "random_point_rate0.4",
+          "protocol_kind": "structured_csv",
+          "budget_regime": "updates",
+          "mask_metadata": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/masks/random_point/0.4/metadata.json",
+          "training_mask_source": "dynamic_diverse"
+        }
+      }
+    }
+  ],
+  "datasets": {
+    "train": {
+      "path": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/taxibj_train.npz",
+      "shape_ncthw": [
+        2452,
+        2,
+        12,
+        32,
+        32
+      ],
+      "stored_shape": [
+        2452,
+        2,
+        12,
+        32,
+        32
+      ],
+      "layout": "NCTHW",
+      "keys": [
+        "x_f_gt"
+      ]
+    },
+    "val": {
+      "path": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/taxibj_val.npz",
+      "shape_ncthw": [
+        342,
+        2,
+        12,
+        32,
+        32
+      ],
+      "stored_shape": [
+        342,
+        2,
+        12,
+        32,
+        32
+      ],
+      "layout": "NCTHW",
+      "keys": [
+        "x_f_gt"
+      ]
+    },
+    "test": {
+      "path": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/taxibj_test.npz",
+      "shape_ncthw": [
+        707,
+        2,
+        12,
+        32,
+        32
+      ],
+      "stored_shape": [
+        707,
+        2,
+        12,
+        32,
+        32
+      ],
+      "layout": "NCTHW",
+      "keys": [
+        "x_f_gt"
+      ]
+    }
+  },
+  "files_sha256": {
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/configs/v24/abc_base.json": "0bca1ad81c1c607dadd6f66e0e17dd4178cd5e98c73415d882a3be66fdfa0ef8",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/configs/v24/abcde_experiments.json": "fda61f9dc7a71b0638b016bef6f80bb6d2c2f0459ae13d2726b340bdfdb32954",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/configs/v24/experiments/abc_a.json": "81e6afefc6999b81df55f9347804fa86acf5f78d54e5b2fb3147e863a2c7cb7e",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/configs/v24/experiments/abc_b.json": "bfdc4c6a1e3bd5f4564d80f68ac67c84531da6d266b92eff10253323ac66c9b2",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/configs/v24/experiments/abc_c.json": "8732bb20dade51d302cb3c187c9a0564329978273e00a0994e00247976a29c3b",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/configs/v24/experiments/abc_d.json": "043898b711337fa92639a60efad829867428fa2773a754d516cb63ac7c381695",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/configs/v24/experiments/abc_e.json": "1b6c9fed902db6fac751e1c9dc6c92d0583d65063be1e3e9177491cb5370eab0",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/configs/v24/experiments/chain4_balance.json": "81e6afefc6999b81df55f9347804fa86acf5f78d54e5b2fb3147e863a2c7cb7e",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/configs/v24/experiments/fixed_ss.json": "2a1e6169febc50fe437e31b0d94a77469e0879d30b7a24ac98d277418c2af1e7",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/configs/v24/experiments/fixed_st.json": "743dcbae2b0f69ab2f3c7d94d43c34ad629ba2997d91b3e9cee7e5c3763b4168",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/configs/v24/experiments/fixed_ts.json": "cbd90cc3ee11a1ff26d6a451c8f4bfef3921251e7499c42e92138effc2772542",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/configs/v24/experiments/fixed_tt.json": "f66eef14ac8c8e590503ae9b0a7d04d203fd9eb0ad0ab650ae29c9ee220e0337",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/configs/v24/experiments/full.json": "40276da89c8a7f4feebe0537d10681c1760b570c5d19946af42be7b2e42ecd39",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/configs/v24/experiments/initial_router.json": "3cb4d97e10c18fda280028a76ff98917b8569a254133f986921c330366236983",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/configs/v24/experiments/no_expert_state_update.json": "c99552ff3b8fc164183416696e5da01057d8a95863866515e3f14e9ee281ce46",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/configs/v24/experiments/parallel.json": "811333a792473082d73d7cd6bde199a32b5e0b3611e359ee5b2e015996bf1c90",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/configs/v24/experiments/routed_only.json": "cf9543896a6b0ef4d1ce176bb7db4b1809c1d02aee491c3a4efdf95a8d074f5e",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/configs/v24/experiments/shared_only.json": "9fcd6545f919713c1e56457fe7d32e2ad5493fff16b5a8900943e665e22889c8",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/configs/v24/experiments/soft.json": "ad840be691247119f8a361dfee71e14c357e1415840397fb1f9483abd97224e5",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/configs/v24/experiments/weak_mid.json": "81701e71e7609f6746698011ea0fdc5d4e477f082c1c2b0e1b578d0660915abf",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/manifest.json": "67c0e8099ad240a72fe89103459067f0b05b955ba00ffe6639507ffd86ef80cc",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/masks/random_point/0.4/metadata.json": "86344318a5924120e901957e7a8d989a265ed9d85fe41176fef64808e1aa0c9b",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/masks/random_point/0.4/test.csv": "2060f8f3df3942fe25644efcfbb2775878f7fd8bc6dda9839df078bc9214e40b",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/masks/random_point/0.4/train.csv": "71b25f6f628361aef33b4a0d7d4fa99547827c7c9d84d0f69c6b7b582960a291",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/masks/random_point/0.4/val.csv": "55894604c9dc82c026d60257ec8857e19d8d2d068462671e517490ba1db8d357",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/taxibj_test.npz": "f1ce00e7bf24167001e5d99f547f170656e230a3b9cec698aa2da340851afa90",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/taxibj_train.npz": "73386c831eaab76dc9b05e5c572b94e2ea42dc1841902999f820ed8b35855f8c",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/taxibj_val.npz": "bb0e60c333d71c61c55ad3ec35152b433a3b6d891995aac1bb5bc87b17ff91fc",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/scripts/train.py": "8c1de3110a6f412deff7c1e0bac4e77e3f3eb69a87bbf7067c625ae53c5a3a07",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/scripts/v24/analyze_paths.py": "566a0c423b44428004f34000cde18c542bd0cc8b4adf34800e392b0a1ac9056a",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/scripts/v24/build_experiment_plan.py": "27451c22347dbd89c7baf9bc773002869f0919375ab91792ea79460fd324cb1a",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/scripts/v24/evaluate_mask_panel.py": "4282cf93785a9a67de6639e85e9cba66b36d194a2230d8cb800ce256c274e08f",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/scripts/v24/generate_structured_masks.py": "b7a0ed846b7b364864d1d6873e16161700f0f8d2d503bdc0d262416358b002b4",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/scripts/v24/prepare_clean_taxibj.py": "08c7a9717c9219480045a9951b7bbb84a1ec1d62e38c501ddb63a2db956c59d2",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/scripts/v24/preview_diverse_masks.py": "8084f87bbba493db6f00df6be48359ed0662a9360a5c2557cc1bb091e003c9c9",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/scripts/v24/run_abcde.py": "5226d0d478514fa4fe8af87c754c992176c1c9dbcf4da401c5300542af014ce3",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/scripts/v24/run_experiments.py": "25d9ce42adf456216eea5d1458a6457f2e4f3c5fdd1aa660fe2a5e4c34a44a22",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/src/stmoe_imputer/__init__.py": "7af4ee71afb30777e3e954b6350084d838283273e450fb4bfd5d2f51693da219",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/src/stmoe_imputer/config.py": "07d65db2fff5ca719d671557b609b07c751a8fd2c18e7ee3a79b66983a6fe145",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/src/stmoe_imputer/data/__init__.py": "a5a817005197fe4424daf161f1fca7e7fc96fc29ff15dcddc4961d7301e63c84",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/src/stmoe_imputer/data/build.py": "95ded198a759b31ba6654252be25c52ba7edc2545091033e1798aa419a74c3f2",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/src/stmoe_imputer/data/diverse_masks.py": "34fa473e4179de155e18af0ebe90040c21a32039d19ab50eb4416dd33106393c",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/src/stmoe_imputer/data/masks.py": "ae1eebe4abe78609ff3997ed916e23dc0903b1650d3ed8edc55f1c5ef7485051",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/src/stmoe_imputer/data/npz_dataset.py": "ea17fa2465f50bc89e3b00e5299d50fccb28bf64b49a7a1ae8c71205191be026",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/src/stmoe_imputer/data/synthetic.py": "6988ba4b80788944695b6724cb76c44354efd4b6a3a6435e37302283d7229daf",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/src/stmoe_imputer/data/transforms.py": "80b9b806577ae3cc7f647b014ddec1971349cb9b2819cf4e202b2706a660b17e",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/src/stmoe_imputer/engine.py": "82013c69104b0199282823368881c39cec701152bdc0e08bc1c1387f84de9d6f",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/src/stmoe_imputer/losses.py": "b1a57da0073394401b2b26e0624c72c718df014af43399bb37f2e04ba12f6d99",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/src/stmoe_imputer/metrics.py": "d296dff3e2aaa2cb72b0d806d66be91ec99dd6e964587f3586f7cbc3aa567919",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/src/stmoe_imputer/models/__init__.py": "dae895f806da7f2c0c18aba1191fa3fc5a06427e612c9516af6edf82df398d7a",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/src/stmoe_imputer/models/aux_branch.py": "f64f568cd7be99a95a86e868077e57716fe4b9ff9d45cb83c5813f5f790a76e0",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/src/stmoe_imputer/models/blocks.py": "14085adbc783869f50f6ddbce1fd699b4e773547380bcf9fb18045ce89b655af",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/src/stmoe_imputer/models/coe_pattern_experts.py": "b45acee9756bc2e4d9f7e5888b6cecda7df8bef2783b84f68e71ab908ba90492",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/src/stmoe_imputer/models/coe_router.py": "bd419f21c8675c5030288801d83934bf682364191ad5efca7b7036b6c2aedf40",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/src/stmoe_imputer/models/embedding.py": "13f03ef964e35d212d8348a38d4e859326b4ea16f75bd706130ca261dd68c3c5",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/src/stmoe_imputer/models/experts.py": "c814384ca7878bc43f60ee8a865e09323b318a650f83a045c41663c8c832df0e",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/src/stmoe_imputer/models/fusion.py": "2958d9d00321dab67a3ca901d16ab860d4d96cfd5fb61b07d4d4278ff22d70ba",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/src/stmoe_imputer/models/imputer.py": "3fa30ab1e9fb2821114e763db5227db0ca01cd5eca1725f9243a525b4ebe91db",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/src/stmoe_imputer/models/main_branch.py": "d186b4fc2057c238092dfa38905105693be33ec95dcf895e365f219910342c03",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/src/stmoe_imputer/models/registry.py": "db1f7e6a2a29dde98f65ceaf70da3c06e158f8887495539ff361b75b1167bc60",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/src/stmoe_imputer/models/router.py": "cda6713167c0a145b7b087551339f03a4034af5116b2d4fea4e45edbbcb22632",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/src/stmoe_imputer/models/scale_utils.py": "7fe952e7fb7585a589ea7063fc580d645e7f6af4f3ac0294b6c013f52ef96e2e",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/src/stmoe_imputer/models/stats.py": "da30e8736299d638ba82e75437c0ef13ed9513200e31804ab7f4114185a86df1",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/src/stmoe_imputer/models/temporal_spatial_coe.py": "fa265bb6800366226172010e501d32561ed1c7e3901bbb2cd08629eb5310fe56",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/src/stmoe_imputer/models/v_single/__init__.py": "27bd29975e660077407d795804a5ef662f024d01b86ffb6c9c1f783926cb88a3",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/src/stmoe_imputer/models/v_single/difficulty_condition.py": "6fd2598ae736d3b4ad2296368d87d4d26a49797a2d2a05e413a766581bfd01ed",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/src/stmoe_imputer/models/v_single/local_residual_gate.py": "6cd7469d202000aa31d4d0baba465b8634b5cedf90fe34084dc505f3ea8d350e",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/src/stmoe_imputer/models/v_single/safe_c2f_refiner.py": "b20ffff1ffdff49c2e75512312a2fae21800d36ad17c909c888b1181592d4ab3",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/src/stmoe_imputer/models/v_single/safety_controller.py": "6390b53fb9fc9bb6640aebf9c03e2dadd53ec057833d8267306b40de3107e96a",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/src/stmoe_imputer/models/v_single/v14_safe_c2f_moe.py": "89564874d3ef0527291f8d471f07e8b286ad457d086074f58b93acd3750daa8b",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/src/stmoe_imputer/routing_metrics.py": "361d96f90621823fdad57f95610bdd229ec930b27e6f2a6d99a8002602119745",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/src/stmoe_imputer/utils/__init__.py": "7f8a22da35cc4eca6e012b2503b2a992ec85755b7a4a9ad8d43413df6e6a8884",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/src/stmoe_imputer/utils/checkpoint.py": "4f364ff3722ffa1bdb660e2bfefc9d17cf03a61526e51adc96d679685e2921ac",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/src/stmoe_imputer/utils/device.py": "becb8e03f89546ed93732ca1f4883f0535208681b971e0019600daf9d2ac446e",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/src/stmoe_imputer/utils/seed.py": "d5c42fea97dd899788162728af6c66ba7b66671f49382a8e30a3aa3969e1fc44",
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/src/stmoe_imputer/utils/train_logger.py": "1758b3c632a0b654b0a9cf598fe1ec104156ddba7ebbdd2c7808a48231241c0b"
+  },
+  "python": "3.9.25 (main, Nov  3 2025, 22:33:05) \n[GCC 11.2.0]",
+  "executable": "/home/students/HuangMingYu/anaconda3/envs/difftdi/bin/python",
+  "packages": {
+    "torch": "2.6.0+cu124",
+    "numpy": "2.0.2",
+    "tqdm": "4.67.1"
+  },
+  "cpu_threads": 2
+}

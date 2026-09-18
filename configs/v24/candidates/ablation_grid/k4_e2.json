@@ -1,0 +1,20 @@
+{
+  "model": {
+    "coe": {
+      "num_steps": 4,
+      "expert_pool": [
+        "T",
+        "S"
+      ],
+      "routing_mode": "hard",
+      "router_state": "dynamic",
+      "fixed_path": null,
+      "use_shared": true,
+      "use_routed": true,
+      "temporal_dilation": 2,
+      "spatial_dilation": 2,
+      "attention_heads": 4,
+      "residual_init": 0.1
+    }
+  }
+}

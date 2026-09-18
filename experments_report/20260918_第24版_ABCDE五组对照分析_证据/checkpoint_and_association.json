@@ -1,0 +1,109 @@
+{
+  "A": {
+    "checkpoint_epoch": 68,
+    "checkpoint_matches_best": true,
+    "parameters": 211507,
+    "buffers": 0,
+    "last10_amp_skips": 0.0,
+    "last_val_minus_best": 1.0113449102178151e-05,
+    "last20_val_improvement_percent": 0.48024466042836045
+  },
+  "B": {
+    "checkpoint_epoch": 68,
+    "checkpoint_matches_best": true,
+    "parameters": 194787,
+    "buffers": 4,
+    "last10_amp_skips": 0.0,
+    "last_val_minus_best": 5.015824573284533e-05,
+    "last20_val_improvement_percent": 0.4648735981542689
+  },
+  "C": {
+    "checkpoint_epoch": 70,
+    "checkpoint_matches_best": true,
+    "parameters": 194787,
+    "buffers": 4,
+    "last10_amp_skips": 0.0,
+    "last_val_minus_best": 0.0,
+    "last20_val_improvement_percent": 0.8564432889018154
+  },
+  "D": {
+    "checkpoint_epoch": 62,
+    "checkpoint_matches_best": true,
+    "parameters": 211507,
+    "buffers": 0,
+    "last10_amp_skips": 0.0,
+    "last_val_minus_best": 0.06295425002825894,
+    "last20_val_improvement_percent": 0.6153419763141262,
+    "last10_family_path_association": {
+      "samples": 24520,
+      "MI_nats": 0.02590188834107915,
+      "path_entropy_nats": 1.016874629923038,
+      "MI_over_path_entropy": 0.025472056809047867,
+      "note": "Descriptive plug-in estimate from changing checkpoints and stochastic training paths, not a paired causal or significance test."
+    },
+    "training_family_window_presentations": {
+      "multi_block": 19071,
+      "spatial_region": 19071,
+      "moving_region": 19071,
+      "spatiotemporal_block": 19071,
+      "node_outage": 19071,
+      "temporal_gap": 19071,
+      "random_point": 19072,
+      "composite": 19071,
+      "stripe": 19071
+    }
+  },
+  "E": {
+    "checkpoint_epoch": 68,
+    "checkpoint_matches_best": true,
+    "parameters": 212659,
+    "buffers": 0,
+    "last10_amp_skips": 0.0,
+    "last_val_minus_best": 0.007386312933912009,
+    "last20_val_improvement_percent": 2.0852571975189056,
+    "last10_family_path_association": {
+      "samples": 24520,
+      "MI_nats": 0.03260655262605557,
+      "path_entropy_nats": 1.1932843816558754,
+      "MI_over_path_entropy": 0.027325047681264963,
+      "note": "Descriptive plug-in estimate from changing checkpoints and stochastic training paths, not a paired causal or significance test."
+    },
+    "training_family_window_presentations": {
+      "multi_block": 19071,
+      "spatial_region": 19071,
+      "moving_region": 19071,
+      "spatiotemporal_block": 19071,
+      "node_outage": 19071,
+      "temporal_gap": 19071,
+      "random_point": 19072,
+      "composite": 19071,
+      "stripe": 19071
+    },
+    "embedding_row_norms": {
+      "main_branch.routers.1.previous_expert_embedding": [
+        0.17906704545021057,
+        0.18284521996974945,
+        0.21238358318805695,
+        0.15297073125839233,
+        0.12209141254425049,
+        0.16617509722709656
+      ],
+      "main_branch.routers.2.previous_expert_embedding": [
+        0.15010599792003632,
+        0.15246492624282837,
+        0.1880538910627365,
+        0.16483722627162933,
+        0.21659968793392181,
+        0.18797750771045685
+      ],
+      "main_branch.routers.3.previous_expert_embedding": [
+        0.18871243298053741,
+        0.21586784720420837,
+        0.22392447292804718,
+        0.1957300901412964,
+        0.24595721065998077,
+        0.251069575548172
+      ]
+    }
+  }
+}

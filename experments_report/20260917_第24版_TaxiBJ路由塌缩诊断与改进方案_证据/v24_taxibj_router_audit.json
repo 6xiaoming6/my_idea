@@ -1,0 +1,163 @@
+{
+  "router_count": 4,
+  "router_parameters_disjoint": true,
+  "optimizer_router_groups": [
+    {
+      "name": "main",
+      "lr": 0.001,
+      "router_tensors": 12
+    },
+    {
+      "name": "no_decay",
+      "lr": 0.001,
+      "router_tensors": 12
+    }
+  ],
+  "experts": {
+    "T": 17472,
+    "S": 18240,
+    "TD": 17472,
+    "SD": 18240,
+    "TA": 33472,
+    "ST": 20544
+  },
+  "patterns": {
+    "random_point": {
+      "hidden": {
+        "rms": 0.25847339630126953,
+        "mean_across_window_std": 0.006460273172706366,
+        "normalized_mean_across_window_std": 0.027360867708921432
+      },
+      "values": {
+        "rms": 50.609031677246094,
+        "mean_across_window_std": 12.560660362243652,
+        "normalized_mean_across_window_std": 0.04004152491688728
+      },
+      "support": {
+        "rms": 0.48517701029777527,
+        "mean_across_window_std": 0.010606060735881329,
+        "normalized_mean_across_window_std": 0.03467950224876404
+      },
+      "change": {
+        "rms": 0.0,
+        "mean_across_window_std": 0.0,
+        "normalized_mean_across_window_std": 0.009801956824958324
+      },
+      "missing": {
+        "rms": 0.28283122181892395,
+        "mean_across_window_std": 0.0,
+        "normalized_mean_across_window_std": 0.023799337446689606
+      }
+    },
+    "node_contiguous": {
+      "hidden": {
+        "rms": 0.2747829854488373,
+        "mean_across_window_std": 0.007979084737598896,
+        "normalized_mean_across_window_std": 0.033171333372592926
+      },
+      "values": {
+        "rms": 50.64591979980469,
+        "mean_across_window_std": 12.602858543395996,
+        "normalized_mean_across_window_std": 0.05358664691448212
+      },
+      "support": {
+        "rms": 0.6819161772727966,
+        "mean_across_window_std": 0.009811332449316978,
+        "normalized_mean_across_window_std": 0.05452272295951843
+      },
+      "change": {
+        "rms": 0.0,
+        "mean_across_window_std": 0.0,
+        "normalized_mean_across_window_std": 0.019581664353609085
+      },
+      "missing": {
+        "rms": 0.28283122181892395,
+        "mean_across_window_std": 0.0,
+        "normalized_mean_across_window_std": 0.023137062788009644
+      }
+    },
+    "spatial_region": {
+      "hidden": {
+        "rms": 0.27907490730285645,
+        "mean_across_window_std": 0.061290089040994644,
+        "normalized_mean_across_window_std": 0.050259485840797424
+      },
+      "values": {
+        "rms": 45.836090087890625,
+        "mean_across_window_std": 12.290361404418945,
+        "normalized_mean_across_window_std": 0.10102535784244537
+      },
+      "support": {
+        "rms": 0.7013858556747437,
+        "mean_across_window_std": 0.0015108248917385936,
+        "normalized_mean_across_window_std": 0.0750044509768486
+      },
+      "change": {
+        "rms": 0.0,
+        "mean_across_window_std": 0.0,
+        "normalized_mean_across_window_std": 0.02732975222170353
+      },
+      "missing": {
+        "rms": 0.28311893343925476,
+        "mean_across_window_std": 0.0,
+        "normalized_mean_across_window_std": 0.03124299645423889
+      }
+    },
+    "spatiotemporal_block": {
+      "hidden": {
+        "rms": 0.2729605436325073,
+        "mean_across_window_std": 0.09108885377645493,
+        "normalized_mean_across_window_std": 0.04760495200753212
+      },
+      "values": {
+        "rms": 39.25016403198242,
+        "mean_across_window_std": 9.656806945800781,
+        "normalized_mean_across_window_std": 0.07095929235219955
+      },
+      "support": {
+        "rms": 0.5141239166259766,
+        "mean_across_window_std": 0.0979856476187706,
+        "normalized_mean_across_window_std": 0.06800778955221176
+      },
+      "change": {
+        "rms": 0.0,
+        "mean_across_window_std": 0.0,
+        "normalized_mean_across_window_std": 0.017179373651742935
+      },
+      "missing": {
+        "rms": 0.2827736735343933,
+        "mean_across_window_std": 0.0,
+        "normalized_mean_across_window_std": 0.030143169686198235
+      }
+    },
+    "mixed": {
+      "hidden": {
+        "rms": 0.2732275426387787,
+        "mean_across_window_std": 0.09583643823862076,
+        "normalized_mean_across_window_std": 0.04842430353164673
+      },
+      "values": {
+        "rms": 48.415225982666016,
+        "mean_across_window_std": 13.0189847946167,
+        "normalized_mean_across_window_std": 0.07169253379106522
+      },
+      "support": {
+        "rms": 0.6183299422264099,
+        "mean_across_window_std": 0.18853163719177246,
+        "normalized_mean_across_window_std": 0.07449610531330109
+      },
+      "change": {
+        "rms": 0.0,
+        "mean_across_window_std": 0.0,
+        "normalized_mean_across_window_std": 0.018288787454366684
+      },
+      "missing": {
+        "rms": 0.28290945291519165,
+        "mean_across_window_std": 0.00010105216642841697,
+        "normalized_mean_across_window_std": 0.03509253263473511
+      }
+    }
+  },
+  "input_channel_mean_abs_difference": 1.9851808547973633,
+  "hard_gumbel_same_noise_same_selections_across_tau": true
+}

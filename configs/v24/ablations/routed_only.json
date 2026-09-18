@@ -1,0 +1,8 @@
+{
+  "model": {
+    "coe": {
+      "use_shared": false,
+      "use_routed": true
+    }
+  }
+}

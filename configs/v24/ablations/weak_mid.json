@@ -1,0 +1,5 @@
+{
+  "loss": {
+    "lambda_coe_mid": 0.1
+  }
+}

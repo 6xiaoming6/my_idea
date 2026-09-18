@@ -1,0 +1,69 @@
+{
+  "seed": 7,
+  "output_dir": "outputs/v24-COE",
+  "device": "cpu",
+  "data": {
+    "batch_size": 2,
+    "num_workers": 0,
+    "pin_memory": false,
+    "drop_last": false,
+    "mask": {
+      "pattern": "random",
+      "missing_rate": 0.45
+    },
+    "synthetic": {
+      "num_train": 8,
+      "num_val": 4,
+      "t": 6,
+      "h": 8,
+      "w": 8
+    },
+    "multiscale": false,
+    "dataset_name": "Synthetic"
+  },
+  "model": {
+    "architecture": "v24_ts_coe",
+    "c_in": 2,
+    "main": {
+      "dim": 16,
+      "max_t": 6,
+      "h": 8,
+      "w": 8,
+      "scale_mode": "fine",
+      "use_multiscale": false
+    },
+    "coe": {
+      "num_steps": 2,
+      "routing_mode": "hard",
+      "fixed_path": [
+        "T",
+        "S"
+      ],
+      "router_state": "dynamic",
+      "use_shared": true,
+      "use_routed": true,
+      "temperature": 1.0,
+      "temporal_kernel": 3,
+      "spatial_kernel": 3,
+      "residual_init": 0.1
+    },
+    "aux": {
+      "enabled": false,
+      "alpha_init": 0.0
+    }
+  },
+  "loss": {
+    "type": "l1",
+    "lambda_coe_mid": 0.0,
+    "lambda_coe_balance": 0.0
+  },
+  "train": {
+    "epochs": 1,
+    "val_epoch": 1,
+    "lr_main": 0.0005,
+    "weight_decay": 0.0001,
+    "grad_clip_norm": 1.0,
+    "amp": false,
+    "save_every": 1
+  }
+}
