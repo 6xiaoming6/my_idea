@@ -9,7 +9,7 @@ python scripts/v24/run_abcde.py --gpu 0
 python scripts/v24/run_abcde.py --dry-run
 ```
 
-ABCDE 完成后的诊断与候选实验（固定四轮路径、D-static、两轮三专家 F）位于
+当前后续实验统一为 20 epoch、train/val/test 九类同分布混合 mask，共六组（硬路由基准、预热、分组输入、专家身份传递、固定路径、两层三专家），配置与运行顺序位于
 [后续实验说明](scripts/v24/README_FOLLOWUP.md)，统一从 `scripts/v24/run_followup.py` 启动，仍按单卡顺序运行。
 
 当前分支新增单尺度 TS-CoE：两轮共享时间/空间专家池，根据观测支撑和更新后的补全状态逐轮路由。第一版按方案 10.4/10.5，仅以隐藏目标 MAE 训练，`lambda_coe_balance=0`、`lambda_coe_mid=0`；保留 ST Gumbel-Softmax 梯度估计和轻量点级共享专家。先监控专家使用率、路径、梯度及缺失条件下的选择，不要求时间/空间专家平均分工；不构造中/粗尺度。

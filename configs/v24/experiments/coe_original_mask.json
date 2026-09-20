@@ -1,0 +1,13 @@
+{
+  "data": {
+    "train_mask_diversity": null,
+    "eval_mask_diversity": null,
+    "mask": {
+      "pattern": "random",
+      "missing_rate": 0.4,
+      "train_csv": "data/TaxiBJ/v24_clean_abc_20260917/masks/random_point/0.4/train.csv",
+      "val_csv": "data/TaxiBJ/v24_clean_abc_20260917/masks/random_point/0.4/val.csv",
+      "test_csv": "data/TaxiBJ/v24_clean_abc_20260917/masks/random_point/0.4/test.csv"
+    }
+  }
+}

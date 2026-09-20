@@ -1,0 +1,6 @@
+{
+  "model": {"coe": {
+    "router_input_noise_std": 0.1,
+    "router_input_noise_steps": 2
+  }}
+}

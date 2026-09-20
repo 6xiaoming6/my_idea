@@ -1,0 +1,34 @@
+{
+  "model": {
+    "coe": {
+      "num_steps": 4,
+      "expert_pool": [
+        "T",
+        "S",
+        "TD",
+        "SD",
+        "TA",
+        "ST"
+      ],
+      "routing_mode": "fixed",
+      "router_state": "dynamic",
+      "fixed_path": [
+        "TA",
+        "ST",
+        "S",
+        "TA"
+      ],
+      "use_shared": true,
+      "use_routed": true,
+      "temporal_dilation": 2,
+      "spatial_dilation": 2,
+      "attention_heads": 4,
+      "residual_init": 0.1,
+      "expert_state": "dynamic"
+    }
+  },
+  "loss": {
+    "lambda_coe_mid": 0.0,
+    "lambda_coe_balance": 0.0
+  }
+}

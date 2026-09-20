@@ -96,7 +96,7 @@ class DiverseMaskSchedule:
         schedule_epoch = epoch if self.resample_each_epoch else 1
         rng = np.random.default_rng(np.random.SeedSequence([self.seed, schedule_epoch, 0]))
         combinations = len(self.families)*len(self.rates)
-        offset = (epoch-1)*self.length % combinations
+        offset = (schedule_epoch-1)*self.length % combinations
         self.assignments = (np.arange(self.length)+offset) % combinations
         rng.shuffle(self.assignments)
 

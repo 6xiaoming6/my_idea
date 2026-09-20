@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run fixed-path, D-static and F sequentially on one explicitly idle GPU."""
+"""Run seven matched-distribution 20-epoch routing diagnostics on one GPU."""
 from __future__ import annotations
 import argparse, fcntl, subprocess, sys
 from pathlib import Path

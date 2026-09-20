@@ -1,0 +1,1 @@
+{"model":{"coe":{"routing_mode":"fixed","fixed_path":["ST","ST","ST","ST"],"routing_warmup_epochs":0,"routing_transition_epochs":0}},"loss":{"lambda_coe_balance":0.0}}

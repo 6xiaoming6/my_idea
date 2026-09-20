@@ -1,61 +1,49 @@
-# 后续诊断实验：评估分布、固定路径、mask 拆分与 F
+# TaxiBJ：20 epoch 同分布混合缺失路由诊断
 
-本轮在已完成 ABCDE 结果基础上继续诊断，不重复训练 A/D/E。代码和配置已经写入根目录；本轮没有启动 GPU。
+当前入口为项目根目录 `scripts/v24/run_followup.py`，配置为 `configs/v24/followup_experiments.json`，统一基配置为 `configs/v24/route20_base.json`。旧 A–E 和 followup 结果保留；本轮重新训练，不能与旧 50/70 epoch 数字直接当作配对结果。
 
-## 现有 checkpoint 的九类固定 mask 面板
+## 共同协议
 
-目的：直接回答 D/E 是否只是损害 random_point，还是在结构化缺失上有收益。使用 ABCDE 已按共同 random_point 验证集选出的 A、C、D、E 最佳 checkpoint，在同一批测试窗口上分别生成九类固定 mask：random_point、node_outage、temporal_gap、spatial_region、spatiotemporal_block、stripe、moving_region、multi_block、composite。这个面板只做诊断，不重新选择 checkpoint，也不改变原正式测试结果。
+- TaxiBJ 清洁数据，seed 7，batch 16，20 epoch，cosine 周期也为 20；每 2 epoch 验证，关闭早停。
+- train/val/test 均使用九类近似等比例混合：random_point、node_outage、temporal_gap、spatial_region、spatiotemporal_block、stripe、moving_region、multi_block、composite；全部缺失率 0.4。
+- 每个窗口分配一种模式，composite 本身允许组合模式。不是对每个窗口同时叠加九类 mask。
+- 训练每 epoch 重采样，所有组共享相同 mask seed、epoch/index 规则和样本顺序。训练 2452 个窗口，每类每 epoch 272–273 个。
+- 验证 342 个窗口，每类 38 个；测试 707 个窗口，每类 78–79 个。验证/测试使用独立 seed（基础 mask seed +20000/+30000），固定 mask，跨组相同。
+- 各组按混合验证 MAE 选择最佳 checkpoint，结束后仅测试一次。路由诊断同时查看最后 5 epoch 与最佳 checkpoint，不能只看早期最好的一次验证。
 
-```bash
-cd /home/students/HuangMingYu/code/py/my_idea/my_idea
-CUDA_VISIBLE_DEVICES=0 python scripts/v24/run_mask_panel.py --device cuda --output outputs/v24-COE/experiments/abcde/abcde/38027eefadf2a586/mask_panel_20260918.json
-```
+## 运行顺序与对照
 
-脚本逐个加载模型、释放显存，单卡运行。每种 mask 的 MAE/RMSE 和路由统计写入 JSON；不要同时在另一张卡启动训练。
+| 顺序 | 配置名称 | 相对 R0 的改变 | 检验问题 |
+|---|---|---|---|
+| R0 | route20_base | 四层六专家、从头硬路由，balance=0.01 | 同分布基准，优先运行 |
+| R1 | route20_warmup | 3 epoch 软预热 + 3 epoch 过渡，uniform_mix_start=0.5、sampling_temperature_start=2 | 早期探索能否避免饱和；第 7–20 epoch 硬路由是否保持分化 |
+| R2 | route20_grouped | 分组归一化路由输入 + 观测差分特征 | 路由输入表达是否影响坍缩；不叠加 R1 |
+| R3 | route20_previous | 传递上一层实际选择的专家身份 | 专家选择历史是否有帮助；不叠加 R1/R2 |
+| R4 | route20_noise | 训练阶段仅给前两层 router 输入加相对尺度 0.1 的高斯噪声，验证/测试关闭 | 随机扰动能否打破前两层固定选择 |
+| R5 | route20_fixed | 固定 TA→ST→S→TA；无可学习路由，balance=0 | 学习路由相对一条预先指定链路是否有收益 |
+| R6 | route20_small | 两层三专家 T/S/ST，balance=0.01 | 小链路候选是否更稳定、更高效 |
 
-## 四个新训练对照
+R2 同时改变特征表达与归一化，是一个路由输入方案对照，不能拆解各组成部分的贡献。R6 同时改变层数和专家集合（也移除了 TA），不是严格的深度单变量消融。固定路径的路径来自旧 A 的验证行为，只是一条预先指定参照，不能视为最优固定路径。D-static 暂不进入本轮队列，集中检验路由设置。
 
-新队列有四个任务，各 70 epoch、batch 16、seed 7，按下面顺序在同一张卡上运行：
+## 判断方式
 
-| 任务 | 设置 | 用途 |
-|---|---|---|
-| `abc_d_eval_mixed` | D 的九类训练 mask；验证和测试也各自使用九类固定混合 mask | 修正训练/评估分布不一致的问题，作为本轮第一个任务 |
-| `fixed4_ta_st_s_ta` | 四轮六专家固定 `TA→ST→S→TA` | 与 A 的动态路由比较；路径来自 A 的验证集行为，不使用测试选择 |
-| `abc_d_static` | D 的九类 mask，但每个训练窗口只生成一次，70 轮不重采样 | 与已有动态 D 比较，拆开“形态多样性”和“逐轮重采样” |
-| `abc_f` | 两轮、三专家 `[T,S,ST]`，硬路由，balance=0.01 | F：较小链路候选，与 A 的四轮六专家比较 |
+每层分别看专家使用率、最大占比、路由熵、logit margin、router 梯度；整条链看路径数、最大路径占比、路径熵；按九种缺失模式分别看路由分布。验证采用确定性选择，避免把训练 Gumbel 随机性误认为学到的分工。固定路径组的集中使用是实验定义，不是训练失败。
 
-D-eval-mixed 的训练/验证/测试都使用相同的九类和 40% 缺失率分布。验证和测试 mask 按各自数据集固定生成，避免验证指标随 epoch 改变；它们与训练 mask 的家庭分布一致，但不是同一批样本的 mask。该组的 test MAE 不能直接和 random_point 测试协议下的其他组做数值比较，应在同一评估协议内比较。
-
-D-static 的训练 mask 与动态 D 使用同一 seed、同一九类、同一 40% 缺失预算；区别只有 `resample_each_epoch=false`。它的验证和测试仍使用原来的 random_point 协议。固定路径 `TA→ST→S→TA` 是 A 在验证集形成的路径，不能作为所有可能固定路径的最优证明；该实验只回答“这条固定链是否已足够解释 A 的成绩”。
-
-F 不是 A 的严格单变量消融，因为它同时减少轮数和专家池，并改变候选算子集合；它是容量/链路预算候选。若 F 优于 A，只能说明较小候选在本任务上有竞争力，不能直接归因于某一个专家。
+20 epoch 用于早期筛选，不证明最终精度或长期不坍缩。改变验证/测试分布本身不提供训练梯度；同分布协议用于正确评估及选模。所有组都在完全相同的混合测试 mask 上比较，汇总以 R0 为参照。
 
 ## 启动
-
-先确认服务器所有 GPU 都没有计算任务，然后只运行一张卡：
 
 ```bash
 cd /home/students/HuangMingYu/code/py/my_idea/my_idea
 conda activate difftdi
-tmux new-session -s v24-followup 'python -u scripts/v24/run_followup.py --gpu 0'
-```
-
-只查看计划，不训练：
-
-```bash
 python scripts/v24/run_followup.py --dry-run
+tmux new-session -s v24-route20 'python -u scripts/v24/run_followup.py --gpu 0'
 ```
 
-单卡启动入口会检查任意 GPU 上的计算进程，发现已有任务就拒绝启动；不会停止其他任务，也不会自动使用第二张卡。四项任务按 D-eval-mixed→固定路径→D-static→F 顺序执行。调度器不会把不同评估 mask 协议的结果混成一个 paired delta。
+单卡顺序执行，不使用第二张卡。已有 GPU 任务时入口拒绝启动；如果旧队列还在运行，需要先在原 tmux 里 Ctrl-C 退出旧队列再启动。修改磁盘配置不会把已启动进程自动改成 20 epoch。旧队列检测到代码/配置变化时也可能在任务边界退出。
 
-## 预计时间
+新结果目录：`outputs/v24-COE/experiments/route20/followup/<fingerprint>/`。任务名和协议明确标注 `mixed9_rate0.4`，不再沿用误导性的 random_point 名称。终端仍只显示训练进度条，详细统计写入日志。
 
-按之前 TaxiBJ 四轮六专家约 91–94 秒/epoch 估计，固定路径会更快，F 会更快，四项合计预计约 **6–7 小时**，但仍以实际日志为准。正式结果应与已有 A/D 动态结果一起看：
+## 时间
 
-- D-eval-mixed vs D：先比较同一九类评估协议下的各家庭结果；
-- A vs fixed path：动态路由是否超过一条验证选出的固定链；
-- D-static vs D dynamic：逐轮重采样是否是主要代价/收益来源；
-- F vs A：两轮三专家是否在误差和路由稳定性之间更平衡；
-- 九类 mask panel：D/E 的多路径是否真的对结构化缺失有帮助。
-
-输出根目录为 `outputs/v24-COE/experiments/followup/followup/<fingerprint>/`。所有任务仍保存最佳 checkpoint，按验证 MAE 选择并最后只测试一次。
+五个动态四层组按此前约 94 秒/epoch，各约 31–33 分钟；固定路径和两层候选预计更快。七组总计暂估 **3–3.5 小时**，预留到 4 小时；以本轮实际速度为准。未启动新的训练。

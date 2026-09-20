@@ -433,6 +433,8 @@ def evaluate(
         for key, value in {**loss_dict, **metrics}.items():
             logs[key].append(float(value.detach().cpu()))
         _append_model_diagnostics(logs, outputs)
+        if resolve_architecture(cfg) == "v24_ts_coe" and 'mask_family' in batch:
+            outputs['coe']['mask_family'] = batch['mask_family']
         _update_routing_metrics(routing_metrics, outputs)
     result = _mean_logs(logs)
     if resolve_architecture(cfg) == "v24_ts_coe" and exact_metrics[""].count == 0:

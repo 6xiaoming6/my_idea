@@ -1,0 +1,8 @@
+{
+  "model": {
+    "coe": {}
+  },
+  "loss": {
+    "lambda_coe_balance": 0.0
+  }
+}

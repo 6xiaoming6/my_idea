@@ -1,0 +1,38 @@
+{
+  "model": {
+    "coe": {
+      "num_steps": 4,
+      "expert_pool": [
+        "T",
+        "S",
+        "TD",
+        "SD",
+        "TA",
+        "ST"
+      ],
+      "routing_mode": "hard",
+      "router_state": "dynamic",
+      "fixed_path": null,
+      "use_shared": true,
+      "use_routed": true,
+      "temporal_dilation": 2,
+      "spatial_dilation": 2,
+      "attention_heads": 4,
+      "residual_init": 0.1,
+      "expert_state": "dynamic",
+      "router_features": "grouped",
+      "value_mean": [
+        108.8073788550057,
+        108.8073788550057
+      ],
+      "value_std": [
+        135.23679702217615,
+        135.3215286772739
+      ]
+    }
+  },
+  "loss": {
+    "lambda_coe_mid": 0.0,
+    "lambda_coe_balance": 0.01
+  }
+}

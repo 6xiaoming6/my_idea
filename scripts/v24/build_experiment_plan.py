@@ -22,6 +22,10 @@ CORE = (
     "no_expert_state_update", "parallel", "shared_only", "routed_only", "soft",
 )
 STAGES = {
+    "coe_validation": ("coe_main", "coe_initial_router", "coe_initial_expert", "coe_fixed_chain", "coe_no_balance", "coe_original_mask"),
+    "coe_dual_mask": ("coe_main", "coe_fixed_tast", "coe_fixed_tsts", "coe_fixed_stst", "coe_fixed_tata", "coe_fixed_ssss", "coe_fixed_tttt", "coe_fixed_stst_alt"),
+    "route20": ("route20_base", "route20_warmup", "route20_grouped", "route20_previous", "route20_noise", "route20_fixed", "route20_small"),
+    "route20_next": ("route20_next_noise", "route20_next_warmup", "route20_next_warmup_fixed2"),
     "pilot": ("full", "fixed_ts", "fixed_st", "fixed_tt", "fixed_ss", "parallel"),
     "core": CORE,
     "depth": tuple(f"k{k}_e{e}" for k in (2, 3, 4) for e in (2, 4, 6)),
@@ -36,6 +40,29 @@ PATTERNS = (
     "random_point", "node_contiguous", "spatial_region", "spatiotemporal_block", "mixed",
 )
 QUESTIONS = {
+    "coe_main": "主方案：四层六专家、软预热、当前状态重路由",
+    "coe_initial_router": "主方案仅将各层路由输入固定为初始状态",
+    "coe_initial_expert": "主方案仅将各层专家输入固定为初始状态",
+    "coe_fixed_chain": "同深度固定 TA-ST-S-TA，对照动态路由方案",
+    "coe_no_balance": "主方案仅关闭均衡辅助损失",
+    "coe_original_mask": "主方案恢复原始 random_point mask，检验九类混合缺失协议的影响",
+    "coe_fixed_tsts": "固定 T-S-T-S，时间/空间交替链",
+    "coe_fixed_tast": "固定 TA-ST-S-TA，旧实验参照链",
+    "coe_fixed_stst": "固定 S-T-S-T，空间/时间交替链",
+    "coe_fixed_tata": "固定 TA-TA-TA-TA，重复时间注意力链",
+    "coe_fixed_ssss": "固定 S-S-S-S，重复空间链",
+    "coe_fixed_tttt": "固定 T-T-T-T，重复时间链",
+    "coe_fixed_stst_alt": "固定 ST-ST-ST-ST，重复时空链",
+    "route20_base": "R0：九类同分布、四层六专家硬路由基准",
+    "route20_warmup": "R1：R0 + 3 epoch软预热、3 epoch过渡，随后完全硬路由",
+    "route20_grouped": "R2：R0 + 分组归一化与观测模式特征",
+    "route20_previous": "R3：R0 + 上一层选择的专家身份",
+    "route20_noise": "R4：R0 + 训练阶段前两层路由输入相对高斯噪声",
+    "route20_fixed": "R5：固定TA-ST-S-TA，检验动态选择收益",
+    "route20_small": "R6：两层三专家T/S/ST容量候选",
+    "route20_next_noise": "N1：四层六专家 R0 + 前两层训练期路由输入高斯噪声",
+    "route20_next_warmup": "N2：复现实验 R1 软预热与过渡",
+    "route20_next_warmup_fixed2": "N3：R1 + 第二层固定选择 TA",
     "full": "当前状态重路由的完整两轮模型",
     "fixed_ts": "固定时间后空间",
     "fixed_st": "固定空间后时间",
@@ -138,6 +165,24 @@ def _protocols(args: argparse.Namespace, cfg: dict, datasets: dict) -> list[dict
                     "prepare an explicitly reviewed experiment NPZ without these fields first"
                 )
     if args.mask_root is None:
+        if cfg['data'].get('train_mask_diversity') and cfg['data'].get('eval_mask_diversity'):
+            if args.synthetic or args.patterns is not None or args.rates is not None:
+                raise ValueError('Generated mixed masks require real NPZs and base-config family/rate settings')
+            mixed = {
+                'name': 'mixed9_rate0.4' if args.stage in {'route20', 'route20_next', 'coe_validation', 'coe_dual_mask'} else 'generated_mixed',
+                'kind': 'generated_diverse',
+                'mask_patch': {},
+                'description': 'Balanced mixed families; dynamic train masks and fixed independent val/test masks',
+            }
+            if args.stage == 'coe_dual_mask':
+                original_cfg = deep_update(cfg, load_config(ROOT / 'configs/v24/experiments/coe_original_mask.json'))
+                legacy = _protocols(args, original_cfg, datasets)[0]
+                legacy['name'] = 'original_random_rate0.4'
+                legacy['description'] = 'Original random_point CSV masks for train/val/test'
+                legacy['data_patch'] = {'train_mask_diversity': None, 'eval_mask_diversity': None}
+                mixed['data_patch'] = {}
+                return [mixed, legacy]
+            return [mixed]
         if args.patterns is not None or args.rates is not None:
             raise ValueError("--patterns/--rates require --mask-root")
         mask = cfg["data"]["mask"]
@@ -290,16 +335,38 @@ def build_plan(args: argparse.Namespace, base_patch: dict | None = None) -> dict
     if samples <= 0 or int(cfg["data"]["batch_size"]) <= 0:
         raise ValueError("Training dataset and batch size must be positive")
     protocols = _protocols(args, cfg, datasets)
-    count = len(variants) * len(seeds) * len(protocols)
+    if args.stage == "coe_validation":
+        original_cfg = deep_update(
+            cfg, load_config(ROOT / "configs/v24/experiments/coe_original_mask.json")
+        )
+        original_protocols = _protocols(args, original_cfg, datasets)
+        for protocol in protocols:
+            protocol["variant_scope"] = "mixed"
+        for protocol in original_protocols:
+            protocol["variant_scope"] = "original"
+        protocols.extend(original_protocols)
+    count = len(seeds) * sum(
+        len(variants) if protocol.get("variant_scope") is None else
+        sum(variant != "coe_original_mask" if protocol["variant_scope"] == "mixed" else variant == "coe_original_mask" for variant in variants)
+        for protocol in protocols
+    )
     if count > args.max_plans:
         raise ValueError(f"Plan has {count} runs, exceeds --max-plans {args.max_plans}; filter explicitly or raise the cap")
     budgets = _epochs(args, cfg, variants)
     common = load_config(ROOT / "configs/v24/experiments/full.json")
+    # This stage has a complete authoritative base: legacy two-expert defaults
+    # must never overwrite its depth, expert pool, or auxiliary loss.
+    if args.stage in {"coe_validation", "coe_dual_mask"}:
+        common = {}
     common = deep_update(common, {"data": {"drop_last": False}, "train": {"early_stopping": {"enabled": False}}})
     output = args.output_dir.resolve()
     runs = []
     for protocol in protocols:
         for variant in variants:
+            if protocol.get("variant_scope") == "mixed" and variant == "coe_original_mask":
+                continue
+            if protocol.get("variant_scope") == "original" and variant != "coe_original_mask":
+                continue
             patch_path = (
                 ROOT / "configs/v24/candidates/ablation_grid" / f"{variant}.json"
                 if args.stage == "depth" else ROOT / "configs/v24/experiments" / f"{variant}.json"
@@ -312,12 +379,14 @@ def build_plan(args: argparse.Namespace, base_patch: dict | None = None) -> dict
                     "data": {"mask": protocol["mask_patch"]},
                     "train": {"epochs": budgets[variant]["epochs"]},
                 })
+                if protocol.get("data_patch"):
+                    config["data"] = deep_update(config["data"], protocol["data_patch"])
                 config["experiment_plan"] = {
                     "stage": args.stage, "variant": variant, "protocol": protocol["name"],
                     "protocol_kind": protocol["kind"], "budget_regime": args.budget_regime,
                     "mask_metadata": protocol.get("metadata_file"),
-                    "training_mask_source": ("dynamic_diverse" if 'train_mask_diversity' in config['data'] else "protocol"),
-                    "evaluation_mask_source": ("diverse_fixed_per_split" if 'eval_mask_diversity' in config['data'] else "protocol"),
+                    "training_mask_source": ("dynamic_diverse" if config['data'].get('train_mask_diversity') else "protocol"),
+                    "evaluation_mask_source": ("diverse_fixed_per_split" if config['data'].get('eval_mask_diversity') else "protocol"),
                 }
                 path = output / "configs" / f"{name}.json"
                 command = [args.python, str(ROOT / "scripts/train.py"), "-c", str(path), "--no_plot", "-n", name]
@@ -342,9 +411,9 @@ def build_plan(args: argparse.Namespace, base_patch: dict | None = None) -> dict
         "seeds": seeds, "paired_seeds": len(seeds) >= 3, "budget_regime": args.budget_regime,
         "num_runs": len(runs), "datasets": datasets, "protocols": protocols,
         "comparison_policy": {
-            "same_dataset_and_masks_across_variants": not any('train_mask_diversity' in r['config']['data'] for r in runs),
+            "same_dataset_and_masks_across_variants": len({json.dumps(r['config']['data'].get('train_mask_diversity'), sort_keys=True) for r in runs}) == 1 and len({json.dumps(r['config']['data'].get('eval_mask_diversity'), sort_keys=True) for r in runs}) == 1,
             "same_evaluation_masks_across_variants": len({
-                "diverse_fixed_per_split" if 'eval_mask_diversity' in r['config']['data'] else "protocol"
+                json.dumps(r['config']['data'].get('eval_mask_diversity'), sort_keys=True)
                 for r in runs
             }) == 1,
             "evaluation_mask_intervention": {

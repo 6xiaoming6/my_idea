@@ -66,6 +66,9 @@ def plan_inputs(manifest):
         mask = cfg["data"]["mask"]
         pattern = mask.get("pattern", "random")
         for split in ("train", "val", "test"):
+            diversity_key = 'train_mask_diversity' if split == 'train' else 'eval_mask_diversity'
+            if cfg['data'].get(diversity_key) is not None:
+                continue  # Generator source and full config are already fingerprinted.
             value = mask.get(f"{split}_csv") or mask.get(f"{pattern}_{split}_csv")
             if value is None:
                 raise ValueError(f"Missing {split} mask CSV")
@@ -170,6 +173,21 @@ def validate_plan(manifest):
         names.add(name)
         cfg = run["config"]
         train = cfg["train"]
+        if manifest.get("stage") == "coe_dual_mask":
+            coe = cfg["model"]["coe"]
+            if coe["num_steps"] != 4 or coe.get("expert_pool") != ["T", "S", "TD", "SD", "TA", "ST"]:
+                raise ValueError(f"{name}: dual-mask experiments require four steps and the six-expert pool")
+            if len(coe.get("fixed_expert_steps", [None] * 4)) != 4:
+                raise ValueError(f"{name}: fixed_expert_steps must have four entries")
+            if run["variant"] == "coe_main":
+                if (coe["routing_mode"] != "hard" or coe.get("routing_warmup_epochs") != 3
+                        or coe.get("routing_transition_epochs") != 3
+                        or cfg["loss"].get("lambda_coe_balance") != 0.01):
+                    raise ValueError(f"{name}: main warmup/balance settings were overwritten")
+            elif (coe["routing_mode"] != "fixed" or len(coe.get("fixed_path") or []) != 4
+                  or any(e not in coe["expert_pool"] for e in coe["fixed_path"])
+                  or coe.get("routing_warmup_epochs", 0) or coe.get("routing_transition_epochs", 0)):
+                raise ValueError(f"{name}: invalid fixed-chain configuration")
         for key in ("epochs", "val_epoch"):
             if type(train[key]) is not int or train[key] < 1:
                 raise ValueError(f"train.{key} must be a positive integer")
@@ -296,6 +314,10 @@ def summarize(manifest, suite):
             group = [r for r in all_group if r["evaluation_mask_source"] == evaluation_source]
             if manifest.get("stage") in {"abc", "abcd", "abcde"}:
                 reference = "abc_a"
+            elif manifest.get("stage") in {"coe_validation", "coe_dual_mask"}:
+                reference = "coe_main"
+            elif manifest.get("stage") == "route20":
+                reference = "route20_base"
             elif manifest.get("stage") == "followup":
                 reference = "abc_d_eval_mixed" if evaluation_source == "diverse_fixed_per_split" else "abc_d_static"
             else:

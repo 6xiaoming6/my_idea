@@ -208,6 +208,7 @@ class TemporalSpatialCoE(nn.Module):
         num_steps: int = 2,
         routing_mode: str = "hard",
         fixed_path: Sequence[str] | None = None,
+        fixed_expert_steps: Sequence[str | None] | None = None,
         router_state: str = "dynamic",
         use_shared: bool = True,
         use_routed: bool = True,
@@ -231,6 +232,8 @@ class TemporalSpatialCoE(nn.Module):
         sampling_temperature_start: float = 2.0,
         uniform_mix_start: float = 0.5,
         previous_expert_context: bool = False,
+        router_input_noise_std: float = 0.0,
+        router_input_noise_steps: int = 0,
     ) -> None:
         super().__init__()
         self.c_in = _positive_int("c_in", c_in)
@@ -281,6 +284,10 @@ class TemporalSpatialCoE(nn.Module):
             raise ValueError("sampling_temperature_start must be finite and >= 1")
         if not 0 <= uniform_mix_start <= 1:
             raise ValueError("uniform_mix_start must be in [0,1]")
+        if not math.isfinite(router_input_noise_std) or router_input_noise_std < 0:
+            raise ValueError("router_input_noise_std must be finite and nonnegative")
+        if type(router_input_noise_steps) is not int or router_input_noise_steps < 0:
+            raise ValueError("router_input_noise_steps must be a nonnegative integer")
         if router_init_std is not None and (not math.isfinite(router_init_std) or router_init_std <= 0):
             raise ValueError("router_init_std must be positive and finite")
         if routing_warmup_epochs + routing_transition_epochs and routing_mode != "hard":
@@ -292,6 +299,8 @@ class TemporalSpatialCoE(nn.Module):
                 router_features != 'legacy' or routing_warmup_epochs + routing_transition_epochs):
             raise ValueError('Previous expert context requires legacy hard routing without soft warmup')
         self.previous_expert_context = previous_expert_context
+        self.router_input_noise_std = float(router_input_noise_std)
+        self.router_input_noise_steps = min(int(router_input_noise_steps), self.num_steps)
         self.router_fp32 = bool(router_fp32)
         self.routing_warmup_epochs = routing_warmup_epochs
         self.routing_transition_epochs = routing_transition_epochs
@@ -319,6 +328,24 @@ class TemporalSpatialCoE(nn.Module):
             or any(label not in self.expert_names for label in self.fixed_path)
         ):
             raise ValueError("fixed_path must contain num_steps labels from expert_pool")
+        if fixed_expert_steps is None:
+            fixed_expert_steps = [None] * num_steps
+        if isinstance(fixed_expert_steps, (str, bytes)) or not isinstance(fixed_expert_steps, Sequence):
+            raise ValueError("fixed_expert_steps must be a sequence of labels or nulls")
+        if len(fixed_expert_steps) != num_steps:
+            raise ValueError("fixed_expert_steps must have num_steps entries")
+        normalized_fixed_steps = []
+        for label in fixed_expert_steps:
+            if label is None:
+                normalized_fixed_steps.append(None)
+            else:
+                normalized = str(label).upper()
+                if normalized not in self.expert_names:
+                    raise ValueError("fixed_expert_steps labels must belong to expert_pool")
+                normalized_fixed_steps.append(normalized)
+        if routing_mode == "fixed" and any(label is not None for label in normalized_fixed_steps):
+            raise ValueError("fixed_expert_steps cannot be combined with fixed routing_mode")
+        self.fixed_expert_steps = tuple(normalized_fixed_steps)
 
         support_dim = len(SUPPORT_FEATURE_NAMES) * c_in
         self.position_projection = nn.Conv3d(3, dim, 1, bias=False)
@@ -408,6 +435,7 @@ class TemporalSpatialCoE(nn.Module):
             num_steps=coe.get("num_steps", 2),
             routing_mode=coe.get("routing_mode", "hard"),
             fixed_path=coe.get("fixed_path"),
+            fixed_expert_steps=coe.get("fixed_expert_steps"),
             router_state=coe.get("router_state", "dynamic"),
             use_shared=coe.get("use_shared", True),
             use_routed=coe.get("use_routed", True),
@@ -425,6 +453,8 @@ class TemporalSpatialCoE(nn.Module):
                 "router_fp32", "router_init_std", "routing_warmup_epochs",
                 "routing_transition_epochs", "sampling_temperature_start", "uniform_mix_start",
                 "previous_expert_context") if name in coe},
+            router_input_noise_std=coe.get("router_input_noise_std", 0.0),
+            router_input_noise_steps=coe.get("router_input_noise_steps", 0),
         )
 
     def set_routing_epoch(self, epoch: int) -> None:
@@ -501,6 +531,16 @@ class TemporalSpatialCoE(nn.Module):
             dim=1,
         )
 
+    def _add_router_input_noise(self, features: torch.Tensor, step: int) -> torch.Tensor:
+        """Add relative Gaussian noise to selected early routers in training only."""
+        if (not self.training or self.router_input_noise_std <= 0 or
+                step >= self.router_input_noise_steps):
+            return features
+        base = features.float()
+        scale = base.detach().std(dim=-1, keepdim=True, unbiased=False).clamp_min(1e-3)
+        noisy = base + torch.randn_like(base) * (self.router_input_noise_std * scale)
+        return noisy.to(dtype=features.dtype)
+
     def _dispatch(self, unified: torch.Tensor, paths: torch.Tensor) -> torch.Tensor:
         """Evaluate only selected whole windows, keeping their full context."""
         result = torch.zeros_like(unified)
@@ -572,21 +612,27 @@ class TemporalSpatialCoE(nn.Module):
         logits_history, probability_history, weight_history, path_history = [], [], [], []
         previous_choice_history = []
         for step in range(self.num_steps):
+            forced_expert = self.fixed_expert_steps[step]
+            forced_index = self.expert_names.index(forced_expert) if forced_expert is not None else None
             previous_choice = None
             if self.previous_expert_context:
                 previous_choice = (F.one_hot(path_history[-1].detach(), self.num_experts).float()
                                    if step else hidden.new_zeros((hidden.shape[0], self.num_experts)))
                 previous_choice_history.append(previous_choice)
-            if self.use_routed and self.routing_mode != "fixed":
+            if self.use_routed and self.routing_mode != "fixed" and forced_index is None:
                 router_features = (
                     initial_router_features
                     if self.router_state == "initial"
                     else self._router_features(hidden, completion, support_summary, change, missing, pattern_summary)
                 )
+                router_features = self._add_router_input_noise(router_features, step)
                 with torch.autocast(device_type=hidden.device.type, enabled=False) if self.router_fp32 else nullcontext():
                     features = router_features.float() if self.router_fp32 else router_features
                     logits = (self.routers[step](features, previous_choice)
                               if self.previous_expert_context and step else self.routers[step](features))
+            elif forced_index is not None:
+                logits = hidden.new_full((hidden.shape[0], self.num_experts), -20.0)
+                logits[:, forced_index] = 20.0
             else:
                 logits = hidden.new_zeros((hidden.shape[0], self.num_experts))
             # Gumbel hard argmax is invariant to tau: its clean categorical
@@ -600,6 +646,9 @@ class TemporalSpatialCoE(nn.Module):
             if not self.use_routed:
                 weights = torch.zeros_like(probabilities)
                 paths = torch.full((hidden.shape[0],), -1, device=hidden.device, dtype=torch.long)
+            elif forced_index is not None:
+                paths = torch.full((hidden.shape[0],), forced_index, device=hidden.device, dtype=torch.long)
+                weights = F.one_hot(paths, self.num_experts).to(hidden.dtype)
             elif self.routing_mode == "fixed":
                 expert_index = self.expert_names.index(self.fixed_path[step])
                 paths = torch.full((hidden.shape[0],), expert_index, device=hidden.device, dtype=torch.long)
