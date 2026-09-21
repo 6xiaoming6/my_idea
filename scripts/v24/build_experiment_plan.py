@@ -22,6 +22,7 @@ CORE = (
     "no_expert_state_update", "parallel", "shared_only", "routed_only", "soft",
 )
 STAGES = {
+    "coe_mechanism1": ("coe_mech_main", "coe_mech_initial_router", "coe_mech_fixed_s_ta_sd_st", "coe_mech_fixed_ta_sd_st_ta", "coe_mech_conditional_soft", "coe_mech_global_soft", "coe_mech_no_balance", "coe_mech_initial_expert"),
     "coe_validation": ("coe_main", "coe_initial_router", "coe_initial_expert", "coe_fixed_chain", "coe_no_balance", "coe_original_mask"),
     "coe_dual_mask": ("coe_main", "coe_fixed_tast", "coe_fixed_tsts", "coe_fixed_stst", "coe_fixed_tata", "coe_fixed_ssss", "coe_fixed_tttt", "coe_fixed_stst_alt"),
     "route20": ("route20_base", "route20_warmup", "route20_grouped", "route20_previous", "route20_noise", "route20_fixed", "route20_small"),
@@ -40,6 +41,14 @@ PATTERNS = (
     "random_point", "node_contiguous", "spatial_region", "spatiotemporal_block", "mixed",
 )
 QUESTIONS = {
+    "coe_mech_main": "A0：当前四层六专家软预热主方案，保存最佳权重",
+    "coe_mech_initial_router": "A1：仅将每层 router 输入固定为初始状态",
+    "coe_mech_fixed_s_ta_sd_st": "F1：固定 S-TA-SD-ST，补充含 SD 的强固定链",
+    "coe_mech_fixed_ta_sd_st_ta": "F2：固定 TA-SD-ST-TA，改变含 SD 链的专家顺序",
+    "coe_mech_conditional_soft": "A2：四层条件 Soft，始终按样本融合专家",
+    "coe_mech_global_soft": "A3：四层全局可学习 Soft，权重不随样本变化",
+    "coe_mech_no_balance": "A4：主方案关闭路由均衡损失",
+    "coe_mech_initial_expert": "A5：仅将专家输入固定为初始状态",
     "coe_main": "主方案：四层六专家、软预热、当前状态重路由",
     "coe_initial_router": "主方案仅将各层路由输入固定为初始状态",
     "coe_initial_expert": "主方案仅将各层专家输入固定为初始状态",
@@ -169,7 +178,7 @@ def _protocols(args: argparse.Namespace, cfg: dict, datasets: dict) -> list[dict
             if args.synthetic or args.patterns is not None or args.rates is not None:
                 raise ValueError('Generated mixed masks require real NPZs and base-config family/rate settings')
             mixed = {
-                'name': 'mixed9_rate0.4' if args.stage in {'route20', 'route20_next', 'coe_validation', 'coe_dual_mask'} else 'generated_mixed',
+                'name': 'mixed9_rate0.4' if args.stage in {'route20', 'route20_next', 'coe_validation', 'coe_dual_mask', 'coe_mechanism1'} else 'generated_mixed',
                 'kind': 'generated_diverse',
                 'mask_patch': {},
                 'description': 'Balanced mixed families; dynamic train masks and fixed independent val/test masks',
@@ -356,7 +365,7 @@ def build_plan(args: argparse.Namespace, base_patch: dict | None = None) -> dict
     common = load_config(ROOT / "configs/v24/experiments/full.json")
     # This stage has a complete authoritative base: legacy two-expert defaults
     # must never overwrite its depth, expert pool, or auxiliary loss.
-    if args.stage in {"coe_validation", "coe_dual_mask"}:
+    if args.stage in {"coe_validation", "coe_dual_mask", "coe_mechanism1"}:
         common = {}
     common = deep_update(common, {"data": {"drop_last": False}, "train": {"early_stopping": {"enabled": False}}})
     output = args.output_dir.resolve()

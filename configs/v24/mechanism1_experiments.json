@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "output_dir": "outputs/v24-COE/experiments/coe_mechanism1",
+  "cpu_threads": 2,
+  "batch_size": 16,
+  "seeds": [7],
+  "extra_inputs": ["data/TaxiBJ/v24_clean_abc_20260917/manifest.json"],
+  "training": {
+    "epochs": 60,
+    "val_epoch": 2,
+    "save_best_checkpoint": true,
+    "early_stopping": {"enabled": false},
+    "scheduler": {"type": "cosine", "total_epochs": 60, "eta_min": 1e-6},
+    "router_grad_diagnostic_every": 50
+  },
+  "studies": {
+    "coe_mechanism1": {
+      "base_config": "configs/v24/coe_main_base.json",
+      "stage": "coe_mechanism1",
+      "sources": {
+        "train": "data/TaxiBJ/v24_clean_abc_20260917/taxibj_train.npz",
+        "val": "data/TaxiBJ/v24_clean_abc_20260917/taxibj_val.npz",
+        "test": "data/TaxiBJ/v24_clean_abc_20260917/taxibj_test.npz"
+      }
+    }
+  },
+  "default_study": "coe_mechanism1"
+}

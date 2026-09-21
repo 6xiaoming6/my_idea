@@ -232,6 +232,7 @@ class TemporalSpatialCoE(nn.Module):
         sampling_temperature_start: float = 2.0,
         uniform_mix_start: float = 0.5,
         previous_expert_context: bool = False,
+        global_route_weights: bool = False,
         router_input_noise_std: float = 0.0,
         router_input_noise_steps: int = 0,
     ) -> None:
@@ -295,10 +296,15 @@ class TemporalSpatialCoE(nn.Module):
         self.router_features = router_features
         if type(previous_expert_context) is not bool:
             raise ValueError('previous_expert_context must be boolean')
+        if type(global_route_weights) is not bool:
+            raise ValueError('global_route_weights must be boolean')
+        if global_route_weights and routing_mode != "soft":
+            raise ValueError('global_route_weights requires soft routing_mode')
         if previous_expert_context and (routing_mode != 'hard' or not use_routed or
                 router_features != 'legacy' or routing_warmup_epochs + routing_transition_epochs):
             raise ValueError('Previous expert context requires legacy hard routing without soft warmup')
         self.previous_expert_context = previous_expert_context
+        self.global_route_weights = global_route_weights
         self.router_input_noise_std = float(router_input_noise_std)
         self.router_input_noise_steps = min(int(router_input_noise_steps), self.num_steps)
         self.router_fp32 = bool(router_fp32)
@@ -420,6 +426,8 @@ class TemporalSpatialCoE(nn.Module):
         residual_logit = math.log(float(residual_init) / (1 - float(residual_init)))
         self.shared_scale_logits = nn.Parameter(torch.full((num_steps,), residual_logit))
         self.routed_scale_logits = nn.Parameter(torch.full((num_steps,), residual_logit))
+        if self.global_route_weights:
+            self.global_route_logits = nn.Parameter(torch.zeros(num_steps, self.num_experts))
         if self.previous_expert_context:
             for step in range(1, num_steps):
                 self.routers[step] = PreviousExpertRouter(self.routers[step], self.num_experts)
@@ -453,6 +461,7 @@ class TemporalSpatialCoE(nn.Module):
                 "router_fp32", "router_init_std", "routing_warmup_epochs",
                 "routing_transition_epochs", "sampling_temperature_start", "uniform_mix_start",
                 "previous_expert_context") if name in coe},
+            global_route_weights=coe.get("global_route_weights", False),
             router_input_noise_std=coe.get("router_input_noise_std", 0.0),
             router_input_noise_steps=coe.get("router_input_noise_steps", 0),
         )
@@ -626,10 +635,13 @@ class TemporalSpatialCoE(nn.Module):
                     else self._router_features(hidden, completion, support_summary, change, missing, pattern_summary)
                 )
                 router_features = self._add_router_input_noise(router_features, step)
-                with torch.autocast(device_type=hidden.device.type, enabled=False) if self.router_fp32 else nullcontext():
-                    features = router_features.float() if self.router_fp32 else router_features
-                    logits = (self.routers[step](features, previous_choice)
-                              if self.previous_expert_context and step else self.routers[step](features))
+                if self.global_route_weights:
+                    logits = self.global_route_logits[step].to(device=hidden.device, dtype=hidden.dtype).unsqueeze(0).expand(hidden.shape[0], -1)
+                else:
+                    with torch.autocast(device_type=hidden.device.type, enabled=False) if self.router_fp32 else nullcontext():
+                        features = router_features.float() if self.router_fp32 else router_features
+                        logits = (self.routers[step](features, previous_choice)
+                                  if self.previous_expert_context and step else self.routers[step](features))
             elif forced_index is not None:
                 logits = hidden.new_full((hidden.shape[0], self.num_experts), -20.0)
                 logits[:, forced_index] = 20.0

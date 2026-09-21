@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "output_dir": "outputs/v24-COE/experiments/coe_rate_compare",
+  "dataset": "TaxiBJ",
+  "train_npz": "data/TaxiBJ/taxibj_train.npz",
+  "val_npz": "data/TaxiBJ/taxibj_val.npz",
+  "test_npz": "data/TaxiBJ/taxibj_test.npz",
+  "base_config": "configs/v24/coe_main_base.json",
+  "variants": ["A0", "A2"],
+  "patterns": ["random"],
+  "rates": [0.2, 0.4, 0.6, 0.8],
+  "seed": 7,
+  "epochs": 100,
+  "val_epoch": 5,
+  "batch_size": 16,
+  "save_best_checkpoint": true,
+  "scheduler": {"type": "cosine", "total_epochs": 100, "eta_min": 1e-6},
+  "early_stopping": {"enabled": false},
+  "variants_config": {
+    "A0": {},
+    "A2": {
+      "model": {"coe": {"routing_mode": "soft", "routing_warmup_epochs": 0, "routing_transition_epochs": 0, "global_route_weights": false}},
+      "loss": {"lambda_coe_balance": 0.01}
+    }
+  }
+}

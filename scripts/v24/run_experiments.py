@@ -173,6 +173,26 @@ def validate_plan(manifest):
         names.add(name)
         cfg = run["config"]
         train = cfg["train"]
+        if manifest.get("stage") == "coe_mechanism1":
+            coe = cfg["model"]["coe"]
+            if coe.get("num_steps") != 4 or coe.get("expert_pool") != ["T", "S", "TD", "SD", "TA", "ST"]:
+                raise ValueError(f"{name}: mechanism1 requires the four-step six-expert pool")
+            if run["variant"] in {"coe_mech_main", "coe_mech_initial_router", "coe_mech_no_balance", "coe_mech_initial_expert"}:
+                if (coe.get("routing_mode") != "hard" or coe.get("routing_warmup_epochs") != 3
+                        or coe.get("routing_transition_epochs") != 3
+                        or cfg["loss"].get("lambda_coe_balance") != (0.0 if run["variant"] == "coe_mech_no_balance" else 0.01)):
+                    raise ValueError(f"{name}: warmup main configuration was overwritten")
+            elif run["variant"] == "coe_mech_conditional_soft":
+                if coe.get("routing_mode") != "soft" or coe.get("global_route_weights") or cfg["loss"].get("lambda_coe_balance") != 0.01:
+                    raise ValueError(f"{name}: invalid conditional-soft configuration")
+            elif run["variant"] == "coe_mech_global_soft":
+                if coe.get("routing_mode") != "soft" or not coe.get("global_route_weights") or cfg["loss"].get("lambda_coe_balance") != 0.01:
+                    raise ValueError(f"{name}: invalid global-soft configuration")
+            else:
+                if (coe.get("routing_mode") != "fixed" or len(coe.get("fixed_path") or []) != 4
+                        or coe.get("routing_warmup_epochs", 0) or coe.get("routing_transition_epochs", 0)
+                        or cfg["loss"].get("lambda_coe_balance") != 0.0):
+                    raise ValueError(f"{name}: invalid fixed-chain configuration")
         if manifest.get("stage") == "coe_dual_mask":
             coe = cfg["model"]["coe"]
             if coe["num_steps"] != 4 or coe.get("expert_pool") != ["T", "S", "TD", "SD", "TA", "ST"]:
@@ -314,7 +334,7 @@ def summarize(manifest, suite):
             group = [r for r in all_group if r["evaluation_mask_source"] == evaluation_source]
             if manifest.get("stage") in {"abc", "abcd", "abcde"}:
                 reference = "abc_a"
-            elif manifest.get("stage") in {"coe_validation", "coe_dual_mask"}:
+            elif manifest.get("stage") in {"coe_validation", "coe_dual_mask", "coe_mechanism1"}:
                 reference = "coe_main"
             elif manifest.get("stage") == "route20":
                 reference = "route20_base"
