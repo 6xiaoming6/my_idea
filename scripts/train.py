@@ -217,7 +217,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--no_plot", action="store_true", help="Skip plotting training curves.")
     parser.add_argument("--name", "-n", default="run", help="Run name for the output directory.")
     parser.add_argument("--quiet", "-q", action="store_true", help="Compatibility flag; console output is always limited to training progress bars.")
+    parser.add_argument("--console-epoch", action="store_true", help="Print one compact train/validation summary per epoch and suppress batch progress bars.")
     parser.add_argument("--result-file", type=Path, help="Write a completion receipt for the experiment runner.")
+    parser.add_argument("--epochs", type=int, default=None, help="Override the configured number of training epochs.")
     return parser.parse_args()
 
 
@@ -243,6 +245,13 @@ def main() -> None:
     cfg = load_config(args.config)
     if args.override_config:
         cfg = deep_update(cfg, load_config(args.override_config))
+    if args.epochs is not None:
+        if args.epochs <= 0:
+            raise ValueError("--epochs must be a positive integer")
+        cfg.setdefault("train", {})["epochs"] = args.epochs
+        scheduler_cfg = cfg["train"].get("scheduler")
+        if isinstance(scheduler_cfg, dict) and scheduler_cfg.get("type"):
+            scheduler_cfg["total_epochs"] = args.epochs
     save_best = cfg["train"].get("save_best_checkpoint", True)
     if type(save_best) is not bool:
         raise ValueError("train.save_best_checkpoint must be true or false")
@@ -352,7 +361,11 @@ def main() -> None:
 
             _sync_device(device)
             train_start = time.perf_counter()
-            train_logs = train_one_epoch(model, train_loader, optimizer, device, cfg, epoch, scaler=scaler)
+            train_logs = train_one_epoch(
+                model, train_loader, optimizer, device, cfg, epoch, scaler=scaler,
+                show_progress=not args.console_epoch,
+                total_epochs=cfg["train"]["epochs"],
+            )
             _sync_device(device)
             train_time = time.perf_counter() - train_start
 
@@ -385,6 +398,16 @@ def main() -> None:
                 scheduler.step()
 
             logger.log_epoch(epoch, train_logs, val_logs, perf=perf, is_best=is_best)
+            if args.console_epoch:
+                line = (
+                    f"epoch {epoch:03d}/{cfg['train']['epochs']:03d} | "
+                    f"train loss={train_logs['loss']:.4f} mae={train_logs['mae']:.4f} rmse={train_logs['rmse']:.4f}"
+                )
+                if val_logs is not None:
+                    line += f" | val loss={val_logs['loss']:.4f} mae={val_logs['mae']:.4f} rmse={val_logs['rmse']:.4f}"
+                if is_best:
+                    line += " | best"
+                print(line, flush=True)
             completed_epochs = epoch
             epoch_perfs.append(perf)
             history["train_loss"].append(float(train_logs["loss"]))

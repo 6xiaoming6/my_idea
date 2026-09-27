@@ -73,7 +73,8 @@ def build_jobs(policy: dict) -> list[dict]:
                 }
                 cfg_path = ROOT / policy["output_dir"] / "configs" / f"{name}.json"
                 result_path = ROOT / policy["output_dir"] / "results" / f"{name}.json"
-                log_path = ROOT / policy["output_dir"] / "launcher_logs" / f"{name}.log"
+                control_dir = policy.get("control_dir", policy["output_dir"])
+                log_path = ROOT / control_dir / "launcher_logs" / f"{name}.log"
                 jobs.append({"name": name, "variant": variant, "pattern": pattern,
                              "rate": rate, "config": cfg, "config_path": cfg_path,
                              "result_path": result_path, "log_path": log_path})
@@ -96,7 +97,7 @@ def write_plan(jobs: list[dict], policy: dict) -> None:
             "epochs": policy["epochs"], "variants": policy["variants"],
             "patterns": policy["patterns"], "rates": policy["rates"],
             "jobs": [{k: j[k] for k in ("name", "variant", "pattern", "rate")} for j in jobs]}
-    path = ROOT / policy["output_dir"] / "plan.json"
+    path = ROOT / policy.get("control_dir", policy["output_dir"]) / "plan.json"
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(plan, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
@@ -114,7 +115,7 @@ def main() -> int:
                       "order": [j["name"] for j in jobs]}, ensure_ascii=False, indent=2))
     if args.dry_run or args.summary_only:
         return 0
-    output = ROOT / policy["output_dir"]
+    output = ROOT / policy.get("control_dir", policy["output_dir"])
     for sub in ("configs", "results", "launcher_logs"):
         (output / sub).mkdir(parents=True, exist_ok=True)
     with (output / ".single_gpu_queue.lock").open("a") as lock:

@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "output_dir": "outputs/v24-COE",
+  "control_dir": "outputs/v24-COE/experiments/coe_depth_pool",
+  "dataset": "TaxiBJ",
+  "train_npz": "data/TaxiBJ/taxibj_train.npz",
+  "val_npz": "data/TaxiBJ/taxibj_val.npz",
+  "test_npz": "data/TaxiBJ/taxibj_test.npz",
+  "base_config": "configs/v24/coe_main_base.json",
+  "seed": 7,
+  "epochs": 20,
+  "val_epoch": 2,
+  "batch_size": 16,
+  "save_best_checkpoint": false,
+  "scheduler": {"type": "cosine", "total_epochs": 20, "eta_min": 1e-6},
+  "early_stopping": {"enabled": false},
+  "variants": [
+    {"name": "hetero_s1_top8", "num_steps": 1, "top_k": 8, "expert_pool": ["T", "S", "TD", "SD", "TA", "ST", "TL", "SL"]},
+    {"name": "hetero_s2_top4", "num_steps": 2, "top_k": 4, "expert_pool": ["T", "S", "TD", "SD", "TA", "ST", "TL", "SL"]},
+    {"name": "hetero_s4_top2", "num_steps": 4, "top_k": 2, "expert_pool": ["T", "S", "TD", "SD", "TA", "ST", "TL", "SL"]},
+    {"name": "hetero_s4_top8", "num_steps": 4, "top_k": 8, "expert_pool": ["T", "S", "TD", "SD", "TA", "ST", "TL", "SL"]},
+    {"name": "dup12_s1_top8", "num_steps": 1, "top_k": 8, "expert_pool": ["T1", "T2", "S1", "S2", "TD1", "TD2", "SD1", "SD2", "TA1", "TA2", "ST1", "ST2"]},
+    {"name": "dup12_s2_top4", "num_steps": 2, "top_k": 4, "expert_pool": ["T1", "T2", "S1", "S2", "TD1", "TD2", "SD1", "SD2", "TA1", "TA2", "ST1", "ST2"]},
+    {"name": "dup12_s4_top2", "num_steps": 4, "top_k": 2, "expert_pool": ["T1", "T2", "S1", "S2", "TD1", "TD2", "SD1", "SD2", "TA1", "TA2", "ST1", "ST2"]},
+    {"name": "dup12_s4_top8", "num_steps": 4, "top_k": 8, "expert_pool": ["T1", "T2", "S1", "S2", "TD1", "TD2", "SD1", "SD2", "TA1", "TA2", "ST1", "ST2"]}
+  ]
+}

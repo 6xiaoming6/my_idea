@@ -20,6 +20,7 @@ class _CoERoutingTotals:
         self.entropy_sum = None
         self.path_counts: Counter = Counter()
         self.mode = None
+        self.top_k = None
         self.expert_names: tuple[str, ...] | None = None
 
     @torch.no_grad()
@@ -30,16 +31,17 @@ class _CoERoutingTotals:
         probs = coe["route_probs"].detach().double().cpu()
         names = tuple(coe.get("expert_names", ("T", "S")))
         mode = coe["routing_mode"]
+        top_k = int(coe.get("top_k", 1))
         if weights.ndim != 3 or probs.shape != weights.shape or len(names) != weights.shape[-1]:
             raise ValueError("CoE routing tensors must match [batch, steps, len(expert_names)]")
         if len(set(names)) != len(names):
             raise ValueError("CoE expert_names must be unique")
         if self.weight_sum is not None and (
-            names != self.expert_names or mode != self.mode
+            names != self.expert_names or mode != self.mode or top_k != self.top_k
             or weights.shape[1:] != self.weight_sum.shape
         ):
             raise ValueError("CoE routing configuration changed during accumulation")
-        self.mode, self.expert_names = mode, names
+        self.mode, self.expert_names, self.top_k = mode, names, top_k
         if self.weight_sum is None:
             self.weight_sum = torch.zeros_like(weights[0])
             self.probability_sum = torch.zeros_like(probs[0])
@@ -62,6 +64,7 @@ class _CoERoutingTotals:
             "coe_routing_sample_count": float(self.count),
             "coe_num_experts": float(len(self.expert_names)),
             "coe_num_steps": float(self.weight_sum.shape[0]),
+            "coe_top_k": float(self.top_k),
         }
         for step in range(self.weight_sum.shape[0]):
             prefix = f"coe_step{step + 1}"

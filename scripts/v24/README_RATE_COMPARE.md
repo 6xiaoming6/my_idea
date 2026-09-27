@@ -27,7 +27,7 @@ tmux new-session -s v24-rate-compare \
   'python -u scripts/v24/run_rate_compare.py --gpu 0'
 ```
 
-入口会检查 GPU 是否已有计算进程；已存在结果回执的任务会跳过。每个任务的完整训练输出写入 `outputs/v24-COE/experiments/coe_rate_compare/launcher_logs/`，控制台只打印任务开始和完成信息。
+入口会检查 GPU 是否已有计算进程；已存在结果回执的任务会跳过。模型结果按 v14-single 风格写入 `outputs/v24-COE/TaxiBJ/custom/<实验名>/random/rate<rate>/<时间_seed_bs>/`，每个 run 下包含 `config.json`、`logs/` 和 `checkpoints/`。队列配置、结果回执和完整 launcher 输出单独写入 `outputs/v24-COE/experiments/coe_rate_compare/`，控制台只打印任务开始和完成信息。
 
 ## 时间估计
 
@@ -37,4 +37,4 @@ tmux new-session -s v24-rate-compare \
 - A2：每组约 2.7–2.9 小时；4 组约 10.8–11.6 小时
 - 总计约 21.5–23 小时，建议按 25 小时预留
 
-这是单卡串行时间，不包含服务器负载波动；fixed 和 random 的单组时间通常接近。`rate_compare_experiments.json` 和运行脚本会保留完整配置及顺序。
+这是单卡串行时间，不包含服务器负载波动。`rate_compare_experiments.json` 和运行脚本会保留完整配置及顺序。

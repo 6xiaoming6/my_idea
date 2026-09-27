@@ -26,7 +26,16 @@ from .coe_pattern_experts import (
 from .coe_router import GroupedRouter, PreviousExpertRouter, observed_pattern_features
 
 
-SUPPORTED_EXPERT_NAMES = ("T", "S", "TD", "SD", "TA", "ST")
+SUPPORTED_EXPERT_NAMES = ("T", "S", "TD", "SD", "TA", "ST", "TL", "SL")
+
+
+def _expert_kind(name: str) -> str:
+    """Map an instance label (T1, S2, T_A, ...) to its operator kind."""
+    upper = str(name).upper().replace("_", "")
+    for kind in ("TD", "SD", "TA", "ST", "TL", "SL", "T", "S"):
+        if upper == kind or upper.startswith(kind) and upper[len(kind):].isdigit():
+            return kind
+    return upper
 
 
 SUPPORT_FEATURE_NAMES = (
@@ -197,6 +206,8 @@ class TemporalSpatialCoE(nn.Module):
     bypass their unused routing heads. ``expert_state='initial'`` freezes the
     expert input while residual states and router inputs can still evolve.
     ``parallel`` is a single-round, learned soft mixture of initial-state experts.
+    Hard routing supports ``top_k`` simultaneous experts; their clean routing
+    probabilities are renormalized over the selected experts before fusion.
     """
 
     requires_multiscale = False
@@ -235,6 +246,7 @@ class TemporalSpatialCoE(nn.Module):
         global_route_weights: bool = False,
         router_input_noise_std: float = 0.0,
         router_input_noise_steps: int = 0,
+        top_k: int = 1,
     ) -> None:
         super().__init__()
         self.c_in = _positive_int("c_in", c_in)
@@ -247,10 +259,15 @@ class TemporalSpatialCoE(nn.Module):
         self.expert_names = tuple(str(name).upper() for name in expert_pool)
         if len(set(self.expert_names)) != len(self.expert_names):
             raise ValueError("expert_pool must not contain duplicate expert labels")
-        unknown = set(self.expert_names) - set(SUPPORTED_EXPERT_NAMES)
+        unknown = {name for name in self.expert_names if _expert_kind(name) not in SUPPORTED_EXPERT_NAMES}
         if unknown:
             raise ValueError(f"Unknown expert labels: {sorted(unknown)}")
         self.num_experts = len(self.expert_names)
+        if type(top_k) is not int or not 1 <= top_k <= self.num_experts:
+            raise ValueError("top_k must be an integer in [1, len(expert_pool)]")
+        if routing_mode in {"fixed", "parallel"} and top_k != 1:
+            raise ValueError("top_k > 1 is supported only for hard or soft routing")
+        self.top_k = top_k
         temporal_dilation = _positive_int("temporal_dilation", temporal_dilation)
         spatial_dilation = _positive_int("spatial_dilation", spatial_dilation)
         attention_heads = _positive_int("attention_heads", attention_heads)
@@ -364,30 +381,31 @@ class TemporalSpatialCoE(nn.Module):
         # One projection builds the same H/V/M/s/P interface for every expert.
         self.state_projection = nn.Conv3d(2 * dim + 2 * c_in + support_dim, dim, 1)
         self.state_norm = PointwiseLayerNorm(dim)
-        self.temporal_expert = (
-            DirectionalExpert(dim, "temporal", self.temporal_kernel)
-            if "T" in self.expert_names else None
-        )
-        self.spatial_expert = (
-            DirectionalExpert(dim, "spatial", self.spatial_kernel)
-            if "S" in self.expert_names else None
-        )
-        # Keep the legacy T/S module names for existing two-expert checkpoints.
-        # Register only requested additions; no expert is replicated per step.
+        # Every configured label receives its own module. Suffixes such as T1
+        # and T2 deliberately create independent parameter instances.
         self.pattern_experts = nn.ModuleDict()
         for name in self.expert_names:
-            if name == "TD":
+            kind = _expert_kind(name)
+            if kind == "T":
+                self.pattern_experts[name] = DirectionalExpert(dim, "temporal", self.temporal_kernel)
+            elif kind == "S":
+                self.pattern_experts[name] = DirectionalExpert(dim, "spatial", self.spatial_kernel)
+            elif kind == "TD":
                 self.pattern_experts[name] = DilatedDirectionalExpert(
                     dim, "temporal", self.temporal_kernel, temporal_dilation
                 )
-            elif name == "SD":
+            elif kind == "SD":
                 self.pattern_experts[name] = DilatedDirectionalExpert(
                     dim, "spatial", self.spatial_kernel, spatial_dilation
                 )
-            elif name == "TA":
+            elif kind == "TA":
                 self.pattern_experts[name] = TemporalAttentionExpert(dim, attention_heads)
-            elif name == "ST":
+            elif kind == "ST":
                 self.pattern_experts[name] = JointSpatioTemporalExpert(dim)
+            elif kind == "TL":
+                self.pattern_experts[name] = DirectionalExpert(dim, "temporal", self.temporal_kernel + 2)
+            elif kind == "SL":
+                self.pattern_experts[name] = DirectionalExpert(dim, "spatial", self.spatial_kernel + 2)
         self.shared_expert = PointwiseExpert(dim)
         self.decoder = nn.Sequential(
             PointwiseLayerNorm(dim),
@@ -464,6 +482,7 @@ class TemporalSpatialCoE(nn.Module):
             global_route_weights=coe.get("global_route_weights", False),
             router_input_noise_std=coe.get("router_input_noise_std", 0.0),
             router_input_noise_steps=coe.get("router_input_noise_steps", 0),
+            top_k=coe.get("top_k", 1),
         )
 
     def set_routing_epoch(self, epoch: int) -> None:
@@ -482,11 +501,7 @@ class TemporalSpatialCoE(nn.Module):
 
     def routed_experts(self) -> tuple[nn.Module, ...]:
         """Return the registered operators in router-column order."""
-        base = {"T": self.temporal_expert, "S": self.spatial_expert}
-        return tuple(
-            base[name] if name in base else self.pattern_experts[name]
-            for name in self.expert_names
-        )
+        return tuple(self.pattern_experts[name] for name in self.expert_names)
 
     def _position(self, x: torch.Tensor) -> torch.Tensor:
         b, _, t, h, w = x.shape
@@ -669,21 +684,38 @@ class TemporalSpatialCoE(nn.Module):
                 weights = probabilities
                 paths = weights.argmax(dim=-1)
             elif self.training:
-                with torch.autocast(device_type=hidden.device.type, enabled=False) if self.router_fp32 else nullcontext():
+                if self.top_k > 1:
+                    # Top-K keeps only the selected experts and renormalizes
+                    # their clean probabilities. This is a differentiable
+                    # weighted fusion inside a discrete selected set.
                     sample_logits = (logits.float() if self.router_fp32 else logits) / sampling_temperature
-                    if hard_fraction < 1:
-                        soft = uniform_mix / self.num_experts + (1 - uniform_mix) * probabilities
-                        if hard_fraction == 0:
-                            weights = soft
+                    selected = sample_logits.topk(self.top_k, dim=-1).indices
+                    selection_mask = F.one_hot(selected, self.num_experts).any(dim=-2).to(probabilities.dtype)
+                    weights = probabilities * selection_mask
+                    weights = weights / weights.sum(dim=-1, keepdim=True).clamp_min(1e-8)
+                else:
+                    with torch.autocast(device_type=hidden.device.type, enabled=False) if self.router_fp32 else nullcontext():
+                        sample_logits = (logits.float() if self.router_fp32 else logits) / sampling_temperature
+                        if hard_fraction < 1:
+                            soft = uniform_mix / self.num_experts + (1 - uniform_mix) * probabilities
+                            if hard_fraction == 0:
+                                weights = soft
+                            else:
+                                hard = F.gumbel_softmax(sample_logits, tau=self.temperature, hard=True, dim=-1)
+                                weights = (1 - hard_fraction) * soft + hard_fraction * hard
                         else:
-                            hard = F.gumbel_softmax(sample_logits, tau=self.temperature, hard=True, dim=-1)
-                            weights = (1 - hard_fraction) * soft + hard_fraction * hard
-                    else:
-                        weights = F.gumbel_softmax(sample_logits, tau=self.temperature, hard=True, dim=-1)
+                            weights = F.gumbel_softmax(sample_logits, tau=self.temperature, hard=True, dim=-1)
                 paths = weights.argmax(dim=-1)
             else:
-                paths = logits.argmax(dim=-1)
-                weights = F.one_hot(paths, self.num_experts).to(hidden.dtype)
+                if self.top_k > 1:
+                    selected = logits.topk(self.top_k, dim=-1).indices
+                    selection_mask = F.one_hot(selected, self.num_experts).any(dim=-2).to(probabilities.dtype)
+                    weights = probabilities * selection_mask
+                    weights = weights / weights.sum(dim=-1, keepdim=True).clamp_min(1e-8)
+                    paths = weights.argmax(dim=-1)
+                else:
+                    paths = logits.argmax(dim=-1)
+                    weights = F.one_hot(paths, self.num_experts).to(hidden.dtype)
 
             # Recompute this same interface each round in both state variants.
             # Freezing the expert input leaves residual accumulation and router
@@ -697,7 +729,7 @@ class TemporalSpatialCoE(nn.Module):
             if self.use_shared:
                 update = update + self.shared_scale_logits[step].sigmoid() * self.shared_expert(unified)
             if self.use_routed:
-                if self.routing_mode in {"soft", "parallel"} or (self.routing_mode == "hard" and self.training):
+                if self.routing_mode in {"soft", "parallel"} or (self.routing_mode == "hard" and (self.training or self.top_k > 1)):
                     routed_update = torch.zeros_like(unified)
                     for expert_index, expert in enumerate(self.routed_experts()):
                         routed_update = routed_update + (
@@ -772,6 +804,7 @@ class TemporalSpatialCoE(nn.Module):
                 "expert_names": self.expert_names,
                 "num_experts": self.num_experts,
                 "num_steps": self.num_steps,
+                "top_k": self.top_k,
                 "support": support,
                 "support_feature_names": SUPPORT_FEATURE_NAMES,
                 "observation_mask": original_mask,

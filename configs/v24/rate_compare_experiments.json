@@ -1,6 +1,7 @@
 {
   "schema_version": 1,
-  "output_dir": "outputs/v24-COE/experiments/coe_rate_compare",
+  "output_dir": "outputs/v24-COE",
+  "control_dir": "outputs/v24-COE/experiments/coe_rate_compare",
   "dataset": "TaxiBJ",
   "train_npz": "data/TaxiBJ/taxibj_train.npz",
   "val_npz": "data/TaxiBJ/taxibj_val.npz",

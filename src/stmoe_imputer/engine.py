@@ -268,6 +268,8 @@ def train_one_epoch(
     cfg: dict,
     epoch: int,
     scaler: torch.amp.GradScaler | None = None,
+    show_progress: bool = True,
+    total_epochs: int | None = None,
 ) -> dict[str, float]:
     model.train()
     if hasattr(getattr(loader, 'dataset', None), 'set_epoch'):
@@ -293,7 +295,8 @@ def train_one_epoch(
             optimizer._stmoe_grad_scaler = scaler
     scale_start = scaler.get_scale()
     optimizer_steps = seen_samples = skipped_empty_batches = skipped_amp_steps = 0
-    progress = tqdm(loader, desc=f"train epoch {epoch}", leave=True)
+    total_epochs = int(total_epochs or cfg["train"]["epochs"])
+    progress = tqdm(loader, desc=f"train epoch {epoch}/{total_epochs}", leave=True, disable=not show_progress)
     for batch_index, batch in enumerate(progress):
         batch = move_batch_to_device(batch, device)
         if is_coe and not bool(supervision_mask(
