@@ -1,0 +1,50 @@
+-------------------------------------------------------------------------
+ epoch         loss         mae         rmse   train_mae   epoch_s   best
+-------------------------------------------------------------------------
+     2     55.84101     54.7269     103.6021     71.7386      25.9      *
+Best model at epoch 2 (val_mae=54.7269)
+     4     46.11965     45.2844      84.1596     52.4244      26.1      *
+Best model at epoch 4 (val_mae=45.2844)
+     6     42.29936     41.6000      75.6925     47.6262      26.1      *
+Best model at epoch 6 (val_mae=41.6000)
+     8     40.42481     39.7775      71.8787     45.1960      26.1      *
+Best model at epoch 8 (val_mae=39.7775)
+    10     39.19025     38.5978      68.6990     43.1331      26.1      *
+Best model at epoch 10 (val_mae=38.5978)
+    12     38.26514     37.7073      67.2163     41.9979      26.1      *
+Best model at epoch 12 (val_mae=37.7073)
+    14     37.68162     37.1403      66.4107     41.0400      26.1      *
+Best model at epoch 14 (val_mae=37.1403)
+    16     37.19610     36.6642      65.2957     40.4627      26.1      *
+Best model at epoch 16 (val_mae=36.6642)
+    18     37.05929     36.5377      64.9727     40.1302      26.1      *
+Best model at epoch 18 (val_mae=36.5377)
+    20     36.95034     36.4366      64.6844     39.9869      26.1      *
+Best model at epoch 20 (val_mae=36.4366)
+
+------------------------------------------------------------------------------------------------
+Training finished normally: 2026-09-21 10:33:37
+Summary
+  completed_epochs: 20
+  best_epoch: 20
+  best_val_mae: 36.436630
+  val_epoch: 2
+  validation_count: 10
+  final_train_loss: 40.040100
+  final_train_mae: 39.986873
+  final_val_loss: 36.950337
+  final_val_mae: 36.436630
+  total_time: 8m 30s
+  avg_epoch_time_sec: 25.32
+  avg_train_sec_per_step: 0.1573
+  avg_val_sec_per_step: 0.0338
+  peak_memory_gb: 3.57
+  test_loss: 34.418704
+  test_mae: 34.453889
+  test_rmse: 60.684405
+  test_mape: 536249.642959
+  test_time_sec: 3.10
+  best_checkpoint: /home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/v24_coe_depth_s1_top6_random_rate0.4_seed7/random/rate0.4/20260921_102506_seed7_bs16/checkpoints/best.pt
+  best_state_source: checkpoint
+  metrics_jsonl: /home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/v24_coe_depth_s1_top6_random_rate0.4_seed7/random/rate0.4/20260921_102506_seed7_bs16/logs/metrics.jsonl
+------------------------------------------------------------------------------------------------

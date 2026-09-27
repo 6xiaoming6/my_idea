@@ -1,0 +1,50 @@
+-------------------------------------------------------------------------
+ epoch         loss         mae         rmse   train_mae   epoch_s   best
+-------------------------------------------------------------------------
+     2     35.69798     35.1331      85.1298     56.5961      92.9      *
+Best model at epoch 2 (val_mae=35.1331)
+     4     18.22005     17.9065      48.0587     22.6685      92.9      *
+Best model at epoch 4 (val_mae=17.9065)
+     6     11.23489     11.0408      29.1802     14.0125      92.4      *
+Best model at epoch 6 (val_mae=11.0408)
+     8      9.54743      9.4019      21.4369     11.0826      92.4      *
+Best model at epoch 8 (val_mae=9.4019)
+    10      8.75262      8.6283      17.6896      9.8842      92.4      *
+Best model at epoch 10 (val_mae=8.6283)
+    12      8.54794      8.4320      16.0056      9.3156      92.4      *
+Best model at epoch 12 (val_mae=8.4320)
+    14      8.31058      8.1982      14.8911      8.9988      92.4      *
+Best model at epoch 14 (val_mae=8.1982)
+    16      8.19094      8.0813      14.3134      8.8189      92.4      *
+Best model at epoch 16 (val_mae=8.0813)
+    18      8.14581      8.0373      14.0458      8.7263      92.4      *
+Best model at epoch 18 (val_mae=8.0373)
+    20      8.13164      8.0236      13.9736      8.6909      92.4      *
+Best model at epoch 20 (val_mae=8.0236)
+
+------------------------------------------------------------------------------------------------
+Training finished normally: 2026-09-18 21:23:37
+Summary
+  completed_epochs: 20
+  best_epoch: 20
+  best_val_mae: 8.023560
+  val_epoch: 2
+  validation_count: 10
+  final_train_loss: 8.739576
+  final_train_mae: 8.690890
+  final_val_loss: 8.131637
+  final_val_mae: 8.023560
+  total_time: 30m 38s
+  avg_epoch_time_sec: 91.71
+  avg_train_sec_per_step: 0.5903
+  avg_val_sec_per_step: 0.0362
+  peak_memory_gb: 12.08
+  test_loss: 7.564967
+  test_mae: 7.532643
+  test_rmse: 12.623161
+  test_mape: 24856.610828
+  test_time_sec: 3.28
+  best_checkpoint: n/a
+  best_state_source: cpu_memory
+  metrics_jsonl: /home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/experiments/coe_dual_mask/coe_dual_mask/fbea2a35caf9bf06/runs/v24_coe_dual_mask_coe_main_original_random_rate0.4_updates_seed7/TaxiBJ/custom/v24_coe_dual_mask_coe_main_original_random_rate0.4_updates_seed7/random/rate0.4/20260918_205257_seed7_bs16/logs/metrics.jsonl
+------------------------------------------------------------------------------------------------

@@ -1,0 +1,8 @@
+{
+  "model": {
+    "coe": {
+      "pair_mode": "additive",
+      "router_hidden_dim": 68
+    }
+  }
+}

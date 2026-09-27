@@ -1,0 +1,31 @@
+-------------------------------------------------------------------------
+ epoch         loss         mae         rmse   train_mae   epoch_s   best
+-------------------------------------------------------------------------
+     1      0.80944      0.8094       0.9834      0.8407       0.0      *
+Best model at epoch 1 (val_mae=0.8094)
+
+------------------------------------------------------------------------------------------------
+Training finished normally: 2026-09-17 14:28:16
+Summary
+  completed_epochs: 1
+  best_epoch: 1
+  best_val_mae: 0.809441
+  val_epoch: 1
+  validation_count: 1
+  final_train_loss: 0.840659
+  final_train_mae: 0.840659
+  final_val_loss: 0.809441
+  final_val_mae: 0.809441
+  total_time: 0.1s
+  avg_epoch_time_sec: 0.04
+  avg_train_sec_per_step: 0.0079
+  avg_val_sec_per_step: 0.0025
+  peak_memory_gb: 0.00
+  test_loss: 0.794116
+  test_mae: 0.794116
+  test_rmse: 0.974971
+  test_mape: 2.966823
+  test_time_sec: 0.01
+  best_checkpoint: /home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/Synthetic/custom/v24_section13_parallel_smoke/random/rate0.45/20260917_142816_seed7_bs2/checkpoints/best.pt
+  metrics_jsonl: /home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/Synthetic/custom/v24_section13_parallel_smoke/random/rate0.45/20260917_142816_seed7_bs2/logs/metrics.jsonl
+------------------------------------------------------------------------------------------------

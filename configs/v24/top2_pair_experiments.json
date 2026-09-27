@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "stage": "coe_top2_pair",
+  "output_dir": "outputs/v24-COE",
+  "control_dir": "outputs/v24-COE/experiments/coe_top2_pair",
+  "dataset": "TaxiBJ",
+  "train_npz": "data/TaxiBJ/taxibj_train.npz",
+  "val_npz": "data/TaxiBJ/taxibj_val.npz",
+  "test_npz": "data/TaxiBJ/taxibj_test.npz",
+  "base_config": "configs/v24/coe_main_base.json",
+  "seed": 7,
+  "epochs": 30,
+  "val_epoch": 2,
+  "batch_size": 16,
+  "save_best_checkpoint": false,
+  "scheduler": {
+    "type": "cosine",
+    "total_epochs": 30,
+    "eta_min": 1e-06
+  },
+  "early_stopping": {
+    "enabled": false
+  },
+  "variants": [
+    {
+      "name": "pair_s3_e6_top2",
+      "num_steps": 3,
+      "top_k": 2,
+      "expert_pool": [
+        "T",
+        "S",
+        "TD",
+        "SD",
+        "TA",
+        "ST"
+      ]
+    },
+    {
+      "name": "pair_s4_e8_top2",
+      "num_steps": 4,
+      "top_k": 2,
+      "expert_pool": [
+        "T",
+        "S",
+        "TD",
+        "SD",
+        "TA",
+        "ST",
+        "TL",
+        "SL"
+      ]
+    }
+  ]
+}

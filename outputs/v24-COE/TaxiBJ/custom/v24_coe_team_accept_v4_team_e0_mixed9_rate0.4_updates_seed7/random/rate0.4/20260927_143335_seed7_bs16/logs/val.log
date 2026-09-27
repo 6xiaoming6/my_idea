@@ -1,0 +1,75 @@
+-------------------------------------------------------------------------
+ epoch         loss         mae         rmse   train_mae   epoch_s   best
+-------------------------------------------------------------------------
+     2     64.01070     63.2733     116.8059     80.2596      76.6      *
+Best model at epoch 2 (val_mae=63.2733)
+     4     51.67743     51.1388      96.1439     60.5881      76.8      *
+Best model at epoch 4 (val_mae=51.1388)
+     6     46.65433     46.2465      83.9155     52.6461      76.9      *
+Best model at epoch 6 (val_mae=46.2465)
+     8     42.11665     41.7372      79.2292     48.4457      76.9      *
+Best model at epoch 8 (val_mae=41.7372)
+    10     40.26079     39.9217      75.0622     44.7942      76.9      *
+Best model at epoch 10 (val_mae=39.9217)
+    12     40.90522     40.4964      76.3577     43.4357      76.9       
+    14     36.50229     36.2941      67.5010     41.2017      76.9      *
+Best model at epoch 14 (val_mae=36.2941)
+    16     35.74470     35.5304      65.6844     39.7323      77.0      *
+Best model at epoch 16 (val_mae=35.5304)
+    18     37.31033     36.9744      68.9508     38.4308      77.0       
+    20     33.98451     33.7741      61.4580     36.2755      76.9      *
+Best model at epoch 20 (val_mae=33.7741)
+    22     33.10698     32.8966      59.8269     35.1960      77.0      *
+Best model at epoch 22 (val_mae=32.8966)
+    24     31.44453     31.2895      55.9589     33.6202      76.9      *
+Best model at epoch 24 (val_mae=31.2895)
+    26     31.58558     31.4309      55.8008     32.8113      76.9       
+    28     29.74459     29.5802      52.6631     31.9775      77.0      *
+Best model at epoch 28 (val_mae=29.5802)
+    30     29.36967     29.1760      51.4215     31.1230      77.0      *
+Best model at epoch 30 (val_mae=29.1760)
+    32     28.61224     28.4358      50.2661     30.3723      77.0      *
+Best model at epoch 32 (val_mae=28.4358)
+    34     28.48705     28.3180      49.4095     30.1386      76.9      *
+Best model at epoch 34 (val_mae=28.3180)
+    36     28.46637     28.3127      49.4038     29.9828      77.0      *
+Best model at epoch 36 (val_mae=28.3127)
+    38     28.27729     28.1441      49.5777     29.4151      76.9      *
+Best model at epoch 38 (val_mae=28.1441)
+    40     28.30211     28.1536      49.3278     28.7482      76.9       
+    42     27.94564     27.7823      48.8760     28.7977      76.9      *
+Best model at epoch 42 (val_mae=27.7823)
+    44     27.46698     27.3077      47.7447     28.9121      76.9      *
+Best model at epoch 44 (val_mae=27.3077)
+    46     27.47992     27.3162      47.7306     28.5531      76.9       
+    48     27.38913     27.2326      47.5826     28.4601      76.9      *
+Best model at epoch 48 (val_mae=27.2326)
+    50     27.36795     27.2124      47.5293     28.4719      76.9      *
+Best model at epoch 50 (val_mae=27.2124)
+
+------------------------------------------------------------------------------------------------
+Training finished normally: 2026-09-27 15:35:55
+Summary
+  completed_epochs: 50
+  best_epoch: 50
+  best_val_mae: 27.212383
+  val_epoch: 2
+  validation_count: 25
+  final_train_loss: 28.519038
+  final_train_mae: 28.471903
+  final_val_loss: 27.367954
+  final_val_mae: 27.212383
+  total_time: 1h 2m 19s
+  avg_epoch_time_sec: 74.58
+  avg_train_sec_per_step: 0.4691
+  avg_val_sec_per_step: 0.1063
+  peak_memory_gb: 9.48
+  test_loss: 25.731371
+  test_mae: 25.810147
+  test_rmse: 44.514107
+  test_mape: 313695.094260
+  test_time_sec: 9.64
+  best_checkpoint: /home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/v24_coe_team_accept_v4_team_e0_mixed9_rate0.4_updates_seed7/random/rate0.4/20260927_143335_seed7_bs16/checkpoints/best.pt
+  best_state_source: checkpoint
+  metrics_jsonl: /home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/v24_coe_team_accept_v4_team_e0_mixed9_rate0.4_updates_seed7/random/rate0.4/20260927_143335_seed7_bs16/logs/metrics.jsonl
+------------------------------------------------------------------------------------------------

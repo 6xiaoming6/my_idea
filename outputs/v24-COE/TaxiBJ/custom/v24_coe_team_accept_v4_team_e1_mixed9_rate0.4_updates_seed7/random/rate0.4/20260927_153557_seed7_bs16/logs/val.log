@@ -1,0 +1,77 @@
+-------------------------------------------------------------------------
+ epoch         loss         mae         rmse   train_mae   epoch_s   best
+-------------------------------------------------------------------------
+     2     64.07349     63.2897     118.0317     78.7584      76.1      *
+Best model at epoch 2 (val_mae=63.2897)
+     4     54.89384     54.4353      96.0047     59.7881      76.2      *
+Best model at epoch 4 (val_mae=54.4353)
+     6     45.05946     44.6013      83.7262     52.0899      76.2      *
+Best model at epoch 6 (val_mae=44.6013)
+     8     40.88445     40.4670      77.9793     47.0744      76.2      *
+Best model at epoch 8 (val_mae=40.4670)
+    10     38.96672     38.6265      72.0912     42.8551      76.2      *
+Best model at epoch 10 (val_mae=38.6265)
+    12     36.88624     36.5406      70.2194     40.2584      76.2      *
+Best model at epoch 12 (val_mae=36.5406)
+    14     34.76191     34.4865      64.3197     38.3218      76.2      *
+Best model at epoch 14 (val_mae=34.4865)
+    16     33.58144     33.3621      61.7145     37.3307      76.2      *
+Best model at epoch 16 (val_mae=33.3621)
+    18     33.40573     33.1874      61.1177     36.3290      76.2      *
+Best model at epoch 18 (val_mae=33.1874)
+    20     32.65231     32.4482      59.1593     35.1150      76.2      *
+Best model at epoch 20 (val_mae=32.4482)
+    22     32.46223     32.2991      57.9868     33.9312      76.2      *
+Best model at epoch 22 (val_mae=32.2991)
+    24     31.32489     31.1631      56.5128     33.2053      76.2      *
+Best model at epoch 24 (val_mae=31.1631)
+    26     31.25576     31.0442      56.1184     32.8799      76.3      *
+Best model at epoch 26 (val_mae=31.0442)
+    28     31.31107     31.0685      55.7701     32.3513      76.1       
+    30     30.00325     29.8251      53.5223     31.4336      76.2      *
+Best model at epoch 30 (val_mae=29.8251)
+    32     29.44223     29.2522      52.5108     31.0778      76.2      *
+Best model at epoch 32 (val_mae=29.2522)
+    34     29.16882     28.9848      51.2789     30.7796      76.2      *
+Best model at epoch 34 (val_mae=28.9848)
+    36     28.97450     28.8033      51.2253     30.5225      76.2      *
+Best model at epoch 36 (val_mae=28.8033)
+    38     28.43986     28.2844      50.4699     29.8369      76.2      *
+Best model at epoch 38 (val_mae=28.2844)
+    40     28.48670     28.3411      50.3934     29.2833      76.2       
+    42     28.14849     27.9754      49.9365     29.3442      76.2      *
+Best model at epoch 42 (val_mae=27.9754)
+    44     28.12698     27.9814      49.8383     29.7049      76.2       
+    46     28.13271     27.9601      49.7489     29.2352      76.3      *
+Best model at epoch 46 (val_mae=27.9601)
+    48     28.02135     27.8574      49.5521     28.9688      76.3      *
+Best model at epoch 48 (val_mae=27.8574)
+    50     27.96699     27.8054      49.4730     29.2539      76.2      *
+Best model at epoch 50 (val_mae=27.8054)
+
+------------------------------------------------------------------------------------------------
+Training finished normally: 2026-09-27 16:37:42
+Summary
+  completed_epochs: 50
+  best_epoch: 50
+  best_val_mae: 27.805399
+  val_epoch: 2
+  validation_count: 25
+  final_train_loss: 29.317415
+  final_train_mae: 29.253893
+  final_val_loss: 27.966985
+  final_val_mae: 27.805399
+  total_time: 1h 1m 44s
+  avg_epoch_time_sec: 73.88
+  avg_train_sec_per_step: 0.4646
+  avg_val_sec_per_step: 0.1061
+  peak_memory_gb: 9.48
+  test_loss: 26.257080
+  test_mae: 26.315248
+  test_rmse: 46.092970
+  test_mape: 336386.817329
+  test_time_sec: 9.64
+  best_checkpoint: /home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/v24_coe_team_accept_v4_team_e1_mixed9_rate0.4_updates_seed7/random/rate0.4/20260927_153557_seed7_bs16/checkpoints/best.pt
+  best_state_source: checkpoint
+  metrics_jsonl: /home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/v24_coe_team_accept_v4_team_e1_mixed9_rate0.4_updates_seed7/random/rate0.4/20260927_153557_seed7_bs16/logs/metrics.jsonl
+------------------------------------------------------------------------------------------------

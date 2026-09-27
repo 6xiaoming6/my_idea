@@ -15,7 +15,7 @@
   },
   "studies": {
     "pilot": {
-      "base_config": "configs/v24/bikenyc.json",
+      "base_config": "configs/v24/bikenyc_legacy_csv.json",
       "stage": "pilot",
       "sources": {
         "train": "data/BikeNYC/bikenyc_train.npz",
@@ -31,7 +31,7 @@
       ]
     },
     "core": {
-      "base_config": "configs/v24/bikenyc.json",
+      "base_config": "configs/v24/bikenyc_legacy_csv.json",
       "stage": "core",
       "sources": {
         "train": "data/BikeNYC/bikenyc_train.npz",

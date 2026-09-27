@@ -1,0 +1,260 @@
+Training started: 2026-09-17 16:44:52
+------------------------------------------------------------------------------------------------
+Run
+  run_dir: /home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/experiments/core/08fc9d8d37df089e/runs/v24_core_fixed_tt_mixed_rate0.4_updates_seed7/BikeNYC/custom/v24_core_fixed_tt_mixed_rate0.4_updates_seed7/random/rate0.4/20260917_164452_seed7_bs16
+  command: /home/students/HuangMingYu/code/py/my_idea/my_idea/scripts/train.py -c /home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/experiments/core/08fc9d8d37df089e/configs/v24_core_fixed_tt_mixed_rate0.4_updates_seed7.json --no_plot --name v24_core_fixed_tt_mixed_rate0.4_updates_seed7 --train_npz /home/students/HuangMingYu/code/py/my_idea/my_idea/data/BikeNYC/bikenyc_train.npz --val_npz /home/students/HuangMingYu/code/py/my_idea/my_idea/data/BikeNYC/bikenyc_val.npz --test_npz /home/students/HuangMingYu/code/py/my_idea/my_idea/data/BikeNYC/bikenyc_test.npz --result-file /home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/experiments/core/08fc9d8d37df089e/results/v24_core_fixed_tt_mixed_rate0.4_updates_seed7.attempt1.json
+  git_commit: 1f348d420b22878eff7be96a61567a5be410fd0e
+  git_branch: v24-COE
+  git_dirty: True
+  config_sha256: 175d0d28d5efd8d90f183ec18f7a9401da06a54c4ae7909de15256c4c412553c
+  python: 3.9.25
+  torch: 2.6.0+cu124
+  cuda_runtime: 12.4
+  train_npz: /home/students/HuangMingYu/code/py/my_idea/my_idea/data/BikeNYC/bikenyc_train.npz
+  val_npz: /home/students/HuangMingYu/code/py/my_idea/my_idea/data/BikeNYC/bikenyc_val.npz
+  test_npz: /home/students/HuangMingYu/code/py/my_idea/my_idea/data/BikeNYC/bikenyc_test.npz
+  dataset: BikeNYC
+  experiment_type: custom
+  variant: v24_core_fixed_tt_mixed_rate0.4_updates_seed7
+  train_samples: 511
+  val_samples: 73
+  train_steps_per_epoch: 32
+  val_steps_per_epoch: 5
+  test_samples: 147
+  test_steps: 10
+  batch_size: 16
+  mask_pattern: random
+  mask_rate_config: 0.4
+  train_mask: shape=(511, 1, 12, 24, 12), observed_rate=0.6004, missing_rate=0.3996
+  val_mask: shape=(73, 1, 12, 24, 12), observed_rate=0.6004, missing_rate=0.3996
+  data_shape: (511, 2, 12, 24, 12)
+  device: cuda
+  device_name: NVIDIA GeForce RTX 3090
+  total_params: 91,571
+  trainable_params: 91,571
+Config
+{
+  "seed": 7,
+  "output_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/experiments/core/08fc9d8d37df089e/runs/v24_core_fixed_tt_mixed_rate0.4_updates_seed7",
+  "device": "auto",
+  "data": {
+    "dataset_name": "BikeNYC",
+    "batch_size": 16,
+    "num_workers": 0,
+    "pin_memory": true,
+    "drop_last": false,
+    "mask": {
+      "pattern": "random",
+      "missing_rate": 0.4,
+      "train_csv": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/section13/bikenyc_masks_seed2026/mixed/0.4/train.csv",
+      "val_csv": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/section13/bikenyc_masks_seed2026/mixed/0.4/val.csv",
+      "test_csv": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/section13/bikenyc_masks_seed2026/mixed/0.4/test.csv"
+    },
+    "synthetic": {
+      "num_train": 128,
+      "num_val": 32,
+      "t": 12,
+      "h": 24,
+      "w": 12
+    },
+    "multiscale": false
+  },
+  "model": {
+    "architecture": "v24_ts_coe",
+    "c_in": 2,
+    "main": {
+      "dim": 64,
+      "max_t": 12,
+      "h": 24,
+      "w": 12,
+      "scale_mode": "fine",
+      "use_multiscale": false
+    },
+    "coe": {
+      "num_steps": 2,
+      "routing_mode": "fixed",
+      "fixed_path": [
+        "T",
+        "T"
+      ],
+      "router_state": "dynamic",
+      "use_shared": true,
+      "use_routed": true,
+      "temperature": 1.0,
+      "temporal_kernel": 3,
+      "spatial_kernel": 3,
+      "residual_init": 0.1,
+      "expert_pool": [
+        "T",
+        "S"
+      ],
+      "expert_state": "dynamic"
+    },
+    "aux": {
+      "enabled": false,
+      "alpha_init": 0.0
+    }
+  },
+  "loss": {
+    "type": "l1",
+    "lambda_coe_mid": 0,
+    "lambda_coe_balance": 0
+  },
+  "train": {
+    "epochs": 80,
+    "val_epoch": 2,
+    "lr_main": 0.001,
+    "weight_decay": 0.0001,
+    "grad_clip_norm": 1.0,
+    "amp": true,
+    "save_every": 10,
+    "scheduler": {
+      "type": "cosine",
+      "eta_min": 1e-06
+    },
+    "early_stopping": {
+      "enabled": false,
+      "monitor": "val_mae",
+      "patience": 15,
+      "mode": "min"
+    },
+    "save_best_checkpoint": false
+  },
+  "experiment_plan": {
+    "stage": "core",
+    "variant": "fixed_tt",
+    "protocol": "mixed_rate0.4",
+    "protocol_kind": "structured_csv",
+    "budget_regime": "updates",
+    "mask_metadata": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/section13/bikenyc_masks_seed2026/mixed/0.4/metadata.json"
+  },
+  "experiment_suite_fingerprint": "08fc9d8d37df089e074c1f54d84eabb0c7699555c5d348e61134aa3b4ddc48c2"
+}
+------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------
+ epoch         loss         mae         rmse     val_mae          lr   train_s    val_s   epoch_s   mem_gb   best
+-----------------------------------------------------------------------------------------------------------------
+     1     10.39643     10.3913      31.0181           -    1.00e-03       1.2      0.0       1.2     0.61       
+     2      9.87319      9.8750      30.1742     11.2707    1.00e-03       0.8      0.1       0.9     0.61      *
+Best model at epoch 2 (val_mae=11.2707)
+     3      9.34877      9.3489      29.1327           -    9.98e-04       0.8      0.0       0.8     0.61       
+     4      9.05353      9.0470      28.3431     10.6076    9.97e-04       0.8      0.1       0.9     0.61      *
+Best model at epoch 4 (val_mae=10.6076)
+     5      8.78731      8.7883      27.6139           -    9.94e-04       0.8      0.0       0.8     0.61       
+     6      8.57696      8.5797      27.0068     10.2363    9.90e-04       0.8      0.1       0.9     0.61      *
+Best model at epoch 6 (val_mae=10.2363)
+     7      8.39338      8.3957      26.4090           -    9.86e-04       0.8      0.0       0.8     0.61       
+     8      8.11249      8.1138      25.6694      9.5329    9.81e-04       0.8      0.1       0.9     0.61      *
+Best model at epoch 8 (val_mae=9.5329)
+     9      7.94228      7.9420      24.8948           -    9.76e-04       0.8      0.0       0.8     0.61       
+    10      7.77157      7.7705      24.4644      9.1740    9.69e-04       0.8      0.1       0.9     0.61      *
+Best model at epoch 10 (val_mae=9.1740)
+    11      7.70724      7.7054      23.9773           -    9.62e-04       0.8      0.0       0.8     0.61       
+    12      7.61081      7.6108      23.7580      9.4208    9.54e-04       0.8      0.1       0.9     0.61       
+    13      7.50952      7.5080      23.3997           -    9.46e-04       0.8      0.0       0.8     0.61       
+    14      7.48327      7.4853      23.1813      8.8482    9.36e-04       0.8      0.1       0.9     0.61      *
+Best model at epoch 14 (val_mae=8.8482)
+    15      7.36150      7.3633      22.8801           -    9.26e-04       0.8      0.0       0.8     0.61       
+    16      7.29863      7.2972      22.5250      8.7512    9.16e-04       0.8      0.1       0.9     0.61      *
+Best model at epoch 16 (val_mae=8.7512)
+    17      7.22282      7.2228      22.4256           -    9.05e-04       0.8      0.0       0.8     0.61       
+    18      7.22913      7.2292      22.3763      8.6273    8.93e-04       0.8      0.1       0.9     0.61      *
+Best model at epoch 18 (val_mae=8.6273)
+    19      7.09866      7.0984      21.8266           -    8.80e-04       0.8      0.0       0.8     0.61       
+    20      7.06740      7.0703      21.5602      8.4426    8.67e-04       0.8      0.1       0.9     0.61      *
+Best model at epoch 20 (val_mae=8.4426)
+    21      7.08886      7.0872      21.5939           -    8.54e-04       0.8      0.0       0.8     0.61       
+    22      7.14438      7.1436      21.7540      8.4669    8.40e-04       0.8      0.1       0.9     0.61       
+    23      7.03799      7.0366      21.3887           -    8.25e-04       0.8      0.0       0.8     0.61       
+    24      6.94542      6.9467      21.2844      8.4454    8.10e-04       0.8      0.1       0.9     0.61       
+    25      6.98015      6.9787      21.1486           -    7.94e-04       0.8      0.0       0.8     0.61       
+    26      6.92321      6.9243      21.2160      8.6102    7.78e-04       0.8      0.1       0.9     0.61       
+    27      7.01463      7.0140      21.5874           -    7.61e-04       0.8      0.0       0.8     0.61       
+    28      6.90946      6.9060      21.1563      8.2726    7.45e-04       0.8      0.1       0.9     0.61      *
+Best model at epoch 28 (val_mae=8.2726)
+    29      6.85411      6.8512      20.8293           -    7.27e-04       0.8      0.0       0.8     0.61       
+    30      6.78208      6.7824      20.7870      8.2044    7.10e-04       0.8      0.1       0.9     0.61      *
+Best model at epoch 30 (val_mae=8.2044)
+    31      6.79202      6.7887      20.7115           -    6.92e-04       0.8      0.0       0.8     0.61       
+    32      6.76912      6.7658      20.5817      8.1417    6.73e-04       0.8      0.1       0.9     0.61      *
+Best model at epoch 32 (val_mae=8.1417)
+    33      6.71231      6.7142      20.3872           -    6.55e-04       0.8      0.0       0.8     0.61       
+    34      6.81607      6.8170      20.8772      8.0546    6.36e-04       0.8      0.1       0.9     0.61      *
+Best model at epoch 34 (val_mae=8.0546)
+    35      6.71412      6.7159      20.5415           -    6.17e-04       0.8      0.0       0.8     0.61       
+    36      6.78964      6.7922      20.5581      8.0567    5.98e-04       0.8      0.1       0.9     0.61       
+    37      6.68047      6.6801      20.2971           -    5.79e-04       0.8      0.0       0.8     0.61       
+    38      6.64228      6.6436      20.3711      7.8701    5.59e-04       0.8      0.1       0.9     0.61      *
+Best model at epoch 38 (val_mae=7.8701)
+    39      6.64230      6.6397      20.3022           -    5.40e-04       0.8      0.0       0.8     0.61       
+    40      6.62730      6.6283      20.3686      8.0130    5.20e-04       0.8      0.1       0.9     0.61       
+    41      6.60968      6.6091      20.2923           -    5.01e-04       0.8      0.0       0.8     0.61       
+    42      6.61395      6.6164      20.2691      7.9764    4.81e-04       0.8      0.1       0.9     0.61       
+    43      6.60880      6.6089      20.3417           -    4.61e-04       0.8      0.0       0.8     0.61       
+    44      6.58664      6.5855      20.1698      7.9183    4.42e-04       0.8      0.1       0.9     0.61       
+    45      6.54002      6.5381      20.0637           -    4.22e-04       0.8      0.0       0.8     0.61       
+    46      6.57463      6.5752      20.0548      7.9024    4.03e-04       0.8      0.1       0.9     0.61       
+    47      6.60356      6.6046      20.2674           -    3.84e-04       0.8      0.0       0.8     0.61       
+    48      6.59582      6.5953      20.2076      7.9284    3.65e-04       0.8      0.1       0.9     0.61       
+    49      6.54743      6.5464      20.0403           -    3.46e-04       0.8      0.0       0.8     0.61       
+    50      6.53151      6.5315      20.0746      7.8113    3.28e-04       0.8      0.1       0.9     0.61      *
+Best model at epoch 50 (val_mae=7.8113)
+    51      6.53211      6.5290      19.9910           -    3.09e-04       0.8      0.0       0.8     0.61       
+    52      6.55028      6.5494      19.9576      7.9599    2.91e-04       0.8      0.1       0.9     0.61       
+    53      6.53944      6.5407      20.2119           -    2.74e-04       0.8      0.0       0.8     0.61       
+    54      6.50744      6.5050      20.2320      7.8132    2.56e-04       0.8      0.1       0.9     0.61       
+    55      6.50561      6.4972      19.9358           -    2.40e-04       0.8      0.0       0.8     0.61       
+    56      6.55459      6.5557      20.2512      7.8922    2.23e-04       0.8      0.1       0.9     0.61       
+    57      6.49233      6.4963      19.9941           -    2.07e-04       0.8      0.0       0.8     0.61       
+    58      6.48897      6.4863      20.1189      7.7638    1.91e-04       0.8      0.1       0.9     0.61      *
+Best model at epoch 58 (val_mae=7.7638)
+    59      6.47297      6.4753      19.8157           -    1.76e-04       0.8      0.0       0.8     0.61       
+    60      6.46924      6.4692      19.9182      7.7955    1.61e-04       0.8      0.1       0.9     0.61       
+    61      6.44384      6.4427      19.8269           -    1.47e-04       0.8      0.0       0.8     0.61       
+    62      6.46850      6.4676      19.6791      7.7323    1.34e-04       0.8      0.1       0.9     0.61      *
+Best model at epoch 62 (val_mae=7.7323)
+    63      6.45718      6.4557      19.8788           -    1.21e-04       0.8      0.0       0.8     0.61       
+    64      6.45050      6.4514      19.9350      7.8265    1.08e-04       0.8      0.1       0.9     0.61       
+    65      6.46127      6.4612      20.0211           -    9.64e-05       0.8      0.0       0.8     0.61       
+    66      6.43506      6.4371      19.7740      7.7427    8.52e-05       0.8      0.1       0.9     0.61       
+    67      6.43169      6.4313      19.7828           -    7.46e-05       0.8      0.0       0.8     0.61       
+    68      6.42869      6.4307      19.7853      7.7392    6.47e-05       0.8      0.1       0.9     0.61       
+    69      6.42922      6.4287      19.8775           -    5.54e-05       0.8      0.0       0.8     0.61       
+    70      6.42567      6.4279      19.9017      7.7547    4.69e-05       0.8      0.1       0.9     0.61       
+    71      6.42103      6.4222      19.9206           -    3.90e-05       0.8      0.0       0.8     0.61       
+    72      6.43945      6.4410      19.6657      7.7347    3.19e-05       0.8      0.1       0.9     0.61       
+    73      6.42076      6.4243      19.8091           -    2.54e-05       0.8      0.0       0.8     0.61       
+    74      6.41873      6.4223      19.7940      7.7339    1.98e-05       0.8      0.1       0.9     0.61       
+    75      6.42143      6.4197      19.8437           -    1.48e-05       0.8      0.0       0.8     0.61       
+    76      6.41559      6.4180      19.8398      7.7491    1.06e-05       0.8      0.1       0.9     0.61       
+    77      6.41421      6.4150      19.8039           -    7.15e-06       0.8      0.0       0.8     0.61       
+    78      6.41362      6.4138      19.8104      7.7469    4.46e-06       0.8      0.1       0.9     0.61       
+    79      6.41364      6.4131      19.8004           -    2.54e-06       0.8      0.0       0.8     0.61       
+    80      6.41121      6.4128      19.7933      7.7437    1.39e-06       0.8      0.1       0.9     0.61       
+
+------------------------------------------------------------------------------------------------
+Training finished normally: 2026-09-17 16:46:02
+Summary
+  completed_epochs: 80
+  best_epoch: 62
+  best_val_mae: 7.732289
+  val_epoch: 2
+  validation_count: 40
+  final_train_loss: 6.411211
+  final_train_mae: 6.412788
+  final_val_loss: 7.741090
+  final_val_mae: 7.743709
+  total_time: 1m 9s
+  avg_epoch_time_sec: 0.86
+  avg_train_sec_per_step: 0.0261
+  avg_val_sec_per_step: 0.0058
+  peak_memory_gb: 0.61
+  test_loss: 7.300745
+  test_mae: 7.405923
+  test_rmse: 23.399921
+  test_mape: 259249.524590
+  test_time_sec: 0.12
+  best_checkpoint: n/a
+  best_state_source: cpu_memory
+  metrics_jsonl: /home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/experiments/core/08fc9d8d37df089e/runs/v24_core_fixed_tt_mixed_rate0.4_updates_seed7/BikeNYC/custom/v24_core_fixed_tt_mixed_rate0.4_updates_seed7/random/rate0.4/20260917_164452_seed7_bs16/logs/metrics.jsonl
+------------------------------------------------------------------------------------------------

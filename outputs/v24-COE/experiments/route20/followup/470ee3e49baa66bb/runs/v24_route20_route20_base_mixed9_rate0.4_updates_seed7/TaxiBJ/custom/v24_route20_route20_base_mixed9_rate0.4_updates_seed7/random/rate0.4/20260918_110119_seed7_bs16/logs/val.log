@@ -1,0 +1,50 @@
+-------------------------------------------------------------------------
+ epoch         loss         mae         rmse   train_mae   epoch_s   best
+-------------------------------------------------------------------------
+     2     66.00462     65.2769     117.1479     80.4858      95.7      *
+Best model at epoch 2 (val_mae=65.2769)
+     4     57.83974     57.3754     100.0288     66.1398      95.7      *
+Best model at epoch 4 (val_mae=57.3754)
+     6     57.49645     57.2195      94.1129     58.4439      95.7      *
+Best model at epoch 6 (val_mae=57.2195)
+     8     47.82219     47.4590      89.0616     54.1412      95.8      *
+Best model at epoch 8 (val_mae=47.4590)
+    10     46.26814     45.9170      86.7806     51.5869      95.8      *
+Best model at epoch 10 (val_mae=45.9170)
+    12     45.37535     45.0614      85.6366     50.2732      95.8      *
+Best model at epoch 12 (val_mae=45.0614)
+    14     44.85646     44.5705      80.4311     49.0608      95.7      *
+Best model at epoch 14 (val_mae=44.5705)
+    16     44.19298     43.9020      81.6009     48.6781      95.7      *
+Best model at epoch 16 (val_mae=43.9020)
+    18     44.02636     43.7271      80.1310     48.1711      95.7      *
+Best model at epoch 18 (val_mae=43.7271)
+    20     43.80306     43.5211      80.6828     47.5627      95.8      *
+Best model at epoch 20 (val_mae=43.5211)
+
+------------------------------------------------------------------------------------------------
+Training finished normally: 2026-09-18 11:33:00
+Summary
+  completed_epochs: 20
+  best_epoch: 20
+  best_val_mae: 43.521118
+  val_epoch: 2
+  validation_count: 10
+  final_train_loss: 47.628492
+  final_train_mae: 47.562717
+  final_val_loss: 43.803056
+  final_val_mae: 43.521118
+  total_time: 31m 39s
+  avg_epoch_time_sec: 94.74
+  avg_train_sec_per_step: 0.6087
+  avg_val_sec_per_step: 0.0453
+  peak_memory_gb: 12.08
+  test_loss: 41.143764
+  test_mae: 41.450010
+  test_rmse: 76.496674
+  test_mape: 533360.926787
+  test_time_sec: 4.11
+  best_checkpoint: /home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/experiments/route20/followup/470ee3e49baa66bb/runs/v24_route20_route20_base_mixed9_rate0.4_updates_seed7/TaxiBJ/custom/v24_route20_route20_base_mixed9_rate0.4_updates_seed7/random/rate0.4/20260918_110119_seed7_bs16/checkpoints/best.pt
+  best_state_source: checkpoint
+  metrics_jsonl: /home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/experiments/route20/followup/470ee3e49baa66bb/runs/v24_route20_route20_base_mixed9_rate0.4_updates_seed7/TaxiBJ/custom/v24_route20_route20_base_mixed9_rate0.4_updates_seed7/random/rate0.4/20260918_110119_seed7_bs16/logs/metrics.jsonl
+------------------------------------------------------------------------------------------------

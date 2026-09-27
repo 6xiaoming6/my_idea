@@ -115,8 +115,13 @@ def assert_unchanged(stamps, code_paths):
             raise RuntimeError(f"Code/data/config changed during the experiment: {path}. Restart to create a new suite.")
 
 
-def policy_plan(path, study):
+def policy_plan(path, study, epochs=None):
     policy = load(path)
+    if epochs is not None:
+        if type(epochs) is not int or epochs <= 0:
+            raise ValueError("--epochs must be a positive integer")
+        policy["training"]["epochs"] = epochs
+        policy["training"].setdefault("scheduler", {})["total_epochs"] = epochs
     if policy.get("schema_version") != 1:
         raise ValueError("Unsupported experiment policy schema")
     spec = policy["studies"][study]
@@ -173,6 +178,62 @@ def validate_plan(manifest):
         names.add(name)
         cfg = run["config"]
         train = cfg["train"]
+        if manifest.get("stage") == "coe_focus":
+            coe = cfg["model"]["coe"]
+            expected = {
+                "focus_moe": (False, "per_step", "native"),
+                "focus_coe_independent": (True, "per_step", "native"),
+                "focus_coe_shared": (True, "shared", "native"),
+                "focus_pair_additive": (True, "shared", "additive"),
+                "focus_pair_capacity": (True, "shared", "additive"),
+                "focus_pair_interaction": (True, "shared", "interaction"),
+            }[run["variant"]]
+            actual = tuple(coe.get(key) for key in ("completion_feedback", "expert_sharing", "pair_mode"))
+            expected_hidden = 68 if run["variant"] == "focus_pair_capacity" else 64
+            mask = cfg["data"]["mask"]
+            if (actual != expected or cfg["data"].get("dataset_name") != "BikeNYC" or
+                    mask.get("pattern") != "random" or mask.get("missing_rate") != 0.4 or
+                    coe.get("router_hidden_dim") != expected_hidden or
+                    coe.get("num_steps") != 3 or coe.get("top_k") != 2 or
+                    coe.get("expert_pool") != ["T", "S", "TD", "SD", "TA", "ST"] or
+                    coe.get("routing_mode") != "hard" or coe.get("router_state") != "dynamic" or
+                    coe.get("expert_state") != "dynamic" or coe.get("acceptance") != "none" or
+                    coe.get("fixed_expert_steps") != [None] * 3 or
+                    coe.get("routing_warmup_epochs") != 3 or coe.get("routing_transition_epochs") != 3 or
+                    cfg["loss"].get("lambda_coe_balance") != 0.01 or
+                    cfg["data"].get("train_mask_diversity", {}).get("rates") != [0.4] or
+                    cfg["data"].get("eval_mask_diversity", {}).get("rates") != [0.4] or
+                    len(cfg["data"].get("train_mask_diversity", {}).get("families", [])) != 9 or
+                    cfg["data"].get("train_mask_diversity", {}).get("resample_each_epoch") is not True or
+                    cfg["data"].get("eval_mask_diversity", {}).get("resample_each_epoch") is not False or
+                    train.get("save_best_checkpoint") is not False or
+                    train.get("scheduler", {}).get("total_epochs") != train["epochs"]):
+                raise ValueError(f"{name}: invalid focused BikeNYC comparison settings")
+        if manifest.get("stage") == "coe_team_accept_v4":
+            coe = cfg["model"]["coe"]
+            expected = {
+                "team_e0": ("native", "none", "shared", 64),
+                "team_e1": ("additive", "none", "shared", 64),
+                "team_e2": ("interaction", "none", "shared", 64),
+                "team_e3": ("additive", "none", "shared", 68),
+                "team_e4": ("additive", "point", "shared", 64),
+                "team_e5": ("interaction", "point", "shared", 64),
+                "team_e10": ("additive", "none", "per_step", 64),
+            }[run["variant"]]
+            actual = tuple(coe.get(key) for key in ("pair_mode", "acceptance", "expert_sharing", "router_hidden_dim"))
+            if (actual != expected or coe.get("num_steps") != 3 or coe.get("top_k") != 2 or
+                    coe.get("expert_pool") != ["T", "S", "TD", "SD", "TA", "ST"] or
+                    coe.get("fixed_expert_steps") != [None] * 3 or coe.get("routing_mode") != "hard" or
+                    coe.get("routing_warmup_epochs") != 3 or coe.get("routing_transition_epochs") != 3 or
+                    cfg["loss"].get("lambda_coe_balance") != 0.01 or
+                    cfg["data"].get("train_mask_diversity", {}).get("rates") != [0.4] or
+                    cfg["data"].get("eval_mask_diversity", {}).get("rates") != [0.4] or
+                    len(cfg["data"].get("train_mask_diversity", {}).get("families", [])) != 9 or
+                    cfg["data"].get("train_mask_diversity", {}).get("resample_each_epoch") is not True or
+                    cfg["data"].get("eval_mask_diversity", {}).get("resample_each_epoch") is not False or
+                    train.get("scheduler", {}).get("total_epochs") != train["epochs"] or
+                    train.get("save_best_checkpoint") != (cfg["data"]["dataset_name"] == "TaxiBJ")):
+                raise ValueError(f"{name}: invalid team/acceptance v4 comparison settings")
         if manifest.get("stage") == "coe_mechanism1":
             coe = cfg["model"]["coe"]
             if coe.get("num_steps") != 4 or coe.get("expert_pool") != ["T", "S", "TD", "SD", "TA", "ST"]:
@@ -226,11 +287,62 @@ def validate_plan(manifest):
                     raise ValueError("Embedded masks change the experiment supervision protocol")
 
 
-def materialize(manifest, suite, fingerprint):
+    if manifest.get("stage") == "coe_focus":
+        expected_order = ["focus_moe", "focus_coe_independent", "focus_coe_shared",
+                          "focus_pair_additive", "focus_pair_capacity", "focus_pair_interaction"]
+        by_seed = {}
+        for run in manifest["runs"]:
+            by_seed.setdefault(run["seed"], []).append(run)
+        for seed, runs in by_seed.items():
+            if [run["variant"] for run in runs] != expected_order:
+                raise ValueError(f"Focused seed {seed} must contain the six planned variants in order")
+            reference = None
+            for run in runs:
+                normalized = copy.deepcopy(run["config"])
+                normalized["experiment_plan"]["variant"] = "reference"
+                for key in ("completion_feedback", "expert_sharing", "pair_mode", "router_hidden_dim"):
+                    normalized["model"]["coe"].pop(key, None)
+                if reference is None:
+                    reference = normalized
+                elif normalized != reference:
+                    raise ValueError(f"{run['variant']}: changed settings outside the planned intervention")
+        for split, dataset in manifest["datasets"].items():
+            if Path(dataset["path"]).resolve() != (ROOT / f"data/BikeNYC/bikenyc_{split}.npz").resolve():
+                raise ValueError(f"Focused {split} split must be the BikeNYC NPZ")
+
+    if manifest.get("stage") == "coe_team_accept_v4":
+        expected_order = ["team_e0", "team_e1", "team_e2", "team_e3", "team_e4", "team_e5", "team_e10"]
+        if [run["variant"] for run in manifest["runs"]] != expected_order:
+            raise ValueError("v4 first batch must contain E0/E1/E2/E3/E4/E5/E10 in order")
+        reference = None
+        for run in manifest["runs"]:
+            normalized = copy.deepcopy(run["config"])
+            normalized["experiment_plan"]["variant"] = "reference"
+            for key in ("pair_mode", "acceptance", "expert_sharing", "router_hidden_dim"):
+                normalized["model"]["coe"].pop(key, None)
+            if reference is None:
+                reference = normalized
+            elif normalized != reference:
+                raise ValueError(f"{run['variant']}: changed settings outside the planned v4 intervention")
+        dataset_name = manifest["runs"][0]["config"]["data"]["dataset_name"]
+        if dataset_name == "TaxiBJ":
+            clean_manifest = load(ROOT / "data/TaxiBJ/v24_clean_abc_20260917/manifest.json")
+            for split, dataset in manifest["datasets"].items():
+                recorded = clean_manifest["splits"][split]
+                if (recorded["shape"] != dataset["shape_ncthw"] or
+                        recorded["npz_sha256"] != planner._sha256(Path(dataset["path"]))):
+                    raise ValueError(f"{split} clean TaxiBJ NPZ differs from its preparation manifest")
+        elif dataset_name != "BikeNYC":
+            raise ValueError(f"Unsupported v4 dataset: {dataset_name}")
+
+
+def materialize(manifest, suite, fingerprint, world_size=1):
     result = copy.deepcopy(manifest)
     result["suite_fingerprint"] = fingerprint
+    result["world_size"] = world_size
     for run in result["runs"]:
-        run["config"]["output_dir"] = str(suite / "runs" / run["name"])
+        run["config"]["output_dir"] = (str(ROOT / "outputs/v24-COE")
+            if result.get("stage") in {"coe_team_accept_v4", "coe_focus"} else str(suite / "runs" / run["name"]))
         run["config"]["experiment_suite_fingerprint"] = fingerprint
         run["config_path"] = str(suite / "configs" / (run["name"] + ".json"))
         command = [sys.executable, "-u", str(ROOT / "scripts/train.py"), "-c",
@@ -257,7 +369,8 @@ def check_complete(receipt_path, run, manifest):
     try:
         receipt = load(receipt_path)
         cfg = run["config"]
-        if receipt["status"] != "finished" or receipt["config_sha256"] != digest(cfg):
+        if (receipt["status"] != "finished" or receipt["config_sha256"] != digest(cfg) or
+                receipt.get("world_size", 1) != manifest.get("world_size", 1)):
             return False
         epochs, interval = cfg["train"]["epochs"], cfg["train"]["val_epoch"]
         if receipt["completed_epochs"] != epochs or receipt["samples"] != expected_samples(manifest, cfg):
@@ -334,6 +447,10 @@ def summarize(manifest, suite):
             group = [r for r in all_group if r["evaluation_mask_source"] == evaluation_source]
             if manifest.get("stage") in {"abc", "abcd", "abcde"}:
                 reference = "abc_a"
+            elif manifest.get("stage") == "coe_team_accept_v4":
+                reference = "team_e0"
+            elif manifest.get("stage") == "coe_focus":
+                reference = "focus_coe_shared"
             elif manifest.get("stage") in {"coe_validation", "coe_dual_mask", "coe_mechanism1"}:
                 reference = "coe_main"
             elif manifest.get("stage") == "route20":
@@ -343,7 +460,7 @@ def summarize(manifest, suite):
             else:
                 reference = "full"
             full = next((r for r in group if r["variant"] == reference and r["status"] == "complete"), None)
-            if full:
+            if full and manifest.get("stage") != "coe_focus":
                 for other in group:
                     if other["status"] == "complete" and other is not full:
                         pairs.append({"dataset": dataset, "protocol": protocol, "seed": seed,
@@ -351,6 +468,38 @@ def summarize(manifest, suite):
                                       "reference": reference, "variant": other["variant"],
                                       f"test_mae_delta_vs_{reference}": other["test_mae"] - full["test_mae"],
                                       f"test_rmse_delta_vs_{reference}": other["test_rmse"] - full["test_rmse"]})
+        if manifest.get('stage') == 'coe_focus':
+            for reference, variant in [
+                ('focus_moe', 'focus_coe_independent'),
+                ('focus_coe_independent', 'focus_coe_shared'),
+                ('focus_moe', 'focus_coe_shared'),
+                ('focus_coe_shared', 'focus_pair_additive'),
+                ('focus_pair_additive', 'focus_pair_capacity'),
+                ('focus_pair_additive', 'focus_pair_interaction'),
+                ('focus_pair_capacity', 'focus_pair_interaction'),
+                ('focus_coe_shared', 'focus_pair_interaction'),
+            ]:
+                base = next((r for r in all_group if r['variant'] == reference and r['status'] == 'complete'), None)
+                other = next((r for r in all_group if r['variant'] == variant and r['status'] == 'complete'), None)
+                if base and other:
+                    pairs.append({'dataset': dataset, 'protocol': protocol, 'seed': seed,
+                                  'reference': reference, 'variant': variant,
+                                  f'test_mae_delta_vs_{reference}': other['test_mae'] - base['test_mae'],
+                                  f'test_rmse_delta_vs_{reference}': other['test_rmse'] - base['test_rmse']})
+        if manifest.get('stage') == 'coe_team_accept_v4':
+            for reference, variant in [
+                ('team_e0', 'team_e1'), ('team_e1', 'team_e2'),
+                ('team_e1', 'team_e3'), ('team_e1', 'team_e4'),
+                ('team_e2', 'team_e5'), ('team_e4', 'team_e5'),
+                ('team_e1', 'team_e10'), ('team_e10', 'team_e5'),
+            ]:
+                base = next((r for r in all_group if r['variant'] == reference and r['status'] == 'complete'), None)
+                other = next((r for r in all_group if r['variant'] == variant and r['status'] == 'complete'), None)
+                if base and other:
+                    pairs.append({'dataset': dataset, 'protocol': protocol, 'seed': seed,
+                                  'reference': reference, 'variant': variant,
+                                  f'test_mae_delta_vs_{reference}': other['test_mae'] - base['test_mae'],
+                                  f'test_rmse_delta_vs_{reference}': other['test_rmse'] - base['test_rmse']})
         if manifest.get('stage') == 'abcde':
             for reference, variant in [('abc_b', 'abc_c'), ('abc_d', 'abc_e')]:
                 base = next((r for r in group if r['variant'] == reference and r['status'] == 'complete'), None)
@@ -380,7 +529,7 @@ def summarize(manifest, suite):
     return rows
 
 
-def launch(run, suite, env):
+def launch(run, suite, env, world_size=1):
     log_dir = suite / "launcher_logs"
     log_dir.mkdir(exist_ok=True)
     attempt = 1
@@ -388,6 +537,9 @@ def launch(run, suite, env):
         attempt += 1
     receipt = suite / "results" / f'{run["name"]}.attempt{attempt}.json'
     command = run["command_argv"] + ["--result-file", str(receipt)]
+    if world_size > 1:
+        command = [sys.executable, "-m", "torch.distributed.run", "--standalone",
+                   f"--nproc_per_node={world_size}", *command[2:]]
     with (log_dir / f'{run["name"]}.attempt{attempt}.log').open("xb") as raw:
         process = subprocess.Popen(command, cwd=ROOT, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         try:
@@ -411,15 +563,25 @@ def launch(run, suite, env):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--config", default="configs/v24/experiments.json")
+    parser.add_argument("--config", default="configs/v24/coe_focus_bikenyc_experiments.json")
     parser.add_argument("--study", help="Study from the policy; defaults to its default_study, or pilot")
     parser.add_argument("--plan", type=Path, help="Run an existing immutable planner manifest using the same lifecycle")
-    parser.add_argument("--gpu", help="One physical GPU; omission preserves CUDA_VISIBLE_DEVICES")
+    gpu_group = parser.add_mutually_exclusive_group()
+    gpu_group.add_argument("--gpu", help="One physical GPU; omission preserves CUDA_VISIBLE_DEVICES")
+    gpu_group.add_argument("--gpus", help="Comma-separated physical GPUs for one DDP job, e.g. 0,1")
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--summary-only", action="store_true")
+    parser.add_argument("--epochs", type=int, help="Override all policy epochs and cosine scheduler period")
     args = parser.parse_args(argv)
+    if args.plan and args.epochs is not None:
+        parser.error("--epochs cannot override an immutable --plan")
     if args.gpu is not None and not args.gpu.isdigit():
         parser.error("--gpu must be a single nonnegative device index")
+    gpu_ids = args.gpus.split(",") if args.gpus else None
+    if gpu_ids and (len(gpu_ids) < 2 or len(set(gpu_ids)) != len(gpu_ids) or
+                    any(not item.isdigit() for item in gpu_ids)):
+        parser.error("--gpus requires two or more distinct nonnegative device indices")
+    world_size = len(gpu_ids) if gpu_ids else 1
     if args.plan:
         plan_path = resolve(args.plan)
         manifest = load(plan_path)
@@ -433,15 +595,16 @@ def main(argv=None):
     else:
         policy_path = resolve(args.config)
         study = args.study or load(policy_path).get("default_study", "pilot")
-        manifest, output, threads, extras = policy_plan(policy_path, study)
+        manifest, output, threads, extras = policy_plan(policy_path, study, args.epochs)
     validate_plan(manifest)
     record, stamps = identity(manifest, extras)
     record["cpu_threads"] = threads
+    record["world_size"] = world_size
     fingerprint = digest(record)
     suite = output / fingerprint[:16]
-    manifest = materialize(manifest, suite, fingerprint)
+    manifest = materialize(manifest, suite, fingerprint, world_size=world_size)
     if args.dry_run:
-        print(json.dumps({"suite": str(suite), "num_runs": len(manifest["runs"]),
+        print(json.dumps({"suite": str(suite), "world_size": world_size, "num_runs": len(manifest["runs"]),
                           "datasets": manifest["datasets"], "jobs": [
             {"name": r["name"], "train": r["config"]["train"],
              "batch_size": r["config"]["data"]["batch_size"]} for r in manifest["runs"]]}, indent=2))
@@ -452,6 +615,8 @@ def main(argv=None):
     env = dict(os.environ, PYTHONUNBUFFERED="1")
     if args.gpu is not None:
         env["CUDA_VISIBLE_DEVICES"] = args.gpu
+    elif gpu_ids:
+        env["CUDA_VISIBLE_DEVICES"] = ",".join(gpu_ids)
     for key in ("OMP_NUM_THREADS", "MKL_NUM_THREADS", "OPENBLAS_NUM_THREADS", "NUMEXPR_NUM_THREADS"):
         env[key] = str(threads)
     code_paths = set(source_files())
@@ -481,7 +646,7 @@ def main(argv=None):
             if result_for(run, suite, manifest):
                 continue
             try:
-                receipt = launch(run, suite, env)
+                receipt = launch(run, suite, env, world_size=world_size)
                 try:
                     assert_unchanged(stamps, code_paths)
                 except RuntimeError:

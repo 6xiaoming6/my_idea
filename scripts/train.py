@@ -4,11 +4,13 @@ import argparse
 import csv
 import hashlib
 import json
+import math
 import os
 import platform
 import shutil
 import subprocess
 import time
+import warnings
 from datetime import datetime
 from pathlib import Path
 import sys
@@ -17,6 +19,10 @@ os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 import matplotlib.pyplot as plt
 import torch
+import torch.distributed as dist
+from torch.nn.parallel import DistributedDataParallel
+from torch.utils.data import Sampler
+from torch.utils.data.distributed import DistributedSampler
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
@@ -240,6 +246,65 @@ def _plot_history(history: dict[str, list[float]], output_dir: Path) -> None:
     plt.close(fig)
 
 
+class ExactDistributedEvalSampler(Sampler[int]):
+    """Shard evaluation without the duplicate samples of DistributedSampler."""
+
+    def __init__(self, dataset, rank: int, world_size: int) -> None:
+        self.dataset, self.rank, self.world_size = dataset, rank, world_size
+
+    def __iter__(self):
+        return iter(range(self.rank, len(self.dataset), self.world_size))
+
+    def __len__(self) -> int:
+        return len(range(self.rank, len(self.dataset), self.world_size))
+
+
+class ExactDistributedTrainSampler(Sampler[int]):
+    """Deterministically shuffle and shard without repeating the odd last sample."""
+
+    def __init__(self, dataset, rank: int, world_size: int, seed: int) -> None:
+        self.dataset, self.rank, self.world_size, self.seed = dataset, rank, world_size, seed
+        self.epoch = 0
+
+    def set_epoch(self, epoch: int) -> None:
+        self.epoch = epoch
+
+    def __iter__(self):
+        generator = torch.Generator().manual_seed(self.seed + self.epoch)
+        permutation = torch.randperm(len(self.dataset), generator=generator).tolist()
+        return iter(permutation[self.rank::self.world_size])
+
+    def __len__(self) -> int:
+        return len(range(self.rank, len(self.dataset), self.world_size))
+
+
+class _SilentLogger:
+    def __getattr__(self, name):
+        return lambda *args, **kwargs: None
+
+
+def _distributed_device(cfg: dict) -> tuple[torch.device, int, int]:
+    world_size = int(os.environ.get("WORLD_SIZE", "1"))
+    if world_size == 1:
+        return get_device(cfg.get("device", "auto")), 0, 1
+    rank = int(os.environ["RANK"])
+    local_rank = int(os.environ["LOCAL_RANK"])
+    if cfg.get("device", "auto") == "cpu":
+        device = torch.device("cpu")
+        backend = "gloo"
+    else:
+        if not torch.cuda.is_available():
+            raise RuntimeError("DDP requires CUDA unless config.device is explicitly 'cpu'")
+        if local_rank >= torch.cuda.device_count():
+            raise RuntimeError(f"LOCAL_RANK={local_rank} has no visible CUDA device")
+        torch.cuda.set_device(local_rank)
+        device = torch.device("cuda", local_rank)
+        backend = "nccl"
+    warnings.filterwarnings("ignore", message="Grad strides do not match bucket view strides.*")
+    dist.init_process_group(backend=backend, init_method="env://")
+    return device, rank, world_size
+
+
 def main() -> None:
     args = parse_args()
     cfg = load_config(args.config)
@@ -257,7 +322,13 @@ def main() -> None:
         raise ValueError("train.save_best_checkpoint must be true or false")
     if args.result_file is not None and args.result_file.exists():
         raise FileExistsError(f"Completion receipt already exists: {args.result_file}")
+    device, rank, world_size = _distributed_device(cfg)
+    is_main = rank == 0
     set_seed(cfg.get("seed", 42))
+    global_batch_size = int(cfg["data"]["batch_size"])
+    if global_batch_size % world_size:
+        raise ValueError("data.batch_size must be divisible by DDP world size")
+    per_device_batch_size = global_batch_size // world_size
 
     dataset_name = cfg["data"].get("dataset_name", "unknown")
     mask_cfg = cfg["data"].get("mask", {})
@@ -275,23 +346,52 @@ def main() -> None:
         / _safe_path_part(mask_pattern)
         / _rate_part(mask_rate)
     )
-    run_dir = _unique_run_dir(run_base_dir, run_id)
+    if is_main:
+        run_dir = _unique_run_dir(run_base_dir, run_id)
+        ckpt_dir = run_dir / "checkpoints"
+        log_dir = run_dir / "logs"
+        if save_best:
+            ckpt_dir.mkdir(parents=True, exist_ok=True)
+        log_dir.mkdir(parents=True, exist_ok=True)
+        save_config(cfg, run_dir / "config.json")
+        run_path = str(run_dir)
+    else:
+        run_path = None
+    if world_size > 1:
+        paths = [run_path]
+        dist.broadcast_object_list(paths, src=0)
+        run_path = paths[0]
+    run_dir = Path(run_path)
     ckpt_dir = run_dir / "checkpoints"
     log_dir = run_dir / "logs"
-    if save_best:
-        ckpt_dir.mkdir(parents=True, exist_ok=True)
-    log_dir.mkdir(parents=True, exist_ok=True)
-    save_config(cfg, run_dir / "config.json")
 
-    device = get_device(cfg.get("device", "auto"))
     train_ds, val_ds = build_datasets(cfg, args.train_npz, args.val_npz, synthetic=args.synthetic)
     test_ds = build_test_dataset(cfg, args.test_npz, synthetic=args.synthetic)
-    train_loader = build_loader(train_ds, cfg, shuffle=True)
-    val_loader = build_loader(val_ds, cfg, shuffle=False)
-    test_loader = build_loader(test_ds, cfg, shuffle=False) if test_ds is not None else None
+    train_sampler = None
+    if world_size > 1:
+        shard_steps = [math.ceil(len(range(part, len(train_ds), world_size)) / per_device_batch_size)
+                       for part in range(world_size)]
+        seed = cfg["data"].get("loader_seed", cfg.get("seed", 42))
+        if len(set(shard_steps)) == 1:
+            train_sampler = ExactDistributedTrainSampler(train_ds, rank, world_size, seed)
+        else:
+            # Equal step counts are mandatory for DDP; padding is used only when
+            # an exact split would leave a rank without its final optimizer step.
+            train_sampler = DistributedSampler(train_ds, num_replicas=world_size, rank=rank,
+                                               shuffle=True, seed=seed)
+    val_sampler = ExactDistributedEvalSampler(val_ds, rank, world_size) if world_size > 1 else None
+    test_sampler = (ExactDistributedEvalSampler(test_ds, rank, world_size)
+                    if world_size > 1 and test_ds is not None else None)
+    train_loader = build_loader(train_ds, cfg, shuffle=True, sampler=train_sampler, batch_size=per_device_batch_size)
+    val_loader = build_loader(val_ds, cfg, shuffle=False, sampler=val_sampler, batch_size=per_device_batch_size)
+    test_loader = (build_loader(test_ds, cfg, shuffle=False, sampler=test_sampler, batch_size=per_device_batch_size)
+                   if test_ds is not None else None)
 
-    model = DualBranchSTImputer.from_config(cfg).to(device)
-    optimizer = build_optimizer(model, cfg)
+    raw_model = DualBranchSTImputer.from_config(cfg).to(device)
+    optimizer = build_optimizer(raw_model, cfg)
+    model = (DistributedDataParallel(raw_model, device_ids=[device.index] if device.type == "cuda" else None,
+                                     find_unused_parameters=True, broadcast_buffers=False)
+             if world_size > 1 else raw_model)
     scheduler = build_scheduler(optimizer, cfg)
     scaler = build_grad_scaler(device, cfg)
 
@@ -300,7 +400,7 @@ def main() -> None:
     git_meta = _git_metadata()
     git_commit = git_meta["git_commit"]
     started_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    logger = TrainLogger(log_dir)
+    logger = TrainLogger(log_dir) if is_main else _SilentLogger()
     logger.log_header(cfg, extra={
         "run_dir": str(run_dir),
         "command": " ".join(sys.argv),
@@ -322,6 +422,8 @@ def main() -> None:
         "test_samples": len(test_ds) if test_ds is not None else 0,
         "test_steps": len(test_loader) if test_loader is not None else 0,
         "batch_size": cfg["data"]["batch_size"],
+        "world_size": world_size,
+        "per_device_batch_size": per_device_batch_size,
         "mask_pattern": mask_pattern,
         "mask_rate_config": mask_rate,
         "train_mask": _mask_summary(train_ds),
@@ -355,6 +457,8 @@ def main() -> None:
     status = "finished"
     try:
         for epoch in range(1, cfg["train"]["epochs"] + 1):
+            if train_sampler is not None:
+                train_sampler.set_epoch(epoch)
             epoch_start = time.perf_counter()
             if device.type == "cuda" and torch.cuda.is_available():
                 torch.cuda.reset_peak_memory_stats(device)
@@ -363,7 +467,7 @@ def main() -> None:
             train_start = time.perf_counter()
             train_logs = train_one_epoch(
                 model, train_loader, optimizer, device, cfg, epoch, scaler=scaler,
-                show_progress=not args.console_epoch,
+                show_progress=is_main and not args.console_epoch,
                 total_epochs=cfg["train"]["epochs"],
             )
             _sync_device(device)
@@ -374,7 +478,7 @@ def main() -> None:
             val_time = 0.0
             if should_validate:
                 val_start = time.perf_counter()
-                val_logs = evaluate(model, val_loader, device, cfg, desc=f"val epoch {epoch}", epoch=epoch, show_progress=False)
+                val_logs = evaluate(raw_model, val_loader, device, cfg, desc=f"val epoch {epoch}", epoch=epoch, show_progress=False)
                 _sync_device(device)
                 val_time = time.perf_counter() - val_start
                 validation_count += 1
@@ -398,7 +502,7 @@ def main() -> None:
                 scheduler.step()
 
             logger.log_epoch(epoch, train_logs, val_logs, perf=perf, is_best=is_best)
-            if args.console_epoch:
+            if args.console_epoch and is_main:
                 line = (
                     f"epoch {epoch:03d}/{cfg['train']['epochs']:03d} | "
                     f"train loss={train_logs['loss']:.4f} mae={train_logs['mae']:.4f} rmse={train_logs['rmse']:.4f}"
@@ -422,9 +526,10 @@ def main() -> None:
                 best_mae = val_logs["mae"]
                 best_epoch = epoch
                 if save_best:
-                    save_checkpoint(ckpt_dir / "best.pt", model, optimizer, epoch, metrics, cfg)
+                    if is_main:
+                        save_checkpoint(ckpt_dir / "best.pt", raw_model, optimizer, epoch, metrics, cfg)
                 else:
-                    best_state = snapshot_model_state(model)
+                    best_state = snapshot_model_state(raw_model)
                 logger.log_best(epoch, best_mae)
 
             if val_logs is not None and early_cfg.get("enabled", False):
@@ -442,18 +547,20 @@ def main() -> None:
                     logger.log_message(f"Early stopping at epoch {epoch} ({monitor}={current:.6f})")
                     break
         best_path = ckpt_dir / "best.pt"
+        if world_size > 1:
+            dist.barrier()
         if save_best:
             if not best_path.is_file():
                 raise RuntimeError("Training completed without a validation checkpoint.")
-            load_checkpoint(best_path, model, map_location=device)
+            load_checkpoint(best_path, raw_model, map_location=device)
         else:
             if best_state is None or not best_epoch:
                 raise RuntimeError("Training completed without a best validation state.")
-            model.load_state_dict(best_state)
+            raw_model.load_state_dict(best_state)
             best_state = None
         if test_loader is not None:
             test_start = time.perf_counter()
-            test_logs = evaluate(model, test_loader, device, cfg, desc=f"test best epoch {best_epoch}", epoch=best_epoch, show_progress=False)
+            test_logs = evaluate(raw_model, test_loader, device, cfg, desc=f"test best epoch {best_epoch}", epoch=best_epoch, show_progress=False)
             _sync_device(device)
             test_time = time.perf_counter() - test_start
         logger.log_test(test_logs, {
@@ -501,44 +608,45 @@ def main() -> None:
         }
         logger.log_footer(summary=summary, status=status)
         logger.close()
-        _append_experiment_index(
-            ROOT / cfg["output_dir"] / "summary" / "experiment_index.csv",
-            {
-                "started_at": started_at,
-                "finished_at": finished_at,
-                "status": status,
-                "run_dir": os.path.relpath(run_dir, ROOT),
-                "dataset": dataset_name,
-                "experiment_type": experiment_type,
-                "variant": variant,
-                "mask_pattern": mask_pattern,
-                "missing_rate": mask_rate,
-                "seed": cfg.get("seed", 42),
-                "batch_size": cfg["data"]["batch_size"],
-                "epochs_config": cfg["train"]["epochs"],
-                "completed_epochs": completed_epochs,
-                "best_epoch": best_epoch or "",
-                "best_val_mae": f"{best_mae:.6f}" if best_epoch else "",
-                "final_train_mae": f"{history['train_mae'][-1]:.6f}" if history["train_mae"] else "",
-                "final_val_mae": f"{history['val_mae'][-1]:.6f}" if history["val_mae"] else "",
-                "total_time_sec": f"{total_time:.2f}",
-                "avg_epoch_time_sec": f"{avg_epoch_time:.2f}",
-                "avg_train_sec_per_step": f"{avg_train_step:.4f}",
-                "avg_val_sec_per_step": f"{avg_val_step:.4f}",
-                "peak_memory_gb": f"{max_mem:.2f}",
-                "git_commit": git_commit,
-            },
-        )
-    if not args.no_plot:
+        if is_main:
+            _append_experiment_index(
+                ROOT / cfg["output_dir"] / "summary" / "experiment_index.csv",
+                {
+                    "started_at": started_at,
+                    "finished_at": finished_at,
+                    "status": status,
+                    "run_dir": os.path.relpath(run_dir, ROOT),
+                    "dataset": dataset_name,
+                    "experiment_type": experiment_type,
+                    "variant": variant,
+                    "mask_pattern": mask_pattern,
+                    "missing_rate": mask_rate,
+                    "seed": cfg.get("seed", 42),
+                    "batch_size": cfg["data"]["batch_size"],
+                    "epochs_config": cfg["train"]["epochs"],
+                    "completed_epochs": completed_epochs,
+                    "best_epoch": best_epoch or "",
+                    "best_val_mae": f"{best_mae:.6f}" if best_epoch else "",
+                    "final_train_mae": f"{history['train_mae'][-1]:.6f}" if history["train_mae"] else "",
+                    "final_val_mae": f"{history['val_mae'][-1]:.6f}" if history["val_mae"] else "",
+                    "total_time_sec": f"{total_time:.2f}",
+                    "avg_epoch_time_sec": f"{avg_epoch_time:.2f}",
+                    "avg_train_sec_per_step": f"{avg_train_step:.4f}",
+                    "avg_val_sec_per_step": f"{avg_val_step:.4f}",
+                    "peak_memory_gb": f"{max_mem:.2f}",
+                    "git_commit": git_commit,
+                },
+            )
+    if is_main and not args.no_plot:
         _plot_history(history, run_dir)
-    if args.result_file is not None:
+    if is_main and args.result_file is not None:
         receipt = {
             "status": status, "run_dir": str(run_dir.resolve()),
             "config_sha256": _config_hash(cfg), "completed_epochs": completed_epochs,
             "validation_count": validation_count, "best_epoch": best_epoch,
             "best_val_mae": best_mae, "test": test_logs,
             "best_state_source": "checkpoint" if save_best else "cpu_memory",
-            "total_time_sec": total_time,
+            "total_time_sec": total_time, "world_size": world_size,
             "samples": {"train": len(train_ds), "val": len(val_ds),
                         "test": len(test_ds) if test_ds is not None else 0},
         }
@@ -546,6 +654,9 @@ def main() -> None:
         temporary = args.result_file.with_suffix(".tmp")
         temporary.write_text(json.dumps(receipt, ensure_ascii=False, indent=2), encoding="utf-8")
         os.replace(temporary, args.result_file)
+    if world_size > 1:
+        dist.barrier()
+        dist.destroy_process_group()
 
 
 if __name__ == "__main__":

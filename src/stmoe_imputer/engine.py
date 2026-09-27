@@ -3,10 +3,12 @@ from __future__ import annotations
 from collections import defaultdict
 
 import torch
+import torch.distributed as dist
 from tqdm import tqdm
 
 from .losses import compute_main_stage_loss, supervision_mask
 from .metrics import MaskedMetricAccumulator, masked_metrics
+from .data.diverse_masks import FAMILIES
 from .routing_metrics import CoERoutingMetricAccumulator, RoutingMetricAccumulator, active_routing_scales
 from .models.registry import resolve_architecture
 from .utils.device import move_batch_to_device
@@ -130,8 +132,107 @@ def build_scheduler(optimizer: torch.optim.Optimizer, cfg: dict) -> torch.optim.
     raise ValueError(f"Unknown scheduler type: {sched_type}")
 
 
+def _distributed_merge(logs, exact_metrics, active_exact_metrics, routing_metrics, coe_quality, counters):
+    if not (dist.is_available() and dist.is_initialized()):
+        return logs, exact_metrics, active_exact_metrics, routing_metrics, coe_quality, counters
+    payload = (dict(logs), exact_metrics, active_exact_metrics, routing_metrics, coe_quality, counters)
+    gathered = [None] * dist.get_world_size()
+    dist.all_gather_object(gathered, payload)
+    merged_logs: dict[str, list[float]] = defaultdict(list)
+    merged_exact = {key: MaskedMetricAccumulator() for key in exact_metrics}
+    merged_active = set()
+    merged_routing = _routing_accumulator_for_merge(routing_metrics)
+    merged_quality = _CoEQualityMetrics() if coe_quality is not None else None
+    merged_counters = defaultdict(float)
+    for part_logs, part_exact, part_active, part_routing, part_quality, part_counters in gathered:
+        for key, values in part_logs.items():
+            merged_logs[key].extend(values)
+        for key, metric in part_exact.items():
+            merged_exact[key].merge(metric)
+        merged_active.update(part_active)
+        if merged_routing is not None and part_routing is not None:
+            merged_routing.merge(part_routing)
+        if merged_quality is not None and part_quality is not None:
+            merged_quality.merge(part_quality)
+        for key, value in part_counters.items():
+            merged_counters[key] += value
+    return merged_logs, merged_exact, merged_active, merged_routing, merged_quality, merged_counters
+
+
+def _routing_accumulator_for_merge(routing_metrics):
+    if isinstance(routing_metrics, CoERoutingMetricAccumulator):
+        return CoERoutingMetricAccumulator()
+    if isinstance(routing_metrics, RoutingMetricAccumulator):
+        return RoutingMetricAccumulator(routing_metrics.scale_names)
+    return None
+
+
 def _mean_logs(accumulator: dict[str, list[float]]) -> dict[str, float]:
     return {key: sum(values) / max(1, len(values)) for key, values in accumulator.items()}
+
+
+def _zero_pair() -> list[float]:
+    return [0.0, 0.0]
+
+
+class _CoEQualityMetrics:
+    """Exact per-family errors and missing-point acceptance deltas."""
+
+    def __init__(self) -> None:
+        self.family = {name: MaskedMetricAccumulator() for name in FAMILIES}
+        self.acceptance: dict[str, list[float]] = defaultdict(_zero_pair)
+
+    @torch.no_grad()
+    def update(self, outputs: dict, batch: dict) -> None:
+        target, mask = batch["x_f_gt"], batch["m_f"]
+        family_ids = batch.get("mask_family")
+        if family_ids is not None:
+            for family_id in family_ids.unique().tolist():
+                index = family_ids == family_id
+                self.family[FAMILIES[int(family_id)]].update(
+                    outputs["x_hat_final"][index], target[index], mask[index],
+                    target_mask=(batch["target_mask"][index] if "target_mask" in batch else None),
+                )
+        coe = outputs.get("coe", {})
+        candidates = coe.get("candidate_completions", ())
+        completions = coe.get("completions", ())
+        old = coe.get("initial_completion")
+        if old is None or not candidates or len(candidates) != len(completions):
+            return
+        selected = supervision_mask(target, mask, batch.get("target_mask"))
+        count = float(selected.sum().item())
+        if not count:
+            return
+        for step, (candidate, accepted) in enumerate(zip(candidates, completions), start=1):
+            old_error = (old[selected].float() - target[selected].float()).abs()
+            for label, value in (("candidate", candidate), ("accepted", accepted)):
+                change = (value[selected].float() - target[selected].float()).abs() - old_error
+                for direction, delta in (("harm", change.clamp_min(0)),
+                                         ("benefit", (-change).clamp_min(0))):
+                    totals = self.acceptance[f"coe_step{step}_{label}_{direction}"]
+                    totals[0] += float(delta.sum().double().cpu())
+                    totals[1] += count
+            old = accepted
+
+    def merge(self, other: "_CoEQualityMetrics") -> None:
+        for name, metric in other.family.items():
+            self.family[name].merge(metric)
+        for name, values in other.acceptance.items():
+            self.acceptance[name][0] += values[0]
+            self.acceptance[name][1] += values[1]
+
+    def compute(self) -> dict[str, float]:
+        result: dict[str, float] = {}
+        for name, metric in self.family.items():
+            if metric.count:
+                result[f"coe_family_{name}_absolute_error"] = metric.absolute_error
+                result[f"coe_family_{name}_squared_error"] = metric.squared_error
+                result[f"coe_family_{name}_count"] = metric.count
+                result[f"coe_family_{name}_mae"] = metric.absolute_error / metric.count
+                result[f"coe_family_{name}_rmse"] = (metric.squared_error / metric.count) ** 0.5
+        for key, (total, count) in self.acceptance.items():
+            result[key] = total / count
+        return result
 
 
 def _append_model_diagnostics(logs: dict[str, list[float]], outputs: dict) -> None:
@@ -274,8 +375,9 @@ def train_one_epoch(
     model.train()
     if hasattr(getattr(loader, 'dataset', None), 'set_epoch'):
         loader.dataset.set_epoch(epoch)
-    if hasattr(model.main_branch, "set_routing_epoch"):
-        model.main_branch.set_routing_epoch(epoch)
+    core_model = model.module if hasattr(model, "module") else model
+    if hasattr(core_model.main_branch, "set_routing_epoch"):
+        core_model.main_branch.set_routing_epoch(epoch)
     is_coe = resolve_architecture(cfg) == "v24_ts_coe"
     logs: dict[str, list[float]] = defaultdict(list)
     exact_metrics = {
@@ -285,6 +387,7 @@ def train_one_epoch(
     }
     active_exact_metrics = {""}
     routing_metrics = _routing_accumulator(cfg)
+    coe_quality = _CoEQualityMetrics() if is_coe else None
     use_amp = cfg["train"].get("amp", True) and device.type == "cuda"
     if scaler is None:
         # Compatibility for callers that manage only model/optimizer: retain
@@ -299,7 +402,7 @@ def train_one_epoch(
     progress = tqdm(loader, desc=f"train epoch {epoch}/{total_epochs}", leave=True, disable=not show_progress)
     for batch_index, batch in enumerate(progress):
         batch = move_batch_to_device(batch, device)
-        if is_coe and not bool(supervision_mask(
+        if is_coe and not (dist.is_available() and dist.is_initialized()) and not bool(supervision_mask(
             batch["x_f_gt"], batch["m_f"], batch.get("target_mask")
         ).any()):
             skipped_empty_batches += 1
@@ -311,7 +414,7 @@ def train_one_epoch(
             loss, loss_dict = compute_main_stage_loss(outputs, batch, cfg, epoch=epoch)
         diagnostic_every = cfg["train"].get("router_grad_diagnostic_every", 0)
         if is_coe and diagnostic_every and batch_index % diagnostic_every == 0:
-            parameters = [p for router in model.main_branch.routers for p in router.parameters()]
+            parameters = [p for router in core_model.main_branch.routers for p in router.parameters()]
             for name, term in outputs["coe"].get("_loss_terms", {}).items():
                 if not term.requires_grad:
                     continue
@@ -323,22 +426,37 @@ def train_one_epoch(
         if grad_clip or is_coe:
             scaler.unscale_(optimizer)
         if is_coe:
-            for step, router in enumerate(model.main_branch.routers):
+            for step, router in enumerate(core_model.main_branch.routers):
                 gradients = [p.grad.detach().float().square().sum()
                              for p in router.parameters() if p.grad is not None]
                 if gradients:
                     logs[f"coe_step{step + 1}_router_grad_norm"].append(
                         float(torch.stack(gradients).sum().sqrt().cpu())
                     )
-            for name, expert in zip(
-                model.main_branch.expert_names, model.main_branch.routed_experts()
-            ):
+            expert_steps = (range(core_model.main_branch.num_steps)
+                            if getattr(core_model.main_branch, "expert_sharing", "shared") == "per_step"
+                            else range(1))
+            for expert_step in expert_steps:
+                for name, expert in zip(
+                    core_model.main_branch.expert_names, core_model.main_branch.routed_experts(expert_step)
+                ):
+                    gradients = [p.grad.detach().float().square().sum()
+                                 for p in expert.parameters() if p.grad is not None]
+                    if gradients:
+                        norm = float(torch.stack(gradients).sum().sqrt().cpu())
+                        prefix = (f"coe_step{expert_step + 1}_expert_{name}" if
+                                  getattr(core_model.main_branch, "expert_sharing", "shared") == "per_step" else
+                                  f"coe_expert_{name}")
+                        logs[f"{prefix}_grad_norm"].append(norm)
+                        logs[f"{prefix}_finite_nonzero_gradient_batch_fraction"].append(
+                            float(0 < norm < float("inf")))
+            acceptance_head = getattr(core_model.main_branch, "acceptance_head", None)
+            if acceptance_head is not None:
                 gradients = [p.grad.detach().float().square().sum()
-                             for p in expert.parameters() if p.grad is not None]
+                             for p in acceptance_head.parameters() if p.grad is not None]
                 if gradients:
-                    norm = float(torch.stack(gradients).sum().sqrt().cpu())
-                    logs[f"coe_expert_{name}_grad_norm"].append(norm)
-                    logs[f"coe_expert_{name}_finite_nonzero_gradient_batch_fraction"].append(float(0 < norm < float("inf")))
+                    logs["coe_acceptance_head_grad_norm"].append(
+                        float(torch.stack(gradients).sum().sqrt().cpu()))
         if grad_clip:
             torch.nn.utils.clip_grad_norm_(model.parameters(), grad_clip)
         previous_scale = scaler.get_scale()
@@ -368,12 +486,22 @@ def train_one_epoch(
         for key, value in {**loss_dict, **metrics}.items():
             logs[key].append(float(value.detach().cpu()))
         _append_model_diagnostics(logs, outputs)
+        if coe_quality is not None:
+            coe_quality.update(outputs, batch)
         if is_coe and 'mask_family' in batch:
             # Labels are introduced after forward and used only for diagnostics.
             outputs['coe']['mask_family'] = batch['mask_family']
         _update_routing_metrics(routing_metrics, outputs)
         _append_lr_logs(logs, optimizer)
         progress.set_postfix(loss=logs["loss"][-1], mae=logs["mae"][-1], rmse=logs["rmse"][-1])
+    logs, exact_metrics, active_exact_metrics, routing_metrics, coe_quality, counters = _distributed_merge(
+        logs, exact_metrics, active_exact_metrics, routing_metrics, coe_quality,
+        {"optimizer_steps": optimizer_steps, "seen_samples": seen_samples,
+         "skipped_empty_batches": skipped_empty_batches, "skipped_amp_steps": skipped_amp_steps},
+    )
+    seen_samples = counters["seen_samples"]
+    skipped_empty_batches = counters["skipped_empty_batches"]
+    skipped_amp_steps = counters["skipped_amp_steps"]
     result = _mean_logs(logs)
     if is_coe:
         result.update({
@@ -389,6 +517,8 @@ def train_one_epoch(
     for suffix in active_exact_metrics:
         for key, value in exact_metrics[suffix].compute().items():
             result[f"{key}{suffix}"] = value
+    if coe_quality is not None:
+        result.update(coe_quality.compute())
     if routing_metrics is not None:
         result.update(routing_metrics.compute())
     return result
@@ -413,6 +543,7 @@ def evaluate(
     }
     active_exact_metrics = {""}
     routing_metrics = _routing_accumulator(cfg)
+    coe_quality = _CoEQualityMetrics() if resolve_architecture(cfg) == "v24_ts_coe" else None
     for batch in tqdm(loader, desc=desc, leave=False, disable=not show_progress):
         batch = move_batch_to_device(batch, device)
         outputs = model(batch)
@@ -436,15 +567,22 @@ def evaluate(
         for key, value in {**loss_dict, **metrics}.items():
             logs[key].append(float(value.detach().cpu()))
         _append_model_diagnostics(logs, outputs)
+        if coe_quality is not None:
+            coe_quality.update(outputs, batch)
         if resolve_architecture(cfg) == "v24_ts_coe" and 'mask_family' in batch:
             outputs['coe']['mask_family'] = batch['mask_family']
         _update_routing_metrics(routing_metrics, outputs)
+    logs, exact_metrics, active_exact_metrics, routing_metrics, coe_quality, _ = _distributed_merge(
+        logs, exact_metrics, active_exact_metrics, routing_metrics, coe_quality, {},
+    )
     result = _mean_logs(logs)
     if resolve_architecture(cfg) == "v24_ts_coe" and exact_metrics[""].count == 0:
         raise ValueError("TS-CoE evaluation has no finite hidden supervision targets")
     for suffix in active_exact_metrics:
         for key, value in exact_metrics[suffix].compute().items():
             result[f"{key}{suffix}"] = value
+    if coe_quality is not None:
+        result.update(coe_quality.compute())
     if routing_metrics is not None:
         result.update(routing_metrics.compute())
     return result

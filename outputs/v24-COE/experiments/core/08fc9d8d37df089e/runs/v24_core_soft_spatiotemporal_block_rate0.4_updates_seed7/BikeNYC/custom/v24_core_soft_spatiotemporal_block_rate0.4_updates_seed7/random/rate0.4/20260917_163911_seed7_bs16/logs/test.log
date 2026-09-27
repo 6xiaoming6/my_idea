@@ -1,0 +1,86 @@
+Testing started: 2026-09-17 16:40:49
+------------------------------------------------------------------------------------------------
+Run
+  checkpoint: None
+  best_epoch: 78
+  best_state_source: cpu_memory
+  best_val_mae: 5.6828952470468534
+  test_samples: 147
+  test_steps: 10
+  test_time_sec: 0.17
+------------------------------------------------------------------------------------------------
+Results
+  loss: 5.418508
+  l_main: 5.418508
+  l_final: 5.418508
+  l_coe_mid: 0.000000
+  supervised_count: 40572.000000
+  l_coe_balance: 1.503234
+  l_coe_balance_weighted: 0.000000
+  l_coe_balance_step1: 1.999921
+  l_coe_balance_step2: 1.006547
+  mae: 5.621764
+  rmse: 19.204907
+  mape: 91174.179000
+  coe_update_abs_mean: 3.207087
+  coe_missing_fraction: 0.399306
+  coe_shared_residual_scale: 0.102517
+  coe_routed_residual_scale: 0.121581
+  coe_step1_update_abs_mean: 0.846915
+  coe_step2_update_abs_mean: 3.207087
+  coe_route_entropy: 0.292809
+  wape: 0.435794
+  metric_missing_count: 405720.000000
+  coe_routing_sample_count: 147.000000
+  coe_num_experts: 2.000000
+  coe_num_steps: 2.000000
+  coe_step1_T_weight: 0.999979
+  coe_step1_T_prob: 0.999979
+  coe_step1_S_weight: 0.000021
+  coe_step1_S_prob: 0.000021
+  coe_step1_router_entropy: 0.000234
+  coe_step2_T_weight: 0.508041
+  coe_step2_T_prob: 0.508041
+  coe_step2_S_weight: 0.491959
+  coe_step2_S_prob: 0.491959
+  coe_step2_router_entropy: 0.593417
+  coe_condition_fully_observed_sample_count: 0.000000
+  coe_condition_missing_low_sample_count: 0.000000
+  coe_condition_missing_medium_sample_count: 147.000000
+  coe_condition_missing_medium_step1_T_weight: 0.999979
+  coe_condition_missing_medium_step1_T_prob: 0.999979
+  coe_condition_missing_medium_step1_S_weight: 0.000021
+  coe_condition_missing_medium_step1_S_prob: 0.000021
+  coe_condition_missing_medium_step1_router_entropy: 0.000234
+  coe_condition_missing_medium_step2_T_weight: 0.508041
+  coe_condition_missing_medium_step2_T_prob: 0.508041
+  coe_condition_missing_medium_step2_S_weight: 0.491959
+  coe_condition_missing_medium_step2_S_prob: 0.491959
+  coe_condition_missing_medium_step2_router_entropy: 0.593417
+  coe_condition_missing_high_sample_count: 0.000000
+  coe_condition_temporal_support_low_sample_count: 147.000000
+  coe_condition_temporal_support_low_step1_T_weight: 0.999979
+  coe_condition_temporal_support_low_step1_T_prob: 0.999979
+  coe_condition_temporal_support_low_step1_S_weight: 0.000021
+  coe_condition_temporal_support_low_step1_S_prob: 0.000021
+  coe_condition_temporal_support_low_step1_router_entropy: 0.000234
+  coe_condition_temporal_support_low_step2_T_weight: 0.508041
+  coe_condition_temporal_support_low_step2_T_prob: 0.508041
+  coe_condition_temporal_support_low_step2_S_weight: 0.491959
+  coe_condition_temporal_support_low_step2_S_prob: 0.491959
+  coe_condition_temporal_support_low_step2_router_entropy: 0.593417
+  coe_condition_temporal_support_high_sample_count: 0.000000
+  coe_condition_spatial_support_low_sample_count: 147.000000
+  coe_condition_spatial_support_low_step1_T_weight: 0.999979
+  coe_condition_spatial_support_low_step1_T_prob: 0.999979
+  coe_condition_spatial_support_low_step1_S_weight: 0.000021
+  coe_condition_spatial_support_low_step1_S_prob: 0.000021
+  coe_condition_spatial_support_low_step1_router_entropy: 0.000234
+  coe_condition_spatial_support_low_step2_T_weight: 0.508041
+  coe_condition_spatial_support_low_step2_T_prob: 0.508041
+  coe_condition_spatial_support_low_step2_S_weight: 0.491959
+  coe_condition_spatial_support_low_step2_S_prob: 0.491959
+  coe_condition_spatial_support_low_step2_router_entropy: 0.593417
+  coe_condition_spatial_support_high_sample_count: 0.000000
+Testing finished: 2026-09-17 16:40:49
+------------------------------------------------------------------------------------------------

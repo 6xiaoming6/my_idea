@@ -1,0 +1,66 @@
+Testing started: 2026-09-17 13:47:47
+------------------------------------------------------------------------------------------------
+Run
+  checkpoint: /home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/Synthetic/custom/v24_chain3_smoke/random/rate0.45/20260917_134746_seed7_bs2/checkpoints/best.pt
+  best_epoch: 1
+  best_val_mae: 0.809819085257394
+  test_samples: 4
+  test_steps: 2
+  test_time_sec: 0.01
+------------------------------------------------------------------------------------------------
+Results
+  loss: 0.857293
+  l_main: 0.857293
+  l_final: 0.857293
+  l_coe_mid: 0.000000
+  supervised_count: 672.000000
+  mae: 0.857293
+  rmse: 1.046502
+  mape: 2.748603
+  coe_update_abs_mean: 0.005728
+  coe_missing_fraction: 0.437500
+  coe_shared_residual_scale: 0.100178
+  coe_routed_residual_scale: 0.100061
+  coe_step1_update_abs_mean: 0.013897
+  coe_step2_update_abs_mean: 0.007439
+  coe_step3_update_abs_mean: 0.005728
+  coe_route_entropy: 1.368814
+  wape: 1.065707
+  metric_missing_count: 1344.000000
+  coe_routing_sample_count: 4.000000
+  coe_num_experts: 4.000000
+  coe_num_steps: 3.000000
+  coe_step1_T_usage: 0.000000
+  coe_step1_T_prob: 0.241992
+  coe_step1_S_usage: 0.000000
+  coe_step1_S_prob: 0.182468
+  coe_step1_TD_usage: 0.000000
+  coe_step1_TD_prob: 0.215375
+  coe_step1_SD_usage: 1.000000
+  coe_step1_SD_prob: 0.360166
+  coe_step1_router_entropy: 1.352048
+  coe_step2_T_usage: 0.000000
+  coe_step2_T_prob: 0.223275
+  coe_step2_S_usage: 0.750000
+  coe_step2_S_prob: 0.300816
+  coe_step2_TD_usage: 0.000000
+  coe_step2_TD_prob: 0.201615
+  coe_step2_SD_usage: 0.250000
+  coe_step2_SD_prob: 0.274294
+  coe_step2_router_entropy: 1.373263
+  coe_step3_T_usage: 1.000000
+  coe_step3_T_prob: 0.282644
+  coe_step3_S_usage: 0.000000
+  coe_step3_S_prob: 0.214657
+  coe_step3_TD_usage: 0.000000
+  coe_step3_TD_prob: 0.259575
+  coe_step3_SD_usage: 0.000000
+  coe_step3_SD_prob: 0.243124
+  coe_step3_router_entropy: 1.381132
+  coe_path_SD__S__T_fraction: 0.750000
+  coe_path_SD__SD__T_fraction: 0.250000
+  coe_path_unique_count: 2.000000
+  coe_path_entropy: 0.562335
+  coe_path_max_fraction: 0.750000
+Testing finished: 2026-09-17 13:47:47
+------------------------------------------------------------------------------------------------

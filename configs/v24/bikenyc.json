@@ -10,10 +10,7 @@
     "drop_last": false,
     "mask": {
       "pattern": "random",
-      "missing_rate": 0.4,
-      "train_csv": "data/BikeNYC/random_mask/0.4/train.csv",
-      "val_csv": "data/BikeNYC/random_mask/0.4/val.csv",
-      "test_csv": "data/BikeNYC/random_mask/0.4/test.csv"
+      "missing_rate": 0.4
     },
     "synthetic": {
       "num_train": 128,
@@ -22,7 +19,44 @@
       "h": 24,
       "w": 12
     },
-    "multiscale": false
+    "multiscale": false,
+    "loader_seed": 7,
+    "train_mask_diversity": {
+      "families": [
+        "random_point",
+        "node_outage",
+        "temporal_gap",
+        "spatial_region",
+        "spatiotemporal_block",
+        "stripe",
+        "moving_region",
+        "multi_block",
+        "composite"
+      ],
+      "rates": [
+        0.4
+      ],
+      "seed": 20260917,
+      "resample_each_epoch": true
+    },
+    "eval_mask_diversity": {
+      "families": [
+        "random_point",
+        "node_outage",
+        "temporal_gap",
+        "spatial_region",
+        "spatiotemporal_block",
+        "stripe",
+        "moving_region",
+        "multi_block",
+        "composite"
+      ],
+      "rates": [
+        0.4
+      ],
+      "seed": 20260917,
+      "resample_each_epoch": false
+    }
   },
   "model": {
     "architecture": "v24_ts_coe",

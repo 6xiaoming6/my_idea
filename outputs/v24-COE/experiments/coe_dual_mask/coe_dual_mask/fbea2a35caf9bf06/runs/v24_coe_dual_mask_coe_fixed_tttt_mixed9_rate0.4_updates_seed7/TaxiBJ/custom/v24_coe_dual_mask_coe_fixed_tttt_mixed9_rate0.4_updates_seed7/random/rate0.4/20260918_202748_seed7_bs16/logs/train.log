@@ -1,0 +1,249 @@
+Training started: 2026-09-18 20:27:50
+------------------------------------------------------------------------------------------------
+Run
+  run_dir: /home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/experiments/coe_dual_mask/coe_dual_mask/fbea2a35caf9bf06/runs/v24_coe_dual_mask_coe_fixed_tttt_mixed9_rate0.4_updates_seed7/TaxiBJ/custom/v24_coe_dual_mask_coe_fixed_tttt_mixed9_rate0.4_updates_seed7/random/rate0.4/20260918_202748_seed7_bs16
+  command: /home/students/HuangMingYu/code/py/my_idea/my_idea/scripts/train.py -c /home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/experiments/coe_dual_mask/coe_dual_mask/fbea2a35caf9bf06/configs/v24_coe_dual_mask_coe_fixed_tttt_mixed9_rate0.4_updates_seed7.json --no_plot --name v24_coe_dual_mask_coe_fixed_tttt_mixed9_rate0.4_updates_seed7 --train_npz /home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/taxibj_train.npz --val_npz /home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/taxibj_val.npz --test_npz /home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/taxibj_test.npz --result-file /home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/experiments/coe_dual_mask/coe_dual_mask/fbea2a35caf9bf06/results/v24_coe_dual_mask_coe_fixed_tttt_mixed9_rate0.4_updates_seed7.attempt1.json
+  git_commit: 24e57ee114ceb9e41660b396db0a7dd42a833e3a
+  git_branch: v24-COE
+  git_dirty: True
+  config_sha256: 315f98cb1e64c33f0601bce72a41da2cd82049e98965544f28ea504986318607
+  python: 3.9.25
+  torch: 2.6.0+cu124
+  cuda_runtime: 12.4
+  train_npz: /home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/taxibj_train.npz
+  val_npz: /home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/taxibj_val.npz
+  test_npz: /home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/taxibj_test.npz
+  dataset: TaxiBJ
+  experiment_type: custom
+  variant: v24_coe_dual_mask_coe_fixed_tttt_mixed9_rate0.4_updates_seed7
+  train_samples: 2452
+  val_samples: 342
+  train_steps_per_epoch: 154
+  val_steps_per_epoch: 22
+  test_samples: 707
+  test_steps: 45
+  batch_size: 16
+  mask_pattern: random
+  mask_rate_config: 0.4
+  train_mask: unknown
+  val_mask: unknown
+  data_shape: (2452, 2, 12, 32, 32)
+  device: cuda
+  device_name: NVIDIA GeForce RTX 3090
+  total_params: 211,507
+  trainable_params: 211,507
+Config
+{
+  "seed": 7,
+  "output_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/experiments/coe_dual_mask/coe_dual_mask/fbea2a35caf9bf06/runs/v24_coe_dual_mask_coe_fixed_tttt_mixed9_rate0.4_updates_seed7",
+  "device": "cuda",
+  "data": {
+    "dataset_name": "TaxiBJ",
+    "batch_size": 16,
+    "num_workers": 0,
+    "pin_memory": true,
+    "drop_last": false,
+    "mask": {
+      "pattern": "random",
+      "missing_rate": 0.4
+    },
+    "synthetic": {
+      "num_train": 128,
+      "num_val": 32,
+      "t": 12,
+      "h": 32,
+      "w": 32
+    },
+    "multiscale": false,
+    "loader_seed": 7,
+    "train_mask_diversity": {
+      "families": [
+        "random_point",
+        "node_outage",
+        "temporal_gap",
+        "spatial_region",
+        "spatiotemporal_block",
+        "stripe",
+        "moving_region",
+        "multi_block",
+        "composite"
+      ],
+      "rates": [
+        0.4
+      ],
+      "seed": 20260917,
+      "resample_each_epoch": true
+    },
+    "eval_mask_diversity": {
+      "families": [
+        "random_point",
+        "node_outage",
+        "temporal_gap",
+        "spatial_region",
+        "spatiotemporal_block",
+        "stripe",
+        "moving_region",
+        "multi_block",
+        "composite"
+      ],
+      "rates": [
+        0.4
+      ],
+      "seed": 20260917,
+      "resample_each_epoch": false
+    }
+  },
+  "model": {
+    "architecture": "v24_ts_coe",
+    "c_in": 2,
+    "main": {
+      "dim": 64,
+      "max_t": 12,
+      "h": 32,
+      "w": 32,
+      "scale_mode": "fine",
+      "use_multiscale": false
+    },
+    "coe": {
+      "num_steps": 4,
+      "expert_pool": [
+        "T",
+        "S",
+        "TD",
+        "SD",
+        "TA",
+        "ST"
+      ],
+      "routing_mode": "fixed",
+      "fixed_path": [
+        "T",
+        "T",
+        "T",
+        "T"
+      ],
+      "fixed_expert_steps": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "router_state": "dynamic",
+      "expert_state": "dynamic",
+      "use_shared": true,
+      "use_routed": true,
+      "temperature": 1.0,
+      "temporal_kernel": 3,
+      "spatial_kernel": 3,
+      "temporal_dilation": 2,
+      "spatial_dilation": 2,
+      "attention_heads": 4,
+      "residual_init": 0.1,
+      "routing_warmup_epochs": 0,
+      "routing_transition_epochs": 0,
+      "uniform_mix_start": 0.5,
+      "sampling_temperature_start": 2.0
+    },
+    "aux": {
+      "enabled": false,
+      "alpha_init": 0.0
+    }
+  },
+  "loss": {
+    "type": "l1",
+    "lambda_coe_mid": 0.0,
+    "lambda_coe_balance": 0.0
+  },
+  "train": {
+    "epochs": 20,
+    "val_epoch": 2,
+    "lr_main": 0.001,
+    "weight_decay": 0.0001,
+    "grad_clip_norm": 1.0,
+    "amp": true,
+    "save_every": 10,
+    "scheduler": {
+      "type": "cosine",
+      "eta_min": 1e-06,
+      "total_epochs": 20
+    },
+    "early_stopping": {
+      "enabled": false,
+      "monitor": "val_mae",
+      "patience": 40,
+      "mode": "min"
+    },
+    "save_best_checkpoint": false,
+    "router_grad_diagnostic_every": 50
+  },
+  "experiment_plan": {
+    "stage": "coe_dual_mask",
+    "variant": "coe_fixed_tttt",
+    "protocol": "mixed9_rate0.4",
+    "protocol_kind": "generated_diverse",
+    "budget_regime": "updates",
+    "mask_metadata": null,
+    "training_mask_source": "dynamic_diverse",
+    "evaluation_mask_source": "diverse_fixed_per_split"
+  },
+  "experiment_suite_fingerprint": "fbea2a35caf9bf06b509d160bcfa81080b2e1014484bcde47629e4a4ab0f0596"
+}
+------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------
+ epoch         loss         mae         rmse     val_mae          lr   train_s    val_s   epoch_s   mem_gb   best
+-----------------------------------------------------------------------------------------------------------------
+     1    107.72518    107.8804     174.2131           -    1.00e-03      44.5      0.0      44.5     3.75       
+     2     83.28178     83.4092     146.1750     69.3499    9.94e-04      49.7      4.3      54.0     3.75      *
+Best model at epoch 2 (val_mae=69.3499)
+     3     75.88430     75.7939     134.5724           -    9.76e-04      50.0      0.0      50.0     3.75       
+     4     71.62804     71.5369     127.3130     63.2911    9.46e-04      46.4      1.8      48.2     3.75      *
+Best model at epoch 4 (val_mae=63.2911)
+     5     68.71312     68.7600     122.6482           -    9.05e-04      22.9      0.0      22.9     3.75       
+     6     66.56576     66.5641     119.2955     59.9469    8.54e-04      22.8      1.7      24.6     3.75      *
+Best model at epoch 6 (val_mae=59.9469)
+     7     64.89780     64.7705     116.4835           -    7.94e-04      22.9      0.0      22.9     3.75       
+     8     63.62366     63.5649     114.3953     57.9826    7.27e-04      22.8      1.8      24.6     3.75      *
+Best model at epoch 8 (val_mae=57.9826)
+     9     62.25135     62.2961     112.4658           -    6.55e-04      22.8      0.0      22.8     3.75       
+    10     60.95276     60.9061     109.7915     55.1975    5.79e-04      22.8      1.8      24.6     3.75      *
+Best model at epoch 10 (val_mae=55.1975)
+    11     59.99659     59.9724     108.5656           -    5.01e-04      22.9      0.0      22.9     3.75       
+    12     59.44169     59.4630     107.6093     55.2208    4.22e-04      22.8      1.7      24.6     3.75       
+    13     59.26242     59.2316     106.9478           -    3.46e-04      22.8      0.0      22.8     3.75       
+    14     58.91262     58.8620     106.3927     53.3327    2.74e-04      22.8      1.8      24.6     3.75      *
+Best model at epoch 14 (val_mae=53.3327)
+    15     57.23519     57.3108     104.4676           -    2.07e-04      22.9      0.0      22.9     3.75       
+    16     57.50880     57.5477     104.1861     52.6617    1.47e-04      22.9      1.8      24.6     3.75      *
+Best model at epoch 16 (val_mae=52.6617)
+    17     57.27145     57.3259     104.0207           -    9.64e-05      22.9      0.0      22.9     3.75       
+    18     57.02937     57.0599     103.9812     52.3686    5.54e-05      22.9      1.8      24.7     3.75      *
+Best model at epoch 18 (val_mae=52.3686)
+    19     56.67236     56.6722     103.3987           -    2.54e-05      22.9      0.0      22.9     3.75       
+    20     56.77311     56.7714     103.0310     52.1870    7.15e-06      22.9      1.7      24.6     3.75      *
+Best model at epoch 20 (val_mae=52.1870)
+
+------------------------------------------------------------------------------------------------
+Training finished normally: 2026-09-18 20:37:30
+Summary
+  completed_epochs: 20
+  best_epoch: 20
+  best_val_mae: 52.187002
+  val_epoch: 2
+  validation_count: 10
+  final_train_loss: 56.773114
+  final_train_mae: 56.771422
+  final_val_loss: 52.418801
+  final_val_mae: 52.187002
+  total_time: 9m 40s
+  avg_epoch_time_sec: 28.82
+  avg_train_sec_per_step: 0.1806
+  avg_val_sec_per_step: 0.0456
+  peak_memory_gb: 3.75
+  test_loss: 48.640316
+  test_mae: 49.022196
+  test_rmse: 86.730210
+  test_mape: 863593.516655
+  test_time_sec: 3.61
+  best_checkpoint: n/a
+  best_state_source: cpu_memory
+  metrics_jsonl: /home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/experiments/coe_dual_mask/coe_dual_mask/fbea2a35caf9bf06/runs/v24_coe_dual_mask_coe_fixed_tttt_mixed9_rate0.4_updates_seed7/TaxiBJ/custom/v24_coe_dual_mask_coe_fixed_tttt_mixed9_rate0.4_updates_seed7/random/rate0.4/20260918_202748_seed7_bs16/logs/metrics.jsonl
+------------------------------------------------------------------------------------------------

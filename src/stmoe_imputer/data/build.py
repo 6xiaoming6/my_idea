@@ -157,12 +157,13 @@ def build_test_dataset(cfg: dict, test_npz: str | None = None, synthetic: bool =
     )
 
 
-def build_loader(dataset, cfg: dict, shuffle: bool) -> DataLoader:
+def build_loader(dataset, cfg: dict, shuffle: bool, sampler=None, batch_size: int | None = None) -> DataLoader:
     data_cfg = cfg["data"]
     return DataLoader(
         dataset,
-        batch_size=data_cfg["batch_size"],
-        shuffle=shuffle,
+        batch_size=batch_size or data_cfg["batch_size"],
+        shuffle=shuffle and sampler is None,
+        sampler=sampler,
         generator=(torch.Generator().manual_seed(data_cfg["loader_seed"] + (0 if shuffle else 1))
                    if "loader_seed" in data_cfg else None),
         num_workers=data_cfg["num_workers"],

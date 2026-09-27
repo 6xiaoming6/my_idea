@@ -1,0 +1,34 @@
+Testing started: 2026-09-17 16:08:43
+------------------------------------------------------------------------------------------------
+Run
+  checkpoint: None
+  best_epoch: 74
+  best_state_source: cpu_memory
+  best_val_mae: 7.915588665672145
+  test_samples: 147
+  test_steps: 10
+  test_time_sec: 0.06
+------------------------------------------------------------------------------------------------
+Results
+  loss: 7.627264
+  l_main: 7.627264
+  l_final: 7.627264
+  l_coe_mid: 0.000000
+  supervised_count: 40630.800000
+  l_coe_balance: 0.000000
+  l_coe_balance_weighted: 0.000000
+  l_coe_balance_step1: 0.000000
+  l_coe_balance_step2: 0.000000
+  mae: 7.774103
+  rmse: 23.817636
+  mape: 330024.082775
+  coe_update_abs_mean: 1.367413
+  coe_missing_fraction: 0.399884
+  coe_shared_residual_scale: 0.117223
+  coe_routed_residual_scale: 0.100000
+  coe_step1_update_abs_mean: 2.032124
+  coe_step2_update_abs_mean: 1.367413
+  wape: 0.754498
+  metric_missing_count: 406308.000000
+Testing finished: 2026-09-17 16:08:43
+------------------------------------------------------------------------------------------------

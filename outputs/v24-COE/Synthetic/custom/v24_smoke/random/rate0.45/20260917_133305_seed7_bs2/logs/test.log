@@ -1,0 +1,43 @@
+Testing started: 2026-09-17 13:33:06
+------------------------------------------------------------------------------------------------
+Run
+  checkpoint: /home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/Synthetic/custom/v24_smoke/random/rate0.45/20260917_133305_seed7_bs2/checkpoints/best.pt
+  best_epoch: 1
+  best_val_mae: 0.806549072265625
+  test_samples: 4
+  test_steps: 2
+  test_time_sec: 0.01
+------------------------------------------------------------------------------------------------
+Results
+  loss: 0.796872
+  l_main: 0.796872
+  l_final: 0.796872
+  l_coe_mid: 0.000000
+  supervised_count: 672.000000
+  mae: 0.796872
+  rmse: 0.977587
+  mape: 2.783436
+  coe_update_abs_mean: 0.004739
+  coe_missing_fraction: 0.437500
+  coe_shared_residual_scale: 0.099824
+  coe_routed_residual_scale: 0.100066
+  coe_route_entropy: 0.675574
+  wape: 0.990597
+  metric_missing_count: 1344.000000
+  coe_routing_sample_count: 4.000000
+  coe_step1_T_usage: 1.000000
+  coe_step1_T_prob: 0.629633
+  coe_step1_S_usage: 0.000000
+  coe_step1_S_prob: 0.370367
+  coe_step1_router_entropy: 0.659070
+  coe_step2_T_usage: 1.000000
+  coe_step2_T_prob: 0.520855
+  coe_step2_S_usage: 0.000000
+  coe_step2_S_prob: 0.479145
+  coe_step2_router_entropy: 0.692077
+  coe_path_TT_fraction: 1.000000
+  coe_path_TS_fraction: 0.000000
+  coe_path_ST_fraction: 0.000000
+  coe_path_SS_fraction: 0.000000
+Testing finished: 2026-09-17 13:33:06
+------------------------------------------------------------------------------------------------

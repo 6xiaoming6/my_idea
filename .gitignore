@@ -108,12 +108,11 @@ Thumbs.db
 checkpoints/
 
 # =============================================================================
-# Training outputs (logs, plots, saved configs from runs)
+# Training outputs (only v24-COE configs and logs are versioned)
 # =============================================================================
-/outputs/
+/outputs/**
 # /runs/
 # /logs/
-# /outputs/v2_smoke
 
 # =============================================================================
 # Matplotlib / plotting caches
@@ -142,3 +141,10 @@ requirements-freeze.txt
 *.bak
 *.tmp
 *.log
+
+# Keep v24-COE experiment configs and logs after the general exclusions.
+!/outputs/v24-COE/
+!/outputs/v24-COE/**/
+!/outputs/v24-COE/**/config.json
+!/outputs/v24-COE/**/logs/**
+/outputs/**/*.csv

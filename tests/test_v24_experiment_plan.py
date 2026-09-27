@@ -91,7 +91,7 @@ class V24ExperimentPlanTests(unittest.TestCase):
         self.assertEqual((coe("parallel")["num_steps"], coe("parallel")["routing_mode"]), (1, "parallel"))
         self.assertEqual(coe("soft")["num_steps"], 2)
         self.assertEqual(coe("fixed_tt")["fixed_path"], ["T", "T"])
-        self.assertEqual(runs["full"]["candidate_compute"]["train_routed_calls_per_window"], 4)
+        self.assertEqual(runs["full"]["candidate_compute"]["train_routed_calls_per_window"], 2)
         self.assertEqual(runs["fixed_ts"]["candidate_compute"]["train_routed_calls_per_window"], 2)
         self.assertEqual(runs["parallel"]["candidate_compute"]["inference_routed_calls_per_window"], 2)
 
@@ -118,7 +118,7 @@ class V24ExperimentPlanTests(unittest.TestCase):
         self.assertEqual(cfg["loss"]["lambda_coe_balance"], 0.01)
         self.assertEqual(cfg["loss"]["lambda_coe_mid"], 0)
         self.assertTrue(plan["comparison_policy"]["route_balance_enabled_by_default"])
-        self.assertEqual(plan["runs"][0]["candidate_compute"]["train_routed_calls_per_window"], 24)
+        self.assertEqual(plan["runs"][0]["candidate_compute"]["train_routed_calls_per_window"], 4)
 
     def test_weak_mid_is_an_explicit_optional_stage(self):
         plan = planner.build_plan(self.args("--stage", "optional"))

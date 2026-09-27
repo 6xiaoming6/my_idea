@@ -1,0 +1,32 @@
+-------------------------------------------------------------------------
+ epoch         loss         mae         rmse   train_mae   epoch_s   best
+-------------------------------------------------------------------------
+     2     57.18754     56.0387     105.8025     72.2349      26.2      *
+Best model at epoch 2 (val_mae=56.0387)
+
+------------------------------------------------------------------------------------------------
+Training interrupted: 2026-09-21 10:21:02
+Summary
+  completed_epochs: 3
+  best_epoch: 2
+  best_val_mae: 56.038688
+  val_epoch: 2
+  validation_count: 1
+  final_train_loss: 57.682723
+  final_train_mae: 57.602167
+  final_val_loss: nan
+  final_val_mae: nan
+  total_time: 1m 25s
+  avg_epoch_time_sec: 25.25
+  avg_train_sec_per_step: 0.1585
+  avg_val_sec_per_step: 0.0228
+  peak_memory_gb: 3.57
+  test_loss: n/a
+  test_mae: n/a
+  test_rmse: n/a
+  test_mape: n/a
+  test_time_sec: 0.00
+  best_checkpoint: /home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/v24_coe_depth_s1_top6_random_rate0.4_seed7/random/rate0.4/20260921_101935_seed7_bs16/checkpoints/best.pt
+  best_state_source: checkpoint
+  metrics_jsonl: /home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/v24_coe_depth_s1_top6_random_rate0.4_seed7/random/rate0.4/20260921_101935_seed7_bs16/logs/metrics.jsonl
+------------------------------------------------------------------------------------------------

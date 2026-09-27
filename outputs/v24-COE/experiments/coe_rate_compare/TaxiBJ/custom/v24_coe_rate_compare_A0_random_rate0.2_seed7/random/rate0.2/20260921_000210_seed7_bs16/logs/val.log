@@ -1,0 +1,30 @@
+-------------------------------------------------------------------------
+ epoch         loss         mae         rmse   train_mae   epoch_s   best
+-------------------------------------------------------------------------
+
+------------------------------------------------------------------------------------------------
+Training interrupted: 2026-09-21 00:02:39
+Summary
+  completed_epochs: 0
+  best_epoch: n/a
+  best_val_mae: n/a
+  val_epoch: 5
+  validation_count: 0
+  final_train_loss: n/a
+  final_train_mae: n/a
+  final_val_loss: n/a
+  final_val_mae: n/a
+  total_time: 27.8s
+  avg_epoch_time_sec: 0.00
+  avg_train_sec_per_step: 0.0000
+  avg_val_sec_per_step: 0.0000
+  peak_memory_gb: 0.00
+  test_loss: n/a
+  test_mae: n/a
+  test_rmse: n/a
+  test_mape: n/a
+  test_time_sec: 0.00
+  best_checkpoint: n/a
+  best_state_source: checkpoint
+  metrics_jsonl: /home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/experiments/coe_rate_compare/TaxiBJ/custom/v24_coe_rate_compare_A0_random_rate0.2_seed7/random/rate0.2/20260921_000210_seed7_bs16/logs/metrics.jsonl
+------------------------------------------------------------------------------------------------

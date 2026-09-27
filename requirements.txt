@@ -1,2 +1,11 @@
+# Training and evaluation
+# Install a PyTorch build compatible with the local CUDA driver for GPU training.
+torch>=2.3
 numpy>=1.24
 tqdm>=4.66
+matplotlib>=3.7
+
+# Dataset preparation (TaxiBJ / CHAP)
+pandas>=2.0
+xarray>=2024.1
+h5netcdf>=1.3

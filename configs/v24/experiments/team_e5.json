@@ -1,0 +1,8 @@
+{
+  "model": {
+    "coe": {
+      "pair_mode": "interaction",
+      "acceptance": "point"
+    }
+  }
+}

@@ -77,7 +77,7 @@ def build_jobs(policy: dict, epochs: int | None = None) -> list[dict]:
             "early_stopping": policy["early_stopping"],
             "scheduler": policy["scheduler"],
         })
-        cfg["experiment_plan"] = {"stage": "coe_depth_pool", "variant": variant["name"],
+        cfg["experiment_plan"] = {"stage": policy.get("stage", "coe_depth_pool"), "variant": variant["name"],
                                    "protocol": "random_rate0.4", "protocol_kind": "legacy_csv"}
         control = ROOT / policy["control_dir"]
         jobs.append({"name": name, "config": cfg,
@@ -98,13 +98,13 @@ def check_gpu_idle(gpu: int) -> None:
         raise RuntimeError("A GPU already has a compute process; depth-pool queue was not started:\n" + processes.stdout)
 
 
-def main() -> int:
+def main(policy_path: Path = POLICY) -> int:
     p = argparse.ArgumentParser()
     p.add_argument("--gpu", type=int, default=0)
     p.add_argument("--dry-run", action="store_true")
     p.add_argument("--epochs", type=int, default=None, help="Override the epoch count for every queued experiment.")
     args = p.parse_args()
-    policy = load(POLICY)
+    policy = load(policy_path)
     if args.epochs is not None:
         if args.epochs <= 0:
             raise ValueError("--epochs must be a positive integer")

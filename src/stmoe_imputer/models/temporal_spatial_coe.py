@@ -23,7 +23,7 @@ from .coe_pattern_experts import (
 )
 
 
-from .coe_router import GroupedRouter, PreviousExpertRouter, observed_pattern_features
+from .coe_router import GroupedRouter, PairRouter, PreviousExpertRouter, observed_pattern_features
 
 
 SUPPORTED_EXPERT_NAMES = ("T", "S", "TD", "SD", "TA", "ST", "TL", "SL")
@@ -247,6 +247,10 @@ class TemporalSpatialCoE(nn.Module):
         router_input_noise_std: float = 0.0,
         router_input_noise_steps: int = 0,
         top_k: int = 1,
+        pair_mode: str = "native",
+        acceptance: str = "none",
+        expert_sharing: str = "shared",
+        completion_feedback: bool = True,
     ) -> None:
         super().__init__()
         self.c_in = _positive_int("c_in", c_in)
@@ -268,6 +272,24 @@ class TemporalSpatialCoE(nn.Module):
         if routing_mode in {"fixed", "parallel"} and top_k != 1:
             raise ValueError("top_k > 1 is supported only for hard or soft routing")
         self.top_k = top_k
+        if pair_mode not in {"native", "additive", "interaction"}:
+            raise ValueError("pair_mode must be native, additive or interaction")
+        if acceptance not in {"none", "point", "window"}:
+            raise ValueError("acceptance must be none, point or window")
+        if expert_sharing not in {"shared", "per_step"}:
+            raise ValueError("expert_sharing must be shared or per_step")
+        if pair_mode != "native" and (routing_mode != "hard" or top_k != 2 or
+                router_features != "legacy" or previous_expert_context or global_route_weights):
+            raise ValueError("Pair routing requires legacy hard Top-2 without previous/global routing")
+        if type(completion_feedback) is not bool:
+            raise ValueError("completion_feedback must be boolean")
+        if not completion_feedback and acceptance != "none":
+            raise ValueError("Completion-free layered MoE does not use an acceptance gate")
+        self.pair_mode, self.acceptance, self.expert_sharing = pair_mode, acceptance, expert_sharing
+        self.completion_feedback = completion_feedback
+        pairs = (torch.combinations(torch.arange(self.num_experts), r=2) if top_k == 2
+                 else torch.empty((0, 2), dtype=torch.long))
+        self.register_buffer("pair_indices", pairs, persistent=False)
         temporal_dilation = _positive_int("temporal_dilation", temporal_dilation)
         spatial_dilation = _positive_int("spatial_dilation", spatial_dilation)
         attention_heads = _positive_int("attention_heads", attention_heads)
@@ -383,29 +405,32 @@ class TemporalSpatialCoE(nn.Module):
         self.state_norm = PointwiseLayerNorm(dim)
         # Every configured label receives its own module. Suffixes such as T1
         # and T2 deliberately create independent parameter instances.
-        self.pattern_experts = nn.ModuleDict()
-        for name in self.expert_names:
-            kind = _expert_kind(name)
-            if kind == "T":
-                self.pattern_experts[name] = DirectionalExpert(dim, "temporal", self.temporal_kernel)
-            elif kind == "S":
-                self.pattern_experts[name] = DirectionalExpert(dim, "spatial", self.spatial_kernel)
-            elif kind == "TD":
-                self.pattern_experts[name] = DilatedDirectionalExpert(
-                    dim, "temporal", self.temporal_kernel, temporal_dilation
-                )
-            elif kind == "SD":
-                self.pattern_experts[name] = DilatedDirectionalExpert(
-                    dim, "spatial", self.spatial_kernel, spatial_dilation
-                )
-            elif kind == "TA":
-                self.pattern_experts[name] = TemporalAttentionExpert(dim, attention_heads)
-            elif kind == "ST":
-                self.pattern_experts[name] = JointSpatioTemporalExpert(dim)
-            elif kind == "TL":
-                self.pattern_experts[name] = DirectionalExpert(dim, "temporal", self.temporal_kernel + 2)
-            elif kind == "SL":
-                self.pattern_experts[name] = DirectionalExpert(dim, "spatial", self.spatial_kernel + 2)
+        def make_pool() -> nn.ModuleDict:
+            pool = nn.ModuleDict()
+            for name in self.expert_names:
+                kind = _expert_kind(name)
+                if kind == "T":
+                    pool[name] = DirectionalExpert(dim, "temporal", self.temporal_kernel)
+                elif kind == "S":
+                    pool[name] = DirectionalExpert(dim, "spatial", self.spatial_kernel)
+                elif kind == "TD":
+                    pool[name] = DilatedDirectionalExpert(dim, "temporal", self.temporal_kernel, temporal_dilation)
+                elif kind == "SD":
+                    pool[name] = DilatedDirectionalExpert(dim, "spatial", self.spatial_kernel, spatial_dilation)
+                elif kind == "TA":
+                    pool[name] = TemporalAttentionExpert(dim, attention_heads)
+                elif kind == "ST":
+                    pool[name] = JointSpatioTemporalExpert(dim)
+                elif kind == "TL":
+                    pool[name] = DirectionalExpert(dim, "temporal", self.temporal_kernel + 2)
+                elif kind == "SL":
+                    pool[name] = DirectionalExpert(dim, "spatial", self.spatial_kernel + 2)
+            return pool
+
+        # Keep the first pool and all common modules initialized exactly as in
+        # E1; append independent later-round pools only after common modules.
+        self.pattern_experts = make_pool()
+        self.step_pattern_experts = nn.ModuleList()
         self.shared_expert = PointwiseExpert(dim)
         self.decoder = nn.Sequential(
             PointwiseLayerNorm(dim),
@@ -419,17 +444,14 @@ class TemporalSpatialCoE(nn.Module):
         if router_hidden_dim is None:
             router_hidden_dim = max(16, dim)
         router_hidden_dim = _positive_int("router_hidden_dim", router_hidden_dim)
-        self.routers = nn.ModuleList(
-            [
-                nn.Sequential(
-                    nn.LayerNorm(router_input_dim),
-                    nn.Linear(router_input_dim, router_hidden_dim),
-                    nn.GELU(),
-                    nn.Linear(router_hidden_dim, self.num_experts),
-                )
-                for _ in range(num_steps)
-            ]
-        )
+        self.routers = nn.ModuleList([
+            (PairRouter(router_input_dim, router_hidden_dim, self.num_experts,
+                        len(self.pair_indices), False)
+             if pair_mode != "native" else
+             nn.Sequential(nn.LayerNorm(router_input_dim), nn.Linear(router_input_dim, router_hidden_dim),
+                           nn.GELU(), nn.Linear(router_hidden_dim, self.num_experts)))
+            for _ in range(num_steps)
+        ])
         if router_features == "grouped":
             self.routers = nn.ModuleList([
                 GroupedRouter([2 * dim, 2 * c_in, 4 * support_dim, 2 * c_in, 2, 9 * c_in],
@@ -438,7 +460,8 @@ class TemporalSpatialCoE(nn.Module):
             ])
         if router_init_std is not None:
             for router in self.routers:
-                final = router.head[-1] if isinstance(router, GroupedRouter) else router[-1]
+                final = (router.head[-1] if isinstance(router, GroupedRouter) else
+                         router.layers[-1] if isinstance(router, PairRouter) else router[-1])
                 nn.init.normal_(final.weight, std=router_init_std)
                 nn.init.zeros_(final.bias)
         residual_logit = math.log(float(residual_init) / (1 - float(residual_init)))
@@ -446,9 +469,23 @@ class TemporalSpatialCoE(nn.Module):
         self.routed_scale_logits = nn.Parameter(torch.full((num_steps,), residual_logit))
         if self.global_route_weights:
             self.global_route_logits = nn.Parameter(torch.zeros(num_steps, self.num_experts))
+        self.acceptance_head = None
+        if acceptance != "none":
+            head_dim = max(8, dim // 4)
+            self.acceptance_head = nn.Sequential(
+                nn.Conv3d(dim + 14 * c_in, head_dim, 1), nn.GELU(),
+                nn.Conv3d(head_dim, c_in, 1),
+            )
+            nn.init.zeros_(self.acceptance_head[-1].weight)
+            nn.init.constant_(self.acceptance_head[-1].bias, math.log(9.0))
         if self.previous_expert_context:
             for step in range(1, num_steps):
                 self.routers[step] = PreviousExpertRouter(self.routers[step], self.num_experts)
+        if expert_sharing == "per_step":
+            self.step_pattern_experts.extend(make_pool() for _ in range(num_steps - 1))
+        if pair_mode == "interaction":
+            for router in self.routers:
+                router.enable_interaction()
 
     @classmethod
     def from_config(cls, cfg: dict) -> "TemporalSpatialCoE":
@@ -483,6 +520,10 @@ class TemporalSpatialCoE(nn.Module):
             router_input_noise_std=coe.get("router_input_noise_std", 0.0),
             router_input_noise_steps=coe.get("router_input_noise_steps", 0),
             top_k=coe.get("top_k", 1),
+            pair_mode=coe.get("pair_mode", "native"),
+            acceptance=coe.get("acceptance", "none"),
+            expert_sharing=coe.get("expert_sharing", "shared"),
+            completion_feedback=coe.get("completion_feedback", True),
         )
 
     def set_routing_epoch(self, epoch: int) -> None:
@@ -499,9 +540,11 @@ class TemporalSpatialCoE(nn.Module):
                        max(1, self.routing_transition_epochs))
         return hard, (1 - hard) * self.uniform_mix_start, 1 + (1 - hard) * (self.sampling_temperature_start - 1)
 
-    def routed_experts(self) -> tuple[nn.Module, ...]:
-        """Return the registered operators in router-column order."""
-        return tuple(self.pattern_experts[name] for name in self.expert_names)
+    def routed_experts(self, step: int = 0) -> tuple[nn.Module, ...]:
+        """Return the operators for one round in router-column order."""
+        pool = (self.pattern_experts if self.expert_sharing == "shared" or step == 0
+                else self.step_pattern_experts[step - 1])
+        return tuple(pool[name] for name in self.expert_names)
 
     def _position(self, x: torch.Tensor) -> torch.Tensor:
         b, _, t, h, w = x.shape
@@ -565,10 +608,37 @@ class TemporalSpatialCoE(nn.Module):
         noisy = base + torch.randn_like(base) * (self.router_input_noise_std * scale)
         return noisy.to(dtype=features.dtype)
 
-    def _dispatch(self, unified: torch.Tensor, paths: torch.Tensor) -> torch.Tensor:
+    def _pair_route(self, logits: torch.Tensor, pair_bias: torch.Tensor | None,
+                    sampling_temperature: float) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
+        """Deterministic pair forward with a differentiable soft pair surrogate."""
+        individual = logits.float()
+        pair_logits = individual[:, self.pair_indices[:, 0]] + individual[:, self.pair_indices[:, 1]]
+        if pair_bias is not None:
+            pair_logits = pair_logits + pair_bias.float()
+        pair_probs = F.softmax(pair_logits / sampling_temperature, dim=-1)
+        pair_ids = pair_logits.argmax(dim=-1)
+        # Match torch.topk's native tie rule when the additive score has
+        # multiple maxima (including the zero-initialized interaction head).
+        native_top2 = individual.topk(2, dim=-1).indices.sort(dim=-1).values
+        native_ids = (self.pair_indices.unsqueeze(0) == native_top2.unsqueeze(1)).all(dim=-1).long().argmax(dim=-1)
+        native_scores = pair_logits.gather(1, native_ids.unsqueeze(1)).squeeze(1)
+        pair_ids = torch.where(native_scores == pair_logits.max(dim=-1).values, native_ids, pair_ids)
+        hard = F.one_hot(pair_ids, len(self.pair_indices)).to(pair_probs.dtype)
+        pair_choice = (pair_probs - pair_probs.detach()) + hard if self.training else hard
+        pair_individual = individual[:, self.pair_indices]
+        within_pair = F.softmax(pair_individual / sampling_temperature, dim=-1)
+        indices = self.pair_indices.unsqueeze(0).expand(individual.shape[0], -1, -1)
+        pair_to_expert = torch.zeros(
+            (individual.shape[0], len(self.pair_indices), self.num_experts),
+            device=individual.device, dtype=within_pair.dtype,
+        ).scatter(-1, indices, within_pair)
+        weights = torch.einsum("bp,bpe->be", pair_choice, pair_to_expert)
+        return weights, pair_ids, pair_logits, pair_probs
+
+    def _dispatch(self, unified: torch.Tensor, paths: torch.Tensor, step: int = 0) -> torch.Tensor:
         """Evaluate only selected whole windows, keeping their full context."""
         result = torch.zeros_like(unified)
-        for expert_index, expert in enumerate(self.routed_experts()):
+        for expert_index, expert in enumerate(self.routed_experts(step)):
             selected = torch.nonzero(paths == expert_index, as_tuple=False).flatten()
             if selected.numel():
                 updates = expert(unified.index_select(0, selected))
@@ -577,6 +647,24 @@ class TemporalSpatialCoE(nn.Module):
                 # matching dtypes; the differentiable cast preserves gradients
                 # and accumulates every expert in the state's precision.
                 result = result.index_copy(0, selected, updates.to(result.dtype))
+        return result
+
+    def _dispatch_weighted(self, unified: torch.Tensor, weights: torch.Tensor,
+                           step: int = 0) -> torch.Tensor:
+        """Evaluate an expert only on windows that selected it."""
+        if weights.shape != (unified.shape[0], self.num_experts):
+            raise ValueError("Sparse routing weights must have shape [batch, experts]")
+        result = torch.zeros_like(unified)
+        for expert_index, expert in enumerate(self.routed_experts(step)):
+            selected = torch.nonzero(weights[:, expert_index].detach() != 0,
+                                     as_tuple=False).flatten()
+            if selected.numel() == 0:
+                continue
+            inputs = unified.index_select(0, selected)
+            updates = expert(inputs)
+            coefficients = weights.index_select(0, selected)[:, expert_index]
+            weighted = updates * coefficients[:, None, None, None, None].to(updates.dtype)
+            result = result.index_add(0, selected, weighted.to(result.dtype))
         return result
 
     def forward(self, x_f: torch.Tensor, m_f: torch.Tensor, **kwargs: object) -> dict:
@@ -633,8 +721,12 @@ class TemporalSpatialCoE(nn.Module):
         hard_fraction, uniform_mix, sampling_temperature = self.routing_schedule()
 
         predictions, completions, changes = [], [], []
+        candidate_predictions, candidate_completions, candidate_changes = [], [], []
+        acceptance_history = []
         logits_history, probability_history, weight_history, path_history = [], [], [], []
+        selected_history, pair_id_history, pair_logit_history, pair_prob_history = [], [], [], []
         previous_choice_history = []
+        previous_candidate_prediction = initial_prediction
         for step in range(self.num_steps):
             forced_expert = self.fixed_expert_steps[step]
             forced_index = self.expert_names.index(forced_expert) if forced_expert is not None else None
@@ -643,11 +735,18 @@ class TemporalSpatialCoE(nn.Module):
                 previous_choice = (F.one_hot(path_history[-1].detach(), self.num_experts).float()
                                    if step else hidden.new_zeros((hidden.shape[0], self.num_experts)))
                 previous_choice_history.append(previous_choice)
+            pair_bias = None
             if self.use_routed and self.routing_mode != "fixed" and forced_index is None:
                 router_features = (
                     initial_router_features
                     if self.router_state == "initial"
-                    else self._router_features(hidden, completion, support_summary, change, missing, pattern_summary)
+                    else self._router_features(
+                        hidden,
+                        completion if self.completion_feedback else initial_completion,
+                        support_summary,
+                        change if self.completion_feedback else torch.zeros_like(change),
+                        missing, pattern_summary,
+                    )
                 )
                 router_features = self._add_router_input_noise(router_features, step)
                 if self.global_route_weights:
@@ -655,8 +754,12 @@ class TemporalSpatialCoE(nn.Module):
                 else:
                     with torch.autocast(device_type=hidden.device.type, enabled=False) if self.router_fp32 else nullcontext():
                         features = router_features.float() if self.router_fp32 else router_features
-                        logits = (self.routers[step](features, previous_choice)
+                        scored = (self.routers[step](features, previous_choice)
                                   if self.previous_expert_context and step else self.routers[step](features))
+                        if self.pair_mode == "native":
+                            logits = scored
+                        else:
+                            logits, pair_bias = scored
             elif forced_index is not None:
                 logits = hidden.new_full((hidden.shape[0], self.num_experts), -20.0)
                 logits[:, forced_index] = 20.0
@@ -682,6 +785,11 @@ class TemporalSpatialCoE(nn.Module):
                 weights = F.one_hot(paths, self.num_experts).to(hidden.dtype)
             elif self.routing_mode in {"soft", "parallel"}:
                 weights = probabilities
+                paths = weights.argmax(dim=-1)
+            elif self.pair_mode != "native":
+                weights, pair_ids, pair_logits, pair_probs = self._pair_route(
+                    logits, pair_bias, sampling_temperature
+                )
                 paths = weights.argmax(dim=-1)
             elif self.training:
                 if self.top_k > 1:
@@ -717,11 +825,28 @@ class TemporalSpatialCoE(nn.Module):
                     paths = logits.argmax(dim=-1)
                     weights = F.one_hot(paths, self.num_experts).to(hidden.dtype)
 
+            if self.use_routed and self.routing_mode == "hard" and self.top_k == 2:
+                if self.pair_mode == "native":
+                    selected = weights.topk(2, dim=-1).indices.sort(dim=-1).values
+                    first, second = selected.unbind(dim=-1)
+                    pair_ids = first * (2 * self.num_experts - first - 1) // 2 + (second - first - 1)
+                    individual = logits.float()
+                    pair_logits = (individual[:, self.pair_indices[:, 0]] +
+                                   individual[:, self.pair_indices[:, 1]])
+                    pair_probs = F.softmax(pair_logits / sampling_temperature, dim=-1)
+                else:
+                    selected = self.pair_indices[pair_ids]
+                selected_history.append(selected)
+                pair_id_history.append(pair_ids)
+                pair_logit_history.append(pair_logits)
+                pair_prob_history.append(pair_probs)
+
             # Recompute this same interface each round in both state variants.
             # Freezing the expert input leaves residual accumulation and router
             # state policy independent, and retains candidate computation counts.
             expert_hidden = initial_hidden if self.expert_state == "initial" else hidden
-            expert_completion = initial_completion if self.expert_state == "initial" else completion
+            expert_completion = (initial_completion if self.expert_state == "initial" or
+                                 not self.completion_feedback else completion)
             unified = self.state_norm(self.state_projection(torch.cat(
                 [expert_hidden, expert_completion, original_mask, support, position], dim=1
             )))
@@ -729,23 +854,47 @@ class TemporalSpatialCoE(nn.Module):
             if self.use_shared:
                 update = update + self.shared_scale_logits[step].sigmoid() * self.shared_expert(unified)
             if self.use_routed:
-                if self.routing_mode in {"soft", "parallel"} or (self.routing_mode == "hard" and (self.training or self.top_k > 1)):
+                if self.routing_mode in {"soft", "parallel"}:
                     routed_update = torch.zeros_like(unified)
-                    for expert_index, expert in enumerate(self.routed_experts()):
+                    for expert_index, expert in enumerate(self.routed_experts(step)):
                         routed_update = routed_update + (
                             weights[:, expert_index, None, None, None, None] * expert(unified)
                         )
+                elif self.routing_mode == "hard":
+                    routed_update = self._dispatch_weighted(unified, weights, step)
                 else:
-                    routed_update = self._dispatch(unified, paths)
+                    routed_update = self._dispatch(unified, paths, step)
                 update = update + self.routed_scale_logits[step].sigmoid() * routed_update
             hidden = hidden + update
-            previous_prediction = prediction
-            prediction = self.decoder(hidden)
-            completion = torch.where(observed, x_input, prediction)
-            change = torch.where(observed, torch.zeros_like(prediction), (prediction - previous_prediction).abs())
+            candidate_prediction = self.decoder(hidden)
+            candidate_completion = torch.where(observed, x_input, candidate_prediction)
+            candidate_change = torch.where(observed, torch.zeros_like(candidate_prediction),
+                                           (candidate_prediction - previous_candidate_prediction).abs())
+            old_completion = completion
+            if self.acceptance_head is None:
+                acceptance_weight = torch.ones_like(candidate_prediction)
+                completion = candidate_completion
+            else:
+                proposal = candidate_completion - old_completion
+                gate_features = torch.cat(
+                    [hidden, old_completion, candidate_completion, proposal, original_mask, support], dim=1
+                )
+                gate_logits = self.acceptance_head(gate_features)
+                if self.acceptance == "window":
+                    gate_logits = gate_logits.mean(dim=(2, 3, 4), keepdim=True)
+                acceptance_weight = torch.sigmoid(gate_logits)
+                completion = torch.where(observed, x_input, old_completion + acceptance_weight * proposal)
+            prediction = torch.where(observed, candidate_prediction, completion)
+            change = torch.where(observed, torch.zeros_like(prediction),
+                                 (completion - old_completion).abs())
+            previous_candidate_prediction = candidate_prediction
             predictions.append(prediction)
             completions.append(completion)
             changes.append(change)
+            candidate_predictions.append(candidate_prediction)
+            candidate_completions.append(candidate_completion)
+            candidate_changes.append(candidate_change)
+            acceptance_history.append(acceptance_weight)
             logits_history.append(logits)
             probability_history.append(probabilities)
             weight_history.append(weights)
@@ -753,7 +902,8 @@ class TemporalSpatialCoE(nn.Module):
 
         route_probabilities = torch.stack(probability_history, dim=1)
         route_weights = torch.stack(weight_history, dim=1)
-        effective_mode = "soft" if self.routing_mode == "hard" and hard_fraction < 1 else self.routing_mode
+        effective_mode = ("soft" if self.routing_mode == "hard" and self.top_k == 1
+                          and hard_fraction < 1 else self.routing_mode)
         diagnostics = {
             "hard_fraction": hidden.new_tensor(hard_fraction),
             "sampling_temperature": hidden.new_tensor(sampling_temperature),
@@ -761,6 +911,7 @@ class TemporalSpatialCoE(nn.Module):
             "missing_fraction": missing.detach().mean(),
             "shared_residual_scale": self.shared_scale_logits.detach().sigmoid().mean(),
             "routed_residual_scale": self.routed_scale_logits.detach().sigmoid().mean(),
+            "acceptance_mean": torch.stack(acceptance_history).detach().float().mean(),
         }
         for step, step_change in enumerate(changes, start=1):
             if self.previous_expert_context and step > 1:
@@ -772,6 +923,12 @@ class TemporalSpatialCoE(nn.Module):
                 top2 = step_logits.topk(2, dim=-1).values
                 diagnostics[f"step{step}_top12_margin"] = (top2[:, 0] - top2[:, 1]).mean()
             diagnostics[f"step{step}_update_abs_mean"] = step_change.detach().float().mean()
+            if self.routing_mode == "hard" and self.top_k == 2:
+                native_pair = step_logits.topk(2, dim=-1).indices.sort(dim=-1).values
+                chosen_pair = selected_history[step - 1]
+                diagnostics[f"step{step}_pair_vs_top2_disagreement_rate"] = (
+                    (chosen_pair != native_pair).any(dim=-1).float().mean()
+                )
         if self.use_routed and self.routing_mode != "fixed":
             diagnostic_probabilities = route_probabilities.detach().float()
             diagnostics["route_entropy"] = -(
@@ -784,6 +941,14 @@ class TemporalSpatialCoE(nn.Module):
             "coe": {
                 "predictions": predictions,
                 "completions": completions,
+                "candidate_predictions": candidate_predictions,
+                "candidate_completions": candidate_completions,
+                "candidate_changes": candidate_changes,
+                "acceptance_weights": torch.stack(acceptance_history, dim=1),
+                "selected_experts": (torch.stack(selected_history, dim=1) if selected_history else None),
+                "pair_ids": (torch.stack(pair_id_history, dim=1) if pair_id_history else None),
+                "pair_logits": (torch.stack(pair_logit_history, dim=1) if pair_logit_history else None),
+                "pair_probs": (torch.stack(pair_prob_history, dim=1) if pair_prob_history else None),
                 "initial_prediction": initial_prediction,
                 "initial_completion": initial_completion,
                 "changes": changes,
@@ -796,6 +961,10 @@ class TemporalSpatialCoE(nn.Module):
                 "configured_routing_mode": self.routing_mode,
                 "router_state": self.router_state,
                 "expert_state": self.expert_state,
+                "pair_mode": self.pair_mode,
+                "acceptance": self.acceptance,
+                "expert_sharing": self.expert_sharing,
+                "completion_feedback": self.completion_feedback,
                 "previous_expert_context": self.previous_expert_context,
                 "previous_expert_choices": (torch.stack(previous_choice_history, dim=1)
                                             if previous_choice_history else None),

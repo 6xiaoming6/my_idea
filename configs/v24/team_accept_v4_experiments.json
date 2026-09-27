@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "output_dir": "outputs/v24-COE/experiments/coe_team_accept_v4",
+  "cpu_threads": 2,
+  "batch_size": 16,
+  "seeds": [
+    7
+  ],
+  "extra_inputs": [
+    "data/TaxiBJ/v24_clean_abc_20260917/manifest.json",
+    "model_designs/v24_TSCoE_实验设计_v4_已核对最新提交_6d65c6f.md"
+  ],
+  "training": {
+    "epochs": 50,
+    "val_epoch": 2,
+    "save_best_checkpoint": true,
+    "early_stopping": {
+      "enabled": false
+    },
+    "scheduler": {
+      "type": "cosine",
+      "total_epochs": 50,
+      "eta_min": 1e-06
+    },
+    "router_grad_diagnostic_every": 50
+  },
+  "studies": {
+    "coe_team_accept_v4": {
+      "base_config": "configs/v24/team_accept_v4_base.json",
+      "stage": "coe_team_accept_v4",
+      "sources": {
+        "train": "data/TaxiBJ/v24_clean_abc_20260917/taxibj_train.npz",
+        "val": "data/TaxiBJ/v24_clean_abc_20260917/taxibj_val.npz",
+        "test": "data/TaxiBJ/v24_clean_abc_20260917/taxibj_test.npz"
+      }
+    }
+  },
+  "default_study": "coe_team_accept_v4"
+}

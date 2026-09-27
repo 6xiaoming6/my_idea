@@ -1,362 +1,106 @@
-# v24-COE：Temporal-Spatial Chain-of-Experts
+# 时空数据补全实验项目（v24-COE）
 
-最新 TaxiBJ 五组对照使用项目根目录中的 `scripts/v24/run_abcde.py`，按 A→B→C→D→E 在单卡上顺序运行，每组 70 epoch。配置位于 `configs/v24/abcde_experiments.json`，详见 [五组实验说明](scripts/v24/README_ABCDE.md)。`outputs/` 下的旧工作副本仅保留历史记录。
+当前 `v24-COE` 分支研究 **Temporal-Spatial Chain-of-Experts（TS-CoE）**：在原始时空网格上逐层更新补全状态，每层路由器按当前观测和状态从共享专家池中选择专家。`top_k` 表示**每层同时激活的专家数**；被选专家的权重归一化后融合。当前 v24 模型只使用 fine 尺度，不构造 mid/coarse 特征。早期多尺度模型和 v14-single 实验代码仍在仓库中，但它们不是 v24 训练入口的默认架构。
 
-```bash
-# 在项目根目录执行；默认使用 GPU 0，已有 GPU 计算任务时拒绝启动。
-python scripts/v24/run_abcde.py --gpu 0
-# 只检查计划，不启动训练：
-python scripts/v24/run_abcde.py --dry-run
-```
+模型由输入编码、逐层独立路由器、跨层共享的专家池、点级共享分支和预测头组成。常用六专家池是 `T`（时间卷积）、`S`（空间卷积）、`TD`（空洞时间卷积）、`SD`（空洞空间卷积）、`TA`（时间注意力）、`ST`（局部时空联合）；八专家池再加入较大时间核 `TL` 和空间核 `SL`。每层可读取上层更新后的状态，固定链、Soft 路由和 Top-K 均可由配置控制。详细设计见 [v24 方案](model_designs/v24_Temporal-Spatial_Chain-of-Experts_详细方案.md)，实现见 [temporal_spatial_coe.py](src/stmoe_imputer/models/temporal_spatial_coe.py)。
 
-当前后续实验统一为 20 epoch、train/val/test 九类同分布混合 mask，共六组（硬路由基准、预热、分组输入、专家身份传递、固定路径、两层三专家），配置与运行顺序位于
-[后续实验说明](scripts/v24/README_FOLLOWUP.md)，统一从 `scripts/v24/run_followup.py` 启动，仍按单卡顺序运行。
+## 安装
 
-当前分支新增单尺度 TS-CoE：两轮共享时间/空间专家池，根据观测支撑和更新后的补全状态逐轮路由。第一版按方案 10.4/10.5，仅以隐藏目标 MAE 训练，`lambda_coe_balance=0`、`lambda_coe_mid=0`；保留 ST Gumbel-Softmax 梯度估计和轻量点级共享专家。先监控专家使用率、路径、梯度及缺失条件下的选择，不要求时间/空间专家平均分工；不构造中/粗尺度。
-
-现另提供 **3 轮 / 4 类专家**与 **4 轮 / 6 类专家**候选，增加空洞时间、空洞空间、完整窗口时间注意力和局部时空联合专家，并提供轮数 × 专家池大小的九组消融。所有候选保持原始分辨率，详见 [深链候选说明](changes/v24_COE_deeper_candidates.md)。
+先激活项目使用的 Python 环境（例如 `conda activate difftdi`），再在项目根目录执行。代码支持 Python 3.9 及以上；GPU 训练需要与本机 CUDA/驱动兼容的 PyTorch。若环境里已有合适的 PyTorch，下面的安装会保留满足版本约束的版本；否则先按本机环境安装 PyTorch，再安装项目依赖。
 
 ```bash
-python scripts/train.py -c configs/v24/smoke.json --synthetic --no_plot -n v24_smoke
-
-# 3 轮候选；替换 chain4.json / 运行名即可运行 4 轮候选
-python scripts/train.py -c configs/v24/smoke.json \
-  --override_config configs/v24/candidates/chain3.json \
-  --synthetic --no_plot -n v24_chain3_smoke
+python -m pip install -r requirements.txt
+python -m pip install -e .
 ```
 
-完整的可行性评价、方法边界、真实数据训练命令及消融配置见 [v24 实现说明](changes/v24_COE_implementation.md)。核心代码为 [temporal_spatial_coe.py](src/stmoe_imputer/models/temporal_spatial_coe.py)，设计来源为 [详细方案](model_designs/v24_Temporal-Spatial_Chain-of-Experts_详细方案.md)。
+`requirements.txt` 包含训练/评估与 TaxiBJ、CHAP 预处理所需的直接依赖；不需要 torchvision。`pyproject.toml` 将预处理依赖分别提供为 `taxibj`、`chap` 可选项。Linux 上的 v24 顺序实验脚本使用 `fcntl` 和 `nvidia-smi` 检查单卡队列，正式训练需要可用的 NVIDIA GPU。
 
-按方案第 13 节整理的顺序、重路由、状态传递与深度对照，及共享缺失 mask、离线路径干预和运行清单生成方法见 [v24 实验设计](changes/v24_COE_experiment_design.md)。第一版 `pilot/core` 保持无路由正则；新一轮默认运行 **4 轮、6 个路由专家、路由均衡损失权重 0.01**，配置为 [chain4_balance.json](configs/v24/experiments/chain4_balance.json)。继续使用单尺度、单种子 `7`、`80 epoch`；轮数 × 专家池网格暂缓。
-
-v24 实验管理沿用 v23 的流程：每 2 轮完整验证，默认在 CPU 内存保留最佳权重，最后恢复它完整测试一次；重复运行跳过已完整完成的任务，未完成任务从头重跑。配置在 [experiments.json](configs/v24/experiments.json)，终端只显示训练进度条。
+先用合成数据检查安装、前向和训练流程：
 
 ```bash
-# 四轮六专家 + 路由损失，TaxiBJ 五种缺失结构各一组；只查看计划时加 --dry-run
-python scripts/v24/run_experiments.py --study chain4 --gpu 0
-
-# 原两轮无正则对照，显式选择 study
-python scripts/v24/run_experiments.py --study pilot --gpu 0
-python scripts/v24/run_experiments.py --study core --gpu 0
+python -u scripts/train.py -c configs/v24/smoke.json --synthetic --no_plot -n v24_smoke
 ```
 
-结果位于 `outputs/v24-COE/experiments/<chain4或pilot或core>/<指纹>/`，包含 `summary.csv`、`comparison.json`、`diagnostics.json` 及各任务完整日志。代码、数据或配置改变时使用新的指纹目录；旧 `section13/*/commands.sh` 不会自动升级，也不自动复用旧框架结果。新生成的计划命令会调用这一统一队列。需要离线路径分析时，将实验配置的 `training.save_best_checkpoint` 设为 `true`，每个任务只保留一个最佳 checkpoint。
+## TaxiBJ 数据与 mask
 
-下面保留原 v6 / main 基线说明；运行 v24 请使用 `configs/v24/`，原默认配置仍对应旧模型。
+真实数据训练读取 `data/TaxiBJ/taxibj_{train,val,test}.npz`。NPZ 至少包含 `x_f_gt`（或 `x_f`），形状为 `[N,C,T,H,W]`；当前 TaxiBJ 配置使用 `C=2, T=12, H=W=32`。原始 random 0.4 协议读取 `data/TaxiBJ/random_mask/0.4/{train,val,test}.csv`：每个样本一行空间 mask，沿时间维广播。九类混合缺失模式由配置中的 `train_mask_diversity` / `eval_mask_diversity` 在线生成；两种协议不能直接混排比较。
 
----
-
-## 原 v6 基线
-
-面向时空网格数据补全任务的 PyTorch 项目（第 6 版）。核心模型 `DualBranchSTImputer` 以 `MultiScaleMoEBackbone` 为骨干，在 TaxiBJ（出租车流量）、BikeNYC（共享单车）、CHAP（PM2.5 浓度）三个数据集上，评估 fixed / random 两种离线缺失掩码策略下的补全性能。
-
-关键设计：多尺度表示（fine/mid/coarse）、质量感知稀疏路由（QualityRouter + TopKRoutedExpertPool）、可靠性感知跨尺度共享专家（GatedCrossScaleSharedExpert + ReliabilityAwareScaleGate）、共享-路由双分支残差融合（SharedRoutedResidualFusion）。模型仅以观测值作为输入，缺失位置真值不参与前向计算。
-
-> **分支说明**：`main` 分支是项目的核心基线，包含经过完整实验验证的模型结构和训练流程。其他分支均在 `main` 的基础上尝试修改或优化模型结构，属于实验性探索，不代表最终方案。
->
-> **分支命名规则**：
-> - `single-v{i}` — 单分支架构第 i 个版本，不包含多模态辅助分支（`aux.enabled=false`）
-> - `dual-v{j}` — 双分支架构第 j 个版本，在单分支基础上增加多模态辅助分支（`aux.enabled=true`）
-
----
-
-## 项目结构
-
-```
-my_idea/
-├── src/stmoe_imputer/          # 核心模型与训练源码
-├── configs/                    # 训练配置
-│   ├── datasets/               #   TaxiBJ / BikeNYC / CHAP 数据集配置
-│   ├── presets/                #   合成数据默认 + smoke test 配置
-│   └── policies/               #   训练策略（epochs、batch 等）
-├── scripts/                    # 训练、评估、数据处理脚本
-├── data/                       # 数据集与离线 mask（不提交 Git）
-├── outputs/                    # 训练输出与实验索引（不提交 Git）
-├── experments_report/          # 实验分析报告
-├── model_designs/              # 模型设计演进文档
-├── changes/                    # 代码结构改动记录
-└── README.md
-```
-
----
-
-## 模型架构
-
-### 总体数据流
-
-```
-NPZ 数据 → x_f_gt [B,C,T,H,W], m_f [B,1,T,H,W]
-
-数据预处理 (transforms.py):
-  x_f_obs = x_f_gt * m_f                              ← 仅观测值可见
-  x_m_obs, m_m, r_m = masked_pool2d(x_f_obs, m_f, 2)  → [B,C,T,H/2,W/2]
-  x_c_obs, m_c, r_c = masked_pool2d(x_m_obs, m_m, 2)  → [B,C,T,H/4,W/4]
-  q_f, q_m, q_c = compute_observation_stats(m)         → [B,5] each
-
-模型前向 (imputer.py → main_branch.py):
-
-  x_f_obs,m_f        x_m_obs,m_m        x_c_obs,m_c
-      │                   │                   │
-  ┌───▼────┐         ┌───▼────┐         ┌───▼────┐
-  │Embed_F │         │Embed_M │         │Embed_C │    ScaleTokenEncoder
-  └───┬────┘         └───┬────┘         └───┬────┘      value+mask+scale+time+space
-  h_f [B,64,T,H,W]  h_m [B,64,T,H/2,W/2] h_c [B,64,T,H/4,W/4]
-      │                   │                   │
-      ├───────────────────┼───────────────────┤
-      │                   │                   │
-  ┌───▼────┐         ┌───▼────┐         ┌───▼────┐
-  │Router_F│         │Router_M│         │Router_C│    QualityRouter
-  └───┬────┘         └───┬────┘         └───┬────┘     MLP(h_pool|q|scale_embed)
- gate_f[B,4]       gate_m[B,4]       gate_c[B,4]
-      │                   │                   │
-      └────────┬──────────┴──────────┬────────┘
-               │                     │
-        ┌──────▼──────┐              │
-        │ ExpertPool  │ (4 experts,  │              TopKRoutedExpertPool
-        │ top_k=2     │  3尺度共享)   │              STExpert = Conv3d+GELU+ResBlock
-        └──────┬──────┘              │
-      z_f,z_m,z_c                    │
-               │                     │
-        ┌──────▼──────┐              │
-        │ Progressive │              │              c→m→f 渐进上采样+门控融合
-        │ RouteFusion │              │
-        └──────┬──────┘              │
-          h_route                    │
-               │                     │
-               ├─────────────────────┤
-               │                     │
-        ┌──────▼──────────────────────▼──────┐
-        │  GatedCrossScaleSharedExpert      │       可靠性感知尺度门控
-        │  ├─ ReliabilityAwareScaleGate      │       MLP(209→128→3)→softmax
-        │  └─ Conv1x1+2×ResBlock(concat)    │       加权融合 h_f,h_m_up,h_c_up
-        └──────┬────────────────────────────┘
-               │
-          z_shared
-               │
-        ┌──────▼──────────────────────┐
-        │  SharedRoutedResidualFusion │             双分支残差融合
-        │  z_shared → 2×ResBlock → h_shared       │
-        │  h_route → Conv+ResBlock → h_route_proj │  (+Dropout3d 0.1)
-        │  h_main = h_shared + γ·h_route_proj     │  γ = sigmoid(trainable)
-        └──────┬──────────────────────┘
-               │
-          h_main [B,64,T,H,W]
-               │
-        ┌──────┼──────────┬──────────┐
-        ▼      ▼          ▼          ▼
-    pred_head  shared_aux_head  route_aux_head      Conv3d×2
-        │          │              │
-  x_hat_main  x_hat_shared  x_hat_route
-  [B,C,T,H,W]
-```
-
-### 关键模块
-
-**ScaleTokenEncoder** — 多尺度时空嵌入
-- `value_embed(x)` + `mask_embed(m)` + `scale_embed` + `time_embed` + `space_embed`
-- 每个尺度独立参数，将 [B,C,T,H,W] 映射到 [B,64,T,H,W]
-
-**QualityRouter** — 质量感知路由
-- 输入：token 空间池化 [B,64] + 观测统计 q [B,5] + 尺度嵌入 [B,64]
-- 输出：softmax(gate) [B,num_experts]
-- `compute_observation_stats(m)` 返回 5 维统计量（缺失率、观测率、时间缺失分数、空间缺失分数、聚合可靠性）
-
-**TopKRoutedExpertPool** — Top-K 稀疏专家池
-- 4 个 STExpert（Conv3d→GroupNorm→GELU→ResidualSTBlock），3 尺度共享
-- `top_k=2`：每样本激活 2/4 专家，加权组合输出
-
-**ProgressiveRouteFusion** — 渐进路由融合
-- Coarse(8×8) → Mid(16×16) → Fine(32×32) 逐级上采样
-- 每级用 GatedFusion2 学习逐位置门控权重
-
-**GatedCrossScaleSharedExpert** — 跨尺度共享专家
-- `ReliabilityAwareScaleGate`：MLP(209→128→3) → softmax，综合 3 尺度特征+观测统计+可靠性评分，动态输出 [w_f, w_m, w_c]
-- 加权拼接后经 Conv1x1+2×ResidualSTBlock → z_shared
-- 默认 `shared_input_mode="pre"`：接收原始嵌入（非专家输出），与 Routed 分支互补
-
-**SharedRoutedResidualFusion** — 双分支残差融合
-- Shared：z_shared → 2×ResidualSTBlock → h_shared
-- Routed：h_route → Conv3d(k1)+ResidualSTBlock+Dropout3d(0.1) → h_route_proj
-- Fusion：`h_main = h_shared + sigmoid(γ) · h_route_proj`（γ 初始 sigmoid(-3)≈0.047，可学习）
-
-### 损失函数
-
-```python
-L = SmoothL1(x_hat_main, x_gt)           # 主损失（仅 hidden 位置）
-  + 0.10 × SmoothL1(x_hat_pooled, x_obs) # 跨尺度观测损失（mid+coarse）
-  + 0.01 × Σ(gate_mean - 1/E)²          # 专家重要性均衡
-  + 0.01 × Σ(load_mean - avg_load)²      # 专家负载均衡
-  + 0.05 × SmoothL1(x_hat_shared, x_gt)  # 共享分支辅助
-  + 0.10 × SmoothL1(x_hat_route, x_gt)   # 路由分支辅助
-  + 0.003 × cos²(h_shared, h_route_proj) # 特征互补约束
-```
-
-### 默认超参数
-
-| 参数 | 值 | 说明 |
-|------|-----|------|
-| dim | 64 | 隐藏维度 |
-| num_experts | 4 | 专家数（3 尺度共享） |
-| top_k | 2 | 每 token 激活专家数 |
-| c_in | 2 / 1 | TaxiBJ=2(in/out), BikeNYC/CHAP=1 |
-| routing_mode | topk | 稀疏路由 |
-| shared_input_mode | pre | 共享分支接收原始嵌入 |
-| branch_fusion_mode | residual | h_shared + γ·h_route_proj |
-| scale_mode | fine_mid_coarse | 三尺度全开 |
-| route_gamma_init | -3.0 | γ 初始≈0.047 |
-| route_dropout | 0.1 | 路由分支 Dropout3d |
-| aux_branch | 关闭 | NullResidualBranch |
-
----
-
-## 缺失掩码
-
-支持 `fixed` 和 `random` 两种离线掩码，由 CSV 文件提供。
-
-**fixed**：同一缺失率下所有样本共享同一个空间 mask，train/val/test 使用相同掩码。
-**random**：每个样本有独立空间 mask，train/val/test 使用不同 seed 偏移生成。
-
-```text
-data/{dataset}/{fixed,random}_mask/{rate}/
-├── train.csv    # fixed: 1×N | random: N_train×N
-├── val.csv      # fixed: 1×N | random: N_val×N
-└── test.csv     # fixed: 1×N | random: N_test×N
-```
-
----
-
-## 快速开始
+数据文件不随 Git 提交。若已准备好分割后的 NPZ，但缺少原始 random 0.4 CSV，可生成：
 
 ```bash
-# 安装
-pip install torch torchvision --index-url https://download.pytorch.org/whl/cu124
-pip install -e .
-
-# Smoke test（合成数据，快速验证前向+loss）
-python scripts/train.py -c configs/presets/smoke.json --synthetic
-```
-
----
-
-## 真实数据训练
-
-### 统一调度器（推荐）
-
-```bash
-# 单数据集、单模式
-python scripts/run_experiments.py --dataset TaxiBJ --gpu 0 --mask-pattern fixed --mask-rate 0.4
-
-# 全部数据集、全部模式和缺失率
-python scripts/run_experiments.py --dataset all --gpu 0 --mask-pattern all --mask-rate all
-
-# 使用训练策略（控制 epochs、batch、早停等）
-python scripts/run_experiments.py \
-  --dataset all --gpu 0 --mask-pattern all --mask-rate all \
-  --experiments full \
-  --training-policy configs/policies/full_model_paper.json
-```
-
-参数 `all` 展开：`--dataset all` → TaxiBJ, BikeNYC, CHAP；`--mask-pattern all` → fixed, random；`--mask-rate all` → 0.2, 0.4, 0.6, 0.8。
-
-### 单次训练
-
-```bash
-python scripts/train.py \
-  -c configs/datasets/taxibj.json \
+python scripts/generate_fixed_masks.py \
   --train_npz data/TaxiBJ/taxibj_train.npz \
   --val_npz data/TaxiBJ/taxibj_val.npz \
   --test_npz data/TaxiBJ/taxibj_test.npz \
-  -n my_experiment
+  --pattern random --mask_rate 0.4 --seed 7
 ```
 
-配置中需包含离线 mask 路径（调度器自动生成）。合成数据不需 CSV：
+已有 mask 文件时先核对其生成设置；重新生成会改变实验输入。其他缺失模式和双 mask 对照见 [双 mask 实验说明](scripts/v24/README_DUAL_MASK.md)。
+
+## 运行 v24 实验
+
+当前后续实验默认使用 **BikeNYC random 0.4 九类混合 mask** 和双卡 DDP。六组精简对照依次运行，每组内部用两张卡，全局 batch 16（每卡 8）；hard Top-2 每个样本只计算选中的两个专家。先运行 `python -u scripts/v24/run_coe_focus.py --gpus 0,1 --dry-run` 核对计划，再在本地启动：
 
 ```bash
-python scripts/train.py -c configs/presets/default.json --synthetic
+tmux new-session -s v24-coe-focus \
+  'python -u scripts/v24/run_coe_focus.py --gpus 0,1 --epochs 50'
 ```
 
----
+详见 [六组 CoE 对照实验说明](scripts/v24/README_COE_FOCUS.md)。以下 TaxiBJ 命令是历史实验入口，保留供复现。
 
-## 输出结构
+单次真实数据训练可从 [TaxiBJ 配置](configs/v24/taxibj.json) 启动；该配置是早期的两层固定 T→S 示例。当前四层六专家软预热主配置在 [coe_main_base.json](configs/v24/coe_main_base.json)，需由相应实验脚本补齐具体数据与 mask 协议。
 
+```bash
+python -u scripts/train.py \
+  -c configs/v24/taxibj.json \
+  --train_npz data/TaxiBJ/taxibj_train.npz \
+  --val_npz data/TaxiBJ/taxibj_val.npz \
+  --test_npz data/TaxiBJ/taxibj_test.npz \
+  --no_plot -n v24_taxibj_example
 ```
-outputs/{dataset}/{experiment_type}/{variant}/{mask}/rate{rate}/{timestamp}_seed{seed}_bs{bs}/
+
+历史的深度与专家池对照使用 **TaxiBJ、原始 random 0.4、seed 7、batch 16、单卡顺序训练**。其中两组严格匹配训练协议的 Top-2 对照为三层六专家和四层八专家，默认各 30 epoch：
+
+```bash
+python scripts/v24/run_top2_pair.py --dry-run
+# 确认没有其他 GPU 计算任务后，单卡顺序运行：
+tmux new-session -s v24-top2-pair \
+  'python -u scripts/v24/run_top2_pair.py --gpu 0'
+```
+
+脚本位于 [run_top2_pair.py](scripts/v24/run_top2_pair.py)，计划位于 [top2_pair_experiments.json](configs/v24/top2_pair_experiments.json)。`--epochs N` 可同时覆盖两组 epoch 和余弦学习率周期。已有完整结果回执的任务会跳过，中断但未完成的任务从头重跑。两组只改变链路层数和专家池；由于参数量与计算量也随之变化，这一对照不能单独区分深度收益和专家池收益。
+
+更多可复用实验入口：
+
+| 实验 | 入口与说明 | 主要协议 |
+| --- | --- | --- |
+| 八/十二专家深度与 Top-K 网格 | [run_depth_pool.py](scripts/v24/run_depth_pool.py) · [说明](scripts/v24/README_DEPTH_POOL.md) | 原始 random 0.4；默认 20 epoch，可用 `--epochs` 覆盖 |
+| 软预热主方案与机制消融 | [run_coe_validation.py](scripts/v24/run_coe_validation.py) · [说明](scripts/v24/README_COE_VALIDATION.md) | 九类混合 mask；另含原始 mask 组 |
+| 自由路由与固定链的双 mask 对照 | [run_dual_mask.py](scripts/v24/run_dual_mask.py) · [说明](scripts/v24/README_DUAL_MASK.md) | 原始 random 0.4 与九类混合 mask 各一组 |
+| A0/A2 缺失率对照 | [run_rate_compare.py](scripts/v24/run_rate_compare.py) · [说明](scripts/v24/README_RATE_COMPARE.md) | 原始 random，缺失率 0.2–0.8 |
+
+更早的 A–E 与八组机制实验分别见 [A–E 说明](scripts/v24/README_ABCDE.md) 和 [机制实验说明](scripts/v24/README_MECHANISM1.md)。不要同时启动多个 GPU 队列；这些入口会检查现有 GPU 计算进程。训练控制台只显示 batch 级 `train epoch 当前/总数` tqdm，以及 train 的 `loss`、`mae`、`rmse`；验证、测试和路由诊断写入日志。
+
+## 输出与评估
+
+训练结果按数据集、实验名、mask 和缺失率存放：
+
+```text
+outputs/v24-COE/TaxiBJ/custom/<实验名>/random/rate0.4/<时间_seed_bs>/
 ├── config.json
-├── checkpoints/
-│   └── best.pt
-├── logs/
-│   ├── train.log
-│   ├── val.log
-│   ├── test.log
-│   └── metrics.jsonl
-└── training_curves.png
+└── logs/
+    ├── train.log
+    ├── val.log
+    ├── test.log
+    └── metrics.jsonl
 ```
 
-`--name` 自动归类：`full` → `full/model`，`ablation_*` → `ablation/*`，`smoke_*` → `debug/*`。
+队列另在 `outputs/v24-COE/experiments/<队列名>/` 保存生成的配置、启动日志和完成回执 JSON。每次按**验证 MAE** 选最佳轮次，再用对应模型测试一次。近期 Top-2 和深度池实验设为 `save_best_checkpoint=false`：最佳状态只在训练进程的 CPU 内存中保留，不写 `best.pt`；启用该选项的其他实验才会生成 `checkpoints/best.pt`。路由使用率、每层选择与梯度等详细指标保存在日志中。单种子短训结果适合筛选候选，不能单独证明结构优越性。
 
-训练终端只显示带 `loss / mae / rmse` 的训练进度条；每轮摘要和测试结果保存在 `logs/`，完整指标（含专家使用率、路径、梯度和缺失条件诊断）保存在 `metrics.jsonl`。无需额外参数，原有 `--quiet` 仍可兼容使用。
+## 代码位置
 
-汇总索引：`outputs/summary/experiment_index.csv` 记录每次训练的 run_dir、数据集、mask、缺失率、best epoch、best val MAE、耗时、显存等。
-
----
-
-## 数据格式
-
-NPZ 文件需包含：`x_f_gt` 或 `x_f` [N,C,T,H,W] 或 [N,T,H,W,C]。可选：`m_f`, `x_m_obs/m_m`, `x_c_obs/m_c`, `r_m/r_c`。
-
-中粗尺度若未预存，`ensure_multiscale()` 自动从 fine 观测值通过 masked pooling 构造。
-
----
-
-## 源码结构
-
-```
-src/stmoe_imputer/
-├── data/
-│   ├── npz_dataset.py     # NPZ 数据集加载 + 离线 mask CSV
-│   ├── transforms.py      # masked_pool2d_spatial, ensure_multiscale, ensure_observed
-│   ├── masks.py           # mask 生成与转换
-│   ├── synthetic.py       # 合成数据集
-│   └── build.py           # Dataset/DataLoader 构建
-├── models/
-│   ├── imputer.py         # DualBranchSTImputer（顶层封装）
-│   ├── main_branch.py     # MultiScaleMoEBackbone（核心骨干，forward 编排）
-│   ├── embedding.py       # ScaleTokenEncoder
-│   ├── router.py          # QualityRouter
-│   ├── experts.py         # STExpert, TopKRoutedExpertPool
-│   ├── fusion.py          # ProgressiveRouteFusion, GatedCrossScaleSharedExpert,
-│   │                        SharedRoutedResidualFusion, ReliabilityAwareScaleGate,
-│   │                        AdaptiveBranchGate, ExpertEnhancedSharedInput
-│   ├── blocks.py          # ResidualSTBlock
-│   ├── stats.py           # compute_observation_stats
-│   ├── scale_utils.py     # build_scale_active_mask
-│   └── aux_branch.py      # NullResidualBranch
-├── engine.py              # train_one_epoch, evaluate, build_optimizer/scheduler
-├── losses.py              # compute_main_stage_loss, masked_loss, cross_scale_loss
-├── metrics.py             # masked_metrics (MAE/RMSE/MAPE)
-├── config.py              # 配置加载与深度合并
-└── utils/
-    ├── checkpoint.py      # save/load checkpoint
-    ├── device.py          # get_device
-    ├── seed.py            # set_seed
-    └── train_logger.py    # TrainLogger（epoch/test 日志 + metrics.jsonl）
-```
-
----
-
-## 常用类名速查
-
-| 类名 | 职责 |
-|------|------|
-| `DualBranchSTImputer` | 顶层模型，组合主分支+辅助分支 |
-| `MultiScaleMoEBackbone` | 多尺度 MoE 骨干，编排完整前向 |
-| `ScaleTokenEncoder` | 单尺度时空嵌入 |
-| `QualityRouter` | 质量感知专家路由 |
-| `TopKRoutedExpertPool` | Top-K 稀疏专家池 |
-| `STExpert` | 单个专家（Conv3d+ResBlock） |
-| `GatedCrossScaleSharedExpert` | 跨尺度共享专家+可靠性门控 |
-| `ProgressiveRouteFusion` | 渐进路由融合 |
-| `SharedRoutedResidualFusion` | 共享-路由残差融合 |
-| `ReliabilityAwareScaleGate` | 可靠性感知尺度门控 |
-| `ExpertEnhancedSharedInput` | 专家增强共享输入适配器 |
-| `ResidualSTBlock` | 时空残差块（Conv3d×2+GroupNorm+GELU） |
+- [src/stmoe_imputer/models/](src/stmoe_imputer/models/)：v24 CoE 与历史骨干网络；[registry.py](src/stmoe_imputer/models/registry.py) 按配置选择架构。
+- [src/stmoe_imputer/data/](src/stmoe_imputer/data/)：NPZ、离线 CSV mask 与九类在线混合 mask。
+- [scripts/train.py](scripts/train.py)：统一训练、验证、最佳轮次测试和结果记录。
+- [scripts/v24/](scripts/v24/) 与 [configs/v24/](configs/v24/)：v24 顺序实验入口与配置。
+- [experments_report/](experments_report/)：已有实验分析报告；[scripts/v14-exploration/](scripts/v14-exploration/) 与 [configs/v14-single/](configs/v14-single/) 保留历史实验。

@@ -19,6 +19,9 @@ class _CoERoutingTotals:
         self.weight_sum = None
         self.entropy_sum = None
         self.path_counts: Counter = Counter()
+        self.pair_path_counts: Counter = Counter()
+        self.pair_counts: list[Counter] | None = None
+        self.selection_sum = None
         self.mode = None
         self.top_k = None
         self.expert_names: tuple[str, ...] | None = None
@@ -50,12 +53,56 @@ class _CoERoutingTotals:
         self.weight_sum += weights.sum(dim=0)
         self.probability_sum += probs.sum(dim=0)
         self.entropy_sum += -(probs * probs.clamp_min(1e-12).log()).sum(dim=(0, 2))
+        selected = coe.get("selected_experts")
+        pair_ids = coe.get("pair_ids")
+        if selected is not None:
+            selected = selected.detach().long().cpu()
+            if (selected.shape != (*weights.shape[:2], top_k) or
+                    bool(((selected < 0) | (selected >= len(names))).any()) or
+                    bool((selected.diff(dim=-1) <= 0).any())):
+                raise ValueError("selected_experts must be sorted unique indices [batch, steps, top_k]")
+            if self.selection_sum is None:
+                self.selection_sum = torch.zeros_like(weights[0])
+            for step in range(weights.shape[1]):
+                self.selection_sum[step].scatter_add_(0, selected[:, step].reshape(-1),
+                                                       torch.ones(selected.shape[0] * top_k, dtype=torch.float64))
+        if pair_ids is not None:
+            pair_ids = pair_ids.detach().long().cpu()
+            if pair_ids.shape != weights.shape[:2] or top_k != 2:
+                raise ValueError("pair_ids must match [batch, steps] for Top-2")
+            if self.pair_counts is None:
+                self.pair_counts = [Counter() for _ in range(weights.shape[1])]
+            for row in pair_ids.tolist():
+                self.pair_path_counts[tuple(row)] += 1
+                for step, pair_id in enumerate(row):
+                    self.pair_counts[step][pair_id] += 1
         if self.mode not in {"soft", "parallel"}:
             paths = coe["paths"].detach().cpu()
             if paths.shape != weights.shape[:2] or bool(((paths < 0) | (paths >= len(names))).any()):
                 raise ValueError("CoE paths must contain valid expert indices for every step")
             for path in paths.tolist():
                 self.path_counts[tuple(path)] += 1
+
+    def merge(self, other: "_CoERoutingTotals") -> None:
+        if not other.count:
+            return
+        if self.count and (self.mode, self.top_k, self.expert_names) != (other.mode, other.top_k, other.expert_names):
+            raise ValueError("Cannot merge different CoE routing configurations")
+        if not self.count:
+            self.mode, self.top_k, self.expert_names = other.mode, other.top_k, other.expert_names
+        self.count += other.count
+        for name in ("probability_sum", "weight_sum", "entropy_sum", "selection_sum"):
+            value = getattr(other, name)
+            if value is not None:
+                current = getattr(self, name)
+                setattr(self, name, value.clone() if current is None else current + value)
+        self.path_counts.update(other.path_counts)
+        self.pair_path_counts.update(other.pair_path_counts)
+        if other.pair_counts is not None:
+            if self.pair_counts is None:
+                self.pair_counts = [Counter() for _ in other.pair_counts]
+            for target, source in zip(self.pair_counts, other.pair_counts):
+                target.update(source)
 
     def compute(self) -> dict[str, float]:
         if not self.count:
@@ -79,6 +126,17 @@ class _CoERoutingTotals:
                     )
             if self.mode != "fixed":
                 result[f"{prefix}_router_entropy"] = float(self.entropy_sum[step] / self.count)
+            if self.selection_sum is not None:
+                for expert, label in enumerate(self.expert_names):
+                    result[f"{prefix}_{label}_selection_rate"] = float(
+                        self.selection_sum[step, expert] / self.count
+                    )
+            if self.pair_counts is not None:
+                pairs = list(product(range(len(self.expert_names)), repeat=2))
+                pairs = [(i, j) for i, j in pairs if i < j]
+                for pair_id, (i, j) in enumerate(pairs):
+                    label = f"{self.expert_names[i]}+{self.expert_names[j]}"
+                    result[f"{prefix}_pair_{label}_frequency"] = self.pair_counts[step][pair_id] / self.count
         if self.mode not in {"soft", "parallel"}:
             # Keep legacy binary-path keys. For richer pools, separate labels
             # to distinguish a joint ST operation from consecutive S and T.
@@ -94,6 +152,15 @@ class _CoERoutingTotals:
             result["coe_path_unique_count"] = float(len(fractions))
             result["coe_path_entropy"] = -sum(p * math.log(p) for p in fractions)
             result["coe_path_max_fraction"] = max(fractions)
+        if self.pair_path_counts:
+            pairs = [(i, j) for i in range(len(self.expert_names)) for j in range(i + 1, len(self.expert_names))]
+            labels = [f"{self.expert_names[i]}+{self.expert_names[j]}" for i, j in pairs]
+            for path, count in self.pair_path_counts.items():
+                result[f"coe_pair_path_{'--'.join(labels[pair_id] for pair_id in path)}_fraction"] = count / self.count
+            fractions = [count / self.count for count in self.pair_path_counts.values()]
+            result["coe_pair_path_unique_count"] = float(len(fractions))
+            result["coe_pair_path_entropy"] = -sum(p * math.log(p) for p in fractions)
+            result["coe_pair_path_max_fraction"] = max(fractions)
         return result
 
 
@@ -190,13 +257,24 @@ class CoERoutingMetricAccumulator(_CoERoutingTotals):
         }
         if coe["routing_mode"] not in {"soft", "parallel"}:
             route_record["paths"] = coe["paths"].detach().cpu()
+        for name in ("selected_experts", "pair_ids"):
+            value = coe.get(name)
+            if value is not None:
+                route_record[name] = value.detach().cpu()
+        route_record["top_k"] = self.top_k
         for group, selected in groups.items():
             totals = self._condition_totals.setdefault(group, _CoERoutingTotals())
             if not bool(selected.any()):
                 continue
-            record = {name: value[selected] for name, value in route_record.items()}
+            record = {name: (value[selected] if torch.is_tensor(value) else value)
+                      for name, value in route_record.items()}
             record.update(routing_mode=coe["routing_mode"], expert_names=self.expert_names)
             totals.update(record)
+
+    def merge(self, other: "CoERoutingMetricAccumulator") -> None:
+        super().merge(other)
+        for name, totals in other._condition_totals.items():
+            self._condition_totals.setdefault(name, _CoERoutingTotals()).merge(totals)
 
     def compute(self) -> dict[str, float]:
         result = super().compute()
@@ -342,6 +420,21 @@ class RoutingMetricAccumulator:
         for index, value in enumerate(hard_load):
             result[f"{prefix}_hard_load_{index}"] = float(value)
         return result
+
+    def merge(self, other: "RoutingMetricAccumulator") -> None:
+        if self.scale_names != other.scale_names:
+            raise ValueError("Cannot merge different routing scales")
+        for name, value in other._gate_sum.items():
+            if name not in self._gate_sum:
+                self._gate_sum[name] = value.clone()
+                self._load_sum[name] = other._load_sum[name].clone()
+            else:
+                self._gate_sum[name] += value
+                self._load_sum[name] += other._load_sum[name]
+        for field in ("_sample_count", "_margin_sum", "_margin_count"):
+            target, source = getattr(self, field), getattr(other, field)
+            for name, value in source.items():
+                target[name] += value
 
     def compute(self) -> dict[str, float]:
         result: dict[str, float] = {}

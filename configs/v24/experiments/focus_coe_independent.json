@@ -1,0 +1,9 @@
+{
+  "model": {
+    "coe": {
+      "completion_feedback": true,
+      "expert_sharing": "per_step",
+      "pair_mode": "native"
+    }
+  }
+}

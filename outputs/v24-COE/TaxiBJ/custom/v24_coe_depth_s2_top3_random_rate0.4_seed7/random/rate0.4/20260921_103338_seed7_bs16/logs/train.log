@@ -1,0 +1,207 @@
+Training started: 2026-09-21 10:33:40
+------------------------------------------------------------------------------------------------
+Run
+  run_dir: /home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/v24_coe_depth_s2_top3_random_rate0.4_seed7/random/rate0.4/20260921_103338_seed7_bs16
+  command: /home/students/HuangMingYu/code/py/my_idea/my_idea/scripts/train.py -c /home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/experiments/coe_depth_pool/configs/v24_coe_depth_s2_top3_random_rate0.4_seed7.json --train_npz /home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/taxibj_train.npz --val_npz /home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/taxibj_val.npz --test_npz /home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/taxibj_test.npz --no_plot -n v24_coe_depth_s2_top3_random_rate0.4_seed7 --result-file /home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/experiments/coe_depth_pool/results/v24_coe_depth_s2_top3_random_rate0.4_seed7.json
+  git_commit: 880e5987b1ba4bdeb30fe5b334b80ad2925ee395
+  git_branch: v24-COE
+  git_dirty: True
+  config_sha256: 4a7e2d17de1c61d5781829d5a7092bf65efce4a3dcc20ab472ddff4bdf821105
+  python: 3.9.25
+  torch: 2.6.0+cu124
+  cuda_runtime: 12.4
+  train_npz: /home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/taxibj_train.npz
+  val_npz: /home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/taxibj_val.npz
+  test_npz: /home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/taxibj_test.npz
+  dataset: TaxiBJ
+  experiment_type: custom
+  variant: v24_coe_depth_s2_top3_random_rate0.4_seed7
+  train_samples: 2491
+  val_samples: 356
+  train_steps_per_epoch: 156
+  val_steps_per_epoch: 23
+  test_samples: 712
+  test_steps: 45
+  batch_size: 16
+  mask_pattern: random
+  mask_rate_config: 0.4
+  train_mask: shape=(2491, 1, 12, 32, 32), observed_rate=0.6006, missing_rate=0.3994
+  val_mask: shape=(356, 1, 12, 32, 32), observed_rate=0.6006, missing_rate=0.3994
+  data_shape: (2491, 2, 12, 32, 32)
+  device: cuda
+  device_name: NVIDIA GeForce RTX 3090
+  total_params: 181,819
+  trainable_params: 181,819
+Config
+{
+  "seed": 7,
+  "output_dir": "outputs/v24-COE",
+  "device": "cuda",
+  "data": {
+    "dataset_name": "TaxiBJ",
+    "batch_size": 16,
+    "num_workers": 0,
+    "pin_memory": true,
+    "drop_last": false,
+    "mask": {
+      "pattern": "random",
+      "missing_rate": 0.4,
+      "train_csv": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/random_mask/0.4/train.csv",
+      "val_csv": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/random_mask/0.4/val.csv",
+      "test_csv": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/random_mask/0.4/test.csv"
+    },
+    "synthetic": {
+      "num_train": 128,
+      "num_val": 32,
+      "t": 12,
+      "h": 32,
+      "w": 32
+    },
+    "multiscale": false,
+    "loader_seed": 7,
+    "train_mask_diversity": null,
+    "eval_mask_diversity": null
+  },
+  "model": {
+    "architecture": "v24_ts_coe",
+    "c_in": 2,
+    "main": {
+      "dim": 64,
+      "max_t": 12,
+      "h": 32,
+      "w": 32,
+      "scale_mode": "fine",
+      "use_multiscale": false
+    },
+    "coe": {
+      "num_steps": 2,
+      "expert_pool": [
+        "T",
+        "S",
+        "TD",
+        "SD",
+        "TA",
+        "ST"
+      ],
+      "routing_mode": "hard",
+      "fixed_path": null,
+      "fixed_expert_steps": [
+        null,
+        null
+      ],
+      "router_state": "dynamic",
+      "expert_state": "dynamic",
+      "use_shared": true,
+      "use_routed": true,
+      "temperature": 1.0,
+      "temporal_kernel": 3,
+      "spatial_kernel": 3,
+      "temporal_dilation": 2,
+      "spatial_dilation": 2,
+      "attention_heads": 4,
+      "residual_init": 0.1,
+      "routing_warmup_epochs": 0,
+      "routing_transition_epochs": 0,
+      "uniform_mix_start": 0.5,
+      "sampling_temperature_start": 2.0,
+      "top_k": 3
+    },
+    "aux": {
+      "enabled": false,
+      "alpha_init": 0.0
+    }
+  },
+  "loss": {
+    "type": "l1",
+    "lambda_coe_mid": 0.0,
+    "lambda_coe_balance": 0.01
+  },
+  "train": {
+    "epochs": 20,
+    "val_epoch": 2,
+    "lr_main": 0.001,
+    "weight_decay": 0.0001,
+    "grad_clip_norm": 1.0,
+    "amp": true,
+    "save_every": 10,
+    "scheduler": {
+      "type": "cosine",
+      "eta_min": 1e-06,
+      "total_epochs": 20
+    },
+    "early_stopping": {
+      "enabled": false,
+      "monitor": "val_mae",
+      "patience": 40,
+      "mode": "min"
+    },
+    "save_best_checkpoint": true
+  },
+  "experiment_plan": {
+    "stage": "coe_depth_pool",
+    "variant": "coe_depth_s2_top3",
+    "protocol": "random_rate0.4",
+    "protocol_kind": "legacy_csv"
+  }
+}
+------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------
+ epoch         loss         mae         rmse     val_mae          lr   train_s    val_s   epoch_s   mem_gb   best
+-----------------------------------------------------------------------------------------------------------------
+     1     98.35019     98.3325     163.9654           -    1.00e-03      46.9      0.0      46.9     6.18       
+     2     69.64342     69.5991     131.2075     52.8005    9.94e-04      46.4      2.9      49.4     6.18      *
+Best model at epoch 2 (val_mae=52.8005)
+     3     55.52162     55.4569     108.7916           -    9.76e-04      46.5      0.0      46.5     6.18       
+     4     49.89064     49.8641      97.6349     42.1065    9.46e-04      46.5      2.9      49.4     6.18      *
+Best model at epoch 4 (val_mae=42.1065)
+     5     45.11909     45.0724      88.1848           -    9.05e-04      46.5      0.0      46.5     6.18       
+     6     40.88398     40.8620      79.8811     34.6120    8.54e-04      46.5      2.9      49.4     6.18      *
+Best model at epoch 6 (val_mae=34.6120)
+     7     38.15511     38.1360      73.9789           -    7.94e-04      46.5      0.0      46.5     6.18       
+     8     35.59452     35.5744      69.0164     30.9177    7.27e-04      46.5      2.9      49.4     6.18      *
+Best model at epoch 8 (val_mae=30.9177)
+     9     33.56301     33.5531      64.7944           -    6.55e-04      46.5      0.0      46.5     6.18       
+    10     32.21656     32.1973      61.7252     28.4630    5.79e-04      46.5      2.9      49.4     6.18      *
+Best model at epoch 10 (val_mae=28.4630)
+    11     31.06439     31.0445      59.1955           -    5.01e-04      46.5      0.0      46.5     6.18       
+    12     30.11422     30.0859      57.0990     27.2208    4.22e-04      46.5      2.9      49.4     6.18      *
+Best model at epoch 12 (val_mae=27.2208)
+    13     29.58038     29.5571      55.6252           -    3.46e-04      46.6      0.0      46.6     6.18       
+    14     28.81368     28.7885      54.0319     26.0940    2.74e-04      46.6      2.9      49.5     6.18      *
+Best model at epoch 14 (val_mae=26.0940)
+    15     28.26926     28.2446      52.8350           -    2.07e-04      46.5      0.0      46.5     6.18       
+    16     27.86292     27.8424      51.9091     25.5238    1.47e-04      46.5      2.9      49.4     6.18      *
+Best model at epoch 16 (val_mae=25.5238)
+    17     27.55597     27.5310      51.1918           -    9.64e-05      46.5      0.0      46.5     6.18       
+    18     27.29531     27.2717      50.6302     25.0780    5.54e-05      46.5      2.9      49.4     6.18      *
+Best model at epoch 18 (val_mae=25.0780)
+    19     27.16888     27.1503      50.3382           -    2.54e-05      46.5      0.0      46.5     6.18       
+    20     27.09276     27.0748      50.1798     25.0178    7.15e-06      46.5      2.9      49.4     6.18      *
+Best model at epoch 20 (val_mae=25.0178)
+
+------------------------------------------------------------------------------------------------
+Training finished normally: 2026-09-21 10:49:46
+Summary
+  completed_epochs: 20
+  best_epoch: 20
+  best_val_mae: 25.017812
+  val_epoch: 2
+  validation_count: 10
+  final_train_loss: 27.092761
+  final_train_mae: 27.074826
+  final_val_loss: 25.372270
+  final_val_mae: 25.017812
+  total_time: 16m 6s
+  avg_epoch_time_sec: 47.99
+  avg_train_sec_per_step: 0.2983
+  avg_val_sec_per_step: 0.0632
+  peak_memory_gb: 6.18
+  test_loss: 23.455310
+  test_mae: 23.488454
+  test_rmse: 41.186711
+  test_mape: 327418.798385
+  test_time_sec: 5.80
+  best_checkpoint: /home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/v24_coe_depth_s2_top3_random_rate0.4_seed7/random/rate0.4/20260921_103338_seed7_bs16/checkpoints/best.pt
+  best_state_source: checkpoint
+  metrics_jsonl: /home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/v24_coe_depth_s2_top3_random_rate0.4_seed7/random/rate0.4/20260921_103338_seed7_bs16/logs/metrics.jsonl
+------------------------------------------------------------------------------------------------

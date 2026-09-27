@@ -1,0 +1,235 @@
+Training started: 2026-09-18 11:01:21
+------------------------------------------------------------------------------------------------
+Run
+  run_dir: /home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/experiments/route20/followup/470ee3e49baa66bb/runs/v24_route20_route20_base_mixed9_rate0.4_updates_seed7/TaxiBJ/custom/v24_route20_route20_base_mixed9_rate0.4_updates_seed7/random/rate0.4/20260918_110119_seed7_bs16
+  command: /home/students/HuangMingYu/code/py/my_idea/my_idea/scripts/train.py -c /home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/experiments/route20/followup/470ee3e49baa66bb/configs/v24_route20_route20_base_mixed9_rate0.4_updates_seed7.json --no_plot --name v24_route20_route20_base_mixed9_rate0.4_updates_seed7 --train_npz /home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/taxibj_train.npz --val_npz /home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/taxibj_val.npz --test_npz /home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/taxibj_test.npz --result-file /home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/experiments/route20/followup/470ee3e49baa66bb/results/v24_route20_route20_base_mixed9_rate0.4_updates_seed7.attempt1.json
+  git_commit: 24e57ee114ceb9e41660b396db0a7dd42a833e3a
+  git_branch: v24-COE
+  git_dirty: True
+  config_sha256: d291ed635075a25c26fdbc1a1553ff7960f6a01700d2388214821ae9fda68593
+  python: 3.9.25
+  torch: 2.6.0+cu124
+  cuda_runtime: 12.4
+  train_npz: /home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/taxibj_train.npz
+  val_npz: /home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/taxibj_val.npz
+  test_npz: /home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/taxibj_test.npz
+  dataset: TaxiBJ
+  experiment_type: custom
+  variant: v24_route20_route20_base_mixed9_rate0.4_updates_seed7
+  train_samples: 2452
+  val_samples: 342
+  train_steps_per_epoch: 154
+  val_steps_per_epoch: 22
+  test_samples: 707
+  test_steps: 45
+  batch_size: 16
+  mask_pattern: random
+  mask_rate_config: 0.4
+  train_mask: unknown
+  val_mask: unknown
+  data_shape: (2452, 2, 12, 32, 32)
+  device: cuda
+  device_name: NVIDIA GeForce RTX 3090
+  total_params: 211,507
+  trainable_params: 211,507
+Config
+{
+  "seed": 7,
+  "output_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/experiments/route20/followup/470ee3e49baa66bb/runs/v24_route20_route20_base_mixed9_rate0.4_updates_seed7",
+  "device": "cuda",
+  "data": {
+    "dataset_name": "TaxiBJ",
+    "batch_size": 16,
+    "num_workers": 0,
+    "pin_memory": true,
+    "drop_last": false,
+    "mask": {
+      "pattern": "random",
+      "missing_rate": 0.4
+    },
+    "synthetic": {
+      "num_train": 128,
+      "num_val": 32,
+      "t": 12,
+      "h": 32,
+      "w": 32
+    },
+    "multiscale": false,
+    "loader_seed": 7,
+    "train_mask_diversity": {
+      "families": [
+        "random_point",
+        "node_outage",
+        "temporal_gap",
+        "spatial_region",
+        "spatiotemporal_block",
+        "stripe",
+        "moving_region",
+        "multi_block",
+        "composite"
+      ],
+      "rates": [
+        0.4
+      ],
+      "seed": 20260917,
+      "resample_each_epoch": true
+    },
+    "eval_mask_diversity": {
+      "families": [
+        "random_point",
+        "node_outage",
+        "temporal_gap",
+        "spatial_region",
+        "spatiotemporal_block",
+        "stripe",
+        "moving_region",
+        "multi_block",
+        "composite"
+      ],
+      "rates": [
+        0.4
+      ],
+      "seed": 20260917,
+      "resample_each_epoch": false
+    }
+  },
+  "model": {
+    "architecture": "v24_ts_coe",
+    "c_in": 2,
+    "main": {
+      "dim": 64,
+      "max_t": 12,
+      "h": 32,
+      "w": 32,
+      "scale_mode": "fine",
+      "use_multiscale": false
+    },
+    "coe": {
+      "num_steps": 4,
+      "routing_mode": "hard",
+      "fixed_path": null,
+      "router_state": "dynamic",
+      "use_shared": true,
+      "use_routed": true,
+      "temperature": 1.0,
+      "temporal_kernel": 3,
+      "spatial_kernel": 3,
+      "residual_init": 0.1,
+      "expert_pool": [
+        "T",
+        "S",
+        "TD",
+        "SD",
+        "TA",
+        "ST"
+      ],
+      "expert_state": "dynamic",
+      "temporal_dilation": 2,
+      "spatial_dilation": 2,
+      "attention_heads": 4
+    },
+    "aux": {
+      "enabled": false,
+      "alpha_init": 0.0
+    }
+  },
+  "loss": {
+    "type": "l1",
+    "lambda_coe_mid": 0.0,
+    "lambda_coe_balance": 0.01
+  },
+  "train": {
+    "epochs": 20,
+    "val_epoch": 2,
+    "lr_main": 0.001,
+    "weight_decay": 0.0001,
+    "grad_clip_norm": 1.0,
+    "amp": true,
+    "save_every": 10,
+    "scheduler": {
+      "type": "cosine",
+      "eta_min": 1e-06,
+      "total_epochs": 20
+    },
+    "early_stopping": {
+      "enabled": false,
+      "monitor": "val_mae",
+      "patience": 40,
+      "mode": "min"
+    },
+    "save_best_checkpoint": true,
+    "router_grad_diagnostic_every": 50
+  },
+  "experiment_plan": {
+    "stage": "route20",
+    "variant": "route20_base",
+    "protocol": "mixed9_rate0.4",
+    "protocol_kind": "generated_diverse",
+    "budget_regime": "updates",
+    "mask_metadata": null,
+    "training_mask_source": "dynamic_diverse",
+    "evaluation_mask_source": "diverse_fixed_per_split"
+  },
+  "experiment_suite_fingerprint": "470ee3e49baa66bb0dc4c4e57b5551125db3927fbcc12d02465b0dc25ade4fb9"
+}
+------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------
+ epoch         loss         mae         rmse     val_mae          lr   train_s    val_s   epoch_s   mem_gb   best
+-----------------------------------------------------------------------------------------------------------------
+     1    107.18703    107.3289     174.1241           -    1.00e-03      93.5      0.0      93.5    12.08       
+     2     80.43080     80.4858     141.7299     65.2769    9.94e-04      93.7      2.0      95.7    12.08      *
+Best model at epoch 2 (val_mae=65.2769)
+     3     70.54396     70.4246     126.2300           -    9.76e-04      93.7      0.0      93.7    12.08       
+     4     66.28555     66.1398     118.6995     57.3754    9.46e-04      93.8      2.0      95.7    12.08      *
+Best model at epoch 4 (val_mae=57.3754)
+     5     60.94052     60.8759     111.0814           -    9.05e-04      93.7      0.0      93.7    12.08       
+     6     58.52251     58.4439     107.3305     57.2195    8.54e-04      93.7      2.0      95.7    12.08      *
+Best model at epoch 6 (val_mae=57.2195)
+     7     56.28707     56.1430     103.4181           -    7.94e-04      93.7      0.0      93.7    12.08       
+     8     54.25990     54.1412     100.1913     47.4590    7.27e-04      93.8      2.0      95.8    12.08      *
+Best model at epoch 8 (val_mae=47.4590)
+     9     52.61744     52.6095      97.8618           -    6.55e-04      93.7      0.0      93.7    12.08       
+    10     51.69427     51.5869      95.5975     45.9170    5.79e-04      93.8      2.0      95.8    12.08      *
+Best model at epoch 10 (val_mae=45.9170)
+    11     51.19107     51.1061      95.0688           -    5.01e-04      93.8      0.0      93.8    12.08       
+    12     50.26531     50.2732      93.4945     45.0614    4.22e-04      93.8      2.0      95.8    12.08      *
+Best model at epoch 12 (val_mae=45.0614)
+    13     50.25424     50.1688      92.9516           -    3.46e-04      93.8      0.0      93.8    12.08       
+    14     49.15109     49.0608      91.5632     44.5705    2.74e-04      93.7      2.0      95.7    12.08      *
+Best model at epoch 14 (val_mae=44.5705)
+    15     48.52549     48.5115      90.3131           -    2.07e-04      93.8      0.0      93.8    12.08       
+    16     48.73217     48.6781      90.0241     43.9020    1.47e-04      93.7      2.0      95.7    12.08      *
+Best model at epoch 16 (val_mae=43.9020)
+    17     48.51863     48.5576      89.8813           -    9.64e-05      93.8      0.0      93.8    12.08       
+    18     48.19468     48.1711      89.7499     43.7271    5.54e-05      93.8      2.0      95.7    12.08      *
+Best model at epoch 18 (val_mae=43.7271)
+    19     47.62305     47.6290      88.7583           -    2.54e-05      93.8      0.0      93.8    12.08       
+    20     47.62849     47.5627      88.4701     43.5211    7.15e-06      93.8      2.0      95.8    12.08      *
+Best model at epoch 20 (val_mae=43.5211)
+
+------------------------------------------------------------------------------------------------
+Training finished normally: 2026-09-18 11:33:00
+Summary
+  completed_epochs: 20
+  best_epoch: 20
+  best_val_mae: 43.521118
+  val_epoch: 2
+  validation_count: 10
+  final_train_loss: 47.628492
+  final_train_mae: 47.562717
+  final_val_loss: 43.803056
+  final_val_mae: 43.521118
+  total_time: 31m 39s
+  avg_epoch_time_sec: 94.74
+  avg_train_sec_per_step: 0.6087
+  avg_val_sec_per_step: 0.0453
+  peak_memory_gb: 12.08
+  test_loss: 41.143764
+  test_mae: 41.450010
+  test_rmse: 76.496674
+  test_mape: 533360.926787
+  test_time_sec: 4.11
+  best_checkpoint: /home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/experiments/route20/followup/470ee3e49baa66bb/runs/v24_route20_route20_base_mixed9_rate0.4_updates_seed7/TaxiBJ/custom/v24_route20_route20_base_mixed9_rate0.4_updates_seed7/random/rate0.4/20260918_110119_seed7_bs16/checkpoints/best.pt
+  best_state_source: checkpoint
+  metrics_jsonl: /home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/experiments/route20/followup/470ee3e49baa66bb/runs/v24_route20_route20_base_mixed9_rate0.4_updates_seed7/TaxiBJ/custom/v24_route20_route20_base_mixed9_rate0.4_updates_seed7/random/rate0.4/20260918_110119_seed7_bs16/logs/metrics.jsonl
+------------------------------------------------------------------------------------------------

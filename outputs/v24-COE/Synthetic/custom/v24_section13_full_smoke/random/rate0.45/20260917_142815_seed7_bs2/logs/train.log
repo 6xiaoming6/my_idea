@@ -1,0 +1,138 @@
+Training started: 2026-09-17 14:28:15
+------------------------------------------------------------------------------------------------
+Run
+  run_dir: /home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/Synthetic/custom/v24_section13_full_smoke/random/rate0.45/20260917_142815_seed7_bs2
+  command: scripts/train.py -c configs/v24/smoke.json --override_config configs/v24/experiments/full.json --synthetic --no_plot --quiet -n v24_section13_full_smoke
+  git_commit: 1f348d420b22878eff7be96a61567a5be410fd0e
+  git_branch: v24-COE
+  git_dirty: True
+  config_sha256: 99c2a429f9b70a7220e07db6f03d517345355b1070bd82ee36563b7e27854780
+  python: 3.11.15
+  torch: 2.6.0+cu124
+  cuda_runtime: 12.4
+  train_npz: (synthetic)
+  val_npz: (synthetic)
+  test_npz: (synthetic)
+  dataset: Synthetic
+  experiment_type: custom
+  variant: v24_section13_full_smoke
+  train_samples: 8
+  val_samples: 4
+  train_steps_per_epoch: 4
+  val_steps_per_epoch: 2
+  test_samples: 4
+  test_steps: 2
+  batch_size: 2
+  mask_pattern: random
+  mask_rate_config: 0.45
+  train_mask: shape=(8, 1, 6, 8, 8), observed_rate=0.5625, missing_rate=0.4375
+  val_mask: shape=(4, 1, 6, 8, 8), observed_rate=0.5625, missing_rate=0.4375
+  data_shape: (N,2,6,8,8)
+  device: cpu
+  device_name: cpu
+  total_params: 9,731
+  trainable_params: 9,731
+Config
+{
+  "seed": 7,
+  "output_dir": "outputs/v24-COE",
+  "device": "cpu",
+  "data": {
+    "batch_size": 2,
+    "num_workers": 0,
+    "pin_memory": false,
+    "drop_last": false,
+    "mask": {
+      "pattern": "random",
+      "missing_rate": 0.45
+    },
+    "synthetic": {
+      "num_train": 8,
+      "num_val": 4,
+      "t": 6,
+      "h": 8,
+      "w": 8
+    },
+    "multiscale": false,
+    "dataset_name": "Synthetic"
+  },
+  "model": {
+    "architecture": "v24_ts_coe",
+    "c_in": 2,
+    "main": {
+      "dim": 16,
+      "max_t": 6,
+      "h": 8,
+      "w": 8,
+      "scale_mode": "fine",
+      "use_multiscale": false
+    },
+    "coe": {
+      "num_steps": 2,
+      "routing_mode": "hard",
+      "fixed_path": null,
+      "router_state": "dynamic",
+      "use_shared": true,
+      "use_routed": true,
+      "temperature": 1.0,
+      "temporal_kernel": 3,
+      "spatial_kernel": 3,
+      "residual_init": 0.1,
+      "expert_pool": [
+        "T",
+        "S"
+      ],
+      "expert_state": "dynamic"
+    },
+    "aux": {
+      "enabled": false,
+      "alpha_init": 0.0
+    }
+  },
+  "loss": {
+    "type": "l1",
+    "lambda_coe_mid": 0,
+    "lambda_coe_balance": 0
+  },
+  "train": {
+    "epochs": 1,
+    "val_epoch": 1,
+    "lr_main": 0.0005,
+    "weight_decay": 0.0001,
+    "grad_clip_norm": 1.0,
+    "amp": false,
+    "save_every": 1
+  }
+}
+------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------
+ epoch         loss         mae         rmse     val_mae          lr   train_s    val_s   epoch_s   mem_gb   best
+-----------------------------------------------------------------------------------------------------------------
+     1      0.84185      0.8418       1.0243      0.8065    5.00e-04       0.0      0.0       0.0     0.00      *
+Best model at epoch 1 (val_mae=0.8065)
+
+------------------------------------------------------------------------------------------------
+Training finished normally: 2026-09-17 14:28:15
+Summary
+  completed_epochs: 1
+  best_epoch: 1
+  best_val_mae: 0.806549
+  val_epoch: 1
+  validation_count: 1
+  final_train_loss: 0.841850
+  final_train_mae: 0.841850
+  final_val_loss: 0.806549
+  final_val_mae: 0.806549
+  total_time: 0.1s
+  avg_epoch_time_sec: 0.05
+  avg_train_sec_per_step: 0.0109
+  avg_val_sec_per_step: 0.0032
+  peak_memory_gb: 0.00
+  test_loss: 0.796872
+  test_mae: 0.796872
+  test_rmse: 0.977587
+  test_mape: 2.783436
+  test_time_sec: 0.01
+  best_checkpoint: /home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/Synthetic/custom/v24_section13_full_smoke/random/rate0.45/20260917_142815_seed7_bs2/checkpoints/best.pt
+  metrics_jsonl: /home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/Synthetic/custom/v24_section13_full_smoke/random/rate0.45/20260917_142815_seed7_bs2/logs/metrics.jsonl
+------------------------------------------------------------------------------------------------

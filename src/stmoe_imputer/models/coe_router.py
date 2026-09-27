@@ -38,6 +38,37 @@ class PreviousExpertRouter(nn.Sequential):
         return self[3](self[2](hidden + context.to(hidden.dtype)))
 
 
+class PairRouter(nn.Module):
+    """Legacy individual router plus an optional zero-initialized pair interaction.
+
+    Keeping the same four-layer sequence preserves the initial individual
+    logits of the native router under the same seed. The pair head lives under
+    ``routers.*`` so optimizer and gradient diagnostics include it.
+    """
+
+    def __init__(self, input_dim: int, hidden_dim: int, num_experts: int,
+                 num_pairs: int, interaction: bool) -> None:
+        super().__init__()
+        self.layers = nn.Sequential(
+            nn.LayerNorm(input_dim), nn.Linear(input_dim, hidden_dim),
+            nn.GELU(), nn.Linear(hidden_dim, num_experts),
+        )
+        self.pair_head = None
+        self._pair_head_shape = (hidden_dim, num_pairs)
+        if interaction:
+            self.enable_interaction()
+
+    def enable_interaction(self) -> None:
+        hidden_dim, num_pairs = self._pair_head_shape
+        self.pair_head = nn.Linear(hidden_dim, num_pairs)
+        nn.init.zeros_(self.pair_head.weight)
+        nn.init.zeros_(self.pair_head.bias)
+
+    def forward(self, features: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor | None]:
+        hidden = self.layers[2](self.layers[1](self.layers[0](features)))
+        return self.layers[3](hidden), (self.pair_head(hidden) if self.pair_head is not None else None)
+
+
 def observed_pattern_features(values, observed, value_std):
     """Abs differences, observed pair fraction and presence for T/H/W per channel.
 

@@ -43,6 +43,12 @@ class MaskedMetricAccumulator:
         self.absolute_target += float(target_abs.sum().double().cpu())
         self.count += float(selected.sum().double().cpu())
 
+    def merge(self, other: "MaskedMetricAccumulator") -> None:
+        if self.eps != other.eps:
+            raise ValueError("Cannot merge metrics with different eps")
+        for name in ("absolute_error", "squared_error", "absolute_percentage_error", "absolute_target", "count"):
+            setattr(self, name, getattr(self, name) + getattr(other, name))
+
     def compute(self) -> dict[str, float]:
         denom = max(self.count, 1.0)
         return {

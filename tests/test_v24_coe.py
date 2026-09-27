@@ -174,14 +174,15 @@ class V24CoETest(unittest.TestCase):
         outputs = model(make_batch())
         loss, _ = compute_main_stage_loss(outputs, make_batch(), cfg)
         loss.backward()
-        modules = [*model.main_branch.routers, model.main_branch.temporal_expert,
-                   model.main_branch.spatial_expert, model.main_branch.shared_expert]
+        weights = outputs["coe"]["route_weights"].detach()
+        selected_experts = [expert for index, expert in enumerate(model.main_branch.routed_experts(0))
+                            if bool((weights[..., index] > 0).any())]
+        modules = [*model.main_branch.routers, *selected_experts, model.main_branch.shared_expert]
         for module in modules:
             gradients = [parameter.grad for parameter in module.parameters() if parameter.grad is not None]
             self.assertTrue(gradients, type(module).__name__)
             self.assertTrue(all(torch.isfinite(gradient).all() for gradient in gradients))
             self.assertGreater(sum(float(gradient.abs().sum()) for gradient in gradients), 0.0)
-        weights = outputs["coe"]["route_weights"].detach()
         self.assertTrue(((weights == 0.0) | (weights == 1.0)).all())
         torch.testing.assert_close(weights.sum(-1), torch.ones(weights.shape[:-1]))
         optimizer.step()
@@ -190,8 +191,8 @@ class V24CoETest(unittest.TestCase):
         model = TemporalSpatialCoE.from_config(compact_config()).eval()
         called = {"temporal": [], "spatial": []}
         handles = [
-            model.temporal_expert.register_forward_pre_hook(lambda _module, args: called["temporal"].append(args[0].shape[0])),
-            model.spatial_expert.register_forward_pre_hook(lambda _module, args: called["spatial"].append(args[0].shape[0])),
+            model.routed_experts(0)[0].register_forward_pre_hook(lambda _module, args: called["temporal"].append(args[0].shape[0])),
+            model.routed_experts(0)[1].register_forward_pre_hook(lambda _module, args: called["spatial"].append(args[0].shape[0])),
         ]
 
         def force_temporal(_module, _args, logits):

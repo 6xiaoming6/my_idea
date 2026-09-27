@@ -1,0 +1,64 @@
+Testing started: 2026-09-17 15:40:31
+------------------------------------------------------------------------------------------------
+Run
+  checkpoint: None
+  best_epoch: 80
+  best_state_source: cpu_memory
+  best_val_mae: 3.807033433776738
+  test_samples: 147
+  test_steps: 10
+  test_time_sec: 0.10
+------------------------------------------------------------------------------------------------
+Results
+  loss: 3.514100
+  l_main: 3.514100
+  l_final: 3.514100
+  l_coe_mid: 0.000000
+  supervised_count: 40630.800000
+  l_coe_balance: 0.000000
+  l_coe_balance_weighted: 0.000000
+  l_coe_balance_step1: 0.000000
+  mae: 3.588248
+  rmse: 12.620837
+  mape: 94352.124595
+  coe_update_abs_mean: 4.717108
+  coe_missing_fraction: 0.399884
+  coe_shared_residual_scale: 0.106218
+  coe_routed_residual_scale: 0.117874
+  coe_step1_update_abs_mean: 4.717108
+  coe_route_entropy: 0.000250
+  wape: 0.348249
+  metric_missing_count: 406308.000000
+  coe_routing_sample_count: 147.000000
+  coe_num_experts: 2.000000
+  coe_num_steps: 1.000000
+  coe_step1_T_weight: 0.000022
+  coe_step1_T_prob: 0.000022
+  coe_step1_S_weight: 0.999978
+  coe_step1_S_prob: 0.999978
+  coe_step1_router_entropy: 0.000253
+  coe_condition_fully_observed_sample_count: 0.000000
+  coe_condition_missing_low_sample_count: 0.000000
+  coe_condition_missing_medium_sample_count: 147.000000
+  coe_condition_missing_medium_step1_T_weight: 0.000022
+  coe_condition_missing_medium_step1_T_prob: 0.000022
+  coe_condition_missing_medium_step1_S_weight: 0.999978
+  coe_condition_missing_medium_step1_S_prob: 0.999978
+  coe_condition_missing_medium_step1_router_entropy: 0.000253
+  coe_condition_missing_high_sample_count: 0.000000
+  coe_condition_temporal_support_low_sample_count: 147.000000
+  coe_condition_temporal_support_low_step1_T_weight: 0.000022
+  coe_condition_temporal_support_low_step1_T_prob: 0.000022
+  coe_condition_temporal_support_low_step1_S_weight: 0.999978
+  coe_condition_temporal_support_low_step1_S_prob: 0.999978
+  coe_condition_temporal_support_low_step1_router_entropy: 0.000253
+  coe_condition_temporal_support_high_sample_count: 0.000000
+  coe_condition_spatial_support_low_sample_count: 0.000000
+  coe_condition_spatial_support_high_sample_count: 147.000000
+  coe_condition_spatial_support_high_step1_T_weight: 0.000022
+  coe_condition_spatial_support_high_step1_T_prob: 0.000022
+  coe_condition_spatial_support_high_step1_S_weight: 0.999978
+  coe_condition_spatial_support_high_step1_S_prob: 0.999978
+  coe_condition_spatial_support_high_step1_router_entropy: 0.000253
+Testing finished: 2026-09-17 15:40:31
+------------------------------------------------------------------------------------------------
