@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Current six-arm BikeNYC CoE versus layered MoE DDP queue."""
+"""Six-arm CoE versus layered MoE DDP queue with a selectable dataset."""
 from run_team_accept_v4 import main
 
 

@@ -35,6 +35,10 @@ class DualBranchSTImputer(nn.Module):
 
     def forward(self, batch: dict[str, torch.Tensor]) -> dict:
         inputs = {"x_f": batch["x_f_obs"], "m_f": batch["m_f"]}
+        for key in ("forced_partner_step", "forced_partner_ids",
+                    "forced_pair_step", "forced_pair_indices"):
+            if key in batch:
+                inputs[key] = batch[key]
         if getattr(self.main_branch, "requires_multiscale", True):
             inputs.update(
                 x_m=batch["x_m_obs"], m_m=batch["m_m"],

@@ -2,8 +2,7 @@
 
 All tensors use ``[B, C, T, H, W]``.  The original observation mask stays
 fixed throughout the chain; a decoded estimate never becomes an observation.
-Hard training evaluates all configured experts for the straight-through routing
-gradient, while hard evaluation dispatches whole windows to their chosen expert.
+Hard routing dispatches only selected sample/expert pairs in training and evaluation.
 """
 
 from __future__ import annotations
@@ -23,7 +22,7 @@ from .coe_pattern_experts import (
 )
 
 
-from .coe_router import GroupedRouter, PairRouter, PreviousExpertRouter, observed_pattern_features
+from .coe_router import GroupedRouter, PairRouter, PartnerScorer, PreviousExpertRouter, observed_pattern_features
 
 
 SUPPORTED_EXPERT_NAMES = ("T", "S", "TD", "SD", "TA", "ST", "TL", "SL")
@@ -272,8 +271,8 @@ class TemporalSpatialCoE(nn.Module):
         if routing_mode in {"fixed", "parallel"} and top_k != 1:
             raise ValueError("top_k > 1 is supported only for hard or soft routing")
         self.top_k = top_k
-        if pair_mode not in {"native", "additive", "interaction"}:
-            raise ValueError("pair_mode must be native, additive or interaction")
+        if pair_mode not in {"native", "additive", "interaction", "partner"}:
+            raise ValueError("pair_mode must be native, additive, interaction or partner")
         if acceptance not in {"none", "point", "window"}:
             raise ValueError("acceptance must be none, point or window")
         if expert_sharing not in {"shared", "per_step"}:
@@ -486,6 +485,11 @@ class TemporalSpatialCoE(nn.Module):
         if pair_mode == "interaction":
             for router in self.routers:
                 router.enable_interaction()
+        self.partner_scorer = (
+            PartnerScorer(router_input_dim + 2 * dim + 2 * c_in, router_hidden_dim,
+                          self.num_experts)
+            if pair_mode == "partner" else None
+        )
 
     @classmethod
     def from_config(cls, cfg: dict) -> "TemporalSpatialCoE":
@@ -635,6 +639,18 @@ class TemporalSpatialCoE(nn.Module):
         weights = torch.einsum("bp,bpe->be", pair_choice, pair_to_expert)
         return weights, pair_ids, pair_logits, pair_probs
 
+    def _pair_importance(self, logits: torch.Tensor, pair_probs: torch.Tensor,
+                         temperature: float) -> torch.Tensor:
+        """Six-dimensional candidate marginal matching pair selection and fusion."""
+        pair_logits = logits.float()[:, self.pair_indices]
+        within = F.softmax(pair_logits / temperature, dim=-1)
+        indices = self.pair_indices.unsqueeze(0).expand(logits.shape[0], -1, -1)
+        contributions = torch.zeros(
+            logits.shape[0], len(self.pair_indices), self.num_experts,
+            device=logits.device, dtype=within.dtype,
+        ).scatter(-1, indices, within)
+        return torch.einsum("bp,bpe->be", pair_probs.float(), contributions)
+
     def _dispatch(self, unified: torch.Tensor, paths: torch.Tensor, step: int = 0) -> torch.Tensor:
         """Evaluate only selected whole windows, keeping their full context."""
         result = torch.zeros_like(unified)
@@ -685,6 +701,24 @@ class TemporalSpatialCoE(nn.Module):
             raise ValueError("x_f and m_f must be on the same device")
         if not bool(torch.all((m_f == 0) | (m_f == 1))):
             raise ValueError("m_f must contain only finite binary values")
+        forced_partner_step = kwargs.get("forced_partner_step")
+        forced_partner_ids = kwargs.get("forced_partner_ids")
+        forced_pair_step = kwargs.get("forced_pair_step")
+        forced_pair_indices = kwargs.get("forced_pair_indices")
+        if self.pair_mode != "partner" and forced_partner_step is not None:
+            raise ValueError("forced_partner_step requires partner routing")
+        if forced_partner_step is not None and (
+            type(forced_partner_step) is not int or not 0 <= forced_partner_step < self.num_steps
+            or not torch.is_tensor(forced_partner_ids)
+            or forced_partner_ids.shape != (x_f.shape[0],)
+        ):
+            raise ValueError("forced partner needs a valid step and one partner per sample")
+        if forced_pair_step is not None and (
+            type(forced_pair_step) is not int or not 0 <= forced_pair_step < self.num_steps
+            or not torch.is_tensor(forced_pair_indices)
+            or forced_pair_indices.shape != (x_f.shape[0], 2)
+        ):
+            raise ValueError("forced pair needs a valid step and two experts per sample")
         observed = m_f.bool().expand_as(x_f)
         if not bool(torch.all(torch.isfinite(x_f) | ~observed)):
             raise ValueError("Input observed values must be finite; mark missing values with m_f=0")
@@ -725,6 +759,7 @@ class TemporalSpatialCoE(nn.Module):
         acceptance_history = []
         logits_history, probability_history, weight_history, path_history = [], [], [], []
         selected_history, pair_id_history, pair_logit_history, pair_prob_history = [], [], [], []
+        importance_history, partner_score_history, primary_history, partner_history = [], [], [], []
         previous_choice_history = []
         previous_candidate_prediction = initial_prediction
         for step in range(self.num_steps):
@@ -765,6 +800,18 @@ class TemporalSpatialCoE(nn.Module):
                 logits[:, forced_index] = 20.0
             else:
                 logits = hidden.new_zeros((hidden.shape[0], self.num_experts))
+            # The partner route observes the first expert's proposal before
+            # choosing a companion; all variants reuse this same U and shared update.
+            expert_hidden = initial_hidden if self.expert_state == "initial" else hidden
+            expert_completion = (initial_completion if self.expert_state == "initial" or
+                                 not self.completion_feedback else completion)
+            unified = self.state_norm(self.state_projection(torch.cat(
+                [expert_hidden, expert_completion, original_mask, support, position], dim=1
+            )))
+            shared_update = (self.shared_scale_logits[step].sigmoid() * self.shared_expert(unified)
+                             if self.use_shared else torch.zeros_like(hidden))
+            primary_update = None
+            partner_scores = None
             # Gumbel hard argmax is invariant to tau: its clean categorical
             # probabilities are softmax(logits). Tau controls the surrogate
             # gradient; only the soft-mixture variant tempers its actual weights.
@@ -786,10 +833,67 @@ class TemporalSpatialCoE(nn.Module):
             elif self.routing_mode in {"soft", "parallel"}:
                 weights = probabilities
                 paths = weights.argmax(dim=-1)
+            elif self.pair_mode == "partner":
+                primary = logits.argmax(dim=-1)
+                primary_update = self._dispatch(unified, primary, step)
+                proposal_hidden = (hidden + shared_update +
+                                   self.routed_scale_logits[step].sigmoid() * primary_update)
+                proposal = self.decoder(proposal_hidden)
+                proposal_change = torch.where(observed, torch.zeros_like(proposal),
+                                              proposal - prediction)
+                point_missing = missing.mean(dim=1, keepdim=True)
+                partner_features = torch.cat((
+                    router_features,
+                    primary_update.mean(dim=(2, 3, 4)),
+                    self._missing_pool(primary_update, point_missing),
+                    proposal_change.mean(dim=(2, 3, 4)),
+                    self._missing_pool(proposal_change, missing),
+                ), dim=1)
+                partner_scores = self.partner_scorer(partner_features, primary)
+                partner = partner_scores.argmax(dim=-1)
+                if forced_partner_step == step:
+                    partner = forced_partner_ids.to(device=primary.device, dtype=torch.long)
+                    if bool(((partner == primary) | (partner < 0) |
+                             (partner >= self.num_experts)).any()):
+                        raise ValueError("forced partner must differ from the primary expert")
+                selected = torch.stack((primary, partner), dim=-1)
+                if forced_pair_step == step:
+                    selected = forced_pair_indices.to(device=primary.device, dtype=torch.long)
+                if bool(((selected < 0) | (selected >= self.num_experts)).any()) or bool(
+                    (selected[:, 0] == selected[:, 1]).any()
+                ):
+                    raise ValueError("forced pair must contain two distinct valid experts")
+                within = F.softmax(logits.float().gather(1, selected) /
+                                   sampling_temperature, dim=-1)
+                weights = torch.zeros_like(probabilities).scatter(1, selected, within)
+                paths = weights.argmax(dim=-1)
+                ordered = selected.sort(dim=-1).values
+                first, second = ordered.unbind(dim=-1)
+                pair_ids = first * (2 * self.num_experts - first - 1) // 2 + (second - first - 1)
+                left, right = self.pair_indices.unbind(dim=-1)
+                pair_logits = torch.where(
+                    primary[:, None] == left[None], partner_scores[:, right],
+                    torch.where(primary[:, None] == right[None], partner_scores[:, left],
+                                partner_scores.new_full((len(primary), len(left)), -1e4)),
+                )
+                pair_probs = F.softmax(pair_logits.float() / sampling_temperature, dim=-1)
+                partner_score_history.append(partner_scores)
+                primary_history.append(primary)
+                partner_history.append(partner)
             elif self.pair_mode != "native":
                 weights, pair_ids, pair_logits, pair_probs = self._pair_route(
                     logits, pair_bias, sampling_temperature
                 )
+                paths = weights.argmax(dim=-1)
+            elif forced_pair_step == step:
+                selected = forced_pair_indices.to(device=logits.device, dtype=torch.long)
+                if bool(((selected < 0) | (selected >= self.num_experts)).any()) or bool(
+                    (selected[:, 0] == selected[:, 1]).any()
+                ):
+                    raise ValueError("forced pair must contain two distinct valid experts")
+                within = F.softmax(logits.float().gather(1, selected) /
+                                   sampling_temperature, dim=-1)
+                weights = torch.zeros_like(probabilities).scatter(1, selected, within)
                 paths = weights.argmax(dim=-1)
             elif self.training:
                 if self.top_k > 1:
@@ -840,19 +944,12 @@ class TemporalSpatialCoE(nn.Module):
                 pair_id_history.append(pair_ids)
                 pair_logit_history.append(pair_logits)
                 pair_prob_history.append(pair_probs)
+                importance_history.append(self._pair_importance(logits, pair_probs,
+                                                                 sampling_temperature))
+            else:
+                importance_history.append(probabilities)
 
-            # Recompute this same interface each round in both state variants.
-            # Freezing the expert input leaves residual accumulation and router
-            # state policy independent, and retains candidate computation counts.
-            expert_hidden = initial_hidden if self.expert_state == "initial" else hidden
-            expert_completion = (initial_completion if self.expert_state == "initial" or
-                                 not self.completion_feedback else completion)
-            unified = self.state_norm(self.state_projection(torch.cat(
-                [expert_hidden, expert_completion, original_mask, support, position], dim=1
-            )))
-            update = torch.zeros_like(hidden)
-            if self.use_shared:
-                update = update + self.shared_scale_logits[step].sigmoid() * self.shared_expert(unified)
+            update = shared_update
             if self.use_routed:
                 if self.routing_mode in {"soft", "parallel"}:
                     routed_update = torch.zeros_like(unified)
@@ -861,7 +958,17 @@ class TemporalSpatialCoE(nn.Module):
                             weights[:, expert_index, None, None, None, None] * expert(unified)
                         )
                 elif self.routing_mode == "hard":
-                    routed_update = self._dispatch_weighted(unified, weights, step)
+                    if (self.pair_mode == "partner" and primary_update is not None and
+                            forced_pair_step != step):
+                        companion_update = self._dispatch(unified, partner, step)
+                        primary_weight = weights.gather(1, primary[:, None]).flatten()
+                        companion_weight = weights.gather(1, partner[:, None]).flatten()
+                        routed_update = (
+                            primary_update * primary_weight[:, None, None, None, None] +
+                            companion_update * companion_weight[:, None, None, None, None]
+                        )
+                    else:
+                        routed_update = self._dispatch_weighted(unified, weights, step)
                 else:
                     routed_update = self._dispatch(unified, paths, step)
                 update = update + self.routed_scale_logits[step].sigmoid() * routed_update
@@ -901,6 +1008,7 @@ class TemporalSpatialCoE(nn.Module):
             path_history.append(paths)
 
         route_probabilities = torch.stack(probability_history, dim=1)
+        route_importance = torch.stack(importance_history, dim=1)
         route_weights = torch.stack(weight_history, dim=1)
         effective_mode = ("soft" if self.routing_mode == "hard" and self.top_k == 1
                           and hard_fraction < 1 else self.routing_mode)
@@ -934,6 +1042,13 @@ class TemporalSpatialCoE(nn.Module):
             diagnostics["route_entropy"] = -(
                 diagnostic_probabilities * diagnostic_probabilities.clamp_min(1e-8).log()
             ).sum(dim=-1).mean()
+            candidate_marginal = route_importance.detach().float()
+            diagnostics["candidate_importance_entropy"] = -(
+                candidate_marginal * candidate_marginal.clamp_min(1e-8).log()
+            ).sum(dim=-1).mean()
+            diagnostics["candidate_importance_vs_selected_l1"] = (
+                candidate_marginal - route_weights.detach().float()
+            ).abs().sum(dim=-1).mean()
         return {
             "x_hat_main": prediction,
             "h_st_aux": hidden,
@@ -954,7 +1069,14 @@ class TemporalSpatialCoE(nn.Module):
                 "changes": changes,
                 "route_logits": torch.stack(logits_history, dim=1),
                 "route_probs": route_probabilities,
+                "route_importance": route_importance,
                 "route_weights": route_weights,
+                "partner_scores": (torch.stack(partner_score_history, dim=1)
+                                   if partner_score_history else None),
+                "primary_ids": (torch.stack(primary_history, dim=1)
+                                if primary_history else None),
+                "partner_ids": (torch.stack(partner_history, dim=1)
+                                if partner_history else None),
                 "paths": torch.stack(path_history, dim=1),
                 "paths_are_discrete": self.use_routed and effective_mode not in {"soft", "parallel"},
                 "routing_mode": effective_mode,

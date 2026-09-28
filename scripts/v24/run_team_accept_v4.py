@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run six focused BikeNYC CoE versus layered MoE ablations sequentially."""
+"""Run six focused CoE versus layered MoE ablations sequentially."""
 from __future__ import annotations
 
 import argparse
@@ -12,8 +12,10 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts/v24"))
 import run_experiments as runner
 
-POLICY = ROOT / "configs/v24/coe_focus_bikenyc_experiments.json"
-STUDY = "coe_focus_bikenyc"
+POLICIES = {
+    "taxibj": ROOT / "configs/v24/coe_focus_taxibj_experiments.json",
+    "bikenyc": ROOT / "configs/v24/coe_focus_bikenyc_experiments.json",
+}
 
 
 def check_gpu_idle(gpus: list[int]) -> None:
@@ -34,6 +36,10 @@ def check_gpu_idle(gpus: list[int]) -> None:
 
 def main() -> int:
     parser = argparse.ArgumentParser()
+    parser.add_argument("--dataset", choices=POLICIES, default="taxibj",
+                        help="Experiment dataset; defaults to taxibj")
+    parser.add_argument("--config", help="Custom experiment policy; overrides --dataset")
+    parser.add_argument("--study", help="Study within the chosen policy")
     parser.add_argument("--gpus", default="0,1", help="Two physical GPUs for one DDP experiment")
     parser.add_argument("--epochs", type=int, default=50)
     parser.add_argument("--dry-run", action="store_true")
@@ -47,13 +53,15 @@ def main() -> int:
     gpu_ids = [int(part) for part in parts]
     if len(set(gpu_ids)) != 2:
         parser.error("--gpus must contain exactly two distinct device indices, e.g. 0,1")
+    policy = runner.resolve(args.config) if args.config else POLICIES[args.dataset]
+    study = args.study or runner.load(policy)["default_study"]
     command = [sys.executable, "-u", str(ROOT / "scripts/v24/run_experiments.py"),
-               "--config", str(POLICY), "--study", STUDY, "--gpus", args.gpus,
+               "--config", str(policy), "--study", study, "--gpus", args.gpus,
                "--epochs", str(args.epochs)]
     if args.dry_run or args.summary_only:
         command.append("--dry-run" if args.dry_run else "--summary-only")
         return subprocess.call(command, cwd=ROOT)
-    output = runner.resolve(runner.load(POLICY)["output_dir"])
+    output = runner.resolve(runner.load(policy)["output_dir"])
     output.mkdir(parents=True, exist_ok=True)
     with (output / ".ddp_queue.lock").open("a") as lock:
         try:

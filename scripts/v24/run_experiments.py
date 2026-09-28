@@ -106,6 +106,28 @@ def identity(manifest, extra_files=()):
             "packages": versions}, stamps
 
 
+def snapshot_partner_sources(suite, extra_files):
+    """Freeze executable code and small policy inputs, including dirty edits."""
+    snapshot = suite / "source_snapshot"
+    paths = set(source_files())
+    for candidate in extra_files:
+        path = resolve(candidate)
+        if path.is_relative_to(ROOT) and path.suffix in {".py", ".json"} and not path.is_relative_to(ROOT / "data"):
+            paths.add(path)
+    manifest = {}
+    for path in sorted(paths):
+        relative = path.relative_to(ROOT)
+        content = path.read_bytes()
+        target = snapshot / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        if target.exists() and target.read_bytes() != content:
+            raise RuntimeError(f"Frozen source differs from active file: {path}")
+        if not target.exists():
+            target.write_bytes(content)
+        manifest[str(relative)] = hashlib.sha256(content).hexdigest()
+    write_json(snapshot / "manifest.json", manifest)
+
+
 def assert_unchanged(stamps, code_paths):
     if set(source_files()) != code_paths:
         raise RuntimeError("Training source files were added or removed; restart in a new fingerprinted suite.")
@@ -191,7 +213,7 @@ def validate_plan(manifest):
             actual = tuple(coe.get(key) for key in ("completion_feedback", "expert_sharing", "pair_mode"))
             expected_hidden = 68 if run["variant"] == "focus_pair_capacity" else 64
             mask = cfg["data"]["mask"]
-            if (actual != expected or cfg["data"].get("dataset_name") != "BikeNYC" or
+            if (actual != expected or not cfg["data"].get("dataset_name") or
                     mask.get("pattern") != "random" or mask.get("missing_rate") != 0.4 or
                     coe.get("router_hidden_dim") != expected_hidden or
                     coe.get("num_steps") != 3 or coe.get("top_k") != 2 or
@@ -208,7 +230,36 @@ def validate_plan(manifest):
                     cfg["data"].get("eval_mask_diversity", {}).get("resample_each_epoch") is not False or
                     train.get("save_best_checkpoint") is not False or
                     train.get("scheduler", {}).get("total_epochs") != train["epochs"]):
-                raise ValueError(f"{name}: invalid focused BikeNYC comparison settings")
+                raise ValueError(f"{name}: invalid focused comparison settings")
+        if manifest.get("stage") == "coe_partner":
+            coe = cfg["model"]["coe"]
+            expected = {
+                "focus_moe": (False, "per_step", "native"),
+                "focus_coe_independent": (True, "per_step", "native"),
+                "focus_shared_no_feedback": (False, "shared", "native"),
+                "focus_coe_shared": (True, "shared", "native"),
+                "focus_partner": (True, "shared", "partner"),
+            }[run["variant"]]
+            actual = tuple(coe.get(key) for key in
+                           ("completion_feedback", "expert_sharing", "pair_mode"))
+            mask = cfg["data"]["mask"]
+            if (actual != expected or not cfg["data"].get("dataset_name") or
+                    mask.get("pattern") != "random" or mask.get("missing_rate") != 0.4 or
+                    coe.get("num_steps") != 3 or coe.get("top_k") != 2 or
+                    coe.get("expert_pool") != ["T", "S", "TD", "SD", "TA", "ST"] or
+                    coe.get("routing_mode") != "hard" or coe.get("router_hidden_dim") != 64 or
+                    coe.get("acceptance") != "none" or
+                    coe.get("fixed_expert_steps") != [None] * 3 or
+                    cfg["loss"].get("balance_importance") != "candidate" or
+                    cfg["data"].get("train_mask_diversity", {}).get("rates") != [0.4] or
+                    cfg["data"].get("eval_mask_diversity", {}).get("rates") != [0.4] or
+                    len(cfg["data"].get("train_mask_diversity", {}).get("families", [])) != 9 or
+                    cfg["data"].get("train_mask_diversity", {}).get("resample_each_epoch") is not True or
+                    cfg["data"].get("eval_mask_diversity", {}).get("resample_each_epoch") is not False or
+                    train.get("save_best_checkpoint") is not True or
+                    train.get("scheduler", {}).get("total_epochs") != train["epochs"] or
+                    train.get("oracle_last_step_samples", 0) < 1):
+                raise ValueError(f"{name}: invalid five-arm partner comparison settings")
         if manifest.get("stage") == "coe_team_accept_v4":
             coe = cfg["model"]["coe"]
             expected = {
@@ -306,9 +357,25 @@ def validate_plan(manifest):
                     reference = normalized
                 elif normalized != reference:
                     raise ValueError(f"{run['variant']}: changed settings outside the planned intervention")
-        for split, dataset in manifest["datasets"].items():
-            if Path(dataset["path"]).resolve() != (ROOT / f"data/BikeNYC/bikenyc_{split}.npz").resolve():
-                raise ValueError(f"Focused {split} split must be the BikeNYC NPZ")
+    if manifest.get("stage") == "coe_partner":
+        expected_order = ["focus_moe", "focus_coe_independent", "focus_shared_no_feedback",
+                          "focus_coe_shared", "focus_partner"]
+        by_seed = {}
+        for run in manifest["runs"]:
+            by_seed.setdefault(run["seed"], []).append(run)
+        for seed, runs in by_seed.items():
+            if [run["variant"] for run in runs] != expected_order:
+                raise ValueError(f"Partner seed {seed} must contain M0/M1/C0/C1/P1 in order")
+            reference = None
+            for run in runs:
+                normalized = copy.deepcopy(run["config"])
+                normalized["experiment_plan"]["variant"] = "reference"
+                for key in ("completion_feedback", "expert_sharing", "pair_mode"):
+                    normalized["model"]["coe"].pop(key, None)
+                if reference is None:
+                    reference = normalized
+                elif normalized != reference:
+                    raise ValueError(f"{run['variant']}: changed settings outside the planned intervention")
 
     if manifest.get("stage") == "coe_team_accept_v4":
         expected_order = ["team_e0", "team_e1", "team_e2", "team_e3", "team_e4", "team_e5", "team_e10"]
@@ -342,7 +409,7 @@ def materialize(manifest, suite, fingerprint, world_size=1):
     result["world_size"] = world_size
     for run in result["runs"]:
         run["config"]["output_dir"] = (str(ROOT / "outputs/v24-COE")
-            if result.get("stage") in {"coe_team_accept_v4", "coe_focus"} else str(suite / "runs" / run["name"]))
+            if result.get("stage") in {"coe_team_accept_v4", "coe_focus", "coe_partner"} else str(suite / "runs" / run["name"]))
         run["config"]["experiment_suite_fingerprint"] = fingerprint
         run["config_path"] = str(suite / "configs" / (run["name"] + ".json"))
         command = [sys.executable, "-u", str(ROOT / "scripts/train.py"), "-c",
@@ -405,6 +472,18 @@ def check_complete(receipt_path, run, manifest):
             return False
         if storage == "checkpoint" and not (run_dir / "checkpoints/best.pt").is_file():
             return False
+        if manifest.get("stage") == "coe_partner":
+            oracle_path = log_dir / "oracle_last_step.json"
+            if not oracle_path.is_file():
+                return False
+            oracle = load(oracle_path)
+            if (oracle.get("status") != "label_only_diagnostic_not_deployable" or
+                    oracle.get("best_epoch") != receipt["best_epoch"] or
+                    oracle.get("evaluated_samples", 0) < 1 or
+                    any(not math.isfinite(oracle[key]) for key in
+                        ("top2_mae", "anchor_best_mae", "all_best_mae")) or
+                    not oracle["all_best_mae"] <= oracle["anchor_best_mae"] <= oracle["top2_mae"]):
+                return False
         if "Training finished normally" not in (log_dir / "train.log").read_text():
             return False
         return True
@@ -437,6 +516,14 @@ def summarize(manifest, suite):
                        test_mae=result["test"]["mae"], test_rmse=result["test"]["rmse"],
                        seconds=result["total_time_sec"], run_dir=result["run_dir"])
             diagnostics[run["name"]] = {k: v for k, v in result["test"].items() if k.startswith("coe_")}
+        if manifest.get("stage") == "coe_partner":
+            row.update(
+                total_params=result.get("total_params") if result else None,
+                peak_memory_gb=result.get("peak_memory_gb") if result else None,
+                test_time_sec=result.get("test_time_sec") if result else None,
+                forward_ms_per_batch_per_rank=result["test"].get("forward_ms_per_batch_per_rank") if result else None,
+                partner_probe_forward_calls=result.get("partner_probe_forward_calls") if result else None,
+            )
         rows.append(row)
     pairs, fixed = [], []
     groups = {(r["dataset"], r["protocol"], r["seed"]) for r in rows}
@@ -451,6 +538,8 @@ def summarize(manifest, suite):
                 reference = "team_e0"
             elif manifest.get("stage") == "coe_focus":
                 reference = "focus_coe_shared"
+            elif manifest.get("stage") == "coe_partner":
+                reference = "focus_coe_shared"
             elif manifest.get("stage") in {"coe_validation", "coe_dual_mask", "coe_mechanism1"}:
                 reference = "coe_main"
             elif manifest.get("stage") == "route20":
@@ -460,7 +549,7 @@ def summarize(manifest, suite):
             else:
                 reference = "full"
             full = next((r for r in group if r["variant"] == reference and r["status"] == "complete"), None)
-            if full and manifest.get("stage") != "coe_focus":
+            if full and manifest.get("stage") not in {"coe_focus", "coe_partner"}:
                 for other in group:
                     if other["status"] == "complete" and other is not full:
                         pairs.append({"dataset": dataset, "protocol": protocol, "seed": seed,
@@ -468,6 +557,21 @@ def summarize(manifest, suite):
                                       "reference": reference, "variant": other["variant"],
                                       f"test_mae_delta_vs_{reference}": other["test_mae"] - full["test_mae"],
                                       f"test_rmse_delta_vs_{reference}": other["test_rmse"] - full["test_rmse"]})
+        if manifest.get('stage') == 'coe_partner':
+            for reference, variant in [
+                ('focus_moe', 'focus_coe_independent'),
+                ('focus_moe', 'focus_shared_no_feedback'),
+                ('focus_shared_no_feedback', 'focus_coe_shared'),
+                ('focus_coe_independent', 'focus_coe_shared'),
+                ('focus_coe_shared', 'focus_partner'),
+            ]:
+                base = next((r for r in all_group if r['variant'] == reference and r['status'] == 'complete'), None)
+                other = next((r for r in all_group if r['variant'] == variant and r['status'] == 'complete'), None)
+                if base and other:
+                    pairs.append({'dataset': dataset, 'protocol': protocol, 'seed': seed,
+                                  'reference': reference, 'variant': variant,
+                                  f'test_mae_delta_vs_{reference}': other['test_mae'] - base['test_mae'],
+                                  f'test_rmse_delta_vs_{reference}': other['test_rmse'] - base['test_rmse']})
         if manifest.get('stage') == 'coe_focus':
             for reference, variant in [
                 ('focus_moe', 'focus_coe_independent'),
@@ -563,7 +667,7 @@ def launch(run, suite, env, world_size=1):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--config", default="configs/v24/coe_focus_bikenyc_experiments.json")
+    parser.add_argument("--config", default="configs/v24/coe_focus_taxibj_experiments.json")
     parser.add_argument("--study", help="Study from the policy; defaults to its default_study, or pilot")
     parser.add_argument("--plan", type=Path, help="Run an existing immutable planner manifest using the same lifecycle")
     gpu_group = parser.add_mutually_exclusive_group()
@@ -628,6 +732,8 @@ def main(argv=None):
         if (suite / "protocol.json").exists() and load(suite / "protocol.json") != record:
             raise RuntimeError("Suite fingerprint collision or modified protocol")
         assert_unchanged(stamps, code_paths)
+        if manifest.get("stage") == "coe_partner":
+            snapshot_partner_sources(suite, extras)
         write_json(suite / "protocol.json", record)
         write_json(suite / "plan.json", manifest)
         for run in manifest["runs"]:

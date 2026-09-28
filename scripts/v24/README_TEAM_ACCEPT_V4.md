@@ -34,6 +34,6 @@ tmux new-session -s v24-team-v4 \
 这批实验不会枚举全部 15 个末轮候选来计算 oracle regret；该诊断需在选定 checkpoint 后对固定验证子集单独运行，不能用测试标签为模型选参。
 
 
-## 后续 BikeNYC 实验
+## 后续可切换数据集的实验
 
-当前队列已精简为六组 CoE 与分层 MoE、个体 Top-2 与组合评分的对照，使用双卡 DDP 和稀疏 hard Top-2 执行。启动命令与设计见 [README_COE_FOCUS.md](README_COE_FOCUS.md)。本页上方的七组 E0–E10 是历史首批设计；原 BikeNYC 七组策略仍保存在 `configs/v24/team_accept_v4_bikenyc_experiments.json`，需显式传给 `run_experiments.py` 才会执行。
+当前队列已精简为六组 CoE 与分层 MoE、个体 Top-2 与组合评分的对照，使用双卡 DDP 和稀疏 hard Top-2 执行。默认在 TaxiBJ random 0.4 上运行；启动时可用 `--dataset bikenyc` 切换。命令与设计见 [README_COE_FOCUS.md](README_COE_FOCUS.md)。本页上方的七组 E0–E10 是历史首批设计；原 BikeNYC 七组策略仍保存在 `configs/v24/team_accept_v4_bikenyc_experiments.json`，需显式传给 `run_experiments.py` 才会执行。

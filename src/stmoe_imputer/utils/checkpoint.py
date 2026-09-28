@@ -27,6 +27,10 @@ def save_checkpoint(
     epoch: int,
     metrics: dict,
     cfg: dict,
+    *,
+    scheduler=None,
+    scaler=None,
+    rng_states=None,
 ) -> None:
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -36,6 +40,11 @@ def save_checkpoint(
         "epoch": epoch,
         "metrics": metrics,
         "config": cfg,
+        "scheduler": scheduler.state_dict() if scheduler is not None else None,
+        "scaler": scaler.state_dict() if scaler is not None else None,
+        "rng_states": rng_states,
+        "torch_version": str(torch.__version__),
+        "experiment_suite_fingerprint": cfg.get("experiment_suite_fingerprint"),
     }
     temporary = path.with_suffix(path.suffix + ".tmp")
     try:

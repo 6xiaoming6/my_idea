@@ -1,0 +1,15 @@
+{
+  "status": "label_only_diagnostic_not_deployable",
+  "step": 3.0,
+  "evaluated_samples": 48.0,
+  "supervised_samples": 48.0,
+  "supervised_targets": 471840.0,
+  "top2_mae": 23.678523969989826,
+  "anchor_best_mae": 22.87197990844354,
+  "all_best_mae": 22.76532775940997,
+  "anchor_improvable_fraction_gt_0p1": 0.20833333333333334,
+  "all_improvable_fraction_gt_0p1": 0.22916666666666666,
+  "anchor_retains_all_best_fraction": 0.9791666666666666,
+  "candidate_forward_calls_per_sample": 15.0,
+  "best_epoch": 52
+}

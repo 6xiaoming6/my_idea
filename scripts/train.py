@@ -7,6 +7,7 @@ import json
 import math
 import os
 import platform
+import random
 import shutil
 import subprocess
 import time
@@ -18,6 +19,7 @@ import sys
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 import matplotlib.pyplot as plt
+import numpy as np
 import torch
 import torch.distributed as dist
 from torch.nn.parallel import DistributedDataParallel
@@ -31,9 +33,23 @@ from stmoe_imputer.config import deep_update, load_config, save_config
 from stmoe_imputer.data import build_datasets, build_loader, build_test_dataset
 from stmoe_imputer.engine import build_grad_scaler, build_optimizer, build_scheduler, evaluate, train_one_epoch
 from stmoe_imputer.models import DualBranchSTImputer
+from stmoe_imputer.partner_study import last_step_oracle
 from stmoe_imputer.utils import get_device, set_seed
 from stmoe_imputer.utils.checkpoint import load_checkpoint, save_checkpoint, snapshot_model_state
 from stmoe_imputer.utils.train_logger import TrainLogger
+
+
+def _rng_snapshot(device: torch.device) -> dict:
+    numpy_state = np.random.get_state()
+    return {
+        "python": random.getstate(),
+        "numpy": (numpy_state[0], numpy_state[1].tolist(),
+                  numpy_state[2], numpy_state[3], numpy_state[4]),
+        "torch_cpu": torch.get_rng_state().tolist(),
+        "torch_cuda": (torch.cuda.get_rng_state(device).tolist()
+                       if device.type == "cuda" else None),
+        "cuda_device": device.index if device.type == "cuda" else None,
+    }
 
 
 def _git_metadata() -> dict[str, str]:
@@ -449,6 +465,7 @@ def main() -> None:
     epoch_perfs: list[dict[str, float]] = []
     completed_epochs = 0
     validation_count = 0
+    partner_probe_forward_calls = 0.0
     validations_without_improvement = 0
     last_val_logs: dict[str, float] | None = None
     test_logs: dict[str, float] | None = None
@@ -513,6 +530,7 @@ def main() -> None:
                     line += " | best"
                 print(line, flush=True)
             completed_epochs = epoch
+            partner_probe_forward_calls += float(train_logs.get("train_partner_probe_forward_calls", 0.0))
             epoch_perfs.append(perf)
             history["train_loss"].append(float(train_logs["loss"]))
             history["train_mae"].append(float(train_logs["mae"]))
@@ -526,8 +544,17 @@ def main() -> None:
                 best_mae = val_logs["mae"]
                 best_epoch = epoch
                 if save_best:
+                    rng_states = None
+                    if cfg["train"].get("full_checkpoint", False):
+                        local_rng = _rng_snapshot(device)
+                        rng_states = [None] * world_size
+                        if world_size > 1:
+                            dist.all_gather_object(rng_states, local_rng)
+                        else:
+                            rng_states[0] = local_rng
                     if is_main:
-                        save_checkpoint(ckpt_dir / "best.pt", raw_model, optimizer, epoch, metrics, cfg)
+                        save_checkpoint(ckpt_dir / "best.pt", raw_model, optimizer, epoch, metrics, cfg,
+                                        scheduler=scheduler, scaler=scaler, rng_states=rng_states)
                 else:
                     best_state = snapshot_model_state(raw_model)
                 logger.log_best(epoch, best_mae)
@@ -558,6 +585,20 @@ def main() -> None:
                 raise RuntimeError("Training completed without a best validation state.")
             raw_model.load_state_dict(best_state)
             best_state = None
+        oracle_samples = int(cfg["train"].get("oracle_last_step_samples", 0))
+        if oracle_samples > 0:
+            oracle = last_step_oracle(raw_model, val_loader, device, cfg, oracle_samples)
+            oracle["best_epoch"] = best_epoch
+            if is_main:
+                (log_dir / "oracle_last_step.json").write_text(
+                    json.dumps(oracle, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+                )
+                logger.log_message(
+                    "Validation-only last-round Oracle: "
+                    f"Top-2={oracle['top2_mae']:.6f}, "
+                    f"anchor-best={oracle['anchor_best_mae']:.6f}, "
+                    f"all-best={oracle['all_best_mae']:.6f}"
+                )
         if test_loader is not None:
             test_start = time.perf_counter()
             test_logs = evaluate(raw_model, test_loader, device, cfg, desc=f"test best epoch {best_epoch}", epoch=best_epoch, show_progress=False)
@@ -647,6 +688,9 @@ def main() -> None:
             "best_val_mae": best_mae, "test": test_logs,
             "best_state_source": "checkpoint" if save_best else "cpu_memory",
             "total_time_sec": total_time, "world_size": world_size,
+            "total_params": total_params, "trainable_params": trainable_params,
+            "peak_memory_gb": max_mem, "test_time_sec": test_time,
+            "partner_probe_forward_calls": partner_probe_forward_calls,
             "samples": {"train": len(train_ds), "val": len(val_ds),
                         "test": len(test_ds) if test_ds is not None else 0},
         }

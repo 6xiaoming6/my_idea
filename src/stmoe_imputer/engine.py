@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections import defaultdict
+import time
 
 import torch
 import torch.distributed as dist
@@ -11,6 +12,7 @@ from .metrics import MaskedMetricAccumulator, masked_metrics
 from .data.diverse_masks import FAMILIES
 from .routing_metrics import CoERoutingMetricAccumulator, RoutingMetricAccumulator, active_routing_scales
 from .models.registry import resolve_architecture
+from .partner_study import partner_candidate_loss
 from .utils.device import move_batch_to_device
 
 
@@ -398,6 +400,13 @@ def train_one_epoch(
             optimizer._stmoe_grad_scaler = scaler
     scale_start = scaler.get_scale()
     optimizer_steps = seen_samples = skipped_empty_batches = skipped_amp_steps = 0
+    partner_probe_calls = 0
+    partner_cfg = cfg["train"].get("partner_probe", {})
+    partner_mode = is_coe and cfg["model"].get("coe", {}).get("pair_mode") == "partner"
+    if partner_mode and (type(partner_cfg.get("interval_batches")) is not int or
+                         partner_cfg["interval_batches"] < 1 or
+                         float(partner_cfg.get("weight", 0)) <= 0):
+        raise ValueError("Partner routing requires positive train.partner_probe interval_batches and weight")
     total_epochs = int(total_epochs or cfg["train"]["epochs"])
     progress = tqdm(loader, desc=f"train epoch {epoch}/{total_epochs}", leave=True, disable=not show_progress)
     for batch_index, batch in enumerate(progress):
@@ -412,6 +421,19 @@ def train_one_epoch(
         with torch.autocast(device_type=device.type, enabled=use_amp):
             outputs = model(batch)
             loss, loss_dict = compute_main_stage_loss(outputs, batch, cfg, epoch=epoch)
+            if partner_mode:
+                # Keep DDP's partner-head hooks active on non-probe batches too.
+                loss = loss + outputs["coe"]["partner_scores"].sum() * 0.
+                if batch_index % partner_cfg["interval_batches"] == 0:
+                    ranking, probe_logs = partner_candidate_loss(
+                        core_model, batch, outputs, cfg, epoch, batch_index,
+                    )
+                    loss = loss + float(partner_cfg["weight"]) * ranking
+                    logs["l_partner"].append(float(ranking.detach().cpu()))
+                    for key, value in probe_logs.items():
+                        logs[key].append(value)
+                    partner_probe_calls += int(probe_logs["partner_probe_forward_calls"])
+                loss_dict["loss"] = loss.detach()
         diagnostic_every = cfg["train"].get("router_grad_diagnostic_every", 0)
         if is_coe and diagnostic_every and batch_index % diagnostic_every == 0:
             parameters = [p for router in core_model.main_branch.routers for p in router.parameters()]
@@ -450,6 +472,13 @@ def train_one_epoch(
                         logs[f"{prefix}_grad_norm"].append(norm)
                         logs[f"{prefix}_finite_nonzero_gradient_batch_fraction"].append(
                             float(0 < norm < float("inf")))
+            partner_head = getattr(core_model.main_branch, "partner_scorer", None)
+            if partner_head is not None:
+                gradients = [p.grad.detach().float().square().sum()
+                             for p in partner_head.parameters() if p.grad is not None]
+                logs["coe_partner_scorer_grad_norm"].append(
+                    float(torch.stack(gradients).sum().sqrt().cpu()) if gradients else 0.
+                )
             acceptance_head = getattr(core_model.main_branch, "acceptance_head", None)
             if acceptance_head is not None:
                 gradients = [p.grad.detach().float().square().sum()
@@ -497,7 +526,8 @@ def train_one_epoch(
     logs, exact_metrics, active_exact_metrics, routing_metrics, coe_quality, counters = _distributed_merge(
         logs, exact_metrics, active_exact_metrics, routing_metrics, coe_quality,
         {"optimizer_steps": optimizer_steps, "seen_samples": seen_samples,
-         "skipped_empty_batches": skipped_empty_batches, "skipped_amp_steps": skipped_amp_steps},
+         "skipped_empty_batches": skipped_empty_batches, "skipped_amp_steps": skipped_amp_steps,
+         "partner_probe_calls": partner_probe_calls},
     )
     seen_samples = counters["seen_samples"]
     skipped_empty_batches = counters["skipped_empty_batches"]
@@ -511,6 +541,7 @@ def train_one_epoch(
             "train_skipped_amp_steps": float(skipped_amp_steps),
             "train_amp_scale_start": float(scale_start),
             "train_amp_scale_end": float(scaler.get_scale()),
+            "train_partner_probe_forward_calls": float(counters["partner_probe_calls"]),
         })
     if is_coe and exact_metrics[""].count == 0:
         raise ValueError("TS-CoE training has no finite hidden supervision targets")
@@ -544,9 +575,21 @@ def evaluate(
     active_exact_metrics = {""}
     routing_metrics = _routing_accumulator(cfg)
     coe_quality = _CoEQualityMetrics() if resolve_architecture(cfg) == "v24_ts_coe" else None
+    measure_forward = bool(cfg.get("train", {}).get("measure_forward_latency", False))
+    counters = {"forward_seconds": 0.0, "forward_batches": 0.0, "forward_samples": 0.0}
     for batch in tqdm(loader, desc=desc, leave=False, disable=not show_progress):
         batch = move_batch_to_device(batch, device)
+        if measure_forward:
+            if device.type == "cuda":
+                torch.cuda.synchronize(device)
+            forward_start = time.perf_counter()
         outputs = model(batch)
+        if measure_forward:
+            if device.type == "cuda":
+                torch.cuda.synchronize(device)
+            counters["forward_seconds"] += time.perf_counter() - forward_start
+            counters["forward_batches"] += 1
+            counters["forward_samples"] += batch["x_f_gt"].shape[0]
         _, loss_dict = compute_main_stage_loss(outputs, batch, cfg, epoch=epoch)
         metrics = masked_metrics(outputs["x_hat_final"], batch["x_f_gt"], batch["m_f"], target_mask=batch.get("target_mask"))
         exact_metrics[""].update(outputs["x_hat_final"], batch["x_f_gt"], batch["m_f"], target_mask=batch.get("target_mask"))
@@ -572,10 +615,13 @@ def evaluate(
         if resolve_architecture(cfg) == "v24_ts_coe" and 'mask_family' in batch:
             outputs['coe']['mask_family'] = batch['mask_family']
         _update_routing_metrics(routing_metrics, outputs)
-    logs, exact_metrics, active_exact_metrics, routing_metrics, coe_quality, _ = _distributed_merge(
-        logs, exact_metrics, active_exact_metrics, routing_metrics, coe_quality, {},
+    logs, exact_metrics, active_exact_metrics, routing_metrics, coe_quality, counters = _distributed_merge(
+        logs, exact_metrics, active_exact_metrics, routing_metrics, coe_quality, counters,
     )
     result = _mean_logs(logs)
+    if measure_forward and counters["forward_batches"]:
+        result["forward_ms_per_batch_per_rank"] = 1000.0 * counters["forward_seconds"] / counters["forward_batches"]
+        result["forward_ms_per_sample_per_rank"] = 1000.0 * counters["forward_seconds"] / counters["forward_samples"]
     if resolve_architecture(cfg) == "v24_ts_coe" and exact_metrics[""].count == 0:
         raise ValueError("TS-CoE evaluation has no finite hidden supervision targets")
     for suffix in active_exact_metrics:

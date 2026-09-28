@@ -92,7 +92,11 @@ def compute_coe_loss(outputs: dict, batch: dict, cfg: dict) -> tuple[torch.Tenso
         and coe.get("routing_mode", "hard") in ("hard", "soft")
         and bool(supervised_samples.any())
     ):
-        probs, weights = coe.get("route_probs"), coe.get("route_weights")
+        importance_mode = loss_cfg.get("balance_importance", "individual")
+        if importance_mode not in {"individual", "candidate"}:
+            raise ValueError("loss.balance_importance must be individual or candidate")
+        probs = coe.get("route_importance" if importance_mode == "candidate" else "route_probs")
+        weights = coe.get("route_weights")
         if probs is None or weights is None:
             if balance_weight:
                 raise ValueError("CoE routing auxiliary loss requires route_probs and route_weights")

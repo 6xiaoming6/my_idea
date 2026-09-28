@@ -69,6 +69,37 @@ class PairRouter(nn.Module):
         return self.layers[3](hidden), (self.pair_head(hidden) if self.pair_head is not None else None)
 
 
+
+class PartnerScorer(nn.Module):
+    """Score a second expert after observing the primary expert proposal.
+
+    One scorer and identity table are shared across chain rounds. Scores use
+    observable state only; hidden target values enter a separate training loss.
+    """
+
+    def __init__(self, feature_dim: int, hidden_dim: int, experts: int,
+                 identity_dim: int = 16) -> None:
+        super().__init__()
+        self.identity = nn.Embedding(experts, identity_dim)
+        self.network = nn.Sequential(
+            nn.LayerNorm(feature_dim + 2 * identity_dim),
+            nn.Linear(feature_dim + 2 * identity_dim, hidden_dim),
+            nn.GELU(),
+            nn.Linear(hidden_dim, 1),
+        )
+        nn.init.zeros_(self.network[-1].weight)
+        nn.init.zeros_(self.network[-1].bias)
+
+    def forward(self, features: torch.Tensor, primary: torch.Tensor) -> torch.Tensor:
+        batch, experts = features.shape[0], self.identity.num_embeddings
+        primary_embedding = self.identity(primary).unsqueeze(1).expand(-1, experts, -1)
+        candidate_embedding = self.identity.weight.unsqueeze(0).expand(batch, -1, -1)
+        repeated = features.unsqueeze(1).expand(-1, experts, -1)
+        scores = self.network(torch.cat((repeated, primary_embedding, candidate_embedding), dim=-1))
+        scores = scores.squeeze(-1)
+        return scores.masked_fill(torch.arange(experts, device=scores.device)[None] == primary[:, None], -1e4)
+
+
 def observed_pattern_features(values, observed, value_std):
     """Abs differences, observed pair fraction and presence for T/H/W per channel.
 

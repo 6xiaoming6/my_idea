@@ -39,14 +39,15 @@ python scripts/generate_fixed_masks.py \
 
 ## 运行 v24 实验
 
-当前后续实验默认使用 **BikeNYC random 0.4 九类混合 mask** 和双卡 DDP。六组精简对照依次运行，每组内部用两张卡，全局 batch 16（每卡 8）；hard Top-2 每个样本只计算选中的两个专家。先运行 `python -u scripts/v24/run_coe_focus.py --gpus 0,1 --dry-run` 核对计划，再在本地启动：
+当前五组精简对照默认使用 **TaxiBJ random 0.4 九类混合 mask** 和双卡 DDP；`--dataset bikenyc` 可切换数据集。M0/M1/C0/C1 分离专家共享与补全反馈的影响，P1 检验基于主专家实际输出选择搭档是否优于原生 Top-2。五组串行、每组全局 batch 16（每卡 8），默认 80 epoch；推理只执行选中的两个专家。先检查计划，再在本地启动：
 
 ```bash
-tmux new-session -s v24-coe-focus \
-  'python -u scripts/v24/run_coe_focus.py --gpus 0,1 --epochs 50'
+python -u scripts/v24/run_coe_partner.py --dataset taxibj --gpus 0,1 --dry-run
+tmux new-session -s v24-coe-partner \
+  'python -u scripts/v24/run_coe_partner.py --dataset taxibj --gpus 0,1 --epochs 80'
 ```
 
-详见 [六组 CoE 对照实验说明](scripts/v24/README_COE_FOCUS.md)。以下 TaxiBJ 命令是历史实验入口，保留供复现。
+详见 [五组实验说明](scripts/v24/README_COE_PARTNER.md)。旧 [六组 focus 对照](scripts/v24/README_COE_FOCUS.md) 保留供历史复现；新五组的路由均衡项定义已修订，不能与旧日志当作严格配对。以下 TaxiBJ 命令是更早的实验入口。
 
 单次真实数据训练可从 [TaxiBJ 配置](configs/v24/taxibj.json) 启动；该配置是早期的两层固定 T→S 示例。当前四层六专家软预热主配置在 [coe_main_base.json](configs/v24/coe_main_base.json)，需由相应实验脚本补齐具体数据与 mask 协议。
 
@@ -95,7 +96,7 @@ outputs/v24-COE/TaxiBJ/custom/<实验名>/random/rate0.4/<时间_seed_bs>/
     └── metrics.jsonl
 ```
 
-队列另在 `outputs/v24-COE/experiments/<队列名>/` 保存生成的配置、启动日志和完成回执 JSON。每次按**验证 MAE** 选最佳轮次，再用对应模型测试一次。近期 Top-2 和深度池实验设为 `save_best_checkpoint=false`：最佳状态只在训练进程的 CPU 内存中保留，不写 `best.pt`；启用该选项的其他实验才会生成 `checkpoints/best.pt`。路由使用率、每层选择与梯度等详细指标保存在日志中。单种子短训结果适合筛选候选，不能单独证明结构优越性。
+队列另在 `outputs/v24-COE/experiments/<队列名>/` 保存生成的配置、启动日志和完成回执 JSON。每次按**验证 MAE** 选最佳轮次，再用对应模型测试一次。历史 Top-2 和深度池实验设为 `save_best_checkpoint=false`：最佳状态只在训练进程的 CPU 内存中保留，不写 `best.pt`。当前五组精简实验为了在最佳权重上完成验证集 Oracle 诊断和复现，统一保存 `checkpoints/best.pt`。路由使用率、每层选择与梯度等详细指标保存在日志中。单种子短训结果适合筛选候选，不能单独证明结构优越性。
 
 ## 代码位置
 

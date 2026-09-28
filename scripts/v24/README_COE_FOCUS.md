@@ -1,6 +1,6 @@
-# BikeNYC：CoE 与分层 MoE、组合路由的六组对照
+# 可切换数据集：CoE 与分层 MoE、组合路由的六组对照
 
-本批实验只回答两个问题。第一，三轮 CoE 相比同深度分层 MoE 是否有性能或参数效率优势；第二，按学习到的专家对评分选两个专家，是否优于按六个个体路由分数选 Top-2。全组使用 BikeNYC random 0.4、九类缺失模式均衡混合；训练 mask 每轮重采样，验证和测试使用各自固定的同分布 mask。模型种子 7、全局 batch 16、三轮、六类专家 T/S/TD/SD/TA/ST、hard Top-2、相同训练损失及路由辅助损失。默认 50 epoch、每 2 epoch 验证、按验证 MAE 选最优轮次，最佳权重仅保存在内存中直到测试完成。
+本批实验只回答两个问题。第一，三轮 CoE 相比同深度分层 MoE 是否有性能或参数效率优势；第二，按学习到的专家对评分选两个专家，是否优于按六个个体路由分数选 Top-2。默认使用 TaxiBJ random 0.4；也可在启动时用 `--dataset bikenyc` 切换到 BikeNYC random 0.4。两种数据集均采用九类缺失模式均衡混合；训练 mask 每轮重采样，验证和测试使用各自固定的同分布 mask。模型种子 7、全局 batch 16、三轮、六类专家 T/S/TD/SD/TA/ST、hard Top-2、相同训练损失及路由辅助损失。默认 50 epoch、每 2 epoch 验证、按验证 MAE 选最优轮次，最佳权重仅保存在内存中直到测试完成。
 
 | 顺序 | 组别 | 专家池 | 中间补全反馈 | 选两个专家的规则 | 直接用途 |
 | --- | --- | --- | --- | --- | --- |
@@ -22,14 +22,14 @@ hard Top-2 的模型前向按样本把输入派发给入选的两个专家，仅
 检查计划：
 
 ```bash
-python -u scripts/v24/run_coe_focus.py --gpus 0,1 --dry-run
+python -u scripts/v24/run_coe_focus.py --dataset taxibj --gpus 0,1 --dry-run
 ```
 
 本地顺序启动，每次只训练一组双卡 DDP 模型：
 
 ```bash
 tmux new-session -s v24-coe-focus \
-  'python -u scripts/v24/run_coe_focus.py --gpus 0,1 --epochs 50'
+  'python -u scripts/v24/run_coe_focus.py --dataset taxibj --gpus 0,1 --epochs 50'
 ```
 
-完整组会按回执自动跳过，中断组从头重跑。单种子用于筛选；若差异较小，应对第 1、2、3、6 组追加配对种子，再评估稳定性。结果位于 `outputs/v24-COE/BikeNYC/`，队列摘要位于 `outputs/v24-COE/experiments/coe_focus_bikenyc/coe_focus_bikenyc/<fingerprint>/summary.csv` 与 `comparison.json`。历史七组策略仍可通过显式指定 `configs/v24/team_accept_v4_bikenyc_experiments.json` 运行，不属于当前队列。
+切换到 BikeNYC 只需把命令中的 `--dataset taxibj` 改为 `--dataset bikenyc`；也可通过 `--config <实验策略 JSON> --study <研究名>` 指定其他数据配置。数据文件、网格尺寸和输出根目录由所选策略及其 base config 决定，不需要改代码。完整组会按回执自动跳过，中断组从头重跑。单种子用于筛选；若差异较小，应对第 1、2、3、6 组追加配对种子，再评估稳定性。运行结果分别位于 `outputs/v24-COE/TaxiBJ/` 或 `outputs/v24-COE/BikeNYC/`；队列摘要位于所选策略的 `output_dir/<study>/<fingerprint>/summary.csv` 与 `comparison.json`。历史 BikeNYC 七组策略配置为 `configs/v24/team_accept_v4_bikenyc_experiments.json`，不属于当前六组队列。
