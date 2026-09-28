@@ -6,7 +6,7 @@
   "seeds": [7],
   "extra_inputs": ["data/TaxiBJ/v24_clean_abc_20260917/manifest.json"],
   "training": {
-    "epochs": 20, "val_epoch": 2, "save_best_checkpoint": false,
+    "epochs": 20, "val_epoch": 5, "save_best_checkpoint": false,
     "early_stopping": {"enabled": false},
     "scheduler": {"type": "cosine", "total_epochs": 20, "eta_min": 1e-6},
     "router_grad_diagnostic_every": 50

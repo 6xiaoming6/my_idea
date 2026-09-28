@@ -14,7 +14,7 @@
 
 E1/E2/E4/E5 构成“加性/交互 × 无门/点门”的 2×2 设计。重点看验证集配对差值，再报告 best checkpoint 的测试集 MAE/RMSE。一次 seed 7 只用于筛选，不能据此声称统计显著。
 
-所有组采用 TaxiBJ clean train/val/test NPZ；九种缺失模式、缺失率 0.4；训练每轮重新采样 mask，验证/测试使用各自固定的同分布 mask。统一三轮链路、专家池 T/S/TD/SD/TA/ST、Top2、batch 16、L1、路由 balance 0.01、3+3 温度日程、cosine 50、每 2 epoch 验证、关闭早停并保存 best checkpoint。Top2 仍是确定性选择，温度日程只改变组内权重；当前实现每轮会计算六个候选专家，三轮合计 18 次候选计算，最终只有六次非零贡献。数据文件与 clean manifest 的哈希会在队列启动前核验。
+所有组采用 TaxiBJ clean train/val/test NPZ；九种缺失模式、缺失率 0.4；训练每轮重新采样 mask，验证/测试使用各自固定的同分布 mask。统一三轮链路、专家池 T/S/TD/SD/TA/ST、Top2、batch 16、L1、路由 balance 0.01、3+3 温度日程、cosine 50、每 5 epoch 验证、关闭早停并保存 best checkpoint。Top2 仍是确定性选择，温度日程只改变组内权重；当前实现每轮会计算六个候选专家，三轮合计 18 次候选计算，最终只有六次非零贡献。数据文件与 clean manifest 的哈希会在队列启动前核验。
 
 先检查配置与顺序：
 

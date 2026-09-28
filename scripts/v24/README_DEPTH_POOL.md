@@ -1,6 +1,6 @@
 # CoE 深度与专家池对照
 
-八组统一使用 TaxiBJ legacy `random` mask、缺失率 0.4、seed 7、batch 16、20 epoch，每 2 epoch 验证；不保存 `best.pt`，仅在内存中保留最佳状态：
+八组统一使用 TaxiBJ legacy `random` mask、缺失率 0.4、seed 7、batch 16、20 epoch，每 5 epoch 验证；不保存 `best.pt`，仅在内存中保留最佳状态：
 
 |顺序|实验|链路轮数|Top-K|专家池|目的|
 |---:|---|---:|---:|---:|---|

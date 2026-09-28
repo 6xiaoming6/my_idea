@@ -12,7 +12,7 @@
   ],
   "training": {
     "epochs": 50,
-    "val_epoch": 2,
+    "val_epoch": 5,
     "save_best_checkpoint": true,
     "early_stopping": {
       "enabled": false

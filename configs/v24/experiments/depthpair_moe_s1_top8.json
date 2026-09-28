@@ -1,0 +1,13 @@
+{
+  "model": {
+    "coe": {
+      "num_steps": 1,
+      "top_k": 8,
+      "expert_sharing": "per_step",
+      "pair_mode": "native",
+      "fixed_expert_steps": [
+        null
+      ]
+    }
+  }
+}

@@ -13,7 +13,7 @@
 |A4 `coe_mech_no_balance`|主方案设置但 balance=0|判断均衡辅助项是否是主要收益来源|
 |A5 `coe_mech_initial_expert`|仅 `expert_state=initial`，router 仍读更新状态|验证专家状态反馈是否影响后续路由|
 
-训练每 epoch 重采样，val/test 使用固定的独立混合 mask；每 2 epoch 验证，cosine scheduler 总周期为 60，八组均保存 `best.pt`。固定链关闭软预热和均衡项，避免没有可学习 router 时保留无意义的路由损失。A2 是逐样本连续混合，A3 是每层共享的全局可学习混合权重。
+训练每 epoch 重采样，val/test 使用固定的独立混合 mask；每 5 epoch 验证，cosine scheduler 总周期为 60，八组均保存 `best.pt`。固定链关闭软预热和均衡项，避免没有可学习 router 时保留无意义的路由损失。A2 是逐样本连续混合，A3 是每层共享的全局可学习混合权重。
 
 F1/F2 是结构候选，不是验证集已经选出的最优路径；正式论文比较时只能用验证结果选择固定路径，不能用测试结果挑选。它们加入 SD 是为排除“主方案收益只是空间感受野更大”的解释。
 

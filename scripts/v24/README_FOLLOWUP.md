@@ -4,7 +4,7 @@
 
 ## 共同协议
 
-- TaxiBJ 清洁数据，seed 7，batch 16，20 epoch，cosine 周期也为 20；每 2 epoch 验证，关闭早停。
+- TaxiBJ 清洁数据，seed 7，batch 16，20 epoch，cosine 周期也为 20；每 5 epoch 验证，关闭早停。
 - train/val/test 均使用九类近似等比例混合：random_point、node_outage、temporal_gap、spatial_region、spatiotemporal_block、stripe、moving_region、multi_block、composite；全部缺失率 0.4。
 - 每个窗口分配一种模式，composite 本身允许组合模式。不是对每个窗口同时叠加九类 mask。
 - 训练每 epoch 重采样，所有组共享相同 mask seed、epoch/index 规则和样本顺序。训练 2452 个窗口，每类每 epoch 272–273 个。

@@ -54,6 +54,8 @@ tmux new-session -s v24-coe-main \
 
 四轮八专家的独立 MoE、旧搭档评分、残差搭档评分、共享原生 Top-2 与两种改进搭档路由的六组对照，见 [残差搭档对照说明](scripts/v24/README_COE_PARTNER_RESIDUAL4.md)；入口为 [run_coe_partner_residual4.py](scripts/v24/run_coe_partner_residual4.py)。
 
+八专家单轮 Top-8、两轮 Top-4 与四轮共享池全部 28 对评分的对照，见 [深度与专家对实验说明](scripts/v24/README_DEPTH_PAIR8.md)，入口为 [run_depth_pair8.py](scripts/v24/run_depth_pair8.py)。
+
 五组共享与反馈精简对照使用 **TaxiBJ random 0.4 九类混合 mask** 和双卡 DDP；`--dataset bikenyc` 可切换数据集。M0/M1/C0/C1 分离专家共享与补全反馈的影响，P1 检验基于主专家实际输出选择搭档是否优于原生 Top-2。五组串行、每组全局 batch 16（每卡 8），默认 80 epoch；推理只执行选中的两个专家。先检查计划，再在本地启动：
 
 ```bash

@@ -125,7 +125,7 @@
   },
   "train": {
     "epochs": 50,
-    "val_epoch": 2,
+    "val_epoch": 5,
     "lr_main": 0.001,
     "weight_decay": 0.0001,
     "grad_clip_norm": 1.0,

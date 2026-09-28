@@ -1,0 +1,9 @@
+{
+  "model": {
+    "coe": {
+      "pair_mode": "native",
+      "pair_dense_warmup_steps": 0,
+      "fusion_mode": "context"
+    }
+  }
+}

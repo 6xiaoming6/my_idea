@@ -19,7 +19,7 @@ M1/M2保持深度、专家集合、预热、损失、共享支路一致，比单
 
 ## 统一协议
 
-TaxiBJ清洁数据，seed7，batch16，20 epoch，cosine周期20，每2 epoch验证，无早停。M0–M4的train/val/test使用九类缺失混合，缺失率0.4；M5恢复原始 random_point CSV，缺失率仍为0.4。按验证MAE在CPU内存保留最佳模型，结束后测试一次，不落盘best.pt。旧结果保留，新结果单独输出到 `outputs/v24-COE/experiments/coe_validation/`。
+TaxiBJ清洁数据，seed7，batch16，20 epoch，cosine周期20，每5 epoch验证，无早停。M0–M4的train/val/test使用九类缺失混合，缺失率0.4；M5恢复原始 random_point CSV，缺失率仍为0.4。按验证MAE在CPU内存保留最佳模型，结束后测试一次，不落盘best.pt。旧结果保留，新结果单独输出到 `outputs/v24-COE/experiments/coe_validation/`。
 
 本阶段直接采用完整主配置，绕过旧 `experiments/full.json` 的两专家默认覆盖。测试检查最终生成配置，要求除声明的干预外model/loss/data/train均相同，并检查每组软阶段、硬阶段前向反向及评估。
 

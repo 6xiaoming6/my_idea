@@ -9,7 +9,7 @@
   "base_config": "configs/v24/coe_main_base.json",
   "seed": 7,
   "epochs": 20,
-  "val_epoch": 2,
+  "val_epoch": 5,
   "batch_size": 16,
   "save_best_checkpoint": false,
   "scheduler": {"type": "cosine", "total_epochs": 20, "eta_min": 1e-6},

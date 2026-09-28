@@ -7,7 +7,7 @@
   "extra_inputs": ["data/TaxiBJ/v24_clean_abc_20260917/manifest.json"],
   "training": {
     "epochs": 60,
-    "val_epoch": 2,
+    "val_epoch": 5,
     "save_best_checkpoint": true,
     "early_stopping": {"enabled": false},
     "scheduler": {"type": "cosine", "total_epochs": 60, "eta_min": 1e-6},

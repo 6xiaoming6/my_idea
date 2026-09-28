@@ -9,7 +9,7 @@
   "extra_inputs": [],
   "training": {
     "epochs": 50,
-    "val_epoch": 2,
+    "val_epoch": 5,
     "save_best_checkpoint": false,
     "early_stopping": {
       "enabled": false

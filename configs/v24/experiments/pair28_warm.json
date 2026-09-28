@@ -1,0 +1,9 @@
+{
+  "model": {
+    "coe": {
+      "pair_mode": "interaction",
+      "pair_dense_warmup_steps": 2,
+      "fusion_mode": "original"
+    }
+  }
+}

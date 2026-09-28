@@ -1,0 +1,16 @@
+{
+  "model": {
+    "coe": {
+      "num_steps": 4,
+      "top_k": 2,
+      "expert_sharing": "shared",
+      "pair_mode": "interaction",
+      "fixed_expert_steps": [
+        null,
+        null,
+        null,
+        null
+      ]
+    }
+  }
+}

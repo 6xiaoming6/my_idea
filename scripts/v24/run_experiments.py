@@ -200,6 +200,78 @@ def validate_plan(manifest):
         names.add(name)
         cfg = run["config"]
         train = cfg["train"]
+        if manifest.get("stage") == "coe_depth_pair8":
+            coe = cfg["model"]["coe"]
+            data = cfg["data"]
+            expected = {
+                "depthpair_moe_s1_top8": (1, 8, "per_step", "native"),
+                "depthpair_moe_s2_top4": (2, 4, "per_step", "native"),
+                "depthpair_coe_s4_pair28": (4, 2, "shared", "interaction"),
+            }[run["variant"]]
+            actual = tuple(coe.get(key) for key in
+                           ("num_steps", "top_k", "expert_sharing", "pair_mode"))
+            if (actual != expected or
+                    coe.get("expert_pool") != ["T", "S", "TD", "SD", "TA", "ST", "TL", "SL"] or
+                    coe.get("routing_mode") != "hard" or
+                    coe.get("fixed_expert_steps") != [None] * expected[0] or
+                    coe.get("completion_feedback") is not False or
+                    coe.get("acceptance") != "none" or
+                    cfg["model"]["main"].get("dim") != 64 or
+                    cfg["model"]["main"].get("use_multiscale") is not False or
+                    cfg["loss"].get("balance_importance") != "candidate" or
+                    cfg["loss"].get("lambda_coe_balance") != 0.01 or
+                    data.get("mask", {}).get("pattern") != "random" or
+                    data.get("mask", {}).get("missing_rate") != 0.4 or
+                    data.get("train_mask_diversity", {}).get("rates") != [0.4] or
+                    data.get("eval_mask_diversity", {}).get("rates") != [0.4] or
+                    len(data.get("train_mask_diversity", {}).get("families", [])) != 9 or
+                    data.get("train_mask_diversity", {}).get("families") !=
+                    data.get("eval_mask_diversity", {}).get("families") or
+                    data.get("train_mask_diversity", {}).get("resample_each_epoch") is not True or
+                    data.get("eval_mask_diversity", {}).get("resample_each_epoch") is not False or
+                    train.get("partner_probe") is not None or
+                    train.get("save_best_checkpoint") is not False or
+                    train.get("scheduler", {}).get("total_epochs") != train["epochs"]):
+                raise ValueError(f"{name}: invalid one/two/four-round eight-expert depth comparison")
+        if manifest.get("stage") == "coe_fusion1":
+            coe = cfg["model"]["coe"]
+            data = cfg["data"]
+            expected = {
+                "pair28_warm": ("interaction", "original", 2),
+                "top2_context": ("native", "context", 0),
+                "top2_response": ("native", "response", 0),
+                "top2_local": ("native", "local_response", 0),
+                "top2_proposal": ("native", "proposal", 0),
+            }[run["variant"]]
+            actual = tuple(coe.get(key, "original" if key == "fusion_mode" else 0)
+                           for key in ("pair_mode", "fusion_mode", "pair_dense_warmup_steps"))
+            if (actual != expected or coe.get("num_steps") != 4 or coe.get("top_k") != 2 or
+                    coe.get("expert_sharing") != "shared" or
+                    coe.get("expert_pool") != ["T", "S", "TD", "SD", "TA", "ST", "TL", "SL"] or
+                    coe.get("routing_mode") != "hard" or
+                    coe.get("fixed_expert_steps") != [None] * 4 or
+                    coe.get("routing_warmup_epochs") != 3 or
+                    coe.get("routing_transition_epochs") != 3 or
+                    coe.get("completion_feedback") is not False or
+                    coe.get("acceptance") != "none" or
+                    cfg["model"]["main"].get("dim") != 64 or
+                    cfg["model"]["main"].get("use_multiscale") is not False or
+                    cfg["loss"].get("balance_importance") != "candidate" or
+                    cfg["loss"].get("lambda_coe_balance") != 0.01 or
+                    data.get("mask", {}).get("pattern") != "random" or
+                    data.get("mask", {}).get("missing_rate") != 0.4 or
+                    data.get("train_mask_diversity", {}).get("rates") != [0.4] or
+                    data.get("eval_mask_diversity", {}).get("rates") != [0.4] or
+                    len(data.get("train_mask_diversity", {}).get("families", [])) != 9 or
+                    data.get("train_mask_diversity", {}).get("families") !=
+                    data.get("eval_mask_diversity", {}).get("families") or
+                    data.get("train_mask_diversity", {}).get("resample_each_epoch") is not True or
+                    data.get("eval_mask_diversity", {}).get("resample_each_epoch") is not False or
+                    train.get("partner_probe") is not None or
+                    train.get("val_epoch") != 5 or
+                    train.get("save_best_checkpoint") is not False or
+                    train.get("scheduler", {}).get("total_epochs") != train["epochs"]):
+                raise ValueError(f"{name}: invalid fusion exploration settings")
         if manifest.get("stage") == "coe_main_s4_e8":
             coe = cfg["model"]["coe"]
             if (run["variant"] != "main_s4_e8_top2" or
@@ -472,6 +544,46 @@ def validate_plan(manifest):
                 elif normalized != reference:
                     raise ValueError(f"{run['variant']}: changed settings outside the planned intervention")
 
+    if manifest.get("stage") == "coe_depth_pair8":
+        expected_order = ["depthpair_moe_s1_top8", "depthpair_moe_s2_top4",
+                          "depthpair_coe_s4_pair28"]
+        by_seed = {}
+        for run in manifest["runs"]:
+            by_seed.setdefault(run["seed"], []).append(run)
+        for seed, runs in by_seed.items():
+            if [run["variant"] for run in runs] != expected_order:
+                raise ValueError(f"Depth/pair seed {seed} must run all three arms in order")
+            reference = None
+            for run in runs:
+                normalized = copy.deepcopy(run["config"])
+                normalized["experiment_plan"]["variant"] = "reference"
+                for key in ("num_steps", "top_k", "expert_sharing", "pair_mode",
+                            "fixed_expert_steps"):
+                    normalized["model"]["coe"].pop(key, None)
+                if reference is None:
+                    reference = normalized
+                elif normalized != reference:
+                    raise ValueError(f"{run['variant']}: changed settings outside depth/width/pair policy")
+
+    if manifest.get("stage") == "coe_fusion1":
+        expected_order = ["pair28_warm", "top2_context", "top2_response", "top2_local", "top2_proposal"]
+        by_seed = {}
+        for run in manifest["runs"]:
+            by_seed.setdefault(run["seed"], []).append(run)
+        for seed, runs in by_seed.items():
+            if [run["variant"] for run in runs] != expected_order:
+                raise ValueError(f"Fusion seed {seed} must run all five arms in order")
+            reference = None
+            for run in runs:
+                normalized = copy.deepcopy(run["config"])
+                normalized["experiment_plan"]["variant"] = "reference"
+                for key in ("pair_mode", "fusion_mode", "pair_dense_warmup_steps"):
+                    normalized["model"]["coe"].pop(key, None)
+                if reference is None:
+                    reference = normalized
+                elif normalized != reference:
+                    raise ValueError(f"{run['variant']}: changed settings outside fusion intervention")
+
     if manifest.get("stage") == "coe_partner_native4":
         expected_order = ["residual4_shared_native", "residual4_partner_fusion",
                           "residual4_partner_fusion_headonly"]
@@ -543,7 +655,7 @@ def materialize(manifest, suite, fingerprint, world_size=1):
     result["world_size"] = world_size
     for run in result["runs"]:
         run["config"]["output_dir"] = (str(ROOT / "outputs/v24-COE")
-            if result.get("stage") in {"coe_team_accept_v4", "coe_focus", "coe_partner", "coe_partner_residual4", "coe_partner_native4"} else str(suite / "runs" / run["name"]))
+            if result.get("stage") in {"coe_team_accept_v4", "coe_focus", "coe_partner", "coe_partner_residual4", "coe_partner_native4", "coe_depth_pair8", "coe_fusion1"} else str(suite / "runs" / run["name"]))
         run["config"]["experiment_suite_fingerprint"] = fingerprint
         run["config_path"] = str(suite / "configs" / (run["name"] + ".json"))
         command = [sys.executable, "-u", str(ROOT / "scripts/train.py"), "-c",
@@ -650,7 +762,7 @@ def summarize(manifest, suite):
                        test_mae=result["test"]["mae"], test_rmse=result["test"]["rmse"],
                        seconds=result["total_time_sec"], run_dir=result["run_dir"])
             diagnostics[run["name"]] = {k: v for k, v in result["test"].items() if k.startswith("coe_")}
-        if manifest.get("stage") in {"coe_partner", "coe_partner_residual4", "coe_partner_native4"}:
+        if manifest.get("stage") in {"coe_partner", "coe_partner_residual4", "coe_partner_native4", "coe_depth_pair8", "coe_fusion1"}:
             row.update(
                 total_params=result.get("total_params") if result else None,
                 peak_memory_gb=result.get("peak_memory_gb") if result else None,
@@ -676,6 +788,10 @@ def summarize(manifest, suite):
                 reference = "focus_coe_shared"
             elif manifest.get("stage") == "coe_partner_residual4":
                 reference = "residual4_partner_legacy"
+            elif manifest.get("stage") == "coe_depth_pair8":
+                reference = "depthpair_moe_s1_top8"
+            elif manifest.get("stage") == "coe_fusion1":
+                reference = "top2_context"
             elif manifest.get("stage") in {"coe_validation", "coe_dual_mask", "coe_mechanism1"}:
                 reference = "coe_main"
             elif manifest.get("stage") == "route20":
@@ -881,7 +997,7 @@ def main(argv=None):
         if (suite / "protocol.json").exists() and load(suite / "protocol.json") != record:
             raise RuntimeError("Suite fingerprint collision or modified protocol")
         assert_unchanged(stamps, code_paths)
-        if manifest.get("stage") in {"coe_partner", "coe_main_s4_e8", "coe_partner_residual4", "coe_partner_native4"}:
+        if manifest.get("stage") in {"coe_partner", "coe_main_s4_e8", "coe_partner_residual4", "coe_partner_native4", "coe_depth_pair8", "coe_fusion1"}:
             snapshot_partner_sources(suite, extras)
         write_json(suite / "protocol.json", record)
         write_json(suite / "plan.json", manifest)
