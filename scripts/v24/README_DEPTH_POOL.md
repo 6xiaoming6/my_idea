@@ -13,7 +13,7 @@
 |7|`dup12_s4_top2`|4|2|12|六类专家各两份独立实例，四轮 Top-2|
 |8|`dup12_s4_top8`|4|8|12|六类专家各两份独立实例，四轮 Top-8|
 
-模型结果写入 `outputs/v24-COE/TaxiBJ/custom/<实验名>/random/rate0.4/<时间_seed_bs>/`；队列配置和详细 launcher 日志写入 `outputs/v24-COE/experiments/coe_depth_pool/`。控制台实时显示 batch 级训练 tqdm，postfix 只包含 train 的 `loss`、`mae`、`rmse`。
+模型结果写入 `outputs/v24-COE/TaxiBJ/custom/<YYYYMMDD_HHMMSS_核心名_seedN>/random/rate0.4/<时间_seed_bs>/`；队列配置和详细 launcher 日志写入 `outputs/v24-COE/experiments/coe_depth_pool/`。控制台实时显示 batch 级训练 tqdm，postfix 只包含 train 的 `loss`、`mae`、`rmse`。
 
 ```bash
 cd /home/students/HuangMingYu/code/py/my_idea/my_idea

@@ -2,7 +2,7 @@
 
 当前 `v24-COE` 分支研究 **Temporal-Spatial Chain-of-Experts（TS-CoE）**：在原始时空网格上逐层更新补全状态，每层路由器按当前观测和状态从共享专家池中选择专家。`top_k` 表示**每层同时激活的专家数**；被选专家的权重归一化后融合。当前 v24 模型只使用 fine 尺度，不构造 mid/coarse 特征。早期多尺度模型和 v14-single 实验代码仍在仓库中，但它们不是 v24 训练入口的默认架构。
 
-模型由输入编码、逐层独立路由器、跨层共享的专家池、点级共享分支和预测头组成。常用六专家池是 `T`（时间卷积）、`S`（空间卷积）、`TD`（空洞时间卷积）、`SD`（空洞空间卷积）、`TA`（时间注意力）、`ST`（局部时空联合）；八专家池再加入较大时间核 `TL` 和空间核 `SL`。每层可读取上层更新后的状态，固定链、Soft 路由和 Top-K 均可由配置控制。详细设计见 [v24 方案](model_designs/v24_Temporal-Spatial_Chain-of-Experts_详细方案.md)，实现见 [temporal_spatial_coe.py](src/stmoe_imputer/models/temporal_spatial_coe.py)。
+模型由输入编码、逐层独立路由器、跨层共享的专家池、点级共享分支和预测头组成。当前主骨干采用四轮、共享八专家池、每轮稀疏激活 Top-2：`T`（时间卷积）、`S`（空间卷积）、`TD`（空洞时间卷积）、`SD`（空洞空间卷积）、`TA`（时间注意力）、`ST`（局部时空联合）、`TL`（较大时间核）、`SL`（较大空间核）。每层可读取上层更新后的状态，固定链、Soft 路由和 Top-K 均可由配置控制。详细设计见 [v24 方案](model_designs/v24_Temporal-Spatial_Chain-of-Experts_详细方案.md)，实现见 [temporal_spatial_coe.py](src/stmoe_imputer/models/temporal_spatial_coe.py)。
 
 ## 安装
 
@@ -39,7 +39,22 @@ python scripts/generate_fixed_masks.py \
 
 ## 运行 v24 实验
 
-当前五组精简对照默认使用 **TaxiBJ random 0.4 九类混合 mask** 和双卡 DDP；`--dataset bikenyc` 可切换数据集。M0/M1/C0/C1 分离专家共享与补全反馈的影响，P1 检验基于主专家实际输出选择搭档是否优于原生 Top-2。五组串行、每组全局 batch 16（每卡 8），默认 80 epoch；推理只执行选中的两个专家。先检查计划，再在本地启动：
+当前四轮八专家主骨干使用 **TaxiBJ/BikeNYC random 0.4 九类混合 mask**、共享专家池、每轮 Top-2，前 3 个 epoch 软预热、随后 3 个 epoch 过渡。根据最近的共享池对照结果，主配置关闭显式补全反馈；路由仍逐轮读取更新后的隐藏状态。默认 80 epoch，可用 `--epochs` 调整。先检查计划，再在本地启动（单卡或双卡 DDP）：
+
+```bash
+python -u scripts/v24/run_coe_main_s4_e8.py --dataset taxibj --gpu 0 --dry-run
+tmux new-session -s v24-coe-main \
+  'python -u scripts/v24/run_coe_main_s4_e8.py --dataset taxibj --gpu 0 --epochs 80'
+# 双卡时把 --gpu 0 改为 --gpus 0,1；BikeNYC 时使用 --dataset bikenyc。
+```
+
+输出目录的实验层采用 `YYYYMMDD_HHMMSS_核心名_seedN`，例如 `20260921_095818_depth_s1_top6_seed7`；mask 类型和缺失率保留在下层目录。旧的 v24 实验目录已按相同规则迁移，索引和完成回执同步更新。
+
+主配置与数据集入口见 [四轮八专家主骨干说明](scripts/v24/README_COE_MAIN_S4_E8.md)。旧的 [coe_main_base.json](configs/v24/coe_main_base.json) 是历史四轮六专家配置，保留供原实验复现。
+
+四轮八专家的独立 MoE、旧搭档评分、残差搭档评分、共享原生 Top-2 与两种改进搭档路由的六组对照，见 [残差搭档对照说明](scripts/v24/README_COE_PARTNER_RESIDUAL4.md)；入口为 [run_coe_partner_residual4.py](scripts/v24/run_coe_partner_residual4.py)。
+
+五组共享与反馈精简对照使用 **TaxiBJ random 0.4 九类混合 mask** 和双卡 DDP；`--dataset bikenyc` 可切换数据集。M0/M1/C0/C1 分离专家共享与补全反馈的影响，P1 检验基于主专家实际输出选择搭档是否优于原生 Top-2。五组串行、每组全局 batch 16（每卡 8），默认 80 epoch；推理只执行选中的两个专家。先检查计划，再在本地启动：
 
 ```bash
 python -u scripts/v24/run_coe_partner.py --dataset taxibj --gpus 0,1 --dry-run
@@ -49,7 +64,7 @@ tmux new-session -s v24-coe-partner \
 
 详见 [五组实验说明](scripts/v24/README_COE_PARTNER.md)。旧 [六组 focus 对照](scripts/v24/README_COE_FOCUS.md) 保留供历史复现；新五组的路由均衡项定义已修订，不能与旧日志当作严格配对。以下 TaxiBJ 命令是更早的实验入口。
 
-单次真实数据训练可从 [TaxiBJ 配置](configs/v24/taxibj.json) 启动；该配置是早期的两层固定 T→S 示例。当前四层六专家软预热主配置在 [coe_main_base.json](configs/v24/coe_main_base.json)，需由相应实验脚本补齐具体数据与 mask 协议。
+单次真实数据训练可从 [TaxiBJ 配置](configs/v24/taxibj.json) 启动；该配置是早期的两层固定 T→S 示例。历史四层六专家软预热配置在 [coe_main_base.json](configs/v24/coe_main_base.json)，需由对应的历史实验脚本补齐具体数据与 mask 协议。
 
 ```bash
 python -u scripts/train.py \
@@ -87,7 +102,7 @@ tmux new-session -s v24-top2-pair \
 训练结果按数据集、实验名、mask 和缺失率存放：
 
 ```text
-outputs/v24-COE/TaxiBJ/custom/<实验名>/random/rate0.4/<时间_seed_bs>/
+outputs/v24-COE/TaxiBJ/custom/<YYYYMMDD_HHMMSS_核心名_seedN>/random/rate0.4/<时间_seed_bs>/
 ├── config.json
 └── logs/
     ├── train.log
@@ -96,7 +111,7 @@ outputs/v24-COE/TaxiBJ/custom/<实验名>/random/rate0.4/<时间_seed_bs>/
     └── metrics.jsonl
 ```
 
-队列另在 `outputs/v24-COE/experiments/<队列名>/` 保存生成的配置、启动日志和完成回执 JSON。每次按**验证 MAE** 选最佳轮次，再用对应模型测试一次。历史 Top-2 和深度池实验设为 `save_best_checkpoint=false`：最佳状态只在训练进程的 CPU 内存中保留，不写 `best.pt`。当前五组精简实验为了在最佳权重上完成验证集 Oracle 诊断和复现，统一保存 `checkpoints/best.pt`。路由使用率、每层选择与梯度等详细指标保存在日志中。单种子短训结果适合筛选候选，不能单独证明结构优越性。
+队列另在 `outputs/v24-COE/experiments/<队列名>/` 保存生成的配置、启动日志和完成回执 JSON。每次按**验证 MAE** 选最佳轮次，再用对应模型测试一次。历史 Top-2 和深度池实验设为 `save_best_checkpoint=false`：最佳状态只在训练进程的 CPU 内存中保留，不写 `best.pt`。五组精简实验为了在最佳权重上完成验证集 Oracle 诊断和复现，统一保存 `checkpoints/best.pt`；新四轮八专家主骨干不运行 Oracle，`save_best_checkpoint=false`。路由使用率、每层选择与梯度等详细指标保存在日志中。单种子短训结果适合筛选候选，不能单独证明结构优越性。
 
 ## 代码位置
 

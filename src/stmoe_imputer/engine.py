@@ -16,6 +16,31 @@ from .partner_study import partner_candidate_loss
 from .utils.device import move_batch_to_device
 
 
+
+def _loss_gradient_alignment(task: torch.Tensor, auxiliary: torch.Tensor,
+                             parameters: list[torch.nn.Parameter]) -> tuple[float, float, float]:
+    """Norms and cosine before the losses are combined; zero cosine is undefined."""
+    if not parameters:
+        return 0., 0., 0.
+    task_grads = torch.autograd.grad(task, parameters, retain_graph=True, allow_unused=True)
+    aux_grads = torch.autograd.grad(auxiliary, parameters, retain_graph=True, allow_unused=True)
+    task_sq = auxiliary.new_zeros((), dtype=torch.float32)
+    aux_sq = task_sq.clone()
+    dot = task_sq.clone()
+    for left, right in zip(task_grads, aux_grads):
+        if left is not None:
+            left = left.detach().float()
+            task_sq = task_sq + left.square().sum()
+        if right is not None:
+            right = right.detach().float()
+            aux_sq = aux_sq + right.square().sum()
+        if left is not None and right is not None:
+            dot = dot + (left * right).sum()
+    task_norm, aux_norm = task_sq.sqrt(), aux_sq.sqrt()
+    cosine = dot / (task_norm * aux_norm).clamp_min(1e-30)
+    return float(task_norm.cpu()), float(aux_norm.cpu()), float(cosine.cpu())
+
+
 def build_optimizer(model: torch.nn.Module, cfg: dict) -> torch.optim.Optimizer:
     train_cfg = cfg["train"]
     base_lr = train_cfg["lr_main"]
@@ -402,11 +427,14 @@ def train_one_epoch(
     optimizer_steps = seen_samples = skipped_empty_batches = skipped_amp_steps = 0
     partner_probe_calls = 0
     partner_cfg = cfg["train"].get("partner_probe", {})
-    partner_mode = is_coe and cfg["model"].get("coe", {}).get("pair_mode") == "partner"
+    partner_mode = is_coe and cfg["model"].get("coe", {}).get("pair_mode") in {"partner", "partner_residual"}
     if partner_mode and (type(partner_cfg.get("interval_batches")) is not int or
                          partner_cfg["interval_batches"] < 1 or
                          float(partner_cfg.get("weight", 0)) <= 0):
         raise ValueError("Partner routing requires positive train.partner_probe interval_batches and weight")
+    alignment_every = partner_cfg.get("grad_diagnostic_interval_batches", 0) if partner_mode else 0
+    if type(alignment_every) is not int or alignment_every < 0:
+        raise ValueError("train.partner_probe.grad_diagnostic_interval_batches must be nonnegative")
     total_epochs = int(total_epochs or cfg["train"]["epochs"])
     progress = tqdm(loader, desc=f"train epoch {epoch}/{total_epochs}", leave=True, disable=not show_progress)
     for batch_index, batch in enumerate(progress):
@@ -418,9 +446,11 @@ def train_one_epoch(
             continue
         seen_samples += int(batch["x_f_gt"].shape[0])
         optimizer.zero_grad(set_to_none=True)
+        weighted_ranking = None
         with torch.autocast(device_type=device.type, enabled=use_amp):
             outputs = model(batch)
             loss, loss_dict = compute_main_stage_loss(outputs, batch, cfg, epoch=epoch)
+            task_loss = outputs["coe"].get("_loss_terms", {}).get("main", loss) if partner_mode else loss
             if partner_mode:
                 # Keep DDP's partner-head hooks active on non-probe batches too.
                 loss = loss + outputs["coe"]["partner_scores"].sum() * 0.
@@ -428,12 +458,27 @@ def train_one_epoch(
                     ranking, probe_logs = partner_candidate_loss(
                         core_model, batch, outputs, cfg, epoch, batch_index,
                     )
-                    loss = loss + float(partner_cfg["weight"]) * ranking
+                    weighted_ranking = float(partner_cfg["weight"]) * ranking
+                    loss = loss + weighted_ranking
                     logs["l_partner"].append(float(ranking.detach().cpu()))
                     for key, value in probe_logs.items():
                         logs[key].append(value)
                     partner_probe_calls += int(probe_logs["partner_probe_forward_calls"])
                 loss_dict["loss"] = loss.detach()
+        if (weighted_ranking is not None and alignment_every and
+                ((epoch - 1) * len(loader) + batch_index + 1) % alignment_every == 0):
+            backbone = core_model.main_branch
+            decoder_params = list(backbone.decoder.parameters())
+            primary_ids = torch.unique(outputs["coe"]["primary_ids"].detach()).tolist()
+            primary_params = [param for expert_id in primary_ids
+                              for param in backbone.routed_experts()[expert_id].parameters()]
+            for group, parameters in (("decoder", decoder_params), ("primary_experts", primary_params)):
+                task_norm, rank_norm, cosine = _loss_gradient_alignment(
+                    task_loss, weighted_ranking, parameters,
+                )
+                logs[f"coe_partner_{group}_task_grad_norm"].append(task_norm)
+                logs[f"coe_partner_{group}_rank_grad_norm"].append(rank_norm)
+                logs[f"coe_partner_{group}_grad_cosine"].append(cosine)
         diagnostic_every = cfg["train"].get("router_grad_diagnostic_every", 0)
         if is_coe and diagnostic_every and batch_index % diagnostic_every == 0:
             parameters = [p for router in core_model.main_branch.routers for p in router.parameters()]

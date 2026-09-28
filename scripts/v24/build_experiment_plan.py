@@ -22,6 +22,9 @@ CORE = (
     "no_expert_state_update", "parallel", "shared_only", "routed_only", "soft",
 )
 STAGES = {
+    "coe_partner_native4": ("residual4_shared_native", "residual4_partner_fusion", "residual4_partner_fusion_headonly"),
+    "coe_partner_residual4": ("residual4_moe", "residual4_partner_legacy", "residual4_partner_residual"),
+    "coe_main_s4_e8": ("main_s4_e8_top2",),
     "coe_focus": ("focus_moe", "focus_coe_independent", "focus_coe_shared",
                   "focus_pair_additive", "focus_pair_capacity", "focus_pair_interaction"),
     "coe_partner": ("focus_moe", "focus_coe_independent",
@@ -46,6 +49,13 @@ PATTERNS = (
     "random_point", "node_contiguous", "spatial_region", "spatiotemporal_block", "mixed",
 )
 QUESTIONS = {
+    "residual4_shared_native": "四轮共享八专家原生Top-2，检验搭档选择是否带来增益",
+    "residual4_partner_fusion": "残差搭档评分同时控制选择与融合权重",
+    "residual4_partner_fusion_headonly": "融合一致的残差搭档＋排名损失仅更新评分头",
+    "residual4_moe": "四轮每层独立八专家原生Top-2 MoE",
+    "residual4_partner_legacy": "四轮共享八专家旧纯搭档评分",
+    "residual4_partner_residual": "四轮共享八专家原生分数加零初始化搭档修正",
+    "main_s4_e8_top2": "四轮八异构专家共享池、每轮稀疏Top-2的后续v24主骨干",
     "focus_moe": "分层MoE：独立专家池，隐藏状态逐层更新，无补全反馈，原生Top2",
     "focus_coe_independent": "与分层MoE同参数量，启用每轮补全反馈",
     "focus_coe_shared": "CoE共享专家池，检验参数效率",
@@ -198,7 +208,7 @@ def _protocols(args: argparse.Namespace, cfg: dict, datasets: dict) -> list[dict
             if args.synthetic or args.patterns is not None or args.rates is not None:
                 raise ValueError('Generated mixed masks require real NPZs and base-config family/rate settings')
             mixed = {
-                'name': 'mixed9_rate0.4' if args.stage in {'route20', 'route20_next', 'coe_validation', 'coe_dual_mask', 'coe_mechanism1', 'coe_team_accept_v4', 'coe_focus', 'coe_partner'} else 'generated_mixed',
+                'name': 'mixed9_rate0.4' if args.stage in {'route20', 'route20_next', 'coe_validation', 'coe_dual_mask', 'coe_mechanism1', 'coe_team_accept_v4', 'coe_focus', 'coe_partner', 'coe_main_s4_e8', 'coe_partner_residual4', 'coe_partner_native4'} else 'generated_mixed',
                 'kind': 'generated_diverse',
                 'mask_patch': {},
                 'description': 'Balanced mixed families; dynamic train masks and fixed independent val/test masks',
@@ -399,7 +409,7 @@ def build_plan(args: argparse.Namespace, base_patch: dict | None = None) -> dict
     common = load_config(ROOT / "configs/v24/experiments/full.json")
     # This stage has a complete authoritative base: legacy two-expert defaults
     # must never overwrite its depth, expert pool, or auxiliary loss.
-    if args.stage in {"coe_validation", "coe_dual_mask", "coe_mechanism1", "coe_team_accept_v4", "coe_focus", "coe_partner"}:
+    if args.stage in {"coe_validation", "coe_dual_mask", "coe_mechanism1", "coe_team_accept_v4", "coe_focus", "coe_partner", "coe_main_s4_e8", "coe_partner_residual4", "coe_partner_native4"}:
         common = {}
     common = deep_update(common, {"data": {"drop_last": False}, "train": {"early_stopping": {"enabled": False}}})
     output = args.output_dir.resolve()

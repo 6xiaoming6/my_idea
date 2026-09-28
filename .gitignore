@@ -148,3 +148,4 @@ requirements-freeze.txt
 !/outputs/v24-COE/**/config.json
 !/outputs/v24-COE/**/logs/**
 /outputs/**/*.csv
+/outputs/**/metrics.jsonl

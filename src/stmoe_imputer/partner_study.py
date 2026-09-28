@@ -42,7 +42,9 @@ def partner_candidate_loss(raw_model: torch.nn.Module, batch: dict, outputs: dic
                            cfg: dict, epoch: int, batch_index: int) -> tuple[torch.Tensor, dict]:
     """Train the partner scorer from three no-grad full-suffix candidate trials."""
     coe = outputs["coe"]
-    scores = coe["partner_scores"]
+    scores = coe.get("partner_rank_scores")
+    if scores is None:
+        scores = coe["partner_scores"]
     if scores is None:
         raise ValueError("Partner candidate loss requires partner scores")
     steps = scores.shape[1]

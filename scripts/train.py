@@ -35,6 +35,7 @@ from stmoe_imputer.engine import build_grad_scaler, build_optimizer, build_sched
 from stmoe_imputer.models import DualBranchSTImputer
 from stmoe_imputer.partner_study import last_step_oracle
 from stmoe_imputer.utils import get_device, set_seed
+from stmoe_imputer.utils.run_naming import experiment_label
 from stmoe_imputer.utils.checkpoint import load_checkpoint, save_checkpoint, snapshot_model_state
 from stmoe_imputer.utils.train_logger import TrainLogger
 
@@ -352,13 +353,14 @@ def main() -> None:
     mask_rate = mask_cfg.get("missing_rate", mask_cfg.get("mask_rate", 0.0))
     ts = datetime.now().strftime("%Y%m%d_%H%M%S")
     experiment_type, variant = _experiment_parts(args.name)
+    experiment_dir_name = f"{ts}_{experiment_label(args.name)}_seed{_safe_path_part(cfg.get('seed', 42))}"
     run_id = f"{ts}_seed{_safe_path_part(cfg.get('seed', 42))}_bs{_safe_path_part(cfg['data']['batch_size'])}"
     run_base_dir = (
         ROOT
         / cfg["output_dir"]
         / _safe_path_part(dataset_name)
         / experiment_type
-        / variant
+        / experiment_dir_name
         / _safe_path_part(mask_pattern)
         / _rate_part(mask_rate)
     )

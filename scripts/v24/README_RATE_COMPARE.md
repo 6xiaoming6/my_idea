@@ -27,7 +27,7 @@ tmux new-session -s v24-rate-compare \
   'python -u scripts/v24/run_rate_compare.py --gpu 0'
 ```
 
-入口会检查 GPU 是否已有计算进程；已存在结果回执的任务会跳过。模型结果按 v14-single 风格写入 `outputs/v24-COE/TaxiBJ/custom/<实验名>/random/rate<rate>/<时间_seed_bs>/`，每个 run 下包含 `config.json`、`logs/` 和 `checkpoints/`。队列配置、结果回执和完整 launcher 输出单独写入 `outputs/v24-COE/experiments/coe_rate_compare/`，控制台只打印任务开始和完成信息。
+入口会检查 GPU 是否已有计算进程；已存在结果回执的任务会跳过。模型结果按 v14-single 风格写入 `outputs/v24-COE/TaxiBJ/custom/<YYYYMMDD_HHMMSS_核心名_seedN>/random/rate<rate>/<时间_seed_bs>/`，每个 run 下包含 `config.json`、`logs/` 和 `checkpoints/`。队列配置、结果回执和完整 launcher 输出单独写入 `outputs/v24-COE/experiments/coe_rate_compare/`，控制台只打印任务开始和完成信息。
 
 ## 时间估计
 

@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "output_dir": "outputs/v24-COE/experiments/coe_partner_residual4",
+  "cpu_threads": 2,
+  "batch_size": 16,
+  "seeds": [
+    7
+  ],
+  "extra_inputs": [
+    "data/TaxiBJ/v24_clean_abc_20260917/manifest.json"
+  ],
+  "training": {
+    "epochs": 80,
+    "val_epoch": 2,
+    "save_best_checkpoint": false,
+    "early_stopping": {
+      "enabled": false
+    },
+    "scheduler": {
+      "type": "cosine",
+      "total_epochs": 80,
+      "eta_min": 1e-06
+    },
+    "router_grad_diagnostic_every": 0,
+    "full_checkpoint": true,
+    "measure_forward_latency": true,
+    "oracle_last_step_samples": 0,
+    "partner_probe": {
+      "interval_batches": 16,
+      "weight": 0.1,
+      "min_scale": 0.5,
+      "grad_diagnostic_interval_batches": 64
+    }
+  },
+  "studies": {
+    "coe_partner_residual4_taxibj": {
+      "base_config": "configs/v24/coe_partner_residual4_taxibj_base.json",
+      "stage": "coe_partner_residual4",
+      "sources": {
+        "train": "data/TaxiBJ/v24_clean_abc_20260917/taxibj_train.npz",
+        "val": "data/TaxiBJ/v24_clean_abc_20260917/taxibj_val.npz",
+        "test": "data/TaxiBJ/v24_clean_abc_20260917/taxibj_test.npz"
+      }
+    }
+  },
+  "default_study": "coe_partner_residual4_taxibj"
+}

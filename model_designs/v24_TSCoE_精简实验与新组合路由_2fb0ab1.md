@@ -192,7 +192,7 @@ M0/M1/C0/C1构成“共享/独立 × 无/有反馈”2×2；这样不再把专�
 
 本次正式测试日志均位于：
 
-`outputs/v24-COE/BikeNYC/custom/v24_coe_focus_<variant>_mixed9_rate0.4_updates_seed7/random/rate0.4/<run_id>/logs/test.log`
+`outputs/v24-COE/BikeNYC/custom/<YYYYMMDD_HHMMSS_focus_核心变体_seed7>/random/rate0.4/<run_id>/logs/test.log`
 
 | variant | run_id |
 |---|---|

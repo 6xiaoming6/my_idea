@@ -1,0 +1,8 @@
+{
+  "model": {
+    "coe": {
+      "expert_sharing": "per_step",
+      "pair_mode": "native"
+    }
+  }
+}

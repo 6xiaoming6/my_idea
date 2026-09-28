@@ -250,6 +250,8 @@ class TemporalSpatialCoE(nn.Module):
         acceptance: str = "none",
         expert_sharing: str = "shared",
         completion_feedback: bool = True,
+        partner_fusion: str = "individual",
+        partner_aux_head_only: bool = False,
     ) -> None:
         super().__init__()
         self.c_in = _positive_int("c_in", c_in)
@@ -271,8 +273,8 @@ class TemporalSpatialCoE(nn.Module):
         if routing_mode in {"fixed", "parallel"} and top_k != 1:
             raise ValueError("top_k > 1 is supported only for hard or soft routing")
         self.top_k = top_k
-        if pair_mode not in {"native", "additive", "interaction", "partner"}:
-            raise ValueError("pair_mode must be native, additive, interaction or partner")
+        if pair_mode not in {"native", "additive", "interaction", "partner", "partner_residual"}:
+            raise ValueError("pair_mode must be native, additive, interaction, partner or partner_residual")
         if acceptance not in {"none", "point", "window"}:
             raise ValueError("acceptance must be none, point or window")
         if expert_sharing not in {"shared", "per_step"}:
@@ -280,6 +282,14 @@ class TemporalSpatialCoE(nn.Module):
         if pair_mode != "native" and (routing_mode != "hard" or top_k != 2 or
                 router_features != "legacy" or previous_expert_context or global_route_weights):
             raise ValueError("Pair routing requires legacy hard Top-2 without previous/global routing")
+        if partner_fusion not in {"individual", "corrected"}:
+            raise ValueError("partner_fusion must be individual or corrected")
+        if partner_fusion == "corrected" and pair_mode != "partner_residual":
+            raise ValueError("Corrected partner fusion requires residual partner routing")
+        if type(partner_aux_head_only) is not bool or (partner_aux_head_only and pair_mode != "partner_residual"):
+            raise ValueError("partner_aux_head_only requires residual partner routing")
+        self.partner_fusion = partner_fusion
+        self.partner_aux_head_only = partner_aux_head_only
         if type(completion_feedback) is not bool:
             raise ValueError("completion_feedback must be boolean")
         if not completion_feedback and acceptance != "none":
@@ -488,7 +498,7 @@ class TemporalSpatialCoE(nn.Module):
         self.partner_scorer = (
             PartnerScorer(router_input_dim + 2 * dim + 2 * c_in, router_hidden_dim,
                           self.num_experts)
-            if pair_mode == "partner" else None
+            if pair_mode in {"partner", "partner_residual"} else None
         )
 
     @classmethod
@@ -528,6 +538,8 @@ class TemporalSpatialCoE(nn.Module):
             acceptance=coe.get("acceptance", "none"),
             expert_sharing=coe.get("expert_sharing", "shared"),
             completion_feedback=coe.get("completion_feedback", True),
+            partner_fusion=coe.get("partner_fusion", "individual"),
+            partner_aux_head_only=coe.get("partner_aux_head_only", False),
         )
 
     def set_routing_epoch(self, epoch: int) -> None:
@@ -640,9 +652,18 @@ class TemporalSpatialCoE(nn.Module):
         return weights, pair_ids, pair_logits, pair_probs
 
     def _pair_importance(self, logits: torch.Tensor, pair_probs: torch.Tensor,
-                         temperature: float) -> torch.Tensor:
-        """Six-dimensional candidate marginal matching pair selection and fusion."""
+                         temperature: float, partner_scores: torch.Tensor | None = None,
+                         primary: torch.Tensor | None = None) -> torch.Tensor:
+        """Candidate marginal using each pair's actual within-pair fusion logits."""
         pair_logits = logits.float()[:, self.pair_indices]
+        if partner_scores is not None:
+            if primary is None:
+                raise ValueError("Corrected pair importance requires the primary expert")
+            left, right = self.pair_indices.unbind(-1)
+            pair_logits = torch.stack((
+                torch.where(primary[:, None] == right[None], partner_scores[:, left], pair_logits[..., 0]),
+                torch.where(primary[:, None] == left[None], partner_scores[:, right], pair_logits[..., 1]),
+            ), dim=-1)
         within = F.softmax(pair_logits / temperature, dim=-1)
         indices = self.pair_indices.unsqueeze(0).expand(logits.shape[0], -1, -1)
         contributions = torch.zeros(
@@ -705,7 +726,7 @@ class TemporalSpatialCoE(nn.Module):
         forced_partner_ids = kwargs.get("forced_partner_ids")
         forced_pair_step = kwargs.get("forced_pair_step")
         forced_pair_indices = kwargs.get("forced_pair_indices")
-        if self.pair_mode != "partner" and forced_partner_step is not None:
+        if self.pair_mode not in {"partner", "partner_residual"} and forced_partner_step is not None:
             raise ValueError("forced_partner_step requires partner routing")
         if forced_partner_step is not None and (
             type(forced_partner_step) is not int or not 0 <= forced_partner_step < self.num_steps
@@ -760,6 +781,8 @@ class TemporalSpatialCoE(nn.Module):
         logits_history, probability_history, weight_history, path_history = [], [], [], []
         selected_history, pair_id_history, pair_logit_history, pair_prob_history = [], [], [], []
         importance_history, partner_score_history, primary_history, partner_history = [], [], [], []
+        partner_rank_score_history, partner_fusion_weight_history = [], []
+        partner_correction_abs_history = []
         previous_choice_history = []
         previous_candidate_prediction = initial_prediction
         for step in range(self.num_steps):
@@ -833,8 +856,10 @@ class TemporalSpatialCoE(nn.Module):
             elif self.routing_mode in {"soft", "parallel"}:
                 weights = probabilities
                 paths = weights.argmax(dim=-1)
-            elif self.pair_mode == "partner":
-                primary = logits.argmax(dim=-1)
+            elif self.pair_mode in {"partner", "partner_residual"}:
+                native_top2 = logits.float().topk(2, dim=-1).indices
+                primary = (native_top2[:, 0] if self.pair_mode == "partner_residual"
+                           else logits.argmax(dim=-1))
                 primary_update = self._dispatch(unified, primary, step)
                 proposal_hidden = (hidden + shared_update +
                                    self.routed_scale_logits[step].sigmoid() * primary_update)
@@ -849,8 +874,27 @@ class TemporalSpatialCoE(nn.Module):
                     proposal_change.mean(dim=(2, 3, 4)),
                     self._missing_pool(proposal_change, missing),
                 ), dim=1)
-                partner_scores = self.partner_scorer(partner_features, primary)
-                partner = partner_scores.argmax(dim=-1)
+                correction = self.partner_scorer(partner_features, primary)
+                if self.pair_mode == "partner_residual":
+                    primary_mask = F.one_hot(primary, self.num_experts).bool()
+                    partner_correction_abs_history.append(
+                        correction.detach().masked_fill(primary_mask, 0.).abs().sum(-1).div(self.num_experts - 1).mean()
+                    )
+                    # Zero-initialized correction preserves native Top-2,
+                    # including torch.topk's tie rule.
+                    partner_scores = logits.float() + correction.float()
+                    candidate_scores = partner_scores.masked_fill(primary_mask, -torch.inf)
+                    best = candidate_scores.max(dim=-1).values
+                    native_second = native_top2[:, 1]
+                    native_score = candidate_scores.gather(1, native_second[:, None]).squeeze(1)
+                    partner = torch.where(native_score == best, native_second,
+                                          candidate_scores.argmax(dim=-1))
+                else:
+                    partner_scores = correction
+                    partner = partner_scores.argmax(dim=-1)
+                if self.partner_aux_head_only:
+                    rank_correction = self.partner_scorer(partner_features.detach(), primary)
+                    partner_rank_score_history.append(logits.detach().float() + rank_correction.float())
                 if forced_partner_step == step:
                     partner = forced_partner_ids.to(device=primary.device, dtype=torch.long)
                     if bool(((partner == primary) | (partner < 0) |
@@ -863,9 +907,15 @@ class TemporalSpatialCoE(nn.Module):
                     (selected[:, 0] == selected[:, 1]).any()
                 ):
                     raise ValueError("forced pair must contain two distinct valid experts")
-                within = F.softmax(logits.float().gather(1, selected) /
-                                   sampling_temperature, dim=-1)
+                fusion_logits = logits.float().gather(1, selected)
+                if self.partner_fusion == "corrected" and forced_pair_step != step:
+                    fusion_logits = torch.stack((
+                        fusion_logits[:, 0], partner_scores.gather(1, selected[:, 1:]).squeeze(1)
+                    ), dim=-1)
+                within = F.softmax(fusion_logits / sampling_temperature, dim=-1)
                 weights = torch.zeros_like(probabilities).scatter(1, selected, within)
+                if self.partner_fusion == "corrected" and forced_pair_step != step:
+                    partner_fusion_weight_history.append(within[:, 1].detach().float().mean())
                 paths = weights.argmax(dim=-1)
                 ordered = selected.sort(dim=-1).values
                 first, second = ordered.unbind(dim=-1)
@@ -944,8 +994,12 @@ class TemporalSpatialCoE(nn.Module):
                 pair_id_history.append(pair_ids)
                 pair_logit_history.append(pair_logits)
                 pair_prob_history.append(pair_probs)
-                importance_history.append(self._pair_importance(logits, pair_probs,
-                                                                 sampling_temperature))
+                corrected_scores = (partner_scores if self.pair_mode == "partner_residual" and
+                                    self.partner_fusion == "corrected" else None)
+                importance_history.append(self._pair_importance(
+                    logits, pair_probs, sampling_temperature, corrected_scores,
+                    primary if corrected_scores is not None else None,
+                ))
             else:
                 importance_history.append(probabilities)
 
@@ -958,7 +1012,7 @@ class TemporalSpatialCoE(nn.Module):
                             weights[:, expert_index, None, None, None, None] * expert(unified)
                         )
                 elif self.routing_mode == "hard":
-                    if (self.pair_mode == "partner" and primary_update is not None and
+                    if (self.pair_mode in {"partner", "partner_residual"} and primary_update is not None and
                             forced_pair_step != step):
                         companion_update = self._dispatch(unified, partner, step)
                         primary_weight = weights.gather(1, primary[:, None]).flatten()
@@ -1031,6 +1085,16 @@ class TemporalSpatialCoE(nn.Module):
                 top2 = step_logits.topk(2, dim=-1).values
                 diagnostics[f"step{step}_top12_margin"] = (top2[:, 0] - top2[:, 1]).mean()
             diagnostics[f"step{step}_update_abs_mean"] = step_change.detach().float().mean()
+            if self.partner_fusion == "corrected" and len(partner_fusion_weight_history) >= step:
+                diagnostics[f"step{step}_partner_fusion_weight_mean"] = (
+                    partner_fusion_weight_history[step - 1]
+                )
+            if self.pair_mode == "partner_residual" and len(partner_correction_abs_history) >= step:
+                diagnostics[f"step{step}_partner_correction_abs_mean"] = (
+                    partner_correction_abs_history[step - 1].detach().float()
+                )
+                ranked = step_logits.topk(3, dim=-1).values
+                diagnostics[f"step{step}_native_partner_margin"] = (ranked[:, 1] - ranked[:, 2]).mean()
             if self.routing_mode == "hard" and self.top_k == 2:
                 native_pair = step_logits.topk(2, dim=-1).indices.sort(dim=-1).values
                 chosen_pair = selected_history[step - 1]
@@ -1073,6 +1137,8 @@ class TemporalSpatialCoE(nn.Module):
                 "route_weights": route_weights,
                 "partner_scores": (torch.stack(partner_score_history, dim=1)
                                    if partner_score_history else None),
+                "partner_rank_scores": (torch.stack(partner_rank_score_history, dim=1)
+                                        if partner_rank_score_history else None),
                 "primary_ids": (torch.stack(primary_history, dim=1)
                                 if primary_history else None),
                 "partner_ids": (torch.stack(partner_history, dim=1)
@@ -1084,6 +1150,8 @@ class TemporalSpatialCoE(nn.Module):
                 "router_state": self.router_state,
                 "expert_state": self.expert_state,
                 "pair_mode": self.pair_mode,
+                "partner_fusion": self.partner_fusion,
+                "partner_aux_head_only": self.partner_aux_head_only,
                 "acceptance": self.acceptance,
                 "expert_sharing": self.expert_sharing,
                 "completion_feedback": self.completion_feedback,

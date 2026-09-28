@@ -126,7 +126,9 @@ def compute_coe_loss(outputs: dict, batch: dict, cfg: dict) -> tuple[torch.Tenso
         z = logits[supervised_samples].float().logsumexp(dim=-1).square().mean()
     weighted_z = z_weight * z
     total = main + mid_weight * mid + weighted_balance + weighted_z
-    if cfg.get("train", {}).get("router_grad_diagnostic_every", 0):
+    train_cfg = cfg.get("train", {})
+    if (train_cfg.get("router_grad_diagnostic_every", 0) or
+            train_cfg.get("partner_probe", {}).get("grad_diagnostic_interval_batches", 0)):
         coe["_loss_terms"] = {"main": main, "balance": weighted_balance, "z": weighted_z}
     logs = {
         "loss": total.detach(), "l_main": main.detach(), "l_final": main.detach(),

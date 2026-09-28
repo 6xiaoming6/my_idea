@@ -1,0 +1,101 @@
+-------------------------------------------------------------------------
+ epoch         loss         mae         rmse   train_mae   epoch_s   best
+-------------------------------------------------------------------------
+     2     64.47947     63.6981     115.8396     78.9921      37.6      *
+Best model at epoch 2 (val_mae=63.6981)
+     4     53.12682     52.5882      98.1338     61.5130      38.6      *
+Best model at epoch 4 (val_mae=52.5882)
+     6     47.29590     46.9112      87.4304     55.1128      33.2      *
+Best model at epoch 6 (val_mae=46.9112)
+     8     42.53552     42.1686      79.0549     48.9351      29.9      *
+Best model at epoch 8 (val_mae=42.1686)
+    10     41.01420     40.7279      73.3081     44.5693      30.6      *
+Best model at epoch 10 (val_mae=40.7279)
+    12     41.11196     40.8763      74.0015     44.0658      32.4       
+    14     39.27922     39.0461      71.4087     42.6395      30.1      *
+Best model at epoch 14 (val_mae=39.0461)
+    16     37.75398     37.5057      68.9984     41.0366      30.7      *
+Best model at epoch 16 (val_mae=37.5057)
+    18     36.42419     36.2049      66.5707     39.9813      30.5      *
+Best model at epoch 18 (val_mae=36.2049)
+    20     35.70759     35.4995      63.6297     38.7418      31.7      *
+Best model at epoch 20 (val_mae=35.4995)
+    22     35.11660     34.9157      61.3388     37.4594      30.5      *
+Best model at epoch 22 (val_mae=34.9157)
+    24     33.23813     33.0342      60.1971     35.9305      32.5      *
+Best model at epoch 24 (val_mae=33.0342)
+    26     32.66672     32.5219      57.5225     35.0218      31.3      *
+Best model at epoch 26 (val_mae=32.5219)
+    28     31.81050     31.6272      55.4301     34.2890      31.2      *
+Best model at epoch 28 (val_mae=31.6272)
+    30     31.20432     31.0648      54.1227     32.8481      30.6      *
+Best model at epoch 30 (val_mae=31.0648)
+    32     30.54071     30.3611      52.8712     32.2079      30.7      *
+Best model at epoch 32 (val_mae=30.3611)
+    34     31.32426     31.2631      54.9724     32.8860      30.7       
+    36     30.13275     30.0355      51.9477     31.4700      30.8      *
+Best model at epoch 36 (val_mae=30.0355)
+    38     30.26365     30.1193      52.5609     32.1076      30.1       
+    40     29.24724     29.0550      50.0869     30.2345      30.5      *
+Best model at epoch 40 (val_mae=29.0550)
+    42     29.59410     29.4868      50.9981     30.7194      30.3       
+    44     28.68412     28.5725      48.9351     29.7982      31.3      *
+Best model at epoch 44 (val_mae=28.5725)
+    46     27.83752     27.7379      48.4702     29.3129      30.9      *
+Best model at epoch 46 (val_mae=27.7379)
+    48     27.10953     26.9913      46.4861     28.4091      31.2      *
+Best model at epoch 48 (val_mae=26.9913)
+    50     27.29464     27.1737      46.6123     28.1116      31.3       
+    52     26.76404     26.6502      46.1729     27.7279      31.3      *
+Best model at epoch 52 (val_mae=26.6502)
+    54     26.38555     26.2724      45.3116     27.4347      31.3      *
+Best model at epoch 54 (val_mae=26.2724)
+    56     25.75039     25.6417      43.5975     27.1655      31.7      *
+Best model at epoch 56 (val_mae=25.6417)
+    58     25.43401     25.3159      43.0160     26.5935      31.6      *
+Best model at epoch 58 (val_mae=25.3159)
+    60     25.95903     25.8521      44.4999     26.0834      31.7       
+    62     25.23020     25.1319      42.9800     26.0187      31.6      *
+Best model at epoch 62 (val_mae=25.1319)
+    64     25.17875     25.0809      42.9385     26.0341      31.5      *
+Best model at epoch 64 (val_mae=25.0809)
+    66     24.92935     24.8249      42.5663     25.6097      31.8      *
+Best model at epoch 66 (val_mae=24.8249)
+    68     24.90192     24.7950      42.6626     25.4414      31.9      *
+Best model at epoch 68 (val_mae=24.7950)
+    70     24.44116     24.3266      41.6080     25.2995      31.9      *
+Best model at epoch 70 (val_mae=24.3266)
+    72     24.38515     24.2638      41.5235     25.1596      31.9      *
+Best model at epoch 72 (val_mae=24.2638)
+    74     24.38756     24.2656      41.6230     24.9712      31.7       
+    76     24.41134     24.2895      41.6162     24.8376      31.8       
+    78     24.42560     24.3054      41.6627     24.8429      31.8       
+    80     24.36872     24.2474      41.5527     24.8829      31.8      *
+Best model at epoch 80 (val_mae=24.2474)
+
+------------------------------------------------------------------------------------------------
+Training finished normally: 2026-09-28 10:18:04
+Summary
+  completed_epochs: 80
+  best_epoch: 80
+  best_val_mae: 24.247367
+  val_epoch: 2
+  validation_count: 40
+  final_train_loss: 24.906398
+  final_train_mae: 24.882933
+  final_val_loss: 24.368725
+  final_val_mae: 24.247367
+  total_time: 41m 11s
+  avg_epoch_time_sec: 30.83
+  avg_train_sec_per_step: 0.1946
+  avg_val_sec_per_step: 0.0396
+  peak_memory_gb: 3.52
+  test_loss: 23.142222
+  test_mae: 23.185914
+  test_rmse: 39.434496
+  test_mape: 261835.875723
+  test_time_sec: 3.55
+  best_checkpoint: n/a
+  best_state_source: cpu_memory
+  metrics_jsonl: /home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/v24_coe_partner_residual4_residual4_partner_legacy_mixed9_rate0.4_updates_seed7/random/rate0.4/20260928_093652_seed7_bs16/logs/metrics.jsonl
+------------------------------------------------------------------------------------------------

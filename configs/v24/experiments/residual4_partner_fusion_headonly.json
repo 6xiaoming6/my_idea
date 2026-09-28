@@ -1,0 +1,10 @@
+{
+  "model": {
+    "coe": {
+      "expert_sharing": "shared",
+      "pair_mode": "partner_residual",
+      "partner_fusion": "corrected",
+      "partner_aux_head_only": true
+    }
+  }
+}
