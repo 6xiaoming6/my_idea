@@ -1,0 +1,13 @@
+{
+  "model": {
+    "coe": {
+      "completion_feedback": true,
+      "acceptance": "none",
+      "repair_acceptance": "latent_point",
+      "repair_feedback_to_router": false
+    }
+  },
+  "loss": {
+    "lambda_coe_accept": 0.1
+  }
+}

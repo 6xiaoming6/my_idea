@@ -1,0 +1,62 @@
+[
+  {
+    "id": "E0",
+    "name": "v25_ras_e0_c2_baseline",
+    "directory": "E0_c2_baseline",
+    "patch": "e0_c2_baseline.json"
+  },
+  {
+    "id": "E1",
+    "name": "v25_ras_e1_naive_feedback",
+    "directory": "E1_naive_feedback",
+    "patch": "e1_naive_feedback.json"
+  },
+  {
+    "id": "E2",
+    "name": "v25_ras_e2_legacy_point",
+    "directory": "E2_legacy_point",
+    "patch": "e2_legacy_point.json"
+  },
+  {
+    "id": "E3",
+    "name": "v25_ras_e3_latent_unsup",
+    "directory": "E3_latent_unsup",
+    "patch": "e3_latent_unsup.json"
+  },
+  {
+    "id": "E4",
+    "name": "v25_ras_e4_latent_sup",
+    "directory": "E4_latent_sup",
+    "patch": "e4_latent_sup.json"
+  },
+  {
+    "id": "E5",
+    "name": "v25_ras_e5_full",
+    "directory": "E5_full",
+    "patch": "e5_full.json"
+  },
+  {
+    "id": "E6",
+    "name": "v25_ras_e6_full_l003",
+    "directory": "E6_full_l003",
+    "patch": "e6_full_l003.json"
+  },
+  {
+    "id": "E7",
+    "name": "v25_ras_e7_full_l030",
+    "directory": "E7_full_l030",
+    "patch": "e7_full_l030.json"
+  },
+  {
+    "id": "E8",
+    "name": "v25_ras_e8_native_baseline",
+    "directory": "E8_native_baseline",
+    "patch": "e8_native_baseline.json"
+  },
+  {
+    "id": "E9",
+    "name": "v25_ras_e9_native_full",
+    "directory": "E9_native_full",
+    "patch": "e9_native_full.json"
+  }
+]

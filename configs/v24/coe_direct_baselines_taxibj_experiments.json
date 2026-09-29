@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "output_dir": "outputs/v24-COE/experiments/coe_fusion1",
+  "output_dir": "outputs/v24-COE/experiments/coe_direct_baselines",
   "cpu_threads": 2,
   "batch_size": 16,
   "seeds": [
@@ -28,9 +28,9 @@
     "best_checkpoint_name": "best.pth"
   },
   "studies": {
-    "coe_fusion1_taxibj": {
+    "coe_direct_baselines_taxibj": {
       "base_config": "configs/v24/coe_main_s4_e8_taxibj_base.json",
-      "stage": "coe_fusion1",
+      "stage": "coe_direct_baselines",
       "sources": {
         "train": "data/TaxiBJ/v24_clean_abc_20260917/taxibj_train.npz",
         "val": "data/TaxiBJ/v24_clean_abc_20260917/taxibj_val.npz",
@@ -38,5 +38,5 @@
       }
     }
   },
-  "default_study": "coe_fusion1_taxibj"
+  "default_study": "coe_direct_baselines_taxibj"
 }

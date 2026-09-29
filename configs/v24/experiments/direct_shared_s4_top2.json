@@ -1,0 +1,22 @@
+{
+  "model": {
+    "coe": {
+      "num_steps": 4,
+      "top_k": 2,
+      "expert_sharing": "shared",
+      "fixed_expert_steps": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "state_update_mode": "direct",
+      "use_shared": false,
+      "use_routed": true,
+      "completion_feedback": false,
+      "pair_mode": "native",
+      "fusion_mode": "original",
+      "acceptance": "none"
+    }
+  }
+}

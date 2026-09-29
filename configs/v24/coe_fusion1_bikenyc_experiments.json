@@ -8,21 +8,22 @@
   ],
   "extra_inputs": [],
   "training": {
-    "epochs": 80,
+    "epochs": 100,
     "val_epoch": 5,
-    "save_best_checkpoint": false,
+    "save_best_checkpoint": true,
     "early_stopping": {
       "enabled": false
     },
     "scheduler": {
       "type": "cosine",
-      "total_epochs": 80,
+      "total_epochs": 100,
       "eta_min": 1e-06
     },
     "router_grad_diagnostic_every": 0,
     "full_checkpoint": true,
     "measure_forward_latency": true,
-    "oracle_last_step_samples": 0
+    "oracle_last_step_samples": 0,
+    "best_checkpoint_name": "best.pth"
   },
   "studies": {
     "coe_fusion1_bikenyc": {

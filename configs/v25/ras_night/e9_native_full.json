@@ -1,0 +1,15 @@
+{
+  "model": {
+    "coe": {
+      "pair_mode": "native",
+      "partner_fusion": "individual",
+      "partner_aux_head_only": false,
+      "completion_feedback": true,
+      "repair_acceptance": "latent_point",
+      "repair_feedback_to_router": true
+    }
+  },
+  "loss": {
+    "lambda_coe_accept": 0.1
+  }
+}

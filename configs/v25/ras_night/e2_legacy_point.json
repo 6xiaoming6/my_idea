@@ -1,0 +1,8 @@
+{
+  "model": {
+    "coe": {
+      "completion_feedback": true,
+      "acceptance": "point"
+    }
+  }
+}

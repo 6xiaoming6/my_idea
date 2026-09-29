@@ -1,0 +1,8 @@
+{
+  "model": {
+    "coe": {}
+  },
+  "train": {
+    "val_epoch": 2
+  }
+}

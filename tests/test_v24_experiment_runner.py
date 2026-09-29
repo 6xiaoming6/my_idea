@@ -198,6 +198,26 @@ class RunnerIntegrationTests(unittest.TestCase):
         self.assertEqual(len(checkpoints), 1)
         self.assertEqual(checkpoints[0].name, 'best.pt')
 
+    def test_custom_best_checkpoint_filename_is_saved_loaded_and_accepted(self):
+        original = self.manifest['runs'][0]
+        cfg = copy.deepcopy(original['config'])
+        cfg['output_dir'] = str(self.directory/'pth_run')
+        cfg['train']['save_best_checkpoint'] = True
+        cfg['train']['best_checkpoint_name'] = 'best.pth'
+        path = self.directory/'pth.json'; path.write_text(json.dumps(cfg))
+        receipt_file = self.directory/'pth_receipt.json'
+        command = [sys.executable, str(ROOT/'scripts/train.py'), '-c', str(path), '--synthetic',
+                   '--no_plot', '--result-file', str(receipt_file)]
+        result = subprocess.run(command, cwd=ROOT, env=self.env, capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, result.stdout+result.stderr)
+        receipt = runner.load(receipt_file)
+        checkpoint = Path(receipt['run_dir'])/'checkpoints/best.pth'
+        self.assertEqual(receipt['best_state_source'], 'checkpoint')
+        self.assertTrue(checkpoint.is_file())
+        run = copy.deepcopy(original)
+        run['config'] = cfg
+        self.assertTrue(runner.check_complete(receipt_file, run, self.manifest))
+
 
 if __name__ == '__main__':
     unittest.main()

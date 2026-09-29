@@ -1,0 +1,9 @@
+{
+  "model": {
+    "coe": {
+      "pair_mode": "native",
+      "partner_fusion": "individual",
+      "partner_aux_head_only": false
+    }
+  }
+}

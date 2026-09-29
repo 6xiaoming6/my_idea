@@ -337,6 +337,9 @@ def main() -> None:
     save_best = cfg["train"].get("save_best_checkpoint", True)
     if type(save_best) is not bool:
         raise ValueError("train.save_best_checkpoint must be true or false")
+    best_checkpoint_name = cfg["train"].get("best_checkpoint_name", "best.pt")
+    if best_checkpoint_name not in ("best.pt", "best.pth"):
+        raise ValueError("train.best_checkpoint_name must be best.pt or best.pth")
     if args.result_file is not None and args.result_file.exists():
         raise FileExistsError(f"Completion receipt already exists: {args.result_file}")
     device, rank, world_size = _distributed_device(cfg)
@@ -381,6 +384,7 @@ def main() -> None:
         run_path = paths[0]
     run_dir = Path(run_path)
     ckpt_dir = run_dir / "checkpoints"
+    best_path = ckpt_dir / best_checkpoint_name
     log_dir = run_dir / "logs"
 
     train_ds, val_ds = build_datasets(cfg, args.train_npz, args.val_npz, synthetic=args.synthetic)
@@ -555,7 +559,7 @@ def main() -> None:
                         else:
                             rng_states[0] = local_rng
                     if is_main:
-                        save_checkpoint(ckpt_dir / "best.pt", raw_model, optimizer, epoch, metrics, cfg,
+                        save_checkpoint(best_path, raw_model, optimizer, epoch, metrics, cfg,
                                         scheduler=scheduler, scaler=scaler, rng_states=rng_states)
                 else:
                     best_state = snapshot_model_state(raw_model)
@@ -575,7 +579,6 @@ def main() -> None:
                 if validations_without_improvement >= patience:
                     logger.log_message(f"Early stopping at epoch {epoch} ({monitor}={current:.6f})")
                     break
-        best_path = ckpt_dir / "best.pt"
         if world_size > 1:
             dist.barrier()
         if save_best:
@@ -645,7 +648,7 @@ def main() -> None:
             "test_rmse": f"{test_logs['rmse']:.6f}" if test_logs else "n/a",
             "test_mape": f"{test_logs['mape']:.6f}" if test_logs and "mape" in test_logs else "n/a",
             "test_time_sec": f"{test_time:.2f}",
-            "best_checkpoint": str(ckpt_dir / "best.pt") if best_epoch and save_best else "n/a",
+            "best_checkpoint": str(best_path) if best_epoch and save_best else "n/a",
             "best_state_source": "checkpoint" if save_best else "cpu_memory",
             "metrics_jsonl": str(log_dir / "metrics.jsonl"),
         }

@@ -254,6 +254,7 @@ class TemporalSpatialCoE(nn.Module):
         partner_aux_head_only: bool = False,
         fusion_mode: str = "original",
         pair_dense_warmup_steps: int = 0,
+        state_update_mode: str = "residual",
     ) -> None:
         super().__init__()
         self.c_in = _positive_int("c_in", c_in)
@@ -327,6 +328,11 @@ class TemporalSpatialCoE(nn.Module):
             raise ValueError("use_shared and use_routed must be booleans")
         if not use_shared and not use_routed:
             raise ValueError("At least one of use_shared/use_routed must be enabled")
+        if state_update_mode not in {"residual", "direct"}:
+            raise ValueError("state_update_mode must be residual or direct")
+        if state_update_mode == "direct" and (use_shared or not use_routed):
+            raise ValueError("Direct expert propagation requires routed experts only")
+        self.state_update_mode = state_update_mode
         if not math.isfinite(float(temperature)) or float(temperature) <= 0:
             raise ValueError("temperature must be finite and positive")
         if not math.isfinite(float(residual_init)) or not 0 < float(residual_init) < 1:
@@ -579,6 +585,7 @@ class TemporalSpatialCoE(nn.Module):
             partner_aux_head_only=coe.get("partner_aux_head_only", False),
             fusion_mode=coe.get("fusion_mode", "original"),
             pair_dense_warmup_steps=coe.get("pair_dense_warmup_steps", 0),
+            state_update_mode=coe.get("state_update_mode", "residual"),
         )
 
     def set_routing_epoch(self, epoch: int) -> None:
@@ -1162,7 +1169,7 @@ class TemporalSpatialCoE(nn.Module):
                 else:
                     routed_update = self._dispatch(unified, paths, step)
                 update = update + self.routed_scale_logits[step].sigmoid() * routed_update
-            hidden = hidden + update
+            hidden = routed_update if self.state_update_mode == "direct" else hidden + update
             candidate_prediction = self.decoder(hidden)
             candidate_completion = torch.where(observed, x_input, candidate_prediction)
             candidate_change = torch.where(observed, torch.zeros_like(candidate_prediction),

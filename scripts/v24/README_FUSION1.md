@@ -1,6 +1,6 @@
 # v24 第一方向：已选专家的条件化融合
 
-入口：`scripts/v24/run_fusion1.py`。默认 TaxiBJ，可通过 `--dataset bikenyc` 切换；五组按下表串行运行，双卡 DDP 只服务当前一组，不会并行跑两组。默认 80 epoch、每 5 epoch 验证、seed 7、全局 batch 16、九类同分布混合 random@0.4，训练每轮重采样，验证/测试固定。每轮从共享八专家池激活 Top-2；不保存 `best.pt`，最优权重在内存中用于最终测试。
+入口：`scripts/v24/run_fusion1.py`。默认 TaxiBJ，可通过 `--dataset bikenyc` 切换；五组按下表串行运行，双卡 DDP 只服务当前一组，不会并行跑两组。默认 100 epoch、每 5 epoch 验证、seed 7；双卡时全局 batch 32（每卡 16），单卡时沿用策略全局 batch 16；九类同分布混合 random@0.4，训练每轮重采样，验证/测试固定。每轮从共享八专家池激活 Top-2；在各组运行目录的 `checkpoints/best.pth` 保存验证 MAE 最优权重，并在最终测试前加载。
 
 | 顺序 | 名称 | 唯一实验变量 | 要回答的问题 |
 |---|---|---|---|
@@ -17,7 +17,7 @@
 启动：
 
 ```bash
-python -u scripts/v24/run_fusion1.py --gpus 0,1 --epochs 80
+python -u scripts/v24/run_fusion1.py --gpus 0,1 --epochs 100
 ```
 
-输出在 `outputs/v24-COE/experiments/coe_fusion1/`；完成作业经回执校验后跳过。`--dry-run` 可检查配置和队列，不启动训练。
+可用 `--batch-size N` 显式指定全局 batch。更改 batch size、epoch 或最佳权重保存策略会生成新的实验指纹，不会把已完成的 batch 16 结果当作 batch 32 续跑。输出在 `outputs/v24-COE/experiments/coe_fusion1/`；完成作业经回执校验后跳过。`--dry-run` 可检查配置和队列，不启动训练。

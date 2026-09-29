@@ -137,13 +137,17 @@ def assert_unchanged(stamps, code_paths):
             raise RuntimeError(f"Code/data/config changed during the experiment: {path}. Restart to create a new suite.")
 
 
-def policy_plan(path, study, epochs=None):
+def policy_plan(path, study, epochs=None, batch_size=None):
     policy = load(path)
     if epochs is not None:
         if type(epochs) is not int or epochs <= 0:
             raise ValueError("--epochs must be a positive integer")
         policy["training"]["epochs"] = epochs
         policy["training"].setdefault("scheduler", {})["total_epochs"] = epochs
+    if batch_size is not None:
+        if type(batch_size) is not int or batch_size <= 0:
+            raise ValueError("--batch-size must be a positive integer")
+        policy["batch_size"] = batch_size
     if policy.get("schema_version") != 1:
         raise ValueError("Unsupported experiment policy schema")
     spec = policy["studies"][study]
@@ -200,6 +204,43 @@ def validate_plan(manifest):
         names.add(name)
         cfg = run["config"]
         train = cfg["train"]
+        if manifest.get("stage") == "coe_direct_baselines":
+            coe = cfg["model"]["coe"]
+            data = cfg["data"]
+            expected = {
+                "direct_moe_s1_top8": (1, 8, "per_step"),
+                "direct_moe_s4_top2": (4, 2, "per_step"),
+                "direct_shared_s4_top2": (4, 2, "shared"),
+            }[run["variant"]]
+            actual = tuple(coe.get(key) for key in ("num_steps", "top_k", "expert_sharing"))
+            if (actual != expected or
+                    coe.get("expert_pool") != ["T", "S", "TD", "SD", "TA", "ST", "TL", "SL"] or
+                    coe.get("fixed_expert_steps") != [None] * expected[0] or
+                    coe.get("routing_mode") != "hard" or
+                    coe.get("state_update_mode") != "direct" or
+                    coe.get("use_shared") is not False or coe.get("use_routed") is not True or
+                    coe.get("completion_feedback") is not False or
+                    coe.get("pair_mode") != "native" or coe.get("fusion_mode") != "original" or
+                    coe.get("acceptance") != "none" or
+                    coe.get("router_state") != "dynamic" or coe.get("expert_state") != "dynamic" or
+                    cfg["model"]["main"].get("dim") != 64 or
+                    cfg["model"]["main"].get("use_multiscale") is not False or
+                    cfg["loss"].get("balance_importance") != "candidate" or
+                    cfg["loss"].get("lambda_coe_balance") != 0.01 or
+                    data.get("mask", {}).get("pattern") != "random" or
+                    data.get("mask", {}).get("missing_rate") != 0.4 or
+                    data.get("train_mask_diversity", {}).get("rates") != [0.4] or
+                    data.get("eval_mask_diversity", {}).get("rates") != [0.4] or
+                    len(data.get("train_mask_diversity", {}).get("families", [])) != 9 or
+                    data.get("train_mask_diversity", {}).get("families") !=
+                    data.get("eval_mask_diversity", {}).get("families") or
+                    data.get("train_mask_diversity", {}).get("resample_each_epoch") is not True or
+                    data.get("eval_mask_diversity", {}).get("resample_each_epoch") is not False or
+                    train.get("val_epoch") != 5 or
+                    train.get("save_best_checkpoint") is not True or
+                    train.get("best_checkpoint_name") != "best.pth" or
+                    train.get("scheduler", {}).get("total_epochs") != train["epochs"]):
+                raise ValueError(f"{name}: invalid direct MoE baseline settings")
         if manifest.get("stage") == "coe_depth_pair8":
             coe = cfg["model"]["coe"]
             data = cfg["data"]
@@ -269,7 +310,8 @@ def validate_plan(manifest):
                     data.get("eval_mask_diversity", {}).get("resample_each_epoch") is not False or
                     train.get("partner_probe") is not None or
                     train.get("val_epoch") != 5 or
-                    train.get("save_best_checkpoint") is not False or
+                    train.get("save_best_checkpoint") is not True or
+                    train.get("best_checkpoint_name") != "best.pth" or
                     train.get("scheduler", {}).get("total_epochs") != train["epochs"]):
                 raise ValueError(f"{name}: invalid fusion exploration settings")
         if manifest.get("stage") == "coe_main_s4_e8":
@@ -492,6 +534,8 @@ def validate_plan(manifest):
                 raise ValueError(f"train.{key} must be a positive integer")
         if type(train.get("save_best_checkpoint", True)) is not bool:
             raise ValueError("save_best_checkpoint must be boolean")
+        if train.get("best_checkpoint_name", "best.pt") not in ("best.pt", "best.pth"):
+            raise ValueError("best_checkpoint_name must be best.pt or best.pth")
         if train.get("early_stopping", {}).get("enabled", False) or cfg["data"].get("drop_last", False):
             raise ValueError("Matched experiments require full epochs and drop_last=false")
         if cfg["model"]["architecture"] != "v24_ts_coe":
@@ -543,6 +587,25 @@ def validate_plan(manifest):
                     reference = normalized
                 elif normalized != reference:
                     raise ValueError(f"{run['variant']}: changed settings outside the planned intervention")
+
+    if manifest.get("stage") == "coe_direct_baselines":
+        expected_order = ["direct_moe_s1_top8", "direct_moe_s4_top2", "direct_shared_s4_top2"]
+        by_seed = {}
+        for run in manifest["runs"]:
+            by_seed.setdefault(run["seed"], []).append(run)
+        for seed, runs in by_seed.items():
+            if [run["variant"] for run in runs] != expected_order:
+                raise ValueError(f"Direct MoE seed {seed} must run all three baselines in order")
+            reference = None
+            for run in runs:
+                normalized = copy.deepcopy(run["config"])
+                normalized["experiment_plan"]["variant"] = "reference"
+                for key in ("num_steps", "top_k", "expert_sharing", "fixed_expert_steps"):
+                    normalized["model"]["coe"].pop(key, None)
+                if reference is None:
+                    reference = normalized
+                elif normalized != reference:
+                    raise ValueError(f"{run['variant']}: changed settings outside depth, Top-K, or sharing")
 
     if manifest.get("stage") == "coe_depth_pair8":
         expected_order = ["depthpair_moe_s1_top8", "depthpair_moe_s2_top4",
@@ -655,7 +718,7 @@ def materialize(manifest, suite, fingerprint, world_size=1):
     result["world_size"] = world_size
     for run in result["runs"]:
         run["config"]["output_dir"] = (str(ROOT / "outputs/v24-COE")
-            if result.get("stage") in {"coe_team_accept_v4", "coe_focus", "coe_partner", "coe_partner_residual4", "coe_partner_native4", "coe_depth_pair8", "coe_fusion1"} else str(suite / "runs" / run["name"]))
+            if result.get("stage") in {"coe_team_accept_v4", "coe_focus", "coe_partner", "coe_partner_residual4", "coe_partner_native4", "coe_depth_pair8", "coe_fusion1", "coe_direct_baselines"} else str(suite / "runs" / run["name"]))
         run["config"]["experiment_suite_fingerprint"] = fingerprint
         run["config_path"] = str(suite / "configs" / (run["name"] + ".json"))
         command = [sys.executable, "-u", str(ROOT / "scripts/train.py"), "-c",
@@ -716,7 +779,8 @@ def check_complete(receipt_path, run, manifest):
         storage = "checkpoint" if cfg["train"].get("save_best_checkpoint", True) else "cpu_memory"
         if receipt["best_state_source"] != storage or tests[0]["extra"]["best_state_source"] != storage:
             return False
-        if storage == "checkpoint" and not (run_dir / "checkpoints/best.pt").is_file():
+        best_name = cfg["train"].get("best_checkpoint_name", "best.pt")
+        if storage == "checkpoint" and not (run_dir / "checkpoints" / best_name).is_file():
             return False
         if manifest.get("stage") == "coe_partner":
             oracle_path = log_dir / "oracle_last_step.json"
@@ -762,7 +826,7 @@ def summarize(manifest, suite):
                        test_mae=result["test"]["mae"], test_rmse=result["test"]["rmse"],
                        seconds=result["total_time_sec"], run_dir=result["run_dir"])
             diagnostics[run["name"]] = {k: v for k, v in result["test"].items() if k.startswith("coe_")}
-        if manifest.get("stage") in {"coe_partner", "coe_partner_residual4", "coe_partner_native4", "coe_depth_pair8", "coe_fusion1"}:
+        if manifest.get("stage") in {"coe_partner", "coe_partner_residual4", "coe_partner_native4", "coe_depth_pair8", "coe_fusion1", "coe_direct_baselines"}:
             row.update(
                 total_params=result.get("total_params") if result else None,
                 peak_memory_gb=result.get("peak_memory_gb") if result else None,
@@ -790,6 +854,8 @@ def summarize(manifest, suite):
                 reference = "residual4_partner_legacy"
             elif manifest.get("stage") == "coe_depth_pair8":
                 reference = "depthpair_moe_s1_top8"
+            elif manifest.get("stage") == "coe_direct_baselines":
+                reference = "direct_moe_s4_top2"
             elif manifest.get("stage") == "coe_fusion1":
                 reference = "top2_context"
             elif manifest.get("stage") in {"coe_validation", "coe_dual_mask", "coe_mechanism1"}:
@@ -941,9 +1007,12 @@ def main(argv=None):
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--summary-only", action="store_true")
     parser.add_argument("--epochs", type=int, help="Override all policy epochs and cosine scheduler period")
+    parser.add_argument("--batch-size", type=int, help="Override global batch size; DDP splits it across ranks")
     args = parser.parse_args(argv)
-    if args.plan and args.epochs is not None:
-        parser.error("--epochs cannot override an immutable --plan")
+    if args.plan and (args.epochs is not None or args.batch_size is not None):
+        parser.error("--epochs and --batch-size cannot override an immutable --plan")
+    if args.batch_size is not None and args.batch_size <= 0:
+        parser.error("--batch-size must be positive")
     if args.gpu is not None and not args.gpu.isdigit():
         parser.error("--gpu must be a single nonnegative device index")
     gpu_ids = args.gpus.split(",") if args.gpus else None
@@ -964,8 +1033,10 @@ def main(argv=None):
     else:
         policy_path = resolve(args.config)
         study = args.study or load(policy_path).get("default_study", "pilot")
-        manifest, output, threads, extras = policy_plan(policy_path, study, args.epochs)
+        manifest, output, threads, extras = policy_plan(policy_path, study, args.epochs, args.batch_size)
     validate_plan(manifest)
+    if any(run["config"]["data"]["batch_size"] % world_size for run in manifest["runs"]):
+        parser.error("Global batch size must be divisible by DDP world size")
     record, stamps = identity(manifest, extras)
     record["cpu_threads"] = threads
     record["world_size"] = world_size
@@ -997,7 +1068,7 @@ def main(argv=None):
         if (suite / "protocol.json").exists() and load(suite / "protocol.json") != record:
             raise RuntimeError("Suite fingerprint collision or modified protocol")
         assert_unchanged(stamps, code_paths)
-        if manifest.get("stage") in {"coe_partner", "coe_main_s4_e8", "coe_partner_residual4", "coe_partner_native4", "coe_depth_pair8", "coe_fusion1"}:
+        if manifest.get("stage") in {"coe_partner", "coe_main_s4_e8", "coe_partner_residual4", "coe_partner_native4", "coe_depth_pair8", "coe_fusion1", "coe_direct_baselines"}:
             snapshot_partner_sources(suite, extras)
         write_json(suite / "protocol.json", record)
         write_json(suite / "plan.json", manifest)

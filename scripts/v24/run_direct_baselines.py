@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run five v24 fusion experiments sequentially, with pair warmup first."""
+"""Run three direct-propagation MoE baselines sequentially."""
 from __future__ import annotations
 
 import argparse
@@ -14,8 +14,8 @@ import run_experiments as runner
 from run_team_accept_v4 import check_gpu_idle
 
 POLICIES = {
-    "taxibj": ROOT / "configs/v24/coe_fusion1_taxibj_experiments.json",
-    "bikenyc": ROOT / "configs/v24/coe_fusion1_bikenyc_experiments.json",
+    "taxibj": ROOT / "configs/v24/coe_direct_baselines_taxibj_experiments.json",
+    "bikenyc": ROOT / "configs/v24/coe_direct_baselines_bikenyc_experiments.json",
 }
 
 
@@ -73,7 +73,7 @@ def main() -> int:
         try:
             fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         except BlockingIOError:
-            raise RuntimeError("v24 fusion exploration queue already running") from None
+            raise RuntimeError("v24 direct baseline queue already running") from None
         check_gpu_idle(selected)
         return subprocess.call(command, cwd=ROOT)
 
