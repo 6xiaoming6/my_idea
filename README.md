@@ -2,7 +2,21 @@
 
 当前 `v24-COE` 分支研究 **Temporal-Spatial Chain-of-Experts（TS-CoE）**：在原始时空网格上逐层更新补全状态，每层路由器按当前观测和状态从共享专家池中选择专家。`top_k` 表示**每层同时激活的专家数**；被选专家的权重归一化后融合。当前 v24 模型只使用 fine 尺度，不构造 mid/coarse 特征。早期多尺度模型和 v14-single 实验代码仍在仓库中，但它们不是 v24 训练入口的默认架构。
 
-模型由输入编码、逐层独立路由器、跨层共享的专家池、点级共享分支和预测头组成。当前主骨干采用四轮、共享八专家池、每轮稀疏激活 Top-2：`T`（时间卷积）、`S`（空间卷积）、`TD`（空洞时间卷积）、`SD`（空洞空间卷积）、`TA`（时间注意力）、`ST`（局部时空联合）、`TL`（较大时间核）、`SL`（较大空间核）。每层可读取上层更新后的状态，固定链、Soft 路由和 Top-K 均可由配置控制。详细设计见 [v24 方案](model_designs/v24_Temporal-Spatial_Chain-of-Experts_详细方案.md)，实现见 [temporal_spatial_coe.py](src/stmoe_imputer/models/temporal_spatial_coe.py)。
+当前 B3 由输入编码、逐层独立路由器、跨层共享专家池和预测头组成，关闭额外点级共享分支，开启 completion_feedback 并直接传递每轮专家融合输出。当前主骨干采用四轮、共享八专家池、每轮稀疏激活 Top-2：`T`（时间卷积）、`S`（空间卷积）、`TD`（空洞时间卷积）、`SD`（空洞空间卷积）、`TA`（时间注意力）、`ST`（局部时空联合）、`TL`（较大时间核）、`SL`（较大空间核）。每层可读取上层更新后的状态，固定链、Soft 路由和 Top-K 均可由配置控制。详细设计见 [v24 方案](model_designs/v24_Temporal-Spatial_Chain-of-Experts_详细方案.md)，实现见 [temporal_spatial_coe.py](src/stmoe_imputer/models/temporal_spatial_coe.py)。
+
+## 后续实验默认训练协议（2026-09-29）
+
+后续新实验统一使用 **100 epoch，初始学习率 `1e-3`，余弦下限 `3e-4`，每 5 epoch 验证一次**。按验证 MAE 保存 `checkpoints/best.pth`；训练正常结束或触发早停时，另存实际最后一轮的 `checkpoints/last.pth`，最终测试仍使用 best。
+
+当前 v24 四轮八专家主入口、三种直接传递结构基准、v25 通用消融入口已同步这些默认值。历史专用实验计划及已有输出中的配置保留原协议；新建实验时应使用本节协议，不能直接沿用历史脚本的旧学习率。
+
+调度配置为 `type=cosine, total_epochs=100, eta_min=3e-4, reach_min_at_last_epoch=true`。训练器在每轮结束后调用调度器，因此该选项使用 99 次衰减间隔：第 1 轮实际使用 `1e-3`，第 100 轮实际使用 `3e-4`，之后保持下限。`--epochs N` 会同步调整周期；单轮冒烟测试仅使用初始学习率。
+
+`last.pth` 在恢复 best 权重之前原子写入，包含最后一轮模型、优化器、学习率调度器、AMP scaler、各进程随机状态、DataLoader 随机状态、配置和轮次；`training_state` 另记录下一轮编号、最佳验证指标及早停计数。它保存完整训练状态，不只是模型权重。默认 `save_last_checkpoint=true`，显式关闭可用于不落盘的冒烟测试；本次新增的是状态保存，命令行训练入口目前尚未提供 `--resume`。已结束的历史实验不能据 best 权重补造 last。
+
+## 当前 CoE 基础基线与新实验
+
+后续结构改进统一对照 **B3：四轮共享八专家、原生 Top-2、direct 更新、completion_feedback=true**。批量大小默认全局32，单卡顺序运行。历史 no-feedback 基线保持原实验身份，不能当作 B3。精确 B1/B2/B3 配置、本轮 B3→C3 的机制与运行命令见 [B3/C3 实验说明](scripts/v24/README_B3_C3.md)。
 
 ## 安装
 
@@ -37,14 +51,14 @@ python scripts/generate_fixed_masks.py \
 
 已有 mask 文件时先核对其生成设置；重新生成会改变实验输入。其他缺失模式和双 mask 对照见 [双 mask 实验说明](scripts/v24/README_DUAL_MASK.md)。
 
-## 运行 v24 实验
+## 运行历史 v24 实验入口
 
-当前四轮八专家主骨干使用 **TaxiBJ/BikeNYC random 0.4 九类混合 mask**、共享专家池、每轮 Top-2，前 3 个 epoch 软预热、随后 3 个 epoch 过渡。根据最近的共享池对照结果，主配置关闭显式补全反馈；路由仍逐轮读取更新后的隐藏状态。默认 80 epoch，可用 `--epochs` 调整。先检查计划，再在本地启动（单卡或双卡 DDP）：
+以下早期四轮八专家入口使用 **TaxiBJ/BikeNYC random 0.4 九类混合 mask**、共享专家池、每轮 Top-2，前 3 个 epoch 软预热、随后 3 个 epoch 过渡。根据最近的共享池对照结果，主配置关闭显式补全反馈；路由仍逐轮读取更新后的隐藏状态。默认 100 epoch，可用 `--epochs` 调整。先检查计划，再在本地启动（单卡或双卡 DDP）：
 
 ```bash
 python -u scripts/v24/run_coe_main_s4_e8.py --dataset taxibj --gpu 0 --dry-run
 tmux new-session -s v24-coe-main \
-  'python -u scripts/v24/run_coe_main_s4_e8.py --dataset taxibj --gpu 0 --epochs 80'
+  'python -u scripts/v24/run_coe_main_s4_e8.py --dataset taxibj --gpu 0 --epochs 100'
 # 双卡时把 --gpu 0 改为 --gpus 0,1；BikeNYC 时使用 --dataset bikenyc。
 ```
 
@@ -113,7 +127,7 @@ outputs/v24-COE/TaxiBJ/custom/<YYYYMMDD_HHMMSS_核心名_seedN>/random/rate0.4/<
     └── metrics.jsonl
 ```
 
-队列另在 `outputs/v24-COE/experiments/<队列名>/` 保存生成的配置、启动日志和完成回执 JSON。每次按**验证 MAE** 选最佳轮次，再用对应模型测试一次。历史 Top-2 和深度池实验设为 `save_best_checkpoint=false`：最佳状态只在训练进程的 CPU 内存中保留，不写 `best.pt`。五组精简实验为了在最佳权重上完成验证集 Oracle 诊断和复现，统一保存 `checkpoints/best.pt`；新四轮八专家主骨干不运行 Oracle，`save_best_checkpoint=false`。路由使用率、每层选择与梯度等详细指标保存在日志中。单种子短训结果适合筛选候选，不能单独证明结构优越性。
+队列另在 `outputs/v24-COE/experiments/<队列名>/` 保存生成的配置、启动日志和完成回执 JSON。每次按**验证 MAE** 选最佳轮次，再用对应模型测试一次。历史 Top-2 和深度池实验设为 `save_best_checkpoint=false`：最佳状态只在训练进程的 CPU 内存中保留，不写 `best.pt`。五组精简实验为了在最佳权重上完成验证集 Oracle 诊断和复现，统一保存 `checkpoints/best.pt`；当前四轮八专家主骨干不运行 Oracle，保存 `best.pth` 与 `last.pth`。路由使用率、每层选择与梯度等详细指标保存在日志中。单种子短训结果适合筛选候选，不能单独证明结构优越性。
 
 ## 代码位置
 

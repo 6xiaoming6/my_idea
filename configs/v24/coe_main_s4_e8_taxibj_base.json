@@ -4,7 +4,7 @@
   "device": "cuda",
   "data": {
     "dataset_name": "TaxiBJ",
-    "batch_size": 16,
+    "batch_size": 32,
     "num_workers": 0,
     "pin_memory": true,
     "drop_last": false,
@@ -128,7 +128,7 @@
     "balance_importance": "candidate"
   },
   "train": {
-    "epochs": 80,
+    "epochs": 100,
     "val_epoch": 5,
     "lr_main": 0.001,
     "weight_decay": 0.0001,
@@ -137,16 +137,19 @@
     "save_every": 10,
     "scheduler": {
       "type": "cosine",
-      "total_epochs": 80,
-      "eta_min": 1e-06
+      "total_epochs": 100,
+      "eta_min": 0.0003,
+      "reach_min_at_last_epoch": true
     },
     "early_stopping": {
       "enabled": false
     },
-    "save_best_checkpoint": false,
+    "save_best_checkpoint": true,
     "router_grad_diagnostic_every": 0,
     "full_checkpoint": true,
     "measure_forward_latency": true,
-    "oracle_last_step_samples": 0
+    "oracle_last_step_samples": 0,
+    "best_checkpoint_name": "best.pth",
+    "save_last_checkpoint": true
   }
 }

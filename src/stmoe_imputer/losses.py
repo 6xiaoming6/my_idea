@@ -86,7 +86,11 @@ def compute_coe_loss(outputs: dict, batch: dict, cfg: dict) -> tuple[torch.Tenso
         ]).mean()
 
     balance_steps = main.new_zeros(len(coe["predictions"]), dtype=torch.float32)
-    supervised_samples = selected.flatten(start_dim=1).any(dim=1)
+    route_selected = selected
+    if coe.get("routing_region_count", 1) > 1:
+        from .models.local_support_coe import split_regions
+        route_selected = split_regions(selected, coe["region_size"])
+    supervised_samples = route_selected.flatten(start_dim=1).any(dim=1)
     if (
         coe.get("use_routed", True)
         and coe.get("routing_mode", "hard") in ("hard", "soft")
@@ -104,7 +108,7 @@ def compute_coe_loss(outputs: dict, batch: dict, cfg: dict) -> tuple[torch.Tenso
             if (
                 probs.ndim != 3
                 or probs.shape != weights.shape
-                or probs.shape[:2] != (target.shape[0], len(coe["predictions"]))
+                or probs.shape[:2] != (route_selected.shape[0], len(coe["predictions"]))
                 or probs.shape[-1] < 1
             ):
                 raise ValueError("CoE routing tensors must match the supervised batch and prediction rounds")

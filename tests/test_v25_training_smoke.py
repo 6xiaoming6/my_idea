@@ -10,6 +10,8 @@ import sys
 import tempfile
 import unittest
 
+import torch
+
 from stmoe_imputer.config import deep_update
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -72,6 +74,13 @@ class V25TrainingSmokeTests(unittest.TestCase):
             self.assertEqual(receipt['completed_epochs'], 1)
             run_dir = Path(receipt['run_dir'])
             self.assertTrue((run_dir / 'checkpoints/best.pth').is_file())
+            last_path = run_dir / 'checkpoints/last.pth'
+            self.assertEqual(receipt['last_checkpoint'], str(last_path))
+            last = torch.load(last_path, map_location='cpu', weights_only=True)
+            self.assertEqual(last['epoch'], 1)
+            self.assertTrue(last['optimizer']['state'])
+            self.assertEqual(len(last['rng_states']), world_size)
+            self.assertEqual(last['training_state']['next_epoch'], 2)
             self.assertTrue(runner._receipt_valid(receipt_path, cfg))
             self.assertIn('coe_step2_accepted_harm_rate', receipt['test'])
             self.assertIn('coe_all_steps_monotonic_sample_rate', receipt['test'])

@@ -28,7 +28,7 @@ def main() -> int:
     devices.add_argument("--gpu", help="One physical GPU for a single-process job")
     devices.add_argument("--gpus", help="Two physical GPUs for one DDP job (default: 0,1)")
     parser.add_argument("--epochs", type=int, default=100)
-    parser.add_argument("--batch-size", type=int, help="Global batch size; default doubles the policy value for two GPUs")
+    parser.add_argument("--batch-size", type=int, help="Global batch size; defaults to the policy value (32), independent of GPU count")
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--summary-only", action="store_true")
     args = parser.parse_args()
@@ -52,11 +52,11 @@ def main() -> int:
     policy_config = runner.load(policy)
     study = args.study or policy_config["default_study"]
     batch_size = args.batch_size
-    if batch_size is None and len(selected) == 2:
+    if batch_size is None:
         configured = policy_config.get("batch_size")
         if type(configured) is not int or configured <= 0:
-            parser.error("Two-GPU default requires a positive policy batch_size")
-        batch_size = 2 * configured
+            parser.error("Default requires a positive policy batch_size")
+        batch_size = configured
     if batch_size is not None and batch_size % len(selected):
         parser.error("Global batch size must be divisible by the number of GPUs")
     command = [sys.executable, "-u", str(ROOT / "scripts/v24/run_experiments.py"),

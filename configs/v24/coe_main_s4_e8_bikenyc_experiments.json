@@ -2,27 +2,31 @@
   "schema_version": 1,
   "output_dir": "outputs/v24-COE/experiments/coe_main_s4_e8",
   "cpu_threads": 2,
-  "batch_size": 16,
+  "batch_size": 32,
   "seeds": [
     7
   ],
   "extra_inputs": [],
   "training": {
-    "epochs": 80,
+    "epochs": 100,
     "val_epoch": 5,
-    "save_best_checkpoint": false,
+    "save_best_checkpoint": true,
     "early_stopping": {
       "enabled": false
     },
     "scheduler": {
       "type": "cosine",
-      "total_epochs": 80,
-      "eta_min": 1e-06
+      "total_epochs": 100,
+      "eta_min": 0.0003,
+      "reach_min_at_last_epoch": true
     },
     "router_grad_diagnostic_every": 0,
     "full_checkpoint": true,
     "measure_forward_latency": true,
-    "oracle_last_step_samples": 0
+    "oracle_last_step_samples": 0,
+    "lr_main": 0.001,
+    "best_checkpoint_name": "best.pth",
+    "save_last_checkpoint": true
   },
   "studies": {
     "coe_main_s4_e8_bikenyc": {

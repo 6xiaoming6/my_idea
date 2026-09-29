@@ -86,7 +86,7 @@ class RunnerIntegrationTests(unittest.TestCase):
         cls.env = dict(os.environ, MPLCONFIGDIR=str(cls.directory/'mpl'),
                        XDG_CACHE_HOME=str(cls.directory/'cache'), OMP_NUM_THREADS='2', MKL_NUM_THREADS='2')
         value = {'schema_version': 1, 'output_dir': str(cls.directory/'results'), 'cpu_threads': 2,
-                 'seeds': [7], 'training': {'epochs': 3, 'val_epoch': 2, 'save_best_checkpoint': False},
+                 'seeds': [7], 'training': {'epochs': 3, 'val_epoch': 2, 'save_best_checkpoint': False, 'save_last_checkpoint': False},
                  'studies': {'smoke': {'base_config': str(ROOT/'configs/v24/smoke.json'),
                                       'stage': 'pilot', 'synthetic': True, 'variants': ['full', 'fixed_ts']}}}
         cls.policy.write_text(json.dumps(value))

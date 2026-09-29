@@ -329,7 +329,8 @@ def validate_plan(manifest):
                     cfg["loss"].get("lambda_coe_balance") != 0.01 or
                     train.get("oracle_last_step_samples", 0) != 0 or
                     train.get("partner_probe") is not None or
-                    train.get("save_best_checkpoint") is not False or
+                    train.get("save_best_checkpoint") is not True or
+                    train.get("best_checkpoint_name") != "best.pth" or
                     train.get("scheduler", {}).get("total_epochs") != train["epochs"] or
                     cfg["data"].get("mask", {}).get("pattern") != "random" or
                     cfg["data"].get("mask", {}).get("missing_rate") != 0.4 or

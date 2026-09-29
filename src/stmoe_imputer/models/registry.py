@@ -34,4 +34,7 @@ def build_model_backbone(cfg: dict) -> nn.Module:
         raise ValueError(
             f"Unknown model architecture {architecture!r}; supported: {supported}"
         ) from error
+    if architecture == "v24_ts_coe" and cfg["model"].get("coe", {}).get("local_routing", {}).get("enabled", False):
+        from .local_support_coe import LocalSupportCoE
+        builder = LocalSupportCoE.from_config
     return builder(cfg)

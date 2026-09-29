@@ -11,7 +11,7 @@ v25 使用独立的 `v25_ras_coe` 架构、`src/v25_ras_coe/` 模型/损失/指�
 | A4 | 开启 | latent selective commit | 0.1 | 关闭 |
 | A5 | 开启 | latent selective commit | 0.1 | 开启 |
 
-默认 TaxiBJ、seed 7、100 epoch、每 5 epoch 验证、双卡全局 batch 32。六组串行运行；`best.pth` 按验证 MAE 更新，最终测试前恢复。正式长训前先按方案运行 20 epoch pilot，确认机制指标和训练稳定性；BikeNYC 使用 `--dataset bikenyc`。不包括多尺度。
+默认 TaxiBJ、seed 7、100 epoch、每 5 epoch 验证、双卡全局 batch 32。六组串行运行；学习率从 `1e-3` 余弦衰减至最后一轮 `3e-4`。`best.pth` 按验证 MAE 更新，最终测试前恢复；恢复前另存最后一轮的完整训练状态 `last.pth`。正式长训前先按方案运行 20 epoch pilot，确认机制指标和训练稳定性；BikeNYC 使用 `--dataset bikenyc`。不包括多尺度。
 
 ```bash
 python -u scripts/v25/run_ablations.py --dataset taxibj --gpus 0,1 --dry-run

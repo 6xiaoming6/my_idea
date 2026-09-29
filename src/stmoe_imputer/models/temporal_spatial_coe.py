@@ -608,6 +608,9 @@ class TemporalSpatialCoE(nn.Module):
                 else self.step_pattern_experts[step - 1])
         return tuple(pool[name] for name in self.expert_names)
 
+    def _observation_support(self, mask: torch.Tensor) -> torch.Tensor:
+        return compute_observation_support(mask, self.temporal_kernel, self.spatial_kernel).to(mask.dtype)
+
     def _position(self, x: torch.Tensor) -> torch.Tensor:
         b, _, t, h, w = x.shape
         axes = [
@@ -873,9 +876,7 @@ class TemporalSpatialCoE(nn.Module):
             raise ValueError("Input observed values must be finite; mark missing values with m_f=0")
         original_mask = observed.to(x_f.dtype)
         x_input = torch.where(observed, x_f, torch.zeros_like(x_f))
-        support = compute_observation_support(
-            original_mask, self.temporal_kernel, self.spatial_kernel
-        ).to(x_f.dtype)
+        support = self._observation_support(original_mask)
         missing = 1 - original_mask
         support_missing = missing.repeat(1, len(SUPPORT_FEATURE_NAMES), 1, 1, 1)
         support_summary = torch.cat(

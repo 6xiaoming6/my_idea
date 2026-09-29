@@ -31,6 +31,7 @@ def save_checkpoint(
     scheduler=None,
     scaler=None,
     rng_states=None,
+    training_state=None,
 ) -> None:
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -43,6 +44,7 @@ def save_checkpoint(
         "scheduler": scheduler.state_dict() if scheduler is not None else None,
         "scaler": scaler.state_dict() if scaler is not None else None,
         "rng_states": rng_states,
+        "training_state": training_state,
         "torch_version": str(torch.__version__),
         "experiment_suite_fingerprint": cfg.get("experiment_suite_fingerprint"),
     }
@@ -59,6 +61,9 @@ def load_checkpoint(
     model: torch.nn.Module,
     optimizer: torch.optim.Optimizer | None = None,
     map_location: str | torch.device = "cpu",
+    *,
+    scheduler=None,
+    scaler=None,
 ) -> dict:
     checkpoint = torch.load(path, map_location=map_location)
     backbone = getattr(model, "main_branch", model)
@@ -75,4 +80,8 @@ def load_checkpoint(
     model.load_state_dict(checkpoint["model"])
     if optimizer is not None and checkpoint.get("optimizer") is not None:
         optimizer.load_state_dict(checkpoint["optimizer"])
+    if scheduler is not None and checkpoint.get("scheduler") is not None:
+        scheduler.load_state_dict(checkpoint["scheduler"])
+    if scaler is not None and checkpoint.get("scaler") is not None:
+        scaler.load_state_dict(checkpoint["scaler"])
     return checkpoint

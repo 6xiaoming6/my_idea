@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections import defaultdict
+import math
 import time
 
 import torch
@@ -138,15 +139,34 @@ class WarmupCosineLR(torch.optim.lr_scheduler.LRScheduler):
         ]
 
 
+class EndpointCosineAnnealingLR(torch.optim.lr_scheduler.CosineAnnealingLR):
+    """Cosine decay that stays at eta_min after the configured final epoch."""
+
+    def _get_closed_form_lr(self):
+        progress = min(self.last_epoch, self.T_max) / self.T_max
+        return [self.eta_min + (base_lr - self.eta_min) *
+                (1.0 + math.cos(math.pi * progress)) / 2.0 for base_lr in self.base_lrs]
+
+    def get_lr(self):
+        return self._get_closed_form_lr()
+
+
 def build_scheduler(optimizer: torch.optim.Optimizer, cfg: dict) -> torch.optim.lr_scheduler.LRScheduler | None:
     sched_cfg = cfg["train"].get("scheduler", {})
     sched_type = sched_cfg.get("type", "none")
     if sched_type == "none":
         return None
     if sched_type == "cosine":
-        return torch.optim.lr_scheduler.CosineAnnealingLR(
+        total_epochs = int(sched_cfg.get("total_epochs", cfg["train"]["epochs"]))
+        # step() runs after each epoch: N training epochs use scheduler steps 0..N-1.
+        # Opt-in keeps historical experiment schedules unchanged.
+        scheduler_class = torch.optim.lr_scheduler.CosineAnnealingLR
+        if sched_cfg.get("reach_min_at_last_epoch", False):
+            total_epochs = max(1, total_epochs - 1)
+            scheduler_class = EndpointCosineAnnealingLR
+        return scheduler_class(
             optimizer,
-            T_max=sched_cfg.get("total_epochs", cfg["train"]["epochs"]),
+            T_max=total_epochs,
             eta_min=sched_cfg.get("eta_min", 1e-6),
         )
     if sched_type == "warmup_cosine":
@@ -564,7 +584,7 @@ def train_one_epoch(
             coe_quality.update(outputs, batch)
         if is_coe and 'mask_family' in batch:
             # Labels are introduced after forward and used only for diagnostics.
-            outputs['coe']['mask_family'] = batch['mask_family']
+            outputs['coe']['mask_family'] = batch['mask_family'].repeat_interleave(outputs['coe'].get('routing_region_count', 1))
         _update_routing_metrics(routing_metrics, outputs)
         _append_lr_logs(logs, optimizer)
         progress.set_postfix(loss=logs["loss"][-1], mae=logs["mae"][-1], rmse=logs["rmse"][-1])
@@ -658,7 +678,7 @@ def evaluate(
         if coe_quality is not None:
             coe_quality.update(outputs, batch)
         if resolve_architecture(cfg) == "v24_ts_coe" and 'mask_family' in batch:
-            outputs['coe']['mask_family'] = batch['mask_family']
+            outputs['coe']['mask_family'] = batch['mask_family'].repeat_interleave(outputs['coe'].get('routing_region_count', 1))
         _update_routing_metrics(routing_metrics, outputs)
     logs, exact_metrics, active_exact_metrics, routing_metrics, coe_quality, counters = _distributed_merge(
         logs, exact_metrics, active_exact_metrics, routing_metrics, coe_quality, counters,

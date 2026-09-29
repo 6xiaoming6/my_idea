@@ -337,6 +337,9 @@ def main() -> None:
     save_best = cfg["train"].get("save_best_checkpoint", True)
     if type(save_best) is not bool:
         raise ValueError("train.save_best_checkpoint must be true or false")
+    save_last = cfg["train"].get("save_last_checkpoint", True)
+    if type(save_last) is not bool:
+        raise ValueError("train.save_last_checkpoint must be true or false")
     best_checkpoint_name = cfg["train"].get("best_checkpoint_name", "best.pt")
     if best_checkpoint_name not in ("best.pt", "best.pth"):
         raise ValueError("train.best_checkpoint_name must be best.pt or best.pth")
@@ -371,7 +374,7 @@ def main() -> None:
         run_dir = _unique_run_dir(run_base_dir, run_id)
         ckpt_dir = run_dir / "checkpoints"
         log_dir = run_dir / "logs"
-        if save_best:
+        if save_best or save_last:
             ckpt_dir.mkdir(parents=True, exist_ok=True)
         log_dir.mkdir(parents=True, exist_ok=True)
         save_config(cfg, run_dir / "config.json")
@@ -385,6 +388,7 @@ def main() -> None:
     run_dir = Path(run_path)
     ckpt_dir = run_dir / "checkpoints"
     best_path = ckpt_dir / best_checkpoint_name
+    last_path = ckpt_dir / "last.pth"
     log_dir = run_dir / "logs"
 
     train_ds, val_ds = build_datasets(cfg, args.train_npz, args.val_npz, synthetic=args.synthetic)
@@ -579,6 +583,34 @@ def main() -> None:
                 if validations_without_improvement >= patience:
                     logger.log_message(f"Early stopping at epoch {epoch} ({monitor}={current:.6f})")
                     break
+        # Save the final training state BEFORE loading the validation-best weights.
+        # All ranks join state gathering; only rank 0 writes the atomic checkpoint.
+        if save_last and completed_epochs:
+            local_rng = _rng_snapshot(device)
+            for label, loader in (("train", train_loader), ("val", val_loader), ("test", test_loader)):
+                if loader is not None:
+                    generator = getattr(loader, "generator", None)
+                    dataset_generator = getattr(loader.dataset, "generator", None)
+                    local_rng[f"{label}_loader"] = generator.get_state().tolist() if generator is not None else None
+                    local_rng[f"{label}_dataset"] = dataset_generator.get_state().tolist() if dataset_generator is not None else None
+            rng_states = [None] * world_size
+            if world_size > 1:
+                dist.all_gather_object(rng_states, local_rng)
+            else:
+                rng_states[0] = local_rng
+            if is_main:
+                save_checkpoint(
+                    last_path, raw_model, optimizer, completed_epochs, metrics, cfg,
+                    scheduler=scheduler, scaler=scaler, rng_states=rng_states,
+                    training_state={
+                        "next_epoch": completed_epochs + 1, "world_size": world_size,
+                        "best_epoch": best_epoch, "best_val_mae": best_mae,
+                        "best_checkpoint": str(best_path) if save_best else None,
+                        "early_best": early_best,
+                        "validations_without_improvement": validations_without_improvement,
+                        "validation_count": validation_count, "history": history,
+                    },
+                )
         if world_size > 1:
             dist.barrier()
         if save_best:
@@ -649,6 +681,7 @@ def main() -> None:
             "test_mape": f"{test_logs['mape']:.6f}" if test_logs and "mape" in test_logs else "n/a",
             "test_time_sec": f"{test_time:.2f}",
             "best_checkpoint": str(best_path) if best_epoch and save_best else "n/a",
+            "last_checkpoint": str(last_path) if save_last and last_path.is_file() else "n/a",
             "best_state_source": "checkpoint" if save_best else "cpu_memory",
             "metrics_jsonl": str(log_dir / "metrics.jsonl"),
         }
@@ -690,6 +723,7 @@ def main() -> None:
             "status": status, "run_dir": str(run_dir.resolve()),
             "config_sha256": _config_hash(cfg), "completed_epochs": completed_epochs,
             "validation_count": validation_count, "best_epoch": best_epoch,
+            "last_checkpoint": str(last_path) if save_last else None,
             "best_val_mae": best_mae, "test": test_logs,
             "best_state_source": "checkpoint" if save_best else "cpu_memory",
             "total_time_sec": total_time, "world_size": world_size,

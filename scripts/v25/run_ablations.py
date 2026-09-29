@@ -194,7 +194,7 @@ def main() -> None:
     gpu_ids = [args.gpu] if args.gpu is not None else [int(item) for item in args.gpus.split(',')]
     if len(gpu_ids) not in (1, 2) or len(gpu_ids) != len(set(gpu_ids)) or min(gpu_ids) < 0:
         parser.error('use one --gpu or two distinct --gpus indices')
-    batch_size = args.batch_size or (16 * len(gpu_ids))
+    batch_size = 32 if args.batch_size is None else args.batch_size
     if batch_size < 1 or batch_size % len(gpu_ids):
         parser.error('global batch size must be positive and divisible by GPU count')
     plan = _plan(args.dataset, args.epochs, batch_size, args.seeds)

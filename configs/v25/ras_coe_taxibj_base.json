@@ -4,7 +4,7 @@
   "device": "cuda",
   "data": {
     "dataset_name": "TaxiBJ",
-    "batch_size": 16,
+    "batch_size": 32,
     "num_workers": 0,
     "pin_memory": true,
     "drop_last": false,
@@ -149,7 +149,8 @@
     "scheduler": {
       "type": "cosine",
       "total_epochs": 100,
-      "eta_min": 1e-06
+      "eta_min": 0.0003,
+      "reach_min_at_last_epoch": true
     },
     "early_stopping": {
       "enabled": false
@@ -165,6 +166,7 @@
       "min_scale": 0.5,
       "grad_diagnostic_interval_batches": 0
     },
-    "best_checkpoint_name": "best.pth"
+    "best_checkpoint_name": "best.pth",
+    "save_last_checkpoint": true
   }
 }

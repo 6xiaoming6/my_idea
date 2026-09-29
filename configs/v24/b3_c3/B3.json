@@ -1,0 +1,79 @@
+{
+  "model": {
+    "architecture": "v24_ts_coe",
+    "main": {
+      "use_multiscale": false,
+      "scale_mode": "fine"
+    },
+    "coe": {
+      "expert_pool": [
+        "T",
+        "S",
+        "TD",
+        "SD",
+        "TA",
+        "ST",
+        "TL",
+        "SL"
+      ],
+      "routing_mode": "hard",
+      "pair_mode": "native",
+      "use_shared": false,
+      "use_routed": true,
+      "router_state": "dynamic",
+      "expert_state": "dynamic",
+      "acceptance": "none",
+      "repair_acceptance": "none",
+      "fusion_mode": "original",
+      "partner_fusion": "individual",
+      "partner_aux_head_only": false,
+      "previous_expert_context": false,
+      "global_route_weights": false,
+      "router_input_noise_std": 0.0,
+      "router_input_noise_steps": 0,
+      "routing_warmup_epochs": 0,
+      "routing_transition_epochs": 0,
+      "pair_dense_warmup_steps": 0,
+      "state_update_mode": "direct",
+      "router_features": "legacy",
+      "local_routing": {
+        "enabled": false
+      },
+      "num_steps": 4,
+      "top_k": 2,
+      "expert_sharing": "shared",
+      "completion_feedback": true,
+      "fixed_expert_steps": [
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    "aux": {
+      "enabled": false
+    }
+  },
+  "data": {
+    "batch_size": 32,
+    "multiscale": false
+  },
+  "train": {
+    "epochs": 100,
+    "val_epoch": 5,
+    "lr_main": 0.001,
+    "scheduler": {
+      "type": "cosine",
+      "total_epochs": 100,
+      "eta_min": 0.0003,
+      "reach_min_at_last_epoch": true
+    },
+    "save_best_checkpoint": true,
+    "save_last_checkpoint": true,
+    "best_checkpoint_name": "best.pth",
+    "full_checkpoint": true,
+    "early_stopping": {
+      "enabled": false
+    }
+  }
+}

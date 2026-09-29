@@ -27,7 +27,7 @@ def main() -> int:
     devices = parser.add_mutually_exclusive_group()
     devices.add_argument("--gpu", help="One physical GPU for a single-process job")
     devices.add_argument("--gpus", help="Two physical GPUs for one DDP job (default: 0,1)")
-    parser.add_argument("--epochs", type=int, default=80)
+    parser.add_argument("--epochs", type=int, default=100)
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--summary-only", action="store_true")
     args = parser.parse_args()

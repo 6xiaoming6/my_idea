@@ -2,7 +2,7 @@
   "schema_version": 1,
   "output_dir": "outputs/v24-COE/experiments/coe_direct_baselines",
   "cpu_threads": 2,
-  "batch_size": 16,
+  "batch_size": 32,
   "seeds": [
     7
   ],
@@ -19,13 +19,16 @@
     "scheduler": {
       "type": "cosine",
       "total_epochs": 100,
-      "eta_min": 1e-06
+      "eta_min": 0.0003,
+      "reach_min_at_last_epoch": true
     },
     "router_grad_diagnostic_every": 0,
     "full_checkpoint": true,
     "measure_forward_latency": true,
     "oracle_last_step_samples": 0,
-    "best_checkpoint_name": "best.pth"
+    "best_checkpoint_name": "best.pth",
+    "lr_main": 0.001,
+    "save_last_checkpoint": true
   },
   "studies": {
     "coe_direct_baselines_taxibj": {
