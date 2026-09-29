@@ -35,6 +35,40 @@ class LocalSupportTests(unittest.TestCase):
         torch.testing.assert_close(a['x_hat_main'],b['x_hat_main'],atol=2e-6,rtol=2e-6)
         self.assertTrue(torch.equal(a['coe']['selected_experts'],b['coe']['selected_experts']))
 
+    def test_no_feedback_keeps_initial_completion_but_updates_hidden(self):
+        for local in (False, True):
+            with self.subTest(local=local):
+                cfg = config(local)
+                self.assertFalse(cfg['model']['coe']['completion_feedback'])
+                model = DualBranchSTImputer.from_config(cfg).eval()
+                backbone = model.main_branch
+                projections, features = [], []
+                handles = [backbone.state_projection.register_forward_pre_hook(
+                    lambda module, args: projections.append(args[0].detach().clone()))]
+                for router in backbone.routers:
+                    handles.append(router.register_forward_pre_hook(
+                        lambda module, args: features.append(args[0].detach().clone())))
+                x = torch.randn(2, 2, 3, 8, 8)
+                mask = (torch.rand_like(x) > .4).float()
+                with torch.no_grad():
+                    outputs = model({'x_f_obs': x * mask, 'm_f': mask})
+                for handle in handles:
+                    handle.remove()
+                dim, channels = backbone.dim, backbone.c_in
+                initial = outputs['coe']['initial_completion']
+                if local:
+                    initial = backbone._split(initial)
+                self.assertEqual(len(projections), 4)
+                for projected, routed in zip(projections, features):
+                    torch.testing.assert_close(projected[:, dim:dim+channels], initial, rtol=0, atol=0)
+                    torch.testing.assert_close(routed[:, 2*dim:2*dim+2*channels],
+                                               features[0][:, 2*dim:2*dim+2*channels], rtol=0, atol=0)
+                    change_start = 2*dim + 2*channels + 4*10*channels
+                    self.assertEqual(routed[:, change_start:change_start+2*channels].abs().max(), 0)
+                self.assertFalse(torch.equal(projections[0][:, :dim], projections[1][:, :dim]))
+                if local:
+                    self.assertEqual(len(outputs['coe']['support_history']), 4)
+
     def test_halo_execution_matches_each_full_grid_expert_including_edges(self):
         model=DualBranchSTImputer.from_config(config()).main_branch.eval()
         model._layout=(2,8,8)

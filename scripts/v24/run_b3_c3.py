@@ -19,7 +19,7 @@ sys.path.insert(0,str(Path(__file__).resolve().parent))
 from stmoe_imputer.config import deep_update
 from run_team_accept_v4 import check_gpu_idle
 
-LABELS={'B1':'moe_single_top8','B2':'moe_independent_top2','B3':'coe_feedback_base','C3':'coe_local_support'}
+LABELS={'B1':'moe_single_top8','B2':'moe_independent_top2','B3':'coe_nofeedback_base','C3':'coe_local_support'}
 
 def load(path):return json.loads(Path(path).read_text(encoding='utf-8'))
 def digest(obj):return hashlib.sha256(json.dumps(obj,sort_keys=True,ensure_ascii=False,separators=(',',':')).encode()).hexdigest()
@@ -38,7 +38,8 @@ def jobs(dataset='taxibj',epochs=100,batch_size=32,variants=('B3','C3')):
         cfg['output_dir']=str(ROOT/'outputs/v24-COE')
         cfg['train']['epochs']=epochs;cfg['train']['scheduler']['total_epochs']=epochs
         for key in ('lr_router','lr_aux','lr_v14','partner_probe'):cfg['train'].pop(key,None)
-        cfg['experiment_plan']={'suite':'b3_c3','variant':variant,'baseline':'B3_feedback_direct_shared_top2'}
+        assert cfg['model']['coe']['completion_feedback'] is False
+        cfg['experiment_plan']={'suite':'b3_c3','variant':variant,'baseline':'B3_nofeedback_direct_shared_top2'}
         assert cfg['data']['train_mask_diversity']['families']==cfg['data']['eval_mask_diversity']['families']
         assert cfg['data']['train_mask_diversity']['rates']==cfg['data']['eval_mask_diversity']['rates']==[.4]
         result.append({'variant':variant,'name':LABELS[variant],'config':cfg,

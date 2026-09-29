@@ -42,7 +42,7 @@
       "num_steps": 4,
       "top_k": 2,
       "expert_sharing": "per_step",
-      "completion_feedback": true,
+      "completion_feedback": false,
       "fixed_expert_steps": [
         null,
         null,
@@ -74,6 +74,17 @@
     "full_checkpoint": true,
     "early_stopping": {
       "enabled": false
-    }
+    },
+    "optimizer": "AdamW",
+    "weight_decay": 0.0001,
+    "grad_clip_norm": 1.0,
+    "amp": true
+  },
+  "loss": {
+    "type": "l1",
+    "lambda_coe_mid": 0.0,
+    "lambda_coe_balance": 0.01,
+    "lambda_coe_z": 0.0,
+    "balance_importance": "candidate"
   }
 }

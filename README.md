@@ -2,7 +2,7 @@
 
 当前 `v24-COE` 分支研究 **Temporal-Spatial Chain-of-Experts（TS-CoE）**：在原始时空网格上逐层更新补全状态，每层路由器按当前观测和状态从共享专家池中选择专家。`top_k` 表示**每层同时激活的专家数**；被选专家的权重归一化后融合。当前 v24 模型只使用 fine 尺度，不构造 mid/coarse 特征。早期多尺度模型和 v14-single 实验代码仍在仓库中，但它们不是 v24 训练入口的默认架构。
 
-当前 B3 由输入编码、逐层独立路由器、跨层共享专家池和预测头组成，关闭额外点级共享分支，开启 completion_feedback 并直接传递每轮专家融合输出。当前主骨干采用四轮、共享八专家池、每轮稀疏激活 Top-2：`T`（时间卷积）、`S`（空间卷积）、`TD`（空洞时间卷积）、`SD`（空洞空间卷积）、`TA`（时间注意力）、`ST`（局部时空联合）、`TL`（较大时间核）、`SL`（较大空间核）。每层可读取上层更新后的状态，固定链、Soft 路由和 Top-K 均可由配置控制。详细设计见 [v24 方案](model_designs/v24_Temporal-Spatial_Chain-of-Experts_详细方案.md)，实现见 [temporal_spatial_coe.py](src/stmoe_imputer/models/temporal_spatial_coe.py)。
+当前 B3 由输入编码、逐层独立路由器、跨层共享专家池和预测头组成，关闭额外点级共享分支，关闭 completion_feedback 并直接传递每轮专家融合输出。当前主骨干采用四轮、共享八专家池、每轮稀疏激活 Top-2：`T`（时间卷积）、`S`（空间卷积）、`TD`（空洞时间卷积）、`SD`（空洞空间卷积）、`TA`（时间注意力）、`ST`（局部时空联合）、`TL`（较大时间核）、`SL`（较大空间核）。每层可读取上层更新后的状态，固定链、Soft 路由和 Top-K 均可由配置控制。详细设计见 [v24 方案](model_designs/v24_Temporal-Spatial_Chain-of-Experts_详细方案.md)，实现见 [temporal_spatial_coe.py](src/stmoe_imputer/models/temporal_spatial_coe.py)。
 
 ## 后续实验默认训练协议（2026-09-29）
 
@@ -16,7 +16,7 @@
 
 ## 当前 CoE 基础基线与新实验
 
-后续结构改进统一对照 **B3：四轮共享八专家、原生 Top-2、direct 更新、completion_feedback=true**。批量大小默认全局32，单卡顺序运行。历史 no-feedback 基线保持原实验身份，不能当作 B3。精确 B1/B2/B3 配置、本轮 B3→C3 的机制与运行命令见 [B3/C3 实验说明](scripts/v24/README_B3_C3.md)。
+后续结构改进统一对照 **B3：四轮共享八专家、原生 Top-2、direct 更新、completion_feedback=false**。批量大小默认全局32，单卡顺序运行。前次开启反馈的 B3/C3 已中断，按关闭反馈的新配置从头训练；不继承旧权重。精确 B1/B2/B3 配置、本轮 B3→C3 的机制与运行命令见 [B3/C3 实验说明](scripts/v24/README_B3_C3.md)。
 
 ## 安装
 

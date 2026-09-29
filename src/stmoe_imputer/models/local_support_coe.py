@@ -80,11 +80,11 @@ class LocalSupportCoE(TemporalSpatialCoE):
         if (self.routing_mode != 'hard' or self.top_k != 2 or self.pair_mode != 'native'
                 or self.state_update_mode != 'direct' or self.use_shared or not self.use_routed
                 or self.router_state != 'dynamic' or self.expert_state != 'dynamic'
-                or not self.completion_feedback or self.acceptance != 'none'
+                or self.acceptance != 'none'
                 or self.router_features != 'legacy' or self.previous_expert_context
                 or self.global_route_weights or any(v is not None for v in self.fixed_expert_steps)
                 or self.routing_warmup_epochs or self.routing_transition_epochs):
-            raise ValueError('C3 requires native hard Top-2, direct dynamic feedback, no warmup or gates')
+            raise ValueError('C3 requires native hard Top-2, direct dynamic states, no warmup or gates')
         self.region_size = (8, 8)
         self.support_evolution = True
         self.support_enabled = True
