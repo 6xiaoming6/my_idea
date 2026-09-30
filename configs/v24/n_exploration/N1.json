@@ -1,0 +1,9 @@
+{
+  "base_variant": "B1",
+  "name": "primitive_moe_single",
+  "override": {
+    "model": {
+      "coe": {}
+    }
+  }
+}

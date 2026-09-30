@@ -37,4 +37,14 @@ def build_model_backbone(cfg: dict) -> nn.Module:
     if architecture == "v24_ts_coe" and cfg["model"].get("coe", {}).get("local_routing", {}).get("enabled", False):
         from .local_support_coe import LocalSupportCoE
         builder = LocalSupportCoE.from_config
+    if architecture == "v24_ts_coe" and cfg["model"].get("coe", {}).get("spatial_scale", {}).get("enabled", False):
+        if cfg["model"]["coe"].get("local_routing", {}).get("enabled", False):
+            raise ValueError("Spatial-scale baselines cannot enable C3 local routing")
+        from .spatial_scale_coe import SpatialScaleCoE
+        builder = SpatialScaleCoE.from_config
+    if architecture == "v24_ts_coe" and cfg["model"].get("coe", {}).get("round_memory", {}).get("enabled", False):
+        if any(cfg["model"]["coe"].get(name, {}).get("enabled", False) for name in ("local_routing", "spatial_scale")):
+            raise ValueError("Round-memory baseline cannot combine local routing or spatial scales")
+        from .round_memory_coe import RoundMemoryCoE
+        builder = RoundMemoryCoE.from_config
     return builder(cfg)

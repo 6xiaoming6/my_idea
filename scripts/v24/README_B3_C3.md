@@ -1,5 +1,7 @@
 # B3 基础基线与 C3 局部支撑链
 
+> 状态更新（2026-09-29）：B3 已完成，C3 已按用户要求停止并放弃；以下保留历史定义。后续运行 B1→B2→B4→B5，见 [结构基线实验说明](README_STRUCTURE_BASELINES.md)。
+
 2026-09-29 起后续 CoE 改进统一对照 **B3**：四轮、共享 T/S/TD/SD/TA/ST/TL/SL、每轮原生 Top-2、组内 softmax、direct hidden 更新、关闭 completion_feedback。没有额外 shared 分支、搭档路由、接受门、多尺度、残差累加或路由软预热。前次开启反馈的队列已中断；本轮从头训练，两组均不继承旧权重。
 
 B1/B2/B3 的精确覆盖配置在 `configs/v24/b3_c3/`：B1 单层独立 Top-8，B2 四层独立 Top-2 且反馈关闭，B3 四轮共享 Top-2 且反馈关闭。本轮只依次启动 B3、C3；B1/B2 需显式选择。

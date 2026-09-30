@@ -243,7 +243,7 @@ class CoERoutingMetricAccumulator(_CoERoutingTotals):
             return  # Shared-only has neither global nor conditional routes.
         groups = self._condition_groups(coe)
         if 'mask_family' in coe:
-            from .data.diverse_masks import FAMILIES
+            from .data.diverse_masks import ALL_FAMILIES as FAMILIES
             labels = coe['mask_family'].detach().cpu()
             if labels.shape != (weights.shape[0],) or not bool(((labels >= 0) & (labels < len(FAMILIES))).all()):
                 raise ValueError('Invalid diagnostic mask family labels')

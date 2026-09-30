@@ -1,0 +1,243 @@
+Training started: 2026-09-30 00:09:57
+------------------------------------------------------------------------------------------------
+Run
+  run_dir: /home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20260930_000956_primitive_moe_single_seed7/random/rate0.4/20260930_000956_seed7_bs32
+  command: /home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/experiments/n_exploration/taxibj/c172d067aabcbc2b/source_snapshot/scripts/train.py -c /home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/experiments/n_exploration/taxibj/c172d067aabcbc2b/configs/N1.json --name primitive_moe_single --no_plot --result-file /home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/experiments/n_exploration/taxibj/c172d067aabcbc2b/results/N1.attempt1.json --train_npz /home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/taxibj_train.npz --val_npz /home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/taxibj_val.npz --test_npz /home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/taxibj_test.npz
+  git_commit: c6c145ea448e2a2cf356b3b4f6f8b24d8bf16953
+  git_branch: v24-COE
+  git_dirty: True
+  config_sha256: 65cae4374ac01aff4d01f83a8e33f71f519a654215e79136db63cfd16378f4d2
+  python: 3.9.25
+  torch: 2.6.0+cu124
+  cuda_runtime: 12.4
+  train_npz: /home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/taxibj_train.npz
+  val_npz: /home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/taxibj_val.npz
+  test_npz: /home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/taxibj_test.npz
+  dataset: TaxiBJ
+  experiment_type: custom
+  variant: primitive_moe_single
+  train_samples: 2452
+  val_samples: 342
+  train_steps_per_epoch: 77
+  val_steps_per_epoch: 11
+  test_samples: 707
+  test_steps: 23
+  batch_size: 32
+  world_size: 1
+  per_device_batch_size: 32
+  mask_pattern: random
+  mask_rate_config: 0.4
+  train_mask: unknown
+  val_mask: unknown
+  data_shape: (2452, 2, 12, 32, 32)
+  device: cuda
+  device_name: NVIDIA GeForce RTX 3090
+  total_params: 205,121
+  trainable_params: 205,121
+Config
+{
+  "seed": 7,
+  "output_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE",
+  "device": "cuda",
+  "data": {
+    "dataset_name": "TaxiBJ",
+    "batch_size": 32,
+    "num_workers": 0,
+    "pin_memory": true,
+    "drop_last": false,
+    "mask": {
+      "pattern": "random",
+      "missing_rate": 0.4
+    },
+    "synthetic": {
+      "num_train": 128,
+      "num_val": 32,
+      "t": 12,
+      "h": 32,
+      "w": 32
+    },
+    "multiscale": false,
+    "loader_seed": 7,
+    "train_mask_diversity": {
+      "families": [
+        "random_point",
+        "node_outage",
+        "temporal_gap",
+        "spatial_region"
+      ],
+      "rates": [
+        0.4
+      ],
+      "seed": 20260917,
+      "resample_each_epoch": true
+    },
+    "eval_mask_diversity": {
+      "families": [
+        "random_point",
+        "node_outage",
+        "temporal_gap",
+        "spatial_region"
+      ],
+      "rates": [
+        0.4
+      ],
+      "seed": 20260917,
+      "resample_each_epoch": false
+    }
+  },
+  "model": {
+    "architecture": "v24_ts_coe",
+    "c_in": 2,
+    "main": {
+      "dim": 64,
+      "max_t": 12,
+      "h": 32,
+      "w": 32,
+      "scale_mode": "fine",
+      "use_multiscale": false
+    },
+    "coe": {
+      "num_steps": 1,
+      "expert_pool": [
+        "T",
+        "S",
+        "TD",
+        "SD",
+        "TA",
+        "ST",
+        "TL",
+        "SL"
+      ],
+      "routing_mode": "hard",
+      "fixed_path": null,
+      "fixed_expert_steps": [
+        null
+      ],
+      "router_state": "dynamic",
+      "expert_state": "dynamic",
+      "use_shared": false,
+      "use_routed": true,
+      "temperature": 1.0,
+      "temporal_kernel": 3,
+      "spatial_kernel": 3,
+      "temporal_dilation": 2,
+      "spatial_dilation": 2,
+      "attention_heads": 4,
+      "residual_init": 0.1,
+      "routing_warmup_epochs": 0,
+      "routing_transition_epochs": 0,
+      "uniform_mix_start": 0.5,
+      "sampling_temperature_start": 2.0,
+      "top_k": 8,
+      "router_hidden_dim": 64,
+      "pair_mode": "native",
+      "acceptance": "none",
+      "expert_sharing": "per_step",
+      "previous_expert_context": false,
+      "global_route_weights": false,
+      "router_input_noise_std": 0.0,
+      "router_input_noise_steps": 0,
+      "completion_feedback": false,
+      "repair_acceptance": "none",
+      "fusion_mode": "original",
+      "partner_fusion": "individual",
+      "partner_aux_head_only": false,
+      "pair_dense_warmup_steps": 0,
+      "state_update_mode": "direct",
+      "router_features": "legacy",
+      "local_routing": {
+        "enabled": false
+      }
+    },
+    "aux": {
+      "enabled": false,
+      "alpha_init": 0.0
+    }
+  },
+  "loss": {
+    "type": "l1",
+    "lambda_coe_mid": 0.0,
+    "lambda_coe_balance": 0.01,
+    "lambda_coe_z": 0.0,
+    "balance_importance": "candidate"
+  },
+  "train": {
+    "epochs": 100,
+    "val_epoch": 5,
+    "lr_main": 0.001,
+    "weight_decay": 0.0001,
+    "grad_clip_norm": 1.0,
+    "amp": true,
+    "save_every": 10,
+    "scheduler": {
+      "type": "cosine",
+      "total_epochs": 100,
+      "eta_min": 0.0003,
+      "reach_min_at_last_epoch": true
+    },
+    "early_stopping": {
+      "enabled": false
+    },
+    "save_best_checkpoint": true,
+    "router_grad_diagnostic_every": 0,
+    "full_checkpoint": true,
+    "measure_forward_latency": true,
+    "oracle_last_step_samples": 0,
+    "best_checkpoint_name": "best.pth",
+    "save_last_checkpoint": true,
+    "optimizer": "AdamW"
+  },
+  "experiment_plan": {
+    "suite": "n_exploration",
+    "variant": "N1",
+    "base_variant": "B1",
+    "protocol": {
+      "train_families": [
+        "random_point",
+        "node_outage",
+        "temporal_gap",
+        "spatial_region"
+      ],
+      "rate": 0.4,
+      "mask_seed": 20260917,
+      "evaluations": {
+        "in_distribution": {
+          "families": [
+            "random_point",
+            "node_outage",
+            "temporal_gap",
+            "spatial_region"
+          ],
+          "seed": 20260917
+        },
+        "unseen_combinations": {
+          "families": [
+            "node_plus_space",
+            "time_plus_space",
+            "node_plus_time"
+          ],
+          "seed": 20260918
+        },
+        "unseen_geometry": {
+          "families": [
+            "moving_region",
+            "multi_block"
+          ],
+          "seed": 20260919
+        }
+      },
+      "checkpoint_selection": "in_distribution_validation_only",
+      "note": "Same test windows across sets; masks are fixed and identical across models. New family/combination names never reach the model."
+    }
+  }
+}
+------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------
+ epoch         loss         mae         rmse     val_mae          lr   train_s    val_s   epoch_s   mem_gb   best
+-----------------------------------------------------------------------------------------------------------------
+     1    108.52908    108.5311     175.0078           -    1.00e-03      36.0      0.0      36.0     8.95       
+     2     94.58571     94.6377     160.9637           -    1.00e-03      35.8      0.0      35.8     8.95       
+     3     78.79962     78.7588     143.1103           -    9.99e-04      35.9      0.0      35.9     8.95       
+     4     67.67101     67.6740     129.5371           -    9.98e-04      36.0      0.0      36.0     8.95       
+     5     60.16565     60.1634     118.0122     49.7888    9.97e-04      36.1      2.4      38.4     8.95      *
+Best model at epoch 5 (val_mae=49.7888)

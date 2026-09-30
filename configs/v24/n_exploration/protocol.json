@@ -1,0 +1,38 @@
+{
+  "train_families": [
+    "random_point",
+    "node_outage",
+    "temporal_gap",
+    "spatial_region"
+  ],
+  "rate": 0.4,
+  "mask_seed": 20260917,
+  "evaluations": {
+    "in_distribution": {
+      "families": [
+        "random_point",
+        "node_outage",
+        "temporal_gap",
+        "spatial_region"
+      ],
+      "seed": 20260917
+    },
+    "unseen_combinations": {
+      "families": [
+        "node_plus_space",
+        "time_plus_space",
+        "node_plus_time"
+      ],
+      "seed": 20260918
+    },
+    "unseen_geometry": {
+      "families": [
+        "moving_region",
+        "multi_block"
+      ],
+      "seed": 20260919
+    }
+  },
+  "checkpoint_selection": "in_distribution_validation_only",
+  "note": "Same test windows across sets; masks are fixed and identical across models. New family/combination names never reach the model."
+}

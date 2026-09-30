@@ -255,6 +255,7 @@ class TemporalSpatialCoE(nn.Module):
         fusion_mode: str = "original",
         pair_dense_warmup_steps: int = 0,
         state_update_mode: str = "residual",
+        top1_selection: str = "gumbel",
     ) -> None:
         super().__init__()
         self.c_in = _positive_int("c_in", c_in)
@@ -276,6 +277,14 @@ class TemporalSpatialCoE(nn.Module):
         if routing_mode in {"fixed", "parallel"} and top_k != 1:
             raise ValueError("top_k > 1 is supported only for hard or soft routing")
         self.top_k = top_k
+        if top1_selection not in {"gumbel", "argmax_st"}:
+            raise ValueError("top1_selection must be gumbel or argmax_st")
+        if top1_selection == "argmax_st" and (
+            routing_mode != "hard" or top_k != 1 or pair_mode != "native"
+            or routing_warmup_epochs or routing_transition_epochs
+        ):
+            raise ValueError("argmax_st requires native hard Top-1 without warmup")
+        self.top1_selection = top1_selection
         if fusion_mode not in {"original", "context", "response", "local_response", "proposal"}:
             raise ValueError("fusion_mode must be original, context, response, local_response or proposal")
         if fusion_mode != "original" and (routing_mode != "hard" or top_k != 2 or pair_mode != "native"):
@@ -577,6 +586,7 @@ class TemporalSpatialCoE(nn.Module):
             router_input_noise_std=coe.get("router_input_noise_std", 0.0),
             router_input_noise_steps=coe.get("router_input_noise_steps", 0),
             top_k=coe.get("top_k", 1),
+            top1_selection=coe.get("top1_selection", "gumbel"),
             pair_mode=coe.get("pair_mode", "native"),
             acceptance=coe.get("acceptance", "none"),
             expert_sharing=coe.get("expert_sharing", "shared"),
@@ -727,6 +737,12 @@ class TemporalSpatialCoE(nn.Module):
             device=logits.device, dtype=within.dtype,
         ).scatter(-1, indices, within)
         return torch.einsum("bp,bpe->be", pair_probs.float(), contributions)
+
+    def _expert_input(self, hidden, completion, mask, support, position, step):
+        """B-series input projection; subclasses may add execution resolutions."""
+        return self.state_norm(self.state_projection(torch.cat(
+            [hidden, completion, mask, support, position], dim=1
+        )))
 
     def _dispatch(self, unified: torch.Tensor, paths: torch.Tensor, step: int = 0) -> torch.Tensor:
         """Evaluate only selected whole windows, keeping their full context."""
@@ -958,9 +974,9 @@ class TemporalSpatialCoE(nn.Module):
             expert_hidden = initial_hidden if self.expert_state == "initial" else hidden
             expert_completion = (initial_completion if self.expert_state == "initial" or
                                  not self.completion_feedback else completion)
-            unified = self.state_norm(self.state_projection(torch.cat(
-                [expert_hidden, expert_completion, original_mask, support, position], dim=1
-            )))
+            unified = self._expert_input(
+                expert_hidden, expert_completion, original_mask, support, position, step
+            )
             shared_update = (self.shared_scale_logits[step].sigmoid() * self.shared_expert(unified)
                              if self.use_shared else torch.zeros_like(hidden))
             primary_update = None
@@ -1089,7 +1105,13 @@ class TemporalSpatialCoE(nn.Module):
                 else:
                     with torch.autocast(device_type=hidden.device.type, enabled=False) if self.router_fp32 else nullcontext():
                         sample_logits = (logits.float() if self.router_fp32 else logits) / sampling_temperature
-                        if hard_fraction < 1:
+                        if self.top1_selection == "argmax_st":
+                            # Unit-weight argmax forward; selected-only surrogate
+                            # gradients through clean probabilities. No unselected
+                            # expert is evaluated, including during backward.
+                            hard = F.one_hot(sample_logits.argmax(dim=-1), self.num_experts).to(probabilities.dtype)
+                            weights = hard + (probabilities - probabilities.detach())
+                        elif hard_fraction < 1:
                             soft = uniform_mix / self.num_experts + (1 - uniform_mix) * probabilities
                             if hard_fraction == 0:
                                 weights = soft
@@ -1309,6 +1331,7 @@ class TemporalSpatialCoE(nn.Module):
                 "pair_dense_warmup_steps": self.pair_dense_warmup_steps,
                 "acceptance": self.acceptance,
                 "expert_sharing": self.expert_sharing,
+                "top1_selection": self.top1_selection,
                 "completion_feedback": self.completion_feedback,
                 "previous_expert_context": self.previous_expert_context,
                 "previous_expert_choices": (torch.stack(previous_choice_history, dim=1)

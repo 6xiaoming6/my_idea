@@ -1,0 +1,9 @@
+{
+  "base_variant": "B3",
+  "name": "primitive_coe_shared",
+  "override": {
+    "model": {
+      "coe": {}
+    }
+  }
+}

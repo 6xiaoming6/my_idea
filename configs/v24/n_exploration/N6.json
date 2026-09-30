@@ -1,0 +1,22 @@
+{
+  "base_variant": "B3",
+  "name": "primitive_scale_adaptive",
+  "override": {
+    "model": {
+      "coe": {
+        "spatial_scale": {
+          "enabled": true,
+          "mode": "adaptive",
+          "factor": 2,
+          "coarse_rounds": 2,
+          "fixed_scales": [
+            "coarse",
+            "coarse",
+            "fine",
+            "fine"
+          ]
+        }
+      }
+    }
+  }
+}

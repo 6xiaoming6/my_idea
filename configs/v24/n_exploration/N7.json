@@ -1,0 +1,14 @@
+{
+  "base_variant": "B3",
+  "name": "primitive_round_memory",
+  "override": {
+    "model": {
+      "coe": {
+        "round_memory": {
+          "enabled": true,
+          "key_dim": 16
+        }
+      }
+    }
+  }
+}

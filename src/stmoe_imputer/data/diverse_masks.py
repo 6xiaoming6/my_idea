@@ -8,8 +8,15 @@ from __future__ import annotations
 import math
 import numpy as np
 
-FAMILIES = ('random_point', 'node_outage', 'temporal_gap', 'spatial_region',
+LEGACY_FAMILIES = ('random_point', 'node_outage', 'temporal_gap', 'spatial_region',
             'spatiotemporal_block', 'stripe', 'moving_region', 'multi_block', 'composite')
+COMPOSITION_PARTS = {
+    'node_plus_space': ('node_outage', 'spatial_region'),
+    'time_plus_space': ('temporal_gap', 'spatial_region'),
+    'node_plus_time': ('node_outage', 'temporal_gap'),
+}
+FAMILIES = LEGACY_FAMILIES  # Historical nine-pattern public/default protocol.
+ALL_FAMILIES = FAMILIES + tuple(COMPOSITION_PARTS)
 
 
 def _field(shape, family, rng):
@@ -43,7 +50,7 @@ def _field(shape, family, rng):
         # comparable scales; variable quotas prevent one component dominating.
         structured = str(rng.choice(('temporal_gap', 'spatial_region', 'spatiotemporal_block',
                                      'stripe', 'moving_region', 'multi_block')))
-        choices = [structured, *rng.choice([f for f in FAMILIES[:-1] if f != structured],
+        choices = [structured, *rng.choice([f for f in LEGACY_FAMILIES[:-1] if f != structured],
                                            size=int(rng.integers(1, 3)), replace=False)]
         fields = []
         for part in choices:
@@ -58,15 +65,42 @@ def _field(shape, family, rng):
 def make_diverse_mask(shape, rate, family, rng):
     if len(shape) != 3 or any(type(n) is not int or n < 1 for n in shape):
         raise ValueError('Expected positive integer T/H/W dimensions')
-    if family not in FAMILIES or not math.isfinite(rate) or not 0 < rate < 1:
+    if family not in ALL_FAMILIES or not math.isfinite(rate) or not 0 < rate < 1:
         raise ValueError('Expected a known family and a missing rate strictly between zero and one')
     count = round(math.prod(shape)*rate)
     if not 0 < count < math.prod(shape):
         raise ValueError('Shape/rate must leave both observed and missing cells')
+    if family in COMPOSITION_PARTS:
+        return make_composed_mask(shape, count, COMPOSITION_PARTS[family], rng)
     field = _field(shape, family, rng).ravel()
     order = np.lexsort((rng.random(field.size), field))
     mask = np.ones(field.size, dtype=np.float32); mask[order[:count]] = 0
     return mask.reshape(shape)
+
+
+def make_composed_mask(shape, count, parts, rng):
+    """Exact-budget union of two component-field prefixes, with both represented.
+
+    Allocate a random 40--60% of the final union to the first component, then
+    expand the second component's geometric ordering until it contributes the
+    remaining *new* cells. Randomize component order to avoid systematic priority.
+    No uniform random filler is added. Ties follow the legacy geometry convention
+    (a boundary node/time plane can be partial to meet the exact cell budget).
+    """
+    ordered = list(parts)
+    if rng.integers(2):
+        ordered.reverse()
+    missing = np.zeros(math.prod(shape), dtype=bool)
+    first_count = min(count - 1, max(1, round(count * rng.uniform(.4, .6))))
+    for index, part in enumerate(ordered):
+        field = _field(shape, part, rng).ravel()
+        order = np.lexsort((rng.random(field.size), field))
+        if index == 0:
+            missing[order[:first_count]] = True
+        else:
+            new_cells = order[~missing[order]]
+            missing[new_cells[:count - int(missing.sum())]] = True
+    return (~missing).astype(np.float32).reshape(shape)
 
 
 class DiverseMaskSchedule:
@@ -77,13 +111,13 @@ class DiverseMaskSchedule:
     """
     def __init__(self, length, config):
         self.length = length
-        self.families = tuple(config.get('families', FAMILIES))
+        self.families = tuple(config.get('families', LEGACY_FAMILIES))
         self.rates = tuple(config.get('rates', [.4]))
         self.seed = config.get('seed', 20260917)
         self.resample_each_epoch = bool(config.get('resample_each_epoch', True))
         if type(self.seed) is not int or self.seed < 0:
             raise ValueError('Mask seed must be a nonnegative integer')
-        if not self.families or len(set(self.families)) != len(self.families) or any(f not in FAMILIES for f in self.families):
+        if not self.families or len(set(self.families)) != len(self.families) or any(f not in ALL_FAMILIES for f in self.families):
             raise ValueError('Mask families must be unique supported names')
         if not self.rates or any(not math.isfinite(r) or not 0 < r < 1 for r in self.rates):
             raise ValueError('Mask rates must be finite and strictly between zero and one')
@@ -107,4 +141,4 @@ class DiverseMaskSchedule:
         sample_epoch = self.epoch if self.resample_each_epoch else 1
         rng = np.random.default_rng(np.random.SeedSequence([self.seed, sample_epoch, index, 1]))
         mask = make_diverse_mask(tuple(shape), rate, family, rng)
-        return mask, FAMILIES.index(family)
+        return mask, ALL_FAMILIES.index(family)

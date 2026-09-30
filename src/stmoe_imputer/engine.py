@@ -10,7 +10,7 @@ from tqdm import tqdm
 
 from .losses import compute_main_stage_loss, supervision_mask
 from .metrics import MaskedMetricAccumulator, masked_metrics
-from .data.diverse_masks import FAMILIES
+from .data.diverse_masks import ALL_FAMILIES as FAMILIES
 from .routing_metrics import CoERoutingMetricAccumulator, RoutingMetricAccumulator, active_routing_scales
 from .models.registry import resolve_architecture
 from .partner_study import partner_candidate_loss

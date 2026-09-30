@@ -1,0 +1,65 @@
+-------------------------------------------------------------------------
+ epoch         loss         mae         rmse   train_mae   epoch_s   best
+-------------------------------------------------------------------------
+     5     51.95650     51.6912     102.2086     62.6450      43.3      *
+Best model at epoch 5 (val_mae=51.6912)
+    10     37.56248     37.4205      75.9385     44.5060      43.3      *
+Best model at epoch 10 (val_mae=37.4205)
+    15     30.17436     30.0913      60.4750     34.9740      44.0      *
+Best model at epoch 15 (val_mae=30.0913)
+    20     24.93676     24.8712      48.7002     28.4758      44.3      *
+Best model at epoch 20 (val_mae=24.8712)
+    25     23.09294     23.0385      43.5976     25.3376      44.3      *
+Best model at epoch 25 (val_mae=23.0385)
+    30     21.94393     21.8747      40.1852     23.8307      44.4      *
+Best model at epoch 30 (val_mae=21.8747)
+    35     20.21695     20.1518      36.9661     21.7114      44.1      *
+Best model at epoch 35 (val_mae=20.1518)
+    40     19.55136     19.5002      35.6806     20.9761      43.7      *
+Best model at epoch 40 (val_mae=19.5002)
+    45     22.96573     22.8851      38.7888     20.1277      43.4       
+    50     17.87844     17.8209      32.2883     19.3172      43.3      *
+Best model at epoch 50 (val_mae=17.8209)
+    55     18.99471     18.9508      33.4089     19.1422      43.0       
+    60     18.27283     18.2195      32.6545     18.7950      43.3       
+    65     17.15527     17.0988      31.0315     17.7923      43.1      *
+Best model at epoch 65 (val_mae=17.0988)
+    70     16.80930     16.7618      30.4794     17.5414      43.7      *
+Best model at epoch 70 (val_mae=16.7618)
+    75     17.06387     17.0149      30.6442     17.3024      43.6       
+    80     16.42688     16.3718      29.7278     16.8107      44.0      *
+Best model at epoch 80 (val_mae=16.3718)
+    85     16.78917     16.7333      30.7987     16.7612      44.5       
+    90     16.63376     16.5747      30.1982     16.5912      44.8       
+    95     16.25548     16.2034      29.2862     16.3378      44.8      *
+Best model at epoch 95 (val_mae=16.2034)
+   100     16.08218     16.0336      29.1229     16.0316      44.5      *
+Best model at epoch 100 (val_mae=16.0336)
+
+------------------------------------------------------------------------------------------------
+Training finished normally: 2026-09-30 07:45:29
+Summary
+  completed_epochs: 100
+  best_epoch: 100
+  best_val_mae: 16.033609
+  val_epoch: 5
+  validation_count: 20
+  final_train_loss: 16.062670
+  final_train_mae: 16.031561
+  final_val_loss: 16.082177
+  final_val_mae: 16.033609
+  total_time: 1h 9m 44s
+  avg_epoch_time_sec: 41.78
+  avg_train_sec_per_step: 0.5356
+  avg_val_sec_per_step: 0.0493
+  peak_memory_gb: 11.86
+  test_loss: 15.149527
+  test_mae: 15.240322
+  test_rmse: 27.257354
+  test_mape: 115801.381252
+  test_time_sec: 5.61
+  best_checkpoint: /home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20260930_063544_primitive_round_memory_seed7/random/rate0.4/20260930_063544_seed7_bs32/checkpoints/best.pth
+  last_checkpoint: /home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20260930_063544_primitive_round_memory_seed7/random/rate0.4/20260930_063544_seed7_bs32/checkpoints/last.pth
+  best_state_source: checkpoint
+  metrics_jsonl: /home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20260930_063544_primitive_round_memory_seed7/random/rate0.4/20260930_063544_seed7_bs32/logs/metrics.jsonl
+------------------------------------------------------------------------------------------------

@@ -1,0 +1,11 @@
+{
+  "base_variant": "B3",
+  "name": "primitive_initial_router",
+  "override": {
+    "model": {
+      "coe": {
+        "router_state": "initial"
+      }
+    }
+  }
+}

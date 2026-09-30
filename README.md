@@ -4,6 +4,8 @@
 
 当前 B3 由输入编码、逐层独立路由器、跨层共享专家池和预测头组成，关闭额外点级共享分支，关闭 completion_feedback 并直接传递每轮专家融合输出。当前主骨干采用四轮、共享八专家池、每轮稀疏激活 Top-2：`T`（时间卷积）、`S`（空间卷积）、`TD`（空洞时间卷积）、`SD`（空洞空间卷积）、`TA`（时间注意力）、`ST`（局部时空联合）、`TL`（较大时间核）、`SL`（较大空间核）。每层可读取上层更新后的状态，固定链、Soft 路由和 Top-K 均可由配置控制。详细设计见 [v24 方案](model_designs/v24_Temporal-Spatial_Chain-of-Experts_详细方案.md)，实现见 [temporal_spatial_coe.py](src/stmoe_imputer/models/temporal_spatial_coe.py)。
 
+当前夜间探索使用 B 系列派生的 **N1–N7**：四基础模式训练、未见组合/几何测试、初始状态路由对照与固定/自适应双尺度及跨轮状态记忆，入口为 `scripts/v24/run_n_exploration.py`。精确协议、尺度预算和运行方式见 [N1–N7 实验说明](scripts/v24/README_N_EXPLORATION.md)。
+
 ## 后续实验默认训练协议（2026-09-29）
 
 后续新实验统一使用 **100 epoch，初始学习率 `1e-3`，余弦下限 `3e-4`，每 5 epoch 验证一次**。按验证 MAE 保存 `checkpoints/best.pth`；训练正常结束或触发早停时，另存实际最后一轮的 `checkpoints/last.pth`，最终测试仍使用 best。
@@ -16,7 +18,7 @@
 
 ## 当前 CoE 基础基线与新实验
 
-后续结构改进统一对照 **B3：四轮共享八专家、原生 Top-2、direct 更新、completion_feedback=false**。批量大小默认全局32，单卡顺序运行。前次开启反馈的 B3/C3 已中断，按关闭反馈的新配置从头训练；不继承旧权重。精确 B1/B2/B3 配置、本轮 B3→C3 的机制与运行命令见 [B3/C3 实验说明](scripts/v24/README_B3_C3.md)。
+后续结构改进统一对照 **B3：四轮共享八专家、原生 Top-2、direct 更新、completion_feedback=false**。批量大小默认全局32，单卡顺序运行。前次开启反馈的 B3/C3 已中断，按关闭反馈的新配置从头训练；不继承旧权重。B3 已完成；C3 已放弃并停止。B1→B2→B4→B5 结构对照已完成：单层独立 Top-8、四层独立 Top-2、八层独立 Top-1、八轮共享 Top-1，运行与路由约定见 [结构基线实验说明](scripts/v24/README_STRUCTURE_BASELINES.md)。历史 C3 定义保留在 [B3/C3 实验说明](scripts/v24/README_B3_C3.md)。
 
 ## 安装
 

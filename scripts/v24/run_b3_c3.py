@@ -19,7 +19,8 @@ sys.path.insert(0,str(Path(__file__).resolve().parent))
 from stmoe_imputer.config import deep_update
 from run_team_accept_v4 import check_gpu_idle
 
-LABELS={'B1':'moe_single_top8','B2':'moe_independent_top2','B3':'coe_nofeedback_base','C3':'coe_local_support'}
+LABELS={'B1':'moe_single_top8','B2':'moe_independent_top2','B3':'coe_nofeedback_base','C3':'coe_local_support',
+        'B4':'moe_independent_s8_top1','B5':'moe_shared_s8_top1'}
 
 def load(path):return json.loads(Path(path).read_text(encoding='utf-8'))
 def digest(obj):return hashlib.sha256(json.dumps(obj,sort_keys=True,ensure_ascii=False,separators=(',',':')).encode()).hexdigest()
@@ -52,7 +53,8 @@ def jobs(dataset='taxibj',epochs=100,batch_size=32,variants=('B3','C3')):
     return result
 
 def source_manifest(dataset):
-    paths=list((ROOT/'src').rglob('*.py'))+[ROOT/'scripts/train.py',Path(__file__).resolve()]
+    paths=list((ROOT/'src').rglob('*.py'))+[ROOT/'scripts/train.py',Path(__file__).resolve(),
+           ROOT/'scripts/v24/run_structure_baselines.py']
     paths+=list((ROOT/'configs/v24/b3_c3').glob('*.json'))
     paths+=[ROOT/f'configs/v24/coe_main_s4_e8_{dataset}_base.json',ROOT/f'configs/v24/coe_direct_baselines_{dataset}_experiments.json']
     return {str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(paths)}
@@ -105,22 +107,24 @@ def launch(suite,job,gpu):
             process.terminate();process.wait();raise
     if code or not completed(suite,job):raise RuntimeError(f'{job["variant"]} failed; see {log_path}')
 
-def main():
+def main(default_variants=('B3','C3'), suite_name='b3_c3'):
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--dataset',choices=('taxibj','bikenyc'),default='taxibj')
     parser.add_argument('--gpu',type=int,default=0)
     parser.add_argument('--epochs',type=int,default=100)
     parser.add_argument('--batch-size',type=int,default=32)
-    parser.add_argument('--variants',nargs='+',choices=LABELS,default=['B3','C3'])
+    parser.add_argument('--variants',nargs='+',choices=LABELS,default=list(default_variants))
     parser.add_argument('--dry-run',action='store_true')
     parser.add_argument('--summary-only',action='store_true')
     args=parser.parse_args()
     if min(args.epochs,args.batch_size)<1 or args.gpu<0:parser.error('epochs/batch-size must be positive; gpu nonnegative')
     plan=jobs(args.dataset,args.epochs,args.batch_size,args.variants)
+    for job in plan:
+        job['config']['experiment_plan']['suite']=suite_name
     code=source_manifest(args.dataset)
     data={p:{'size':Path(p).stat().st_size,'mtime_ns':Path(p).stat().st_mtime_ns} for p in plan[0]['sources'].values()}
     fingerprint=digest({'jobs':plan,'source':code,'data':data})[:16]
-    suite=ROOT/'outputs/v24-COE/experiments/b3_c3'/args.dataset/fingerprint
+    suite=ROOT/'outputs/v24-COE/experiments'/suite_name/args.dataset/fingerprint
     if args.dry_run:
         print(json.dumps({'suite':str(suite),'jobs':plan},ensure_ascii=False,indent=2));return
     suite.parent.mkdir(parents=True,exist_ok=True)
