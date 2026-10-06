@@ -1,0 +1,11 @@
+{
+  "name": "scale_warm_two",
+  "method": "前20epoch CMFF，之后前两轮自由Top1直通、后两轮F",
+  "module": {
+    "scale_policy": "st",
+    "constraint": "last_two_fine",
+    "fixed_epochs": 20
+  },
+  "seed": 7,
+  "reference": "U01"
+}

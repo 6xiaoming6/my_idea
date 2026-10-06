@@ -1,0 +1,787 @@
+[
+  {
+    "variant": "U01",
+    "status": "finished",
+    "method": "原生固定CMFF",
+    "reference": "U01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261005_114808_cmff_reference_seed7/random/rate0.4/20261005_114808_seed7_bs32",
+    "best_epoch": 100,
+    "val_mae": 14.809677306610032,
+    "training_seconds": 3085.3061206226703,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 14.061151195140587,
+        "rmse": 24.59639196993723
+      },
+      "unseen_combinations": {
+        "mae": 28.52129516850101,
+        "rmse": 52.90492848208498
+      },
+      "unseen_geometry": {
+        "mae": 27.417656130167586,
+        "rmse": 48.63753199468082
+      },
+      "unseen_triple": {
+        "mae": 24.83536456392333,
+        "rmse": 42.985217757775835
+      },
+      "unseen_combinations_repeat": {
+        "mae": 28.84270433292421,
+        "rmse": 53.27259676759005
+      },
+      "unseen_geometry_repeat": {
+        "mae": 26.983896340331608,
+        "rmse": 47.36843335862503
+      }
+    }
+  },
+  {
+    "variant": "U02",
+    "status": "finished",
+    "method": "CMFF＋RMS状态差分，幅度0.1",
+    "reference": "U01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261005_124024_cmff_delta010_seed7/random/rate0.4/20261005_124024_seed7_bs32",
+    "best_epoch": 100,
+    "val_mae": 14.22888319263741,
+    "training_seconds": 3278.741178084165,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 13.355547831523452,
+        "rmse": 23.686229588171138
+      },
+      "unseen_combinations": {
+        "mae": 19.39569004404437,
+        "rmse": 32.79446619100342
+      },
+      "unseen_geometry": {
+        "mae": 22.311931567193923,
+        "rmse": 37.82782685438692
+      },
+      "unseen_triple": {
+        "mae": 19.76828636322432,
+        "rmse": 32.35323064826833
+      },
+      "unseen_combinations_repeat": {
+        "mae": 19.63282189099414,
+        "rmse": 33.29980062285484
+      },
+      "unseen_geometry_repeat": {
+        "mae": 22.19222804742144,
+        "rmse": 37.46509116321104
+      }
+    }
+  },
+  {
+    "variant": "U03",
+    "status": "finished",
+    "method": "CMFF＋RMS状态差分，幅度0.25",
+    "reference": "U01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261005_133554_cmff_delta025_seed7/random/rate0.4/20261005_133554_seed7_bs32",
+    "best_epoch": 90,
+    "val_mae": 14.596152353161642,
+    "training_seconds": 3281.5710595136043,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 13.762041057597258,
+        "rmse": 24.353163375827155
+      },
+      "unseen_combinations": {
+        "mae": 21.70293263862609,
+        "rmse": 37.59284966116375
+      },
+      "unseen_geometry": {
+        "mae": 24.49035069843636,
+        "rmse": 41.37687806817574
+      },
+      "unseen_triple": {
+        "mae": 21.366032794421717,
+        "rmse": 35.36395135585613
+      },
+      "unseen_combinations_repeat": {
+        "mae": 21.726506610432516,
+        "rmse": 37.7487828159857
+      },
+      "unseen_geometry_repeat": {
+        "mae": 24.49116608943266,
+        "rmse": 41.238332844938796
+      }
+    }
+  },
+  {
+    "variant": "U04",
+    "status": "finished",
+    "method": "CMFF＋原始状态差分，幅度0.1",
+    "reference": "U01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261005_143128_cmff_raw_delta_seed7/random/rate0.4/20261005_143128_seed7_bs32",
+    "best_epoch": 95,
+    "val_mae": 14.685134047818767,
+    "training_seconds": 3183.64695003035,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 13.827534691595885,
+        "rmse": 24.442816800215088
+      },
+      "unseen_combinations": {
+        "mae": 16.39431460176609,
+        "rmse": 27.95369149425721
+      },
+      "unseen_geometry": {
+        "mae": 22.068240291820928,
+        "rmse": 38.2656855615843
+      },
+      "unseen_triple": {
+        "mae": 15.834405041288898,
+        "rmse": 26.54615809490223
+      },
+      "unseen_combinations_repeat": {
+        "mae": 16.496013721957866,
+        "rmse": 28.250755222559146
+      },
+      "unseen_geometry_repeat": {
+        "mae": 22.251035010309636,
+        "rmse": 38.80536692232548
+      }
+    }
+  },
+  {
+    "variant": "U05",
+    "status": "finished",
+    "method": "CMFF＋操作内变化输入，幅度0.1",
+    "reference": "U01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261005_152523_cmff_innovation_seed7/random/rate0.4/20261005_152523_seed7_bs32",
+    "best_epoch": 100,
+    "val_mae": 15.500889091157871,
+    "training_seconds": 3412.5458845206304,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 14.864600785848822,
+        "rmse": 25.85186377535477
+      },
+      "unseen_combinations": {
+        "mae": 18.371393565975186,
+        "rmse": 31.45996906572589
+      },
+      "unseen_geometry": {
+        "mae": 25.096003640747014,
+        "rmse": 42.74527947549332
+      },
+      "unseen_triple": {
+        "mae": 17.60543937532105,
+        "rmse": 29.69011763883886
+      },
+      "unseen_combinations_repeat": {
+        "mae": 18.337353557147605,
+        "rmse": 31.597864361300193
+      },
+      "unseen_geometry_repeat": {
+        "mae": 25.187851322554142,
+        "rmse": 42.76314327878705
+      }
+    }
+  },
+  {
+    "variant": "U06",
+    "status": "finished",
+    "method": "U05消息内容detach，门输入梯度保留",
+    "reference": "U01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261005_162311_cmff_innovation_detach_seed7/random/rate0.4/20261005_162311_seed7_bs32",
+    "best_epoch": 100,
+    "val_mae": 15.808100054731607,
+    "training_seconds": 3390.4212873884244,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 14.889976281725687,
+        "rmse": 25.613582001711183
+      },
+      "unseen_combinations": {
+        "mae": 18.01777665954177,
+        "rmse": 30.704191975902628
+      },
+      "unseen_geometry": {
+        "mae": 24.271890382614778,
+        "rmse": 40.92300248396857
+      },
+      "unseen_triple": {
+        "mae": 17.438818363379717,
+        "rmse": 29.26413993116063
+      },
+      "unseen_combinations_repeat": {
+        "mae": 18.220115513949303,
+        "rmse": 31.19419006438877
+      },
+      "unseen_geometry_repeat": {
+        "mae": 24.409303671611166,
+        "rmse": 41.41086509036809
+      }
+    }
+  },
+  {
+    "variant": "U07",
+    "status": "finished",
+    "method": "操作内变化只修正专家Router，幅度0.1",
+    "reference": "U01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261005_172035_cmff_innovation_router_seed7/random/rate0.4/20261005_172035_seed7_bs32",
+    "best_epoch": 100,
+    "val_mae": 14.856707001481324,
+    "training_seconds": 3447.7043886715546,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 14.01691972964009,
+        "rmse": 24.528001999029634
+      },
+      "unseen_combinations": {
+        "mae": 22.324813025464007,
+        "rmse": 39.12873129185599
+      },
+      "unseen_geometry": {
+        "mae": 26.157138207735176,
+        "rmse": 44.11313770620919
+      },
+      "unseen_triple": {
+        "mae": 21.532609884298996,
+        "rmse": 35.966251068240965
+      },
+      "unseen_combinations_repeat": {
+        "mae": 22.200639959042046,
+        "rmse": 38.93029924645329
+      },
+      "unseen_geometry_repeat": {
+        "mae": 26.306775814734504,
+        "rmse": 44.35627325557362
+      }
+    }
+  },
+  {
+    "variant": "U08",
+    "status": "finished",
+    "method": "前两轮自由Top1，后两轮F，从头训练",
+    "reference": "U01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261005_181900_scale_two_free_seed7/random/rate0.4/20261005_181900_seed7_bs32",
+    "best_epoch": 95,
+    "val_mae": 15.120318885973836,
+    "training_seconds": 3214.9625206770143,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 14.192757023213584,
+        "rmse": 24.9219326811506
+      },
+      "unseen_combinations": {
+        "mae": 18.38258969040161,
+        "rmse": 32.72438581235468
+      },
+      "unseen_geometry": {
+        "mae": 21.470125968371796,
+        "rmse": 36.505173850840066
+      },
+      "unseen_triple": {
+        "mae": 17.409508389437985,
+        "rmse": 30.024986642342665
+      },
+      "unseen_combinations_repeat": {
+        "mae": 18.575846093274492,
+        "rmse": 33.10159002875292
+      },
+      "unseen_geometry_repeat": {
+        "mae": 21.375003444338766,
+        "rmse": 36.3467963814955
+      }
+    }
+  },
+  {
+    "variant": "U09",
+    "status": "finished",
+    "method": "前20epoch CMFF，之后四轮自由Top1直通",
+    "reference": "U01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261005_191326_scale_warm_free_seed7/random/rate0.4/20261005_191326_seed7_bs32",
+    "best_epoch": 100,
+    "val_mae": 15.832010330590803,
+    "training_seconds": 2616.9065108719515,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 15.062186659599327,
+        "rmse": 26.46603975109218
+      },
+      "unseen_combinations": {
+        "mae": 16.235109718826845,
+        "rmse": 27.92243930382608
+      },
+      "unseen_geometry": {
+        "mae": 20.332107973095667,
+        "rmse": 34.74009548846144
+      },
+      "unseen_triple": {
+        "mae": 15.51122445253899,
+        "rmse": 26.34465573360289
+      },
+      "unseen_combinations_repeat": {
+        "mae": 16.341079243533276,
+        "rmse": 28.433681744888954
+      },
+      "unseen_geometry_repeat": {
+        "mae": 20.335633869846802,
+        "rmse": 34.62661125445008
+      }
+    }
+  },
+  {
+    "variant": "U10",
+    "status": "finished",
+    "method": "前20epoch CMFF，之后前两轮自由Top1直通、后两轮F",
+    "reference": "U01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261005_195750_scale_warm_two_seed7/random/rate0.4/20261005_195750_seed7_bs32",
+    "best_epoch": 100,
+    "val_mae": 14.51504107845062,
+    "training_seconds": 3115.3857673915336,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 13.821514585470682,
+        "rmse": 24.190357948789337
+      },
+      "unseen_combinations": {
+        "mae": 19.954228317033127,
+        "rmse": 36.845406958689715
+      },
+      "unseen_geometry": {
+        "mae": 21.244941561352036,
+        "rmse": 35.93323782190392
+      },
+      "unseen_triple": {
+        "mae": 19.003190258078998,
+        "rmse": 34.51525932500749
+      },
+      "unseen_combinations_repeat": {
+        "mae": 19.9700707825106,
+        "rmse": 36.85361183524262
+      },
+      "unseen_geometry_repeat": {
+        "mae": 21.049343075566096,
+        "rmse": 35.16512389172852
+      }
+    }
+  },
+  {
+    "variant": "U11",
+    "status": "finished",
+    "method": "前20epoch CMFF，之后四轮自由Top1、尺度头仅教师监督",
+    "reference": "U01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261005_205035_scale_teacher_free_seed7/random/rate0.4/20261005_205035_seed7_bs32",
+    "best_epoch": 95,
+    "val_mae": 15.204922870077873,
+    "training_seconds": 3147.1032813290367,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 14.227611685607233,
+        "rmse": 24.56629656782718
+      },
+      "unseen_combinations": {
+        "mae": 19.264655985199596,
+        "rmse": 32.56091032755913
+      },
+      "unseen_geometry": {
+        "mae": 22.9610089880155,
+        "rmse": 38.19109623600283
+      },
+      "unseen_triple": {
+        "mae": 18.434805241078532,
+        "rmse": 30.439714487078916
+      },
+      "unseen_combinations_repeat": {
+        "mae": 19.52434565207538,
+        "rmse": 33.222276895492975
+      },
+      "unseen_geometry_repeat": {
+        "mae": 22.9220487142814,
+        "rmse": 38.20104552936051
+      }
+    }
+  },
+  {
+    "variant": "U12",
+    "status": "finished",
+    "method": "前20epoch CMFF，之后前两轮尺度头仅教师、后两轮F",
+    "reference": "U01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261005_214353_scale_teacher_two_seed7/random/rate0.4/20261005_214353_seed7_bs32",
+    "best_epoch": 85,
+    "val_mae": 15.814250147239921,
+    "training_seconds": 3097.662162624183,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 15.050839977999399,
+        "rmse": 26.275305986140435
+      },
+      "unseen_combinations": {
+        "mae": 17.441794883601133,
+        "rmse": 29.881638021360303
+      },
+      "unseen_geometry": {
+        "mae": 22.72715779280297,
+        "rmse": 38.307548364810074
+      },
+      "unseen_triple": {
+        "mae": 16.669346868835262,
+        "rmse": 27.922602911055915
+      },
+      "unseen_combinations_repeat": {
+        "mae": 17.612175036080124,
+        "rmse": 30.445732089401883
+      },
+      "unseen_geometry_repeat": {
+        "mae": 22.723914107004365,
+        "rmse": 38.408927028664664
+      }
+    }
+  },
+  {
+    "variant": "U13",
+    "status": "finished",
+    "method": "前20epoch CMFF，之后三选二尺度softmax融合",
+    "reference": "U14",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261005_223620_scale_warm_top2_seed7/random/rate0.4/20261005_223620_seed7_bs32",
+    "best_epoch": 95,
+    "val_mae": 14.596262931829404,
+    "training_seconds": 4533.730131896678,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 13.846576259818614,
+        "rmse": 24.580096739920005
+      },
+      "unseen_combinations": {
+        "mae": 15.48683047630079,
+        "rmse": 26.393954075947
+      },
+      "unseen_geometry": {
+        "mae": 18.491641606029518,
+        "rmse": 30.694283969595816
+      },
+      "unseen_triple": {
+        "mae": 14.7465855451444,
+        "rmse": 24.716242367664233
+      },
+      "unseen_combinations_repeat": {
+        "mae": 15.592208222239169,
+        "rmse": 26.793153457804944
+      },
+      "unseen_geometry_repeat": {
+        "mae": 18.332134502597913,
+        "rmse": 30.53116204716124
+      }
+    }
+  },
+  {
+    "variant": "U14",
+    "status": "finished",
+    "method": "前20epoch CMFF，之后固定CM/MF/CF/MF等权",
+    "reference": "U01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261005_235302_scale_warm_fixed2_seed7/random/rate0.4/20261005_235302_seed7_bs32",
+    "best_epoch": 95,
+    "val_mae": 15.886606521389945,
+    "training_seconds": 4244.142728915787,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 15.184747433742793,
+        "rmse": 26.336115835632256
+      },
+      "unseen_combinations": {
+        "mae": 18.721543731950945,
+        "rmse": 31.70426445108937
+      },
+      "unseen_geometry": {
+        "mae": 24.07310444458194,
+        "rmse": 39.326056155079456
+      },
+      "unseen_triple": {
+        "mae": 18.483435563346337,
+        "rmse": 31.415388411944118
+      },
+      "unseen_combinations_repeat": {
+        "mae": 18.86172576120786,
+        "rmse": 31.969298662262716
+      },
+      "unseen_geometry_repeat": {
+        "mae": 23.511893382696794,
+        "rmse": 38.316575886724486
+      }
+    }
+  },
+  {
+    "variant": "U15",
+    "status": "finished",
+    "method": "前20epoch CMFF，之后单调升分辨率Top1教师、末轮F",
+    "reference": "U01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261006_010451_scale_teacher_ordered_seed7/random/rate0.4/20261006_010451_seed7_bs32",
+    "best_epoch": 100,
+    "val_mae": 14.58482982634613,
+    "training_seconds": 3106.8468534684507,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 13.634425158745348,
+        "rmse": 24.108592720540855
+      },
+      "unseen_combinations": {
+        "mae": 16.395460379492388,
+        "rmse": 29.226961685040838
+      },
+      "unseen_geometry": {
+        "mae": 27.49232327934145,
+        "rmse": 46.88613378307222
+      },
+      "unseen_triple": {
+        "mae": 15.936935483667899,
+        "rmse": 27.452434350703562
+      },
+      "unseen_combinations_repeat": {
+        "mae": 16.71416275229107,
+        "rmse": 29.795818518499715
+      },
+      "unseen_geometry_repeat": {
+        "mae": 27.846439435034913,
+        "rmse": 47.420738064304885
+      }
+    }
+  },
+  {
+    "variant": "U16",
+    "status": "finished",
+    "method": "U12＋第21epoch启用零初始化尺度身份向量",
+    "reference": "U01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261006_015728_scale_teacher_identity_seed7/random/rate0.4/20261006_015728_seed7_bs32",
+    "best_epoch": 100,
+    "val_mae": 15.362706805161428,
+    "training_seconds": 3127.011134832748,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 14.4199332427793,
+        "rmse": 25.31098229152931
+      },
+      "unseen_combinations": {
+        "mae": 16.544104856823424,
+        "rmse": 28.50967577595101
+      },
+      "unseen_geometry": {
+        "mae": 22.05354791174147,
+        "rmse": 36.71437878336383
+      },
+      "unseen_triple": {
+        "mae": 15.9621441539409,
+        "rmse": 27.19235937341915
+      },
+      "unseen_combinations_repeat": {
+        "mae": 16.707300581778494,
+        "rmse": 28.994173797783443
+      },
+      "unseen_geometry_repeat": {
+        "mae": 22.19673796387959,
+        "rmse": 37.0502111421234
+      }
+    }
+  },
+  {
+    "variant": "U18",
+    "status": "finished",
+    "method": "固定CMFF，原生Top2执行后响应融合修正±0.1",
+    "reference": "U01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261006_025028_cmff_response010_seed7/random/rate0.4/20261006_025028_seed7_bs32",
+    "best_epoch": 95,
+    "val_mae": 14.377475117940664,
+    "training_seconds": 3229.0427605657605,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 13.406492659511555,
+        "rmse": 23.58186646294968
+      },
+      "unseen_combinations": {
+        "mae": 24.189841502861228,
+        "rmse": 42.60465143265531
+      },
+      "unseen_geometry": {
+        "mae": 24.80165251819834,
+        "rmse": 42.19168268514352
+      },
+      "unseen_triple": {
+        "mae": 24.161334833254433,
+        "rmse": 42.50889614753247
+      },
+      "unseen_combinations_repeat": {
+        "mae": 24.192264824505994,
+        "rmse": 42.57014983057737
+      },
+      "unseen_geometry_repeat": {
+        "mae": 25.16301348526075,
+        "rmse": 42.637301702563725
+      }
+    }
+  },
+  {
+    "variant": "U17",
+    "status": "awaiting_selection",
+    "method": "第一通信候选＋第一Top1尺度候选",
+    "reference": "U01",
+    "seed": 7,
+    "run_dir": null,
+    "best_epoch": null,
+    "val_mae": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "U29",
+    "status": "awaiting_selection",
+    "method": "U01复验，seed17",
+    "reference": "U29",
+    "seed": 17,
+    "run_dir": null,
+    "best_epoch": null,
+    "val_mae": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "U30",
+    "status": "awaiting_selection",
+    "method": "U01复验，seed27",
+    "reference": "U30",
+    "seed": 27,
+    "run_dir": null,
+    "best_epoch": null,
+    "val_mae": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "U19",
+    "status": "awaiting_selection",
+    "method": "$memory0复验，seed17",
+    "reference": "U29",
+    "seed": 17,
+    "run_dir": null,
+    "best_epoch": null,
+    "val_mae": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "U20",
+    "status": "awaiting_selection",
+    "method": "$memory0复验，seed27",
+    "reference": "U30",
+    "seed": 27,
+    "run_dir": null,
+    "best_epoch": null,
+    "val_mae": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "U21",
+    "status": "awaiting_selection",
+    "method": "$memory1复验，seed17",
+    "reference": "U29",
+    "seed": 17,
+    "run_dir": null,
+    "best_epoch": null,
+    "val_mae": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "U22",
+    "status": "awaiting_selection",
+    "method": "$memory1复验，seed27",
+    "reference": "U30",
+    "seed": 27,
+    "run_dir": null,
+    "best_epoch": null,
+    "val_mae": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "U23",
+    "status": "awaiting_selection",
+    "method": "$scale0复验，seed17",
+    "reference": "U29",
+    "seed": 17,
+    "run_dir": null,
+    "best_epoch": null,
+    "val_mae": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "U24",
+    "status": "awaiting_selection",
+    "method": "$scale0复验，seed27",
+    "reference": "U30",
+    "seed": 27,
+    "run_dir": null,
+    "best_epoch": null,
+    "val_mae": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "U25",
+    "status": "awaiting_selection",
+    "method": "$scale1复验，seed17",
+    "reference": "U29",
+    "seed": 17,
+    "run_dir": null,
+    "best_epoch": null,
+    "val_mae": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "U26",
+    "status": "awaiting_selection",
+    "method": "$scale1复验，seed27",
+    "reference": "U30",
+    "seed": 27,
+    "run_dir": null,
+    "best_epoch": null,
+    "val_mae": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "U27",
+    "status": "awaiting_selection",
+    "method": "U17复验，seed17",
+    "reference": "U29",
+    "seed": 17,
+    "run_dir": null,
+    "best_epoch": null,
+    "val_mae": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "U28",
+    "status": "awaiting_selection",
+    "method": "U17复验，seed27",
+    "reference": "U30",
+    "seed": 27,
+    "run_dir": null,
+    "best_epoch": null,
+    "val_mae": null,
+    "training_seconds": null,
+    "evaluations": {}
+  }
+]

@@ -1,0 +1,8 @@
+{
+  "name": "scale_top2",
+  "method": "S07: F/M/C scale mode=top2",
+  "module": {
+    "scale": "top2"
+  },
+  "reference": "S08"
+}

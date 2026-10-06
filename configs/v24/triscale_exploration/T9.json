@@ -1,0 +1,11 @@
+{
+  "source": "A",
+  "override": {
+    "model": {
+      "coe": {
+        "expert_sharing": "per_step"
+      }
+    }
+  },
+  "suffix": "independent"
+}

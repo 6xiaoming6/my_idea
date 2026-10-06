@@ -1,0 +1,10 @@
+{
+  "name": "cmff_innovation_router",
+  "method": "操作内变化只修正专家Router，幅度0.1",
+  "module": {
+    "communication": "innovation_router",
+    "bound": 0.1
+  },
+  "seed": 7,
+  "reference": "U01"
+}

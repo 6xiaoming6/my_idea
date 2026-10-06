@@ -1,0 +1,12 @@
+{
+  "name": "paths_g09",
+  "method": "G09: CMFF permutations in epochs [93, 100], fixed CMFF evaluation",
+  "module": {
+    "scale": "permutation",
+    "explore_range": [
+      93,
+      100
+    ]
+  },
+  "reference": "S01"
+}

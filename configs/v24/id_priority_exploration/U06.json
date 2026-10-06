@@ -1,0 +1,10 @@
+{
+  "name": "cmff_innovation_detach",
+  "method": "U05消息内容detach，门输入梯度保留",
+  "module": {
+    "communication": "innovation_detach",
+    "bound": 0.1
+  },
+  "seed": 7,
+  "reference": "U01"
+}

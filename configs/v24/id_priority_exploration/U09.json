@@ -1,0 +1,10 @@
+{
+  "name": "scale_warm_free",
+  "method": "前20epoch CMFF，之后四轮自由Top1直通",
+  "module": {
+    "scale_policy": "st",
+    "fixed_epochs": 20
+  },
+  "seed": 7,
+  "reference": "U01"
+}

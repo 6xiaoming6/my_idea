@@ -1,0 +1,9 @@
+{
+  "name": "round_signed",
+  "method": "M05: memory=signed, single F",
+  "module": {
+    "memory": "signed"
+  },
+  "sharing": "shared",
+  "reference": "M01"
+}

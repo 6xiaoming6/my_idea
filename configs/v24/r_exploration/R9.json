@@ -1,0 +1,17 @@
+{
+  "base_variant": "N7",
+  "name": "memory_recent",
+  "override": {
+    "seed": 7,
+    "data": {
+      "loader_seed": 7
+    },
+    "model": {
+      "coe": {
+        "round_memory": {
+          "mode": "recent"
+        }
+      }
+    }
+  }
+}

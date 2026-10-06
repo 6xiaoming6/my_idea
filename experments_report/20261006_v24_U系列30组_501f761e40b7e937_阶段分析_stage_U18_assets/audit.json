@@ -1,0 +1,138 @@
+{
+  "U01": {
+    "epochs": 100,
+    "validations": 20,
+    "best": true,
+    "last": true,
+    "amp_skips": 12.0,
+    "nonfinite": []
+  },
+  "U02": {
+    "epochs": 100,
+    "validations": 20,
+    "best": true,
+    "last": true,
+    "amp_skips": 11.0,
+    "nonfinite": []
+  },
+  "U03": {
+    "epochs": 100,
+    "validations": 20,
+    "best": true,
+    "last": true,
+    "amp_skips": 12.0,
+    "nonfinite": []
+  },
+  "U04": {
+    "epochs": 100,
+    "validations": 20,
+    "best": true,
+    "last": true,
+    "amp_skips": 12.0,
+    "nonfinite": []
+  },
+  "U05": {
+    "epochs": 100,
+    "validations": 20,
+    "best": true,
+    "last": true,
+    "amp_skips": 12.0,
+    "nonfinite": []
+  },
+  "U06": {
+    "epochs": 100,
+    "validations": 20,
+    "best": true,
+    "last": true,
+    "amp_skips": 12.0,
+    "nonfinite": []
+  },
+  "U07": {
+    "epochs": 100,
+    "validations": 20,
+    "best": true,
+    "last": true,
+    "amp_skips": 12.0,
+    "nonfinite": []
+  },
+  "U08": {
+    "epochs": 100,
+    "validations": 20,
+    "best": true,
+    "last": true,
+    "amp_skips": 12.0,
+    "nonfinite": []
+  },
+  "U09": {
+    "epochs": 100,
+    "validations": 20,
+    "best": true,
+    "last": true,
+    "amp_skips": 13.0,
+    "nonfinite": []
+  },
+  "U10": {
+    "epochs": 100,
+    "validations": 20,
+    "best": true,
+    "last": true,
+    "amp_skips": 12.0,
+    "nonfinite": []
+  },
+  "U11": {
+    "epochs": 100,
+    "validations": 20,
+    "best": true,
+    "last": true,
+    "amp_skips": 11.0,
+    "nonfinite": []
+  },
+  "U12": {
+    "epochs": 100,
+    "validations": 20,
+    "best": true,
+    "last": true,
+    "amp_skips": 12.0,
+    "nonfinite": []
+  },
+  "U13": {
+    "epochs": 100,
+    "validations": 20,
+    "best": true,
+    "last": true,
+    "amp_skips": 12.0,
+    "nonfinite": []
+  },
+  "U14": {
+    "epochs": 100,
+    "validations": 20,
+    "best": true,
+    "last": true,
+    "amp_skips": 12.0,
+    "nonfinite": []
+  },
+  "U15": {
+    "epochs": 100,
+    "validations": 20,
+    "best": true,
+    "last": true,
+    "amp_skips": 12.0,
+    "nonfinite": []
+  },
+  "U16": {
+    "epochs": 100,
+    "validations": 20,
+    "best": true,
+    "last": true,
+    "amp_skips": 12.0,
+    "nonfinite": []
+  },
+  "U18": {
+    "epochs": 100,
+    "validations": 20,
+    "best": true,
+    "last": true,
+    "amp_skips": 11.0,
+    "nonfinite": []
+  }
+}

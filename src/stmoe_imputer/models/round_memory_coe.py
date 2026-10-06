@@ -29,6 +29,9 @@ class RoundMemoryCoE(TemporalSpatialCoE):
                 or model.fusion_mode!='original' or model.acceptance!='none'
                 or model.routing_warmup_epochs or model.routing_transition_epochs):
             raise ValueError('N7 requires the four-round B3 shared native Top-2 protocol')
+        model.memory_mode=spec.get('mode','content')
+        if model.memory_mode not in ('content','uniform','recent'):
+            raise ValueError('Unknown round-memory mode')
         model.memory_key_dim=key_dim
         summary_dim=2*model.dim
         # Added after constructing the backbone: all existing B3 parameters keep
@@ -38,6 +41,9 @@ class RoundMemoryCoE(TemporalSpatialCoE):
         model.memory_gate=nn.Sequential(nn.LayerNorm(2*summary_dim),nn.Linear(2*summary_dim,model.dim))
         nn.init.zeros_(model.memory_gate[-1].weight)
         nn.init.zeros_(model.memory_gate[-1].bias)
+        if model.memory_mode != 'content':
+            model.memory_query.requires_grad_(False)
+            model.memory_key.requires_grad_(False)
         return model
 
     def _memory_summary(self, hidden, mask):
@@ -48,10 +54,16 @@ class RoundMemoryCoE(TemporalSpatialCoE):
         current=self._memory_summary(hidden,mask)
         if self._memory_states:
             history=torch.stack(self._memory_summaries,dim=1)
-            query=self.memory_query(current)
-            keys=self.memory_key(history)
-            logits=(keys.float()*query.float().unsqueeze(1)).sum(-1)/math.sqrt(self.memory_key_dim)
-            weights=logits.softmax(-1)
+            if self.memory_mode == 'content':
+                query=self.memory_query(current)
+                keys=self.memory_key(history)
+                logits=(keys.float()*query.float().unsqueeze(1)).sum(-1)/math.sqrt(self.memory_key_dim)
+                weights=logits.softmax(-1)
+            elif self.memory_mode == 'uniform':
+                weights=history.new_full(history.shape[:2],1/history.shape[1],dtype=torch.float32)
+            else:
+                weights=history.new_zeros(history.shape[:2],dtype=torch.float32)
+                weights[:,-1]=1.
             # Stream the full-grid values instead of allocating a [B,R,C,T,H,W]
             # stack. No value or key is detached: task gradients can reach history.
             memory=sum(state*weights[:,i,None,None,None,None].to(state.dtype)

@@ -1,0 +1,8 @@
+{
+  "name": "scale_fixed",
+  "method": "S01: F/M/C scale mode=fixed",
+  "module": {
+    "scale": "fixed"
+  },
+  "reference": "S01"
+}

@@ -1,0 +1,32 @@
+[
+  {
+    "variant": "N2",
+    "checkpoint": "outputs/v24-COE/TaxiBJ/custom/20260930_012215_primitive_moe_independent_seed7/random/rate0.4/20260930_012215_seed7_bs32/checkpoints/best.pth",
+    "config_sha256": "954ce281b920f69aae6a6168942c21166a177f05c8530982c23164cb177caf9b",
+    "source_suite": "outputs/v24-COE/experiments/n_exploration/taxibj/b98fed7e6682bd8b"
+  },
+  {
+    "variant": "N3",
+    "checkpoint": "outputs/v24-COE/TaxiBJ/custom/20260930_023432_primitive_coe_shared_seed7/random/rate0.4/20260930_023432_seed7_bs32/checkpoints/best.pth",
+    "config_sha256": "7e71e61df5f671f09c1c7a739398349d12b54bcd5fe79e0622750dc86e6ea17c",
+    "source_suite": "outputs/v24-COE/experiments/n_exploration/taxibj/b98fed7e6682bd8b"
+  },
+  {
+    "variant": "N5",
+    "checkpoint": "outputs/v24-COE/TaxiBJ/custom/20260930_044705_primitive_scale_fixed_seed7/random/rate0.4/20260930_044705_seed7_bs32/checkpoints/best.pth",
+    "config_sha256": "0a36a12d01444ba24d977d607a5973f204c198b0e7b4c439c9794e4ad2ac7176",
+    "source_suite": "outputs/v24-COE/experiments/n_exploration/taxibj/b98fed7e6682bd8b"
+  },
+  {
+    "variant": "N6",
+    "checkpoint": "outputs/v24-COE/TaxiBJ/custom/20260930_054153_primitive_scale_adaptive_seed7/random/rate0.4/20260930_054153_seed7_bs32/checkpoints/best.pth",
+    "config_sha256": "fb093afc3e8e89ff5d3fb02fa6d3f210be28653c80834271e2f215ba176c2c75",
+    "source_suite": "outputs/v24-COE/experiments/n_exploration/taxibj/b98fed7e6682bd8b"
+  },
+  {
+    "variant": "N7",
+    "checkpoint": "outputs/v24-COE/TaxiBJ/custom/20260930_063544_primitive_round_memory_seed7/random/rate0.4/20260930_063544_seed7_bs32/checkpoints/best.pth",
+    "config_sha256": "bb5ebc37b0eaf0c065f6f57ed63690b3dd70770a72434ff19030a10ec8388fdf",
+    "source_suite": "outputs/v24-COE/experiments/n_exploration/taxibj/b98fed7e6682bd8b"
+  }
+]

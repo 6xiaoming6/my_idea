@@ -1,0 +1,8 @@
+{
+  "name": "scale_history",
+  "method": "S05: F/M/C scale mode=history",
+  "module": {
+    "scale": "history"
+  },
+  "reference": "S01"
+}

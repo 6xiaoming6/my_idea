@@ -1,0 +1,488 @@
+{
+  "summary": [
+    {
+      "variant": "T1",
+      "status": "finished",
+      "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261001_005557_tri_fixed_seed7/random/rate0.4/20261001_005557_seed7_bs32",
+      "best_epoch": 95,
+      "val_mae": 15.036184210526315,
+      "training_seconds": 3104.582932124991,
+      "evaluations": {
+        "in_distribution": {
+          "mae": 14.28836285632269,
+          "rmse": 25.210525814795172
+        },
+        "unseen_combinations": {
+          "mae": 17.166544809318527,
+          "rmse": 29.470262895896415
+        },
+        "unseen_geometry": {
+          "mae": 21.674080734761095,
+          "rmse": 36.63196339311714
+        },
+        "unseen_triple": {
+          "mae": 16.127344641436242,
+          "rmse": 27.075683126683504
+        },
+        "unseen_combinations_repeat": {
+          "mae": 17.30727693454929,
+          "rmse": 29.895572328256762
+        },
+        "unseen_geometry_repeat": {
+          "mae": 21.420495236560424,
+          "rmse": 36.18955236950973
+        }
+      }
+    },
+    {
+      "variant": "T2",
+      "status": "finished",
+      "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261001_014816_tri_free_seed7/random/rate0.4/20261001_014816_seed7_bs32",
+      "best_epoch": 95,
+      "val_mae": 14.694774618812206,
+      "training_seconds": 3376.8444441200118,
+      "evaluations": {
+        "in_distribution": {
+          "mae": 13.841666264977029,
+          "rmse": 24.402470150955185
+        },
+        "unseen_combinations": {
+          "mae": 20.618732405094526,
+          "rmse": 34.08907188405097
+        },
+        "unseen_geometry": {
+          "mae": 25.462910937493255,
+          "rmse": 42.61150999765713
+        },
+        "unseen_triple": {
+          "mae": 20.073575496128672,
+          "rmse": 32.94517220563707
+        },
+        "unseen_combinations_repeat": {
+          "mae": 20.67964403433331,
+          "rmse": 34.245440203813686
+        },
+        "unseen_geometry_repeat": {
+          "mae": 25.577547659576304,
+          "rmse": 42.80758656119342
+        }
+      }
+    },
+    {
+      "variant": "T3",
+      "status": "finished",
+      "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261001_024509_tri_fixed_detail_seed7/random/rate0.4/20261001_024509_seed7_bs32",
+      "best_epoch": 100,
+      "val_mae": 15.839467288941242,
+      "training_seconds": 3424.274672664993,
+      "evaluations": {
+        "in_distribution": {
+          "mae": 15.086011447615114,
+          "rmse": 26.4418267181472
+        },
+        "unseen_combinations": {
+          "mae": 16.17074736575532,
+          "rmse": 27.895236248885833
+        },
+        "unseen_geometry": {
+          "mae": 21.103050236265453,
+          "rmse": 35.372666374663375
+        },
+        "unseen_triple": {
+          "mae": 15.699442273421864,
+          "rmse": 26.657310426643264
+        },
+        "unseen_combinations_repeat": {
+          "mae": 16.39638886710572,
+          "rmse": 28.598200830985643
+        },
+        "unseen_geometry_repeat": {
+          "mae": 21.019199787476204,
+          "rmse": 35.01296117342448
+        }
+      }
+    },
+    {
+      "variant": "T4",
+      "status": "finished",
+      "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261001_034250_tri_free_detail_seed7/random/rate0.4/20261001_034250_seed7_bs32",
+      "best_epoch": 90,
+      "val_mae": 15.423761102484933,
+      "training_seconds": 3448.1795241550135,
+      "evaluations": {
+        "in_distribution": {
+          "mae": 14.521444606039589,
+          "rmse": 25.69268563629502
+        },
+        "unseen_combinations": {
+          "mae": 27.57687113028989,
+          "rmse": 50.24933420534868
+        },
+        "unseen_geometry": {
+          "mae": 29.433557356244272,
+          "rmse": 50.407366121932455
+        },
+        "unseen_triple": {
+          "mae": 25.56276057367036,
+          "rmse": 44.87878051398937
+        },
+        "unseen_combinations_repeat": {
+          "mae": 27.482978869206498,
+          "rmse": 49.83025408526188
+        },
+        "unseen_geometry_repeat": {
+          "mae": 29.447869779893264,
+          "rmse": 50.38683548852473
+        }
+      }
+    },
+    {
+      "variant": "T5",
+      "status": "finished",
+      "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261001_044056_tri_explore_detail_seed7/random/rate0.4/20261001_044056_seed7_bs32",
+      "best_epoch": 95,
+      "val_mae": 14.572550463136478,
+      "training_seconds": 3691.381000003981,
+      "evaluations": {
+        "in_distribution": {
+          "mae": 13.737870468761017,
+          "rmse": 24.285811475227156
+        },
+        "unseen_combinations": {
+          "mae": 30.26945948882056,
+          "rmse": 56.58292527005695
+        },
+        "unseen_geometry": {
+          "mae": 31.165340994933675,
+          "rmse": 53.11412234928728
+        },
+        "unseen_triple": {
+          "mae": 26.626216103389876,
+          "rmse": 49.597998565267204
+        },
+        "unseen_combinations_repeat": {
+          "mae": 30.199024541678117,
+          "rmse": 56.18949453932724
+        },
+        "unseen_geometry_repeat": {
+          "mae": 31.032069437869524,
+          "rmse": 53.15164356165397
+        }
+      }
+    },
+    {
+      "variant": "T6",
+      "status": "finished",
+      "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261001_054306_tri_fixed_repeat_seed17/random/rate0.4/20261001_054306_seed17_bs32",
+      "best_epoch": 90,
+      "val_mae": 14.219822955149828,
+      "training_seconds": 2946.0214840779954,
+      "evaluations": {
+        "in_distribution": {
+          "mae": 13.39826261437363,
+          "rmse": 23.578894703234813
+        },
+        "unseen_combinations": {
+          "mae": 28.171253179943047,
+          "rmse": 49.33148518026692
+        },
+        "unseen_geometry": {
+          "mae": 29.721923962669482,
+          "rmse": 49.998861768877184
+        },
+        "unseen_triple": {
+          "mae": 29.52137533256305,
+          "rmse": 49.583092372066545
+        },
+        "unseen_combinations_repeat": {
+          "mae": 28.12471448859753,
+          "rmse": 48.97601704600089
+        },
+        "unseen_geometry_repeat": {
+          "mae": 28.81987559731849,
+          "rmse": 48.266273847513965
+        }
+      }
+    },
+    {
+      "variant": "T7",
+      "status": "finished",
+      "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261001_063246_tri_free_repeat_seed17/random/rate0.4/20261001_063246_seed17_bs32",
+      "best_epoch": 95,
+      "val_mae": 24.461626302106573,
+      "training_seconds": 2464.50758660899,
+      "evaluations": {
+        "in_distribution": {
+          "mae": 23.28310385463775,
+          "rmse": 37.375322270058945
+        },
+        "unseen_combinations": {
+          "mae": 26.07007110626046,
+          "rmse": 41.633935416717875
+        },
+        "unseen_geometry": {
+          "mae": 27.60332937159433,
+          "rmse": 42.73909846411698
+        },
+        "unseen_triple": {
+          "mae": 25.08873591508257,
+          "rmse": 39.57202348283876
+        },
+        "unseen_combinations_repeat": {
+          "mae": 25.92340857160124,
+          "rmse": 41.2560225963776
+        },
+        "unseen_geometry_repeat": {
+          "mae": 27.491294366320805,
+          "rmse": 42.58425444404439
+        }
+      }
+    },
+    {
+      "variant": "T8",
+      "status": "finished",
+      "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261001_071606_tri_free_memory_seed7/random/rate0.4/20261001_071606_seed7_bs32",
+      "best_epoch": 100,
+      "val_mae": 15.154923018805066,
+      "training_seconds": 3811.4689198270207,
+      "evaluations": {
+        "in_distribution": {
+          "mae": 14.247475007410275,
+          "rmse": 25.186292147504933
+        },
+        "unseen_combinations": {
+          "mae": 28.35411351173629,
+          "rmse": 50.79021163367329
+        },
+        "unseen_geometry": {
+          "mae": 31.86488052371216,
+          "rmse": 55.444265940729295
+        },
+        "unseen_triple": {
+          "mae": 31.29596690413119,
+          "rmse": 53.47296206704967
+        },
+        "unseen_combinations_repeat": {
+          "mae": 28.084173164446224,
+          "rmse": 50.00209996726859
+        },
+        "unseen_geometry_repeat": {
+          "mae": 32.212698998246,
+          "rmse": 55.74977423329728
+        }
+      }
+    },
+    {
+      "variant": "T9",
+      "status": "finished",
+      "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261001_082016_tri_free_independent_seed7/random/rate0.4/20261001_082016_seed7_bs32",
+      "best_epoch": 100,
+      "val_mae": 14.14094809123521,
+      "training_seconds": 3461.074968616973,
+      "evaluations": {
+        "in_distribution": {
+          "mae": 13.318006994076097,
+          "rmse": 23.74155912922074
+        },
+        "unseen_combinations": {
+          "mae": 27.33257664598025,
+          "rmse": 45.629964958675856
+        },
+        "unseen_geometry": {
+          "mae": 30.46101496839482,
+          "rmse": 52.091096511554504
+        },
+        "unseen_triple": {
+          "mae": 26.366582287861107,
+          "rmse": 42.07193090325305
+        },
+        "unseen_combinations_repeat": {
+          "mae": 27.486563940237215,
+          "rmse": 45.766019256882856
+        },
+        "unseen_geometry_repeat": {
+          "mae": 30.405732395921614,
+          "rmse": 51.99076425109208
+        }
+      }
+    }
+  ],
+  "paths_and_costs": [
+    [
+      "T1",
+      "CMFF 100.0%",
+      true,
+      8.0,
+      "4.625",
+      "309,687 / 250,043",
+      "51.74",
+      "8.522"
+    ],
+    [
+      "T2",
+      "MMFF 100.0%",
+      true,
+      8.0,
+      "5.000",
+      "309,687 / 309,687",
+      "56.28",
+      "10.316"
+    ],
+    [
+      "T3",
+      "CMFF 100.0%",
+      true,
+      8.0,
+      "4.625",
+      "309,687 / 250,043",
+      "57.07",
+      "8.662"
+    ],
+    [
+      "T4",
+      "MMFF 100.0%",
+      true,
+      8.0,
+      "5.000",
+      "309,687 / 309,687",
+      "57.47",
+      "10.386"
+    ],
+    [
+      "T5",
+      "CFFF 100.0%",
+      true,
+      8.0,
+      "6.125",
+      "309,687 / 309,687",
+      "61.52",
+      "9.923"
+    ],
+    [
+      "T6",
+      "CMFF 100.0%",
+      true,
+      8.0,
+      "4.625",
+      "309,687 / 250,043",
+      "49.10",
+      "8.200"
+    ],
+    [
+      "T7",
+      "MCFM 100.0%",
+      true,
+      8.0,
+      "3.125",
+      "309,687 / 309,687",
+      "41.08",
+      "9.082"
+    ],
+    [
+      "T8",
+      "FCFF 100.0%",
+      true,
+      8.0,
+      "6.125",
+      "326,647 / 326,647",
+      "63.52",
+      "12.073"
+    ],
+    [
+      "T9",
+      "CFFF 100.0%",
+      true,
+      8.0,
+      "6.125",
+      "800,055 / 800,055",
+      "57.68",
+      "10.310"
+    ]
+  ],
+  "confirmation": {
+    "N5": {
+      "unseen_combinations": {
+        "mae": 25.086336505962034,
+        "rmse": 43.891073163604695
+      },
+      "unseen_geometry": {
+        "mae": 28.200669123508412,
+        "rmse": 48.115826649174316
+      },
+      "unseen_triple": {
+        "mae": 23.824086692657787,
+        "rmse": 40.116647190613946
+      }
+    },
+    "R5": {
+      "unseen_combinations": {
+        "mae": 15.65421379325478,
+        "rmse": 26.865170241426352
+      },
+      "unseen_geometry": {
+        "mae": 20.16607545745855,
+        "rmse": 33.86660917868889
+      },
+      "unseen_triple": {
+        "mae": 14.98495356797524,
+        "rmse": 25.521697686140275
+      }
+    },
+    "T1": {
+      "unseen_combinations": {
+        "mae": 17.218071600158854,
+        "rmse": 29.46202286629607
+      },
+      "unseen_geometry": {
+        "mae": 21.455077094733525,
+        "rmse": 36.08803096134566
+      },
+      "unseen_triple": {
+        "mae": 16.032037350661383,
+        "rmse": 26.792454845677966
+      }
+    },
+    "T2": {
+      "unseen_combinations": {
+        "mae": 20.555460347117403,
+        "rmse": 33.80518045980298
+      },
+      "unseen_geometry": {
+        "mae": 24.91358105473387,
+        "rmse": 41.38396101769607
+      },
+      "unseen_triple": {
+        "mae": 20.151148781405535,
+        "rmse": 33.160078987459855
+      }
+    },
+    "T6": {
+      "unseen_combinations": {
+        "mae": 28.388669744208833,
+        "rmse": 49.973542423619826
+      },
+      "unseen_geometry": {
+        "mae": 29.2793388596235,
+        "rmse": 49.535127465456306
+      },
+      "unseen_triple": {
+        "mae": 29.27426551948902,
+        "rmse": 49.244827516536084
+      }
+    },
+    "T7": {
+      "unseen_combinations": {
+        "mae": 25.90639280066649,
+        "rmse": 41.28202057996162
+      },
+      "unseen_geometry": {
+        "mae": 27.378754724949314,
+        "rmse": 42.349140154925614
+      },
+      "unseen_triple": {
+        "mae": 24.997717401626808,
+        "rmse": 39.34155433210864
+      }
+    }
+  }
+}

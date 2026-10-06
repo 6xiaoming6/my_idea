@@ -467,9 +467,18 @@ def train_one_epoch(
         seen_samples += int(batch["x_f_gt"].shape[0])
         optimizer.zero_grad(set_to_none=True)
         weighted_ranking = None
+        four_direction = cfg["model"].get("coe", {}).get("four_direction", {}).get("enabled", False)
+        if four_direction:
+            core_model.main_branch.prepare_training_batch(batch)
         with torch.autocast(device_type=device.type, enabled=use_amp):
             outputs = model(batch)
             loss, loss_dict = compute_main_stage_loss(outputs, batch, cfg, epoch=epoch)
+            if four_direction and "four_probe" in outputs:
+                auxiliary, probe_logs = core_model.main_branch.candidate_loss(batch, outputs)
+                loss = loss + 0.1 * auxiliary
+                loss_dict["loss"] = loss.detach()
+                logs["l_four_candidate"].append(float(auxiliary.detach()))
+                for key, value in probe_logs.items(): logs[key].append(value)
             task_loss = outputs["coe"].get("_loss_terms", {}).get("main", loss) if partner_mode else loss
             if partner_mode:
                 # Keep DDP's partner-head hooks active on non-probe batches too.

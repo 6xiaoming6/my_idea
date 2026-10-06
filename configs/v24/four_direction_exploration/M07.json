@@ -1,0 +1,9 @@
+{
+  "name": "round_delta",
+  "method": "M07: memory=delta, single F",
+  "module": {
+    "memory": "delta"
+  },
+  "sharing": "shared",
+  "reference": "M01"
+}

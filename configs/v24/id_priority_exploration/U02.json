@@ -1,0 +1,10 @@
+{
+  "name": "cmff_delta010",
+  "method": "CMFF＋RMS状态差分，幅度0.1",
+  "module": {
+    "communication": "delta",
+    "bound": 0.1
+  },
+  "seed": 7,
+  "reference": "U01"
+}

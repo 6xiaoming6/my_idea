@@ -1,0 +1,6 @@
+{
+  "name": "m17_repeat",
+  "source": "$memory1",
+  "seed": 17,
+  "method": "M17: repeat $memory1, seed17"
+}

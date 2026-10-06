@@ -1,0 +1,9 @@
+{
+  "name": "round_message",
+  "method": "M11: memory=message, single F",
+  "module": {
+    "memory": "message"
+  },
+  "sharing": "shared",
+  "reference": "M01"
+}

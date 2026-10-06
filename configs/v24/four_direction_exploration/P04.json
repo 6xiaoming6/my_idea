@@ -1,0 +1,9 @@
+{
+  "name": "pair_joint_history_final",
+  "method": "P04: pair=joint_history, teacher=final",
+  "module": {
+    "pair": "joint_history",
+    "teacher": "final"
+  },
+  "reference": "M01"
+}

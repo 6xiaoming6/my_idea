@@ -10,6 +10,63 @@ from itertools import product
 import torch
 
 
+class _TriScaleTotals:
+    """Sample-exact three-scale metrics, separate from legacy binary scales."""
+    def __init__(self):
+        self.count=0;self.choices=None;self.probs=None;self.paths=Counter()
+        self.executed=None;self.mixture=None;self.execution_paths=Counter()
+    def update(self,record):
+        choices=record['triscale_choices'].detach().long().cpu()
+        probs=record['triscale_probabilities'].detach().double().cpu()
+        if probs.shape!=(*choices.shape,3) or choices.ndim!=2 or bool(((choices<0)|(choices>2)).any()):
+            raise ValueError('Invalid three-scale routing records')
+        onehot=torch.nn.functional.one_hot(choices,3).double().sum(0)
+        self.choices=onehot if self.choices is None else self.choices+onehot
+        self.probs=probs.sum(0) if self.probs is None else self.probs+probs.sum(0)
+        self.count+=len(choices);self.paths.update(tuple(row) for row in choices.tolist())
+        if 'triscale_executed' in record:
+            active=record['triscale_executed'].detach().double().cpu()
+            mixture=record['triscale_weights'].detach().double().cpu()
+            if active.shape!=probs.shape or mixture.shape!=probs.shape:raise ValueError('Invalid scale execution records')
+            self.executed=active.sum(0) if self.executed is None else self.executed+active.sum(0)
+            self.mixture=mixture.sum(0) if self.mixture is None else self.mixture+mixture.sum(0)
+            bits=(active.long()*torch.tensor([1,2,4])).sum(2)
+            self.execution_paths.update(tuple(row) for row in bits.tolist())
+    def merge(self,other):
+        if not other.count:return
+        self.choices=other.choices.clone() if self.choices is None else self.choices+other.choices
+        self.probs=other.probs.clone() if self.probs is None else self.probs+other.probs
+        self.count+=other.count;self.paths.update(other.paths)
+        if other.executed is not None:
+            self.executed=other.executed.clone() if self.executed is None else self.executed+other.executed
+            self.mixture=other.mixture.clone() if self.mixture is None else self.mixture+other.mixture
+            self.execution_paths.update(other.execution_paths)
+    def compute(self,top_k):
+        if not self.count:return {}
+        result={};names=('fine','mid','coarse');n=len(self.choices)
+        for step in range(n):
+            for sid,name in enumerate(names):
+                result[f'coe_step{step+1}_{name}_fraction']=float(self.choices[step,sid]/self.count)
+                result[f'coe_step{step+1}_{name}_probability']=float(self.probs[step,sid]/self.count)
+        for sid,name in enumerate(names):result[f'coe_{name}_rounds_mean']=float(self.choices[:,sid].sum()/self.count)
+        result['coe_expert_execution_count']=float(top_k*n)
+        result['coe_expert_grid_equivalents']=float(top_k*(self.choices*torch.tensor([1.,.25,.0625])).sum()/self.count)
+        if self.executed is not None:
+            result['coe_expert_execution_count']=float(top_k*self.executed.sum()/self.count)
+            result['coe_expert_grid_equivalents']=float(top_k*(self.executed*torch.tensor([1.,.25,.0625])).sum()/self.count)
+            for step in range(n):
+                for sid,name in enumerate(names):
+                    result[f'coe_step{step+1}_{name}_executed_fraction']=float(self.executed[step,sid]/self.count)
+                    result[f'coe_step{step+1}_{name}_mixture_weight']=float(self.mixture[step,sid]/self.count)
+            for path,count in self.execution_paths.items():
+                label='__'.join(''.join('fmc'[i] for i in range(3) if bit & (1<<i)) for bit in path)
+                result[f'coe_scale_execution_path_{label}_fraction']=count/self.count
+        for path in product(range(3),repeat=n):
+            label=''.join('fmc'[i] for i in path)
+            result[f'coe_scale_path_{label}_fraction']=self.paths[path]/self.count
+        return result
+
+
 class _CoERoutingTotals:
     """Routing totals shared by the global and observation-condition groups."""
 
@@ -22,6 +79,14 @@ class _CoERoutingTotals:
         self.pair_path_counts: Counter = Counter()
         self.pair_counts: list[Counter] | None = None
         self.selection_sum = None
+        self.triscale = _TriScaleTotals()
+        self.scale_choice_sum = None
+        self.scale_probability_sum = None
+        self.scale_weight_sum = None
+        self.scale_execution_sum = None
+        self.scale_both_sum = None
+        self.scale_entropy_sum = None
+        self.scale_path_counts: Counter = Counter()
         self.mode = None
         self.top_k = None
         self.expert_names: tuple[str, ...] | None = None
@@ -53,6 +118,33 @@ class _CoERoutingTotals:
         self.weight_sum += weights.sum(dim=0)
         self.probability_sum += probs.sum(dim=0)
         self.entropy_sum += -(probs * probs.clamp_min(1e-12).log()).sum(dim=(0, 2))
+        if 'triscale_choices' in coe:self.triscale.update(coe)
+        scales=coe.get('selected_scales')
+        if scales is not None:
+            scales=scales.detach().double().cpu()
+            scale_probs=coe['scale_probabilities'].detach().double().cpu()
+            if scales.shape!=weights.shape[:2] or scale_probs.shape!=(*scales.shape,2):
+                raise ValueError('Scale records must match routing batch/steps')
+            if self.scale_choice_sum is None:
+                self.scale_choice_sum=torch.zeros_like(scales[0])
+                self.scale_probability_sum=torch.zeros_like(scale_probs[0])
+            self.scale_choice_sum+=scales.sum(0)
+            self.scale_probability_sum+=scale_probs.sum(0)
+            self.scale_path_counts.update(tuple(map(int,row)) for row in scales.tolist())
+            if 'scale_weights' in coe:
+                scale_weights = coe['scale_weights'].detach().double().cpu()
+                execution = coe['scale_executed'].detach().double().cpu()
+                if scale_weights.shape != scale_probs.shape or execution.shape != scale_probs.shape:
+                    raise ValueError('Scale weights/execution must match scale probabilities')
+                if self.scale_weight_sum is None:
+                    self.scale_weight_sum = torch.zeros_like(scale_weights[0])
+                    self.scale_execution_sum = torch.zeros_like(execution[0])
+                    self.scale_both_sum = torch.zeros_like(scales[0])
+                    self.scale_entropy_sum = torch.zeros_like(scales[0])
+                self.scale_weight_sum += scale_weights.sum(0)
+                self.scale_execution_sum += execution.sum(0)
+                self.scale_both_sum += (execution.prod(-1)).sum(0)
+                self.scale_entropy_sum += -(scale_weights * scale_weights.clamp_min(1e-12).log()).sum((0, 2))
         selected = coe.get("selected_experts")
         pair_ids = coe.get("pair_ids")
         if selected is not None:
@@ -91,11 +183,13 @@ class _CoERoutingTotals:
         if not self.count:
             self.mode, self.top_k, self.expert_names = other.mode, other.top_k, other.expert_names
         self.count += other.count
-        for name in ("probability_sum", "weight_sum", "entropy_sum", "selection_sum"):
+        for name in ("probability_sum", "weight_sum", "entropy_sum", "selection_sum", "scale_choice_sum", "scale_probability_sum", "scale_weight_sum", "scale_execution_sum", "scale_both_sum", "scale_entropy_sum"):
             value = getattr(other, name)
             if value is not None:
                 current = getattr(self, name)
                 setattr(self, name, value.clone() if current is None else current + value)
+        self.triscale.merge(other.triscale)
+        self.scale_path_counts.update(other.scale_path_counts)
         self.path_counts.update(other.path_counts)
         self.pair_path_counts.update(other.pair_path_counts)
         if other.pair_counts is not None:
@@ -113,6 +207,28 @@ class _CoERoutingTotals:
             "coe_num_steps": float(self.weight_sum.shape[0]),
             "coe_top_k": float(self.top_k),
         }
+        result.update(self.triscale.compute(self.top_k))
+        if self.scale_choice_sum is not None:
+            for step in range(len(self.scale_choice_sum)):
+                result[f'coe_step{step+1}_coarse_fraction']=float(self.scale_choice_sum[step]/self.count)
+                result[f'coe_step{step+1}_coarse_probability']=float(self.scale_probability_sum[step,1]/self.count)
+            coarse=float(self.scale_choice_sum.sum()/self.count)
+            result['coe_coarse_rounds_mean']=coarse
+            result['coe_expert_grid_equivalents']=self.top_k*(len(self.scale_choice_sum)-coarse+coarse/4)
+            for path in product((0,1),repeat=len(self.scale_choice_sum)):
+                name=''.join('c' if x else 'f' for x in path)
+                result[f'coe_scale_path_{name}_fraction']=self.scale_path_counts[path]/self.count
+        if self.scale_weight_sum is not None:
+            for step in range(len(self.scale_weight_sum)):
+                prefix = f'coe_step{step+1}'
+                result[f'{prefix}_scale_weight_entropy'] = float(self.scale_entropy_sum[step]/self.count)
+                result[f'{prefix}_both_scales_fraction'] = float(self.scale_both_sum[step]/self.count)
+                for sid, label in enumerate(('fine', 'coarse')):
+                    result[f'{prefix}_{label}_scale_weight'] = float(self.scale_weight_sum[step,sid]/self.count)
+                    result[f'{prefix}_{label}_execution_fraction'] = float(self.scale_execution_sum[step,sid]/self.count)
+            # Cost follows executed branches, NOT dominant scales or soft weights.
+            result['coe_expert_grid_equivalents'] = float(self.top_k * (self.scale_execution_sum[:,0] + self.scale_execution_sum[:,1]/4).sum()/self.count)
+            result['coe_expert_execution_count'] = float(self.top_k * self.scale_execution_sum.sum()/self.count)
         for step in range(self.weight_sum.shape[0]):
             prefix = f"coe_step{step + 1}"
             for expert, label in enumerate(self.expert_names):
@@ -257,7 +373,7 @@ class CoERoutingMetricAccumulator(_CoERoutingTotals):
         }
         if coe["routing_mode"] not in {"soft", "parallel"}:
             route_record["paths"] = coe["paths"].detach().cpu()
-        for name in ("selected_experts", "pair_ids"):
+        for name in ("selected_experts", "pair_ids", "selected_scales", "scale_probabilities", "scale_weights", "scale_executed", "triscale_choices", "triscale_probabilities", "triscale_executed", "triscale_weights"):
             value = coe.get(name)
             if value is not None:
                 route_record[name] = value.detach().cpu()

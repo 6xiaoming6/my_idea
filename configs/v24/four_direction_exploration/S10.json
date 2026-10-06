@@ -1,0 +1,8 @@
+{
+  "name": "scale_equal3",
+  "method": "S10: F/M/C scale mode=equal3",
+  "module": {
+    "scale": "equal3"
+  },
+  "reference": "S01"
+}

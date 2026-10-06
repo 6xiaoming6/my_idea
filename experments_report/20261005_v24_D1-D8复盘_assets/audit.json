@@ -1,0 +1,84 @@
+{
+  "runs": {
+    "D1": {
+      "epochs": 100,
+      "validations": 20,
+      "best_exists": true,
+      "last_exists": true,
+      "nonfinite": [],
+      "amp_skips": 12.0
+    },
+    "D2": {
+      "epochs": 100,
+      "validations": 20,
+      "best_exists": true,
+      "last_exists": true,
+      "nonfinite": [],
+      "amp_skips": 12.0
+    },
+    "D3": {
+      "epochs": 100,
+      "validations": 20,
+      "best_exists": true,
+      "last_exists": true,
+      "nonfinite": [],
+      "amp_skips": 12.0
+    },
+    "D4": {
+      "epochs": 100,
+      "validations": 20,
+      "best_exists": true,
+      "last_exists": true,
+      "nonfinite": [],
+      "amp_skips": 11.0
+    },
+    "D5": {
+      "epochs": 100,
+      "validations": 20,
+      "best_exists": true,
+      "last_exists": true,
+      "nonfinite": [],
+      "amp_skips": 11.0
+    },
+    "D6": {
+      "epochs": 100,
+      "validations": 20,
+      "best_exists": true,
+      "last_exists": true,
+      "nonfinite": [],
+      "amp_skips": 12.0
+    },
+    "D7": {
+      "epochs": 100,
+      "validations": 20,
+      "best_exists": true,
+      "last_exists": true,
+      "nonfinite": [],
+      "amp_skips": 12.0
+    },
+    "D8": {
+      "epochs": 100,
+      "validations": 20,
+      "best_exists": true,
+      "last_exists": true,
+      "nonfinite": [],
+      "amp_skips": 11.0
+    }
+  },
+  "coverage": {
+    "evaluations": {
+      "files": 8,
+      "sets": 48
+    },
+    "confirmation": {
+      "files": 12,
+      "sets": 36
+    },
+    "rate_transfer": {
+      "files": 12,
+      "sets": 144
+    }
+  },
+  "source_count": 368,
+  "source_mismatches": []
+}

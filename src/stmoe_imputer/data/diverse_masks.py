@@ -14,6 +14,7 @@ COMPOSITION_PARTS = {
     'node_plus_space': ('node_outage', 'spatial_region'),
     'time_plus_space': ('temporal_gap', 'spatial_region'),
     'node_plus_time': ('node_outage', 'temporal_gap'),
+    'node_plus_time_plus_space': ('node_outage', 'temporal_gap', 'spatial_region'),
 }
 FAMILIES = LEGACY_FAMILIES  # Historical nine-pattern public/default protocol.
 ALL_FAMILIES = FAMILIES + tuple(COMPOSITION_PARTS)
@@ -70,6 +71,8 @@ def make_diverse_mask(shape, rate, family, rng):
     count = round(math.prod(shape)*rate)
     if not 0 < count < math.prod(shape):
         raise ValueError('Shape/rate must leave both observed and missing cells')
+    if family == 'node_plus_time_plus_space':
+        return make_triple_mask(shape, count, rng)
     if family in COMPOSITION_PARTS:
         return make_composed_mask(shape, count, COMPOSITION_PARTS[family], rng)
     field = _field(shape, family, rng).ravel()
@@ -101,6 +104,30 @@ def make_composed_mask(shape, count, parts, rng):
             new_cells = order[~missing[order]]
             missing[new_cells[:count - int(missing.sum())]] = True
     return (~missing).astype(np.float32).reshape(shape)
+
+
+def make_triple_mask(shape, count, rng, return_contributions=False):
+    """Each component supplies a third of NEW cells; no target values or filler.
+
+    Components use the same boundary-plane convention as legacy masks. Optional
+    disjoint contributions make geometric provenance testable without model input.
+    """
+    if count < 3:
+        raise ValueError('Three-component mask requires at least three missing cells')
+    parts=list(rng.permutation(('node_outage','temporal_gap','spatial_region')))
+    missing=np.zeros(math.prod(shape),dtype=bool)
+    contributions={}
+    for index,part in enumerate(parts):
+        field=_field(shape,part,rng).ravel()
+        order=np.lexsort((rng.random(field.size),field))
+        new_cells=order[~missing[order]]
+        quota=count//3 + int(index<count%3)
+        contribution=np.zeros_like(missing)
+        contribution[new_cells[:quota]]=True
+        missing |= contribution
+        contributions[part]=contribution.reshape(shape)
+    mask=(~missing).astype(np.float32).reshape(shape)
+    return (mask,contributions) if return_contributions else mask
 
 
 class DiverseMaskSchedule:

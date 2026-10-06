@@ -1,0 +1,9 @@
+{
+  "name": "round_independent",
+  "method": "M02: memory=none, single F",
+  "module": {
+    "memory": "none"
+  },
+  "sharing": "per_step",
+  "reference": "M01"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "pair_equal",
+  "method": "P01: pair=equal, teacher=none",
+  "module": {
+    "pair": "equal",
+    "teacher": "none"
+  },
+  "reference": "M01"
+}

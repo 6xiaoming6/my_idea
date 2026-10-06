@@ -1,0 +1,12 @@
+{
+  "name": "scale_teacher_identity",
+  "method": "U12＋第21epoch启用零初始化尺度身份向量",
+  "module": {
+    "scale_policy": "teacher",
+    "constraint": "last_two_fine",
+    "fixed_epochs": 20,
+    "scale_identity": true
+  },
+  "seed": 7,
+  "reference": "U01"
+}

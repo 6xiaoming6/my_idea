@@ -1,0 +1,1022 @@
+[
+  {
+    "variant": "M01",
+    "status": "finished",
+    "method": "M01: memory=none, single F",
+    "reference": "M01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261001_111512_round_none_seed7/random/rate0.4/20261001_111512_seed7_bs32",
+    "val_mae": 17.132734260201197,
+    "best_epoch": 95,
+    "training_seconds": 4277.43128595929,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 16.344496558179287,
+        "rmse": 29.017520629315605
+      },
+      "unseen_combinations": {
+        "mae": 27.01804235925155,
+        "rmse": 47.8520280125496
+      },
+      "unseen_geometry": {
+        "mae": 31.26965634672027,
+        "rmse": 55.96119444591506
+      },
+      "unseen_triple": {
+        "mae": 25.37878062493795,
+        "rmse": 43.54727320234648
+      },
+      "unseen_combinations_repeat": {
+        "mae": 27.229673814823716,
+        "rmse": 48.09542058429327
+      },
+      "unseen_geometry_repeat": {
+        "mae": 31.244385224200375,
+        "rmse": 55.51656768587925
+      }
+    }
+  },
+  {
+    "variant": "M02",
+    "status": "finished",
+    "method": "M02: memory=none, single F",
+    "reference": "M01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261001_122739_round_independent_seed7/random/rate0.4/20261001_122739_seed7_bs32",
+    "val_mae": 15.684299762631401,
+    "best_epoch": 95,
+    "training_seconds": 4387.293373691937,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 14.851851547920015,
+        "rmse": 26.484247496503162
+      },
+      "unseen_combinations": {
+        "mae": 18.75139100025756,
+        "rmse": 32.83771225549873
+      },
+      "unseen_geometry": {
+        "mae": 29.198297633316596,
+        "rmse": 51.061139856017476
+      },
+      "unseen_triple": {
+        "mae": 18.65611637224615,
+        "rmse": 31.979306151547636
+      },
+      "unseen_combinations_repeat": {
+        "mae": 18.954400731818566,
+        "rmse": 33.12575273681222
+      },
+      "unseen_geometry_repeat": {
+        "mae": 28.505153432252104,
+        "rmse": 49.83961254501108
+      }
+    }
+  },
+  {
+    "variant": "M03",
+    "status": "finished",
+    "method": "M03: memory=residual, single F",
+    "reference": "M01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261001_134201_round_residual_seed7/random/rate0.4/20261001_134201_seed7_bs32",
+    "val_mae": 16.63522975376726,
+    "best_epoch": 100,
+    "training_seconds": 4377.610344516957,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 15.864508157417253,
+        "rmse": 28.415342385418114
+      },
+      "unseen_combinations": {
+        "mae": 27.506412360553743,
+        "rmse": 49.76223492691566
+      },
+      "unseen_geometry": {
+        "mae": 31.49146864266793,
+        "rmse": 56.70072534870117
+      },
+      "unseen_triple": {
+        "mae": 24.83729721567928,
+        "rmse": 42.50783038482205
+      },
+      "unseen_combinations_repeat": {
+        "mae": 27.509389321434686,
+        "rmse": 49.24250462718403
+      },
+      "unseen_geometry_repeat": {
+        "mae": 31.58517984664329,
+        "rmse": 56.66420991428451
+      }
+    }
+  },
+  {
+    "variant": "M04",
+    "status": "finished",
+    "method": "M04: memory=anchor, single F",
+    "reference": "M01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261001_145610_round_anchor_seed7/random/rate0.4/20261001_145610_seed7_bs32",
+    "val_mae": 16.32951870393175,
+    "best_epoch": 90,
+    "training_seconds": 4649.640322082007,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 15.633686941621425,
+        "rmse": 28.105873798206584
+      },
+      "unseen_combinations": {
+        "mae": 23.311269237936003,
+        "rmse": 40.92877784661602
+      },
+      "unseen_geometry": {
+        "mae": 32.02488810845188,
+        "rmse": 54.82753805689987
+      },
+      "unseen_triple": {
+        "mae": 22.099630367592784,
+        "rmse": 36.87274187662748
+      },
+      "unseen_combinations_repeat": {
+        "mae": 23.239423343947532,
+        "rmse": 40.52055522414133
+      },
+      "unseen_geometry_repeat": {
+        "mae": 31.19340405529072,
+        "rmse": 53.296445720997454
+      }
+    }
+  },
+  {
+    "variant": "M05",
+    "status": "finished",
+    "method": "M05: memory=signed, single F",
+    "reference": "M01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261001_161452_round_signed_seed7/random/rate0.4/20261001_161452_seed7_bs32",
+    "val_mae": 15.71309126495452,
+    "best_epoch": 100,
+    "training_seconds": 4298.232197823061,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 14.910340255704833,
+        "rmse": 26.620162359926184
+      },
+      "unseen_combinations": {
+        "mae": 21.021494976121648,
+        "rmse": 36.74075498412544
+      },
+      "unseen_geometry": {
+        "mae": 32.027619118364385,
+        "rmse": 55.04286311749207
+      },
+      "unseen_triple": {
+        "mae": 20.13181220062131,
+        "rmse": 33.82309501797233
+      },
+      "unseen_combinations_repeat": {
+        "mae": 20.931389329348573,
+        "rmse": 36.335725312378344
+      },
+      "unseen_geometry_repeat": {
+        "mae": 31.15354986323367,
+        "rmse": 53.54967160126407
+      }
+    }
+  },
+  {
+    "variant": "M06",
+    "status": "finished",
+    "method": "M06: memory=positive, single F",
+    "reference": "M01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261001_172741_round_positive_seed7/random/rate0.4/20261001_172741_seed7_bs32",
+    "val_mae": 16.720075568286603,
+    "best_epoch": 90,
+    "training_seconds": 4256.880957592191,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 16.04232361208436,
+        "rmse": 29.301499845717647
+      },
+      "unseen_combinations": {
+        "mae": 27.68425745631895,
+        "rmse": 47.651976780497876
+      },
+      "unseen_geometry": {
+        "mae": 30.80031560215315,
+        "rmse": 53.705688935687
+      },
+      "unseen_triple": {
+        "mae": 27.313333637898015,
+        "rmse": 45.488403479153455
+      },
+      "unseen_combinations_repeat": {
+        "mae": 27.723816226630657,
+        "rmse": 47.645823810380186
+      },
+      "unseen_geometry_repeat": {
+        "mae": 30.848138258455986,
+        "rmse": 53.56020178782615
+      }
+    }
+  },
+  {
+    "variant": "M07",
+    "status": "finished",
+    "method": "M07: memory=delta, single F",
+    "reference": "M01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261001_183948_round_delta_seed7/random/rate0.4/20261001_183948_seed7_bs32",
+    "val_mae": 15.909633357724593,
+    "best_epoch": 95,
+    "training_seconds": 4503.240165780298,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 15.235231205961027,
+        "rmse": 26.973400735293996
+      },
+      "unseen_combinations": {
+        "mae": 21.81054739266253,
+        "rmse": 36.97264961052151
+      },
+      "unseen_geometry": {
+        "mae": 27.14291446007157,
+        "rmse": 47.59696355933711
+      },
+      "unseen_triple": {
+        "mae": 21.30995673802593,
+        "rmse": 35.17218549880889
+      },
+      "unseen_combinations_repeat": {
+        "mae": 21.982776543531404,
+        "rmse": 37.339821607417704
+      },
+      "unseen_geometry_repeat": {
+        "mae": 27.17667756384707,
+        "rmse": 47.89751922917097
+      }
+    }
+  },
+  {
+    "variant": "M08",
+    "status": "finished",
+    "method": "M08: memory=delta_detach, single F",
+    "reference": "M01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261001_195604_round_delta_detach_seed7/random/rate0.4/20261001_195604_seed7_bs32",
+    "val_mae": 15.539281826131962,
+    "best_epoch": 100,
+    "training_seconds": 4729.384005399013,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 14.663456357080266,
+        "rmse": 25.95138912341761
+      },
+      "unseen_combinations": {
+        "mae": 33.742838635156936,
+        "rmse": 59.157151835113424
+      },
+      "unseen_geometry": {
+        "mae": 36.605205717854155,
+        "rmse": 63.232838347906444
+      },
+      "unseen_triple": {
+        "mae": 34.00142865416465,
+        "rmse": 58.18087426935092
+      },
+      "unseen_combinations_repeat": {
+        "mae": 33.935011325849196,
+        "rmse": 59.43037195826727
+      },
+      "unseen_geometry_repeat": {
+        "mae": 36.32310172868035,
+        "rmse": 62.54630370370203
+      }
+    }
+  },
+  {
+    "variant": "M09",
+    "status": "finished",
+    "method": "M09: memory=router, single F",
+    "reference": "M01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261001_211606_round_router_seed7/random/rate0.4/20261001_211606_seed7_bs32",
+    "val_mae": 18.895012731047693,
+    "best_epoch": 95,
+    "training_seconds": 4308.376967312011,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 18.02936426049777,
+        "rmse": 31.80148889006256
+      },
+      "unseen_combinations": {
+        "mae": 25.624334662566316,
+        "rmse": 43.766661332131505
+      },
+      "unseen_geometry": {
+        "mae": 31.669083021694117,
+        "rmse": 54.18358058320641
+      },
+      "unseen_triple": {
+        "mae": 26.555944622946527,
+        "rmse": 44.2819208944618
+      },
+      "unseen_combinations_repeat": {
+        "mae": 25.970925787899237,
+        "rmse": 44.84229215212266
+      },
+      "unseen_geometry_repeat": {
+        "mae": 31.493402256680397,
+        "rmse": 53.928853585720866
+      }
+    }
+  },
+  {
+    "variant": "M10",
+    "status": "finished",
+    "method": "M10: memory=both, single F",
+    "reference": "M01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261001_222906_round_both_seed7/random/rate0.4/20261001_222906_seed7_bs32",
+    "val_mae": 14.905700415841231,
+    "best_epoch": 100,
+    "training_seconds": 4362.949834412284,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 14.118545515992524,
+        "rmse": 25.225304316239207
+      },
+      "unseen_combinations": {
+        "mae": 26.27432685210099,
+        "rmse": 49.328880799265164
+      },
+      "unseen_geometry": {
+        "mae": 36.34627227219161,
+        "rmse": 63.74909412016016
+      },
+      "unseen_triple": {
+        "mae": 29.612573311356712,
+        "rmse": 49.83063231055431
+      },
+      "unseen_combinations_repeat": {
+        "mae": 26.19769064729827,
+        "rmse": 49.02503860103312
+      },
+      "unseen_geometry_repeat": {
+        "mae": 35.0569122393274,
+        "rmse": 61.35075637828992
+      }
+    }
+  },
+  {
+    "variant": "M11",
+    "status": "finished",
+    "method": "M11: memory=message, single F",
+    "reference": "M01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261001_234300_round_message_seed7/random/rate0.4/20261001_234300_seed7_bs32",
+    "val_mae": 15.39418833621864,
+    "best_epoch": 95,
+    "training_seconds": 4528.647491903452,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 14.402869876118915,
+        "rmse": 25.176993698833694
+      },
+      "unseen_combinations": {
+        "mae": 34.579915979717434,
+        "rmse": 64.2912138849187
+      },
+      "unseen_geometry": {
+        "mae": 31.238769531109483,
+        "rmse": 54.77997192249186
+      },
+      "unseen_triple": {
+        "mae": 38.871487350013886,
+        "rmse": 66.83643796482883
+      },
+      "unseen_combinations_repeat": {
+        "mae": 34.48840487185981,
+        "rmse": 63.92073680875806
+      },
+      "unseen_geometry_repeat": {
+        "mae": 30.305880304641423,
+        "rmse": 52.89773869647559
+      }
+    }
+  },
+  {
+    "variant": "M12",
+    "status": "finished",
+    "method": "M12: memory=gru, single F",
+    "reference": "M01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261002_005941_round_gru_seed7/random/rate0.4/20261002_005941_seed7_bs32",
+    "val_mae": 17.28981501311774,
+    "best_epoch": 100,
+    "training_seconds": 4837.539665736258,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 16.5254159286369,
+        "rmse": 29.650058999880038
+      },
+      "unseen_combinations": {
+        "mae": 36.00286427794429,
+        "rmse": 63.539117793916716
+      },
+      "unseen_geometry": {
+        "mae": 35.5133905819008,
+        "rmse": 61.78699936166768
+      },
+      "unseen_triple": {
+        "mae": 35.27173587299509,
+        "rmse": 59.92336876873107
+      },
+      "unseen_combinations_repeat": {
+        "mae": 36.069765828130556,
+        "rmse": 63.7361050195694
+      },
+      "unseen_geometry_repeat": {
+        "mae": 35.2396898440389,
+        "rmse": 61.54309346022708
+      }
+    }
+  },
+  {
+    "variant": "S01",
+    "status": "pending",
+    "method": "S01: F/M/C scale mode=fixed",
+    "reference": "S01",
+    "seed": 7,
+    "run_dir": null,
+    "val_mae": null,
+    "best_epoch": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "S02",
+    "status": "pending",
+    "method": "S02: F/M/C scale mode=free",
+    "reference": "S01",
+    "seed": 7,
+    "run_dir": null,
+    "val_mae": null,
+    "best_epoch": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "S03",
+    "status": "pending",
+    "method": "S03: F/M/C scale mode=sample",
+    "reference": "S01",
+    "seed": 7,
+    "run_dir": null,
+    "val_mae": null,
+    "best_epoch": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "S04",
+    "status": "pending",
+    "method": "S04: F/M/C scale mode=teacher",
+    "reference": "S01",
+    "seed": 7,
+    "run_dir": null,
+    "val_mae": null,
+    "best_epoch": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "S05",
+    "status": "pending",
+    "method": "S05: F/M/C scale mode=history",
+    "reference": "S01",
+    "seed": 7,
+    "run_dir": null,
+    "val_mae": null,
+    "best_epoch": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "S06",
+    "status": "pending",
+    "method": "S06: F/M/C scale mode=bank",
+    "reference": "S01",
+    "seed": 7,
+    "run_dir": null,
+    "val_mae": null,
+    "best_epoch": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "S07",
+    "status": "pending",
+    "method": "S07: F/M/C scale mode=top2",
+    "reference": "S08",
+    "seed": 7,
+    "run_dir": null,
+    "val_mae": null,
+    "best_epoch": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "S08",
+    "status": "pending",
+    "method": "S08: F/M/C scale mode=fixed2",
+    "reference": "S01",
+    "seed": 7,
+    "run_dir": null,
+    "val_mae": null,
+    "best_epoch": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "S09",
+    "status": "pending",
+    "method": "S09: F/M/C scale mode=soft3",
+    "reference": "S10",
+    "seed": 7,
+    "run_dir": null,
+    "val_mae": null,
+    "best_epoch": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "S10",
+    "status": "pending",
+    "method": "S10: F/M/C scale mode=equal3",
+    "reference": "S01",
+    "seed": 7,
+    "run_dir": null,
+    "val_mae": null,
+    "best_epoch": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "G01",
+    "status": "pending",
+    "method": "G01: original R5 two-scale protocol, perturb=True, independent=False, seed=17",
+    "reference": "R2",
+    "seed": 17,
+    "run_dir": null,
+    "val_mae": null,
+    "best_epoch": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "G02",
+    "status": "pending",
+    "method": "G02: original R5 two-scale protocol, perturb=True, independent=False, seed=27",
+    "reference": "G03",
+    "seed": 27,
+    "run_dir": null,
+    "val_mae": null,
+    "best_epoch": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "G03",
+    "status": "pending",
+    "method": "G03: original R5 two-scale protocol, perturb=False, independent=False, seed=27",
+    "reference": "G03",
+    "seed": 27,
+    "run_dir": null,
+    "val_mae": null,
+    "best_epoch": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "G04",
+    "status": "pending",
+    "method": "G04: original R5 two-scale protocol, perturb=True, independent=True, seed=7",
+    "reference": "R6",
+    "seed": 7,
+    "run_dir": null,
+    "val_mae": null,
+    "best_epoch": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "G05",
+    "status": "pending",
+    "method": "G05: original R5 two-scale protocol, perturb=True, independent=True, seed=17",
+    "reference": "G06",
+    "seed": 17,
+    "run_dir": null,
+    "val_mae": null,
+    "best_epoch": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "G06",
+    "status": "pending",
+    "method": "G06: original R5 two-scale protocol, perturb=False, independent=True, seed=17",
+    "reference": "G06",
+    "seed": 17,
+    "run_dir": null,
+    "val_mae": null,
+    "best_epoch": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "G07",
+    "status": "pending",
+    "method": "G07: CMFF permutations in epochs [1, 8], fixed CMFF evaluation",
+    "reference": "S01",
+    "seed": 7,
+    "run_dir": null,
+    "val_mae": null,
+    "best_epoch": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "G08",
+    "status": "pending",
+    "method": "G08: CMFF permutations in epochs [1, 100], fixed CMFF evaluation",
+    "reference": "S01",
+    "seed": 7,
+    "run_dir": null,
+    "val_mae": null,
+    "best_epoch": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "G09",
+    "status": "pending",
+    "method": "G09: CMFF permutations in epochs [93, 100], fixed CMFF evaluation",
+    "reference": "S01",
+    "seed": 7,
+    "run_dir": null,
+    "val_mae": null,
+    "best_epoch": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "P01",
+    "status": "pending",
+    "method": "P01: pair=equal, teacher=none",
+    "reference": "M01",
+    "seed": 7,
+    "run_dir": null,
+    "val_mae": null,
+    "best_epoch": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "P02",
+    "status": "pending",
+    "method": "P02: pair=joint, teacher=none",
+    "reference": "M01",
+    "seed": 7,
+    "run_dir": null,
+    "val_mae": null,
+    "best_epoch": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "P03",
+    "status": "pending",
+    "method": "P03: pair=joint, teacher=final",
+    "reference": "M01",
+    "seed": 7,
+    "run_dir": null,
+    "val_mae": null,
+    "best_epoch": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "P04",
+    "status": "pending",
+    "method": "P04: pair=joint_history, teacher=final",
+    "reference": "M01",
+    "seed": 7,
+    "run_dir": null,
+    "val_mae": null,
+    "best_epoch": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "P05",
+    "status": "pending",
+    "method": "P05: pair=partner, teacher=final",
+    "reference": "M01",
+    "seed": 7,
+    "run_dir": null,
+    "val_mae": null,
+    "best_epoch": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "P06",
+    "status": "pending",
+    "method": "P06: pair=partner, teacher=current",
+    "reference": "M01",
+    "seed": 7,
+    "run_dir": null,
+    "val_mae": null,
+    "best_epoch": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "P07",
+    "status": "pending",
+    "method": "P07: pair=bounded, teacher=none",
+    "reference": "M01",
+    "seed": 7,
+    "run_dir": null,
+    "val_mae": null,
+    "best_epoch": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "P08",
+    "status": "pending",
+    "method": "P08: pair=joint_teacher_only, teacher=final",
+    "reference": "M01",
+    "seed": 7,
+    "run_dir": null,
+    "val_mae": null,
+    "best_epoch": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "M13",
+    "status": "awaiting_selection",
+    "method": "M13: repeat M01, seed17",
+    "reference": null,
+    "seed": null,
+    "run_dir": null,
+    "val_mae": null,
+    "best_epoch": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "M14",
+    "status": "awaiting_selection",
+    "method": "M14: repeat M01, seed27",
+    "reference": null,
+    "seed": null,
+    "run_dir": null,
+    "val_mae": null,
+    "best_epoch": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "M15",
+    "status": "awaiting_selection",
+    "method": "M15: repeat $memory0, seed17",
+    "reference": null,
+    "seed": null,
+    "run_dir": null,
+    "val_mae": null,
+    "best_epoch": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "M16",
+    "status": "awaiting_selection",
+    "method": "M16: repeat $memory0, seed27",
+    "reference": null,
+    "seed": null,
+    "run_dir": null,
+    "val_mae": null,
+    "best_epoch": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "M17",
+    "status": "awaiting_selection",
+    "method": "M17: repeat $memory1, seed17",
+    "reference": null,
+    "seed": null,
+    "run_dir": null,
+    "val_mae": null,
+    "best_epoch": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "M18",
+    "status": "awaiting_selection",
+    "method": "M18: repeat $memory1, seed27",
+    "reference": null,
+    "seed": null,
+    "run_dir": null,
+    "val_mae": null,
+    "best_epoch": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "S11",
+    "status": "awaiting_selection",
+    "method": "S11: repeat S01, seed17",
+    "reference": null,
+    "seed": null,
+    "run_dir": null,
+    "val_mae": null,
+    "best_epoch": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "S12",
+    "status": "awaiting_selection",
+    "method": "S12: repeat S01, seed27",
+    "reference": null,
+    "seed": null,
+    "run_dir": null,
+    "val_mae": null,
+    "best_epoch": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "S13",
+    "status": "awaiting_selection",
+    "method": "S13: repeat $scale, seed17",
+    "reference": null,
+    "seed": null,
+    "run_dir": null,
+    "val_mae": null,
+    "best_epoch": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "S14",
+    "status": "awaiting_selection",
+    "method": "S14: repeat $scale, seed27",
+    "reference": null,
+    "seed": null,
+    "run_dir": null,
+    "val_mae": null,
+    "best_epoch": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "S15",
+    "status": "awaiting_selection",
+    "method": "S15: repeat $mixture, seed17",
+    "reference": null,
+    "seed": null,
+    "run_dir": null,
+    "val_mae": null,
+    "best_epoch": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "S16",
+    "status": "awaiting_selection",
+    "method": "S16: repeat $mixture, seed27",
+    "reference": null,
+    "seed": null,
+    "run_dir": null,
+    "val_mae": null,
+    "best_epoch": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "S17",
+    "status": "awaiting_selection",
+    "method": "S17: repeat $mixture_reference, seed17",
+    "reference": null,
+    "seed": null,
+    "run_dir": null,
+    "val_mae": null,
+    "best_epoch": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "S18",
+    "status": "awaiting_selection",
+    "method": "S18: repeat $mixture_reference, seed27",
+    "reference": null,
+    "seed": null,
+    "run_dir": null,
+    "val_mae": null,
+    "best_epoch": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "G10",
+    "status": "awaiting_selection",
+    "method": "G10: repeat $generalization, seed17",
+    "reference": null,
+    "seed": null,
+    "run_dir": null,
+    "val_mae": null,
+    "best_epoch": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "G11",
+    "status": "awaiting_selection",
+    "method": "G11: repeat $generalization, seed27",
+    "reference": null,
+    "seed": null,
+    "run_dir": null,
+    "val_mae": null,
+    "best_epoch": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "P09",
+    "status": "awaiting_selection",
+    "method": "P09: repeat $pair0, seed17",
+    "reference": null,
+    "seed": null,
+    "run_dir": null,
+    "val_mae": null,
+    "best_epoch": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "P10",
+    "status": "awaiting_selection",
+    "method": "P10: repeat $pair0, seed27",
+    "reference": null,
+    "seed": null,
+    "run_dir": null,
+    "val_mae": null,
+    "best_epoch": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "P11",
+    "status": "awaiting_selection",
+    "method": "P11: repeat $pair1, seed17",
+    "reference": null,
+    "seed": null,
+    "run_dir": null,
+    "val_mae": null,
+    "best_epoch": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "P12",
+    "status": "awaiting_selection",
+    "method": "P12: repeat $pair1, seed27",
+    "reference": null,
+    "seed": null,
+    "run_dir": null,
+    "val_mae": null,
+    "best_epoch": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "G12",
+    "status": "awaiting_selection",
+    "method": "G12: winning memory + winning sparse three-scale method",
+    "reference": null,
+    "seed": null,
+    "run_dir": null,
+    "val_mae": null,
+    "best_epoch": null,
+    "training_seconds": null,
+    "evaluations": {}
+  }
+]

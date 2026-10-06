@@ -1,0 +1,17 @@
+{
+  "name": "tri_fixed",
+  "triscale": {
+    "enabled": true,
+    "mode": "fixed",
+    "update": "direct",
+    "fixed_scales": [
+      2,
+      1,
+      0,
+      0
+    ],
+    "explore_epochs": 8,
+    "explore_seed": 20261001,
+    "recent_memory": false
+  }
+}

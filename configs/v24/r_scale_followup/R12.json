@@ -1,0 +1,13 @@
+{
+  "base_variant": "R7",
+  "name": "scale_soft_fusion",
+  "override": {
+    "model": {
+      "coe": {
+        "spatial_scale": {
+          "mode": "soft_fusion"
+        }
+      }
+    }
+  }
+}

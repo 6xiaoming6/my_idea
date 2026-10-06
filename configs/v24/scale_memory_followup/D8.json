@@ -1,0 +1,8 @@
+{
+  "variant": "D8",
+  "seed": 27,
+  "path": "MCFF",
+  "memory": "none",
+  "reference": "S12",
+  "method": "固定MCFF，原生direct，无额外历史传递"
+}

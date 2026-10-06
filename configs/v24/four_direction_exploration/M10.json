@@ -1,0 +1,9 @@
+{
+  "name": "round_both",
+  "method": "M10: memory=both, single F",
+  "module": {
+    "memory": "both"
+  },
+  "sharing": "shared",
+  "reference": "M01"
+}

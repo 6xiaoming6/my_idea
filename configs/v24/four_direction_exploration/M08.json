@@ -1,0 +1,9 @@
+{
+  "name": "round_delta_detach",
+  "method": "M08: memory=delta_detach, single F",
+  "module": {
+    "memory": "delta_detach"
+  },
+  "sharing": "shared",
+  "reference": "M01"
+}

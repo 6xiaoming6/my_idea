@@ -1,0 +1,9 @@
+{
+  "name": "pair_partner_current",
+  "method": "P06: pair=partner, teacher=current",
+  "module": {
+    "pair": "partner",
+    "teacher": "current"
+  },
+  "reference": "M01"
+}

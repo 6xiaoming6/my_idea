@@ -1,0 +1,215 @@
+{
+  "audit": {
+    "T1": {
+      "epochs": 100,
+      "last_epoch": 100,
+      "validations": 20,
+      "best_exists": true,
+      "last_exists": true,
+      "eval_status": "finished",
+      "eval_sets": 6,
+      "main_nonfinite": [],
+      "other_nonfinite": [],
+      "amp_skips": 11.0,
+      "peak_gib": 8.52161979675293,
+      "params": [
+        309687,
+        250043
+      ]
+    },
+    "T2": {
+      "epochs": 100,
+      "last_epoch": 100,
+      "validations": 20,
+      "best_exists": true,
+      "last_exists": true,
+      "eval_status": "finished",
+      "eval_sets": 6,
+      "main_nonfinite": [],
+      "other_nonfinite": [],
+      "amp_skips": 11.0,
+      "peak_gib": 10.315824031829834,
+      "params": [
+        309687,
+        309687
+      ]
+    },
+    "T3": {
+      "epochs": 100,
+      "last_epoch": 100,
+      "validations": 20,
+      "best_exists": true,
+      "last_exists": true,
+      "eval_status": "finished",
+      "eval_sets": 6,
+      "main_nonfinite": [],
+      "other_nonfinite": [],
+      "amp_skips": 12.0,
+      "peak_gib": 8.66224479675293,
+      "params": [
+        309687,
+        250043
+      ]
+    },
+    "T4": {
+      "epochs": 100,
+      "last_epoch": 100,
+      "validations": 20,
+      "best_exists": true,
+      "last_exists": true,
+      "eval_status": "finished",
+      "eval_sets": 6,
+      "main_nonfinite": [],
+      "other_nonfinite": [],
+      "amp_skips": 12.0,
+      "peak_gib": 10.3863525390625,
+      "params": [
+        309687,
+        309687
+      ]
+    },
+    "T5": {
+      "epochs": 100,
+      "last_epoch": 100,
+      "validations": 20,
+      "best_exists": true,
+      "last_exists": true,
+      "eval_status": "finished",
+      "eval_sets": 6,
+      "main_nonfinite": [],
+      "other_nonfinite": [],
+      "amp_skips": 11.0,
+      "peak_gib": 9.923470497131348,
+      "params": [
+        309687,
+        309687
+      ]
+    },
+    "T6": {
+      "epochs": 100,
+      "last_epoch": 100,
+      "validations": 20,
+      "best_exists": true,
+      "last_exists": true,
+      "eval_status": "finished",
+      "eval_sets": 6,
+      "main_nonfinite": [],
+      "other_nonfinite": [
+        [
+          2,
+          "train",
+          "coe_expert_ST_grad_norm"
+        ],
+        [
+          2,
+          "train",
+          "coe_expert_T_grad_norm"
+        ]
+      ],
+      "amp_skips": 12.0,
+      "peak_gib": 8.200195789337158,
+      "params": [
+        309687,
+        250043
+      ]
+    },
+    "T7": {
+      "epochs": 100,
+      "last_epoch": 100,
+      "validations": 20,
+      "best_exists": true,
+      "last_exists": true,
+      "eval_status": "finished",
+      "eval_sets": 6,
+      "main_nonfinite": [],
+      "other_nonfinite": [],
+      "amp_skips": 12.0,
+      "peak_gib": 9.081859588623047,
+      "params": [
+        309687,
+        309687
+      ]
+    },
+    "T8": {
+      "epochs": 100,
+      "last_epoch": 100,
+      "validations": 20,
+      "best_exists": true,
+      "last_exists": true,
+      "eval_status": "finished",
+      "eval_sets": 6,
+      "main_nonfinite": [],
+      "other_nonfinite": [],
+      "amp_skips": 11.0,
+      "peak_gib": 12.072846412658691,
+      "params": [
+        326647,
+        326647
+      ]
+    },
+    "T9": {
+      "epochs": 100,
+      "last_epoch": 100,
+      "validations": 20,
+      "best_exists": true,
+      "last_exists": true,
+      "eval_status": "finished",
+      "eval_sets": 6,
+      "main_nonfinite": [],
+      "other_nonfinite": [],
+      "amp_skips": 12.0,
+      "peak_gib": 10.309904098510742,
+      "params": [
+        800055,
+        800055
+      ]
+    }
+  },
+  "source_matches": {
+    "src/stmoe_imputer/models/triscale_coe.py": true,
+    "src/stmoe_imputer/models/temporal_spatial_coe.py": true,
+    "scripts/train.py": true,
+    "src/stmoe_imputer/engine.py": true,
+    "scripts/v24/run_triscale_exploration.py": true
+  },
+  "selection": {
+    "A": "T2",
+    "B": "T1",
+    "scores": {
+      "T2": {
+        "id_val_ratio": 0.9772941334760251,
+        "ood_ratio": 1.206866972797969,
+        "J": 1.092080553136997,
+        "eligible": true
+      },
+      "T4": {
+        "id_val_ratio": 1.0257762798414833,
+        "ood_ratio": 1.5164984229620233,
+        "J": 1.2711373514017534,
+        "eligible": false
+      },
+      "T5": {
+        "id_val_ratio": 0.9691654650609253,
+        "ood_ratio": 1.6173961554788097,
+        "J": 1.2932808102698674,
+        "eligible": true
+      }
+    },
+    "id_gate_passed": true,
+    "evidence_sha256": "f2434341cb71d09fdcdc0f8abdb4b23f9b46bf96b3fa78345e48c2ccf14c6d3d",
+    "selection_sets": [
+      "unseen_combinations",
+      "unseen_geometry",
+      "unseen_triple"
+    ],
+    "checkpoint_selection": "ID validation MAE only"
+  },
+  "confirmation_status": {
+    "N5": "finished",
+    "R5": "finished",
+    "T1": "finished",
+    "T2": "finished",
+    "T6": "finished",
+    "T7": "finished"
+  }
+}

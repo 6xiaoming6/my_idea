@@ -1,0 +1,9 @@
+{
+  "name": "pair_partner_final",
+  "method": "P05: pair=partner, teacher=final",
+  "module": {
+    "pair": "partner",
+    "teacher": "final"
+  },
+  "reference": "M01"
+}

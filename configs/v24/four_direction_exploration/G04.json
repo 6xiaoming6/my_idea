@@ -1,0 +1,8 @@
+{
+  "name": "paths_early",
+  "method": "G04: original R5 two-scale protocol, perturb=True, independent=True, seed=7",
+  "legacy": "R5",
+  "seed": 7,
+  "sharing": "per_step",
+  "reference": "R6"
+}

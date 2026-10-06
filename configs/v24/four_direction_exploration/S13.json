@@ -1,0 +1,6 @@
+{
+  "name": "s13_repeat",
+  "source": "$scale",
+  "seed": 17,
+  "method": "S13: repeat $scale, seed17"
+}

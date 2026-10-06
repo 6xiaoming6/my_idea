@@ -108,7 +108,7 @@ Thumbs.db
 checkpoints/
 
 # =============================================================================
-# Training outputs (only v24-COE configs and logs are versioned)
+# Training outputs (only v24-COE text logs are versioned)
 # =============================================================================
 /outputs/**
 # /runs/
@@ -142,10 +142,14 @@ requirements-freeze.txt
 *.tmp
 *.log
 
-# Keep v24-COE experiment configs and logs after the general exclusions.
+# Output artifacts remain local; only v24 training/evaluation .log files are tracked.
+/output/**
 !/outputs/v24-COE/
 !/outputs/v24-COE/**/
-!/outputs/v24-COE/**/config.json
-!/outputs/v24-COE/**/logs/**
-/outputs/**/*.csv
-/outputs/**/metrics.jsonl
+!/outputs/v24-COE/**/logs/*.log
+# This raw diagnostic log exceeds the host limit; track train_summary.log instead.
+/outputs/v24-COE/TaxiBJ/custom/20261002_212804_pair_equal_seed7/random/rate0.4/20261002_212804_seed7_bs32/logs/train.log
+
+# Rebuildable, dense report attachments; keep reports, scripts and small audit tables.
+/experments_report/*_assets/diagnostics.json
+/experments_report/*_assets/review_data.json

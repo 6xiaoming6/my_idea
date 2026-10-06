@@ -1,0 +1,13 @@
+{
+  "base_variant": "N6",
+  "name": "scale_budget_repeat",
+  "override": {
+    "seed": 17,
+    "data": {
+      "loader_seed": 17
+    },
+    "model": {
+      "coe": {}
+    }
+  }
+}

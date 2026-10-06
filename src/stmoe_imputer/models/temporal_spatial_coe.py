@@ -683,6 +683,9 @@ class TemporalSpatialCoE(nn.Module):
         noisy = base + torch.randn_like(base) * (self.router_input_noise_std * scale)
         return noisy.to(dtype=features.dtype)
 
+    def _select_native_topk(self, logits: torch.Tensor) -> torch.Tensor:
+        return logits.topk(self.top_k, dim=-1).indices
+
     def _pair_route(self, logits: torch.Tensor, pair_bias: torch.Tensor | None,
                     sampling_temperature: float, dense_fraction: float = 0.0,
                     uniform_mix: float = 0.0) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
@@ -1098,7 +1101,7 @@ class TemporalSpatialCoE(nn.Module):
                     # their clean probabilities. This is a differentiable
                     # weighted fusion inside a discrete selected set.
                     sample_logits = (logits.float() if self.router_fp32 else logits) / sampling_temperature
-                    selected = sample_logits.topk(self.top_k, dim=-1).indices
+                    selected = self._select_native_topk(sample_logits)
                     selection_mask = F.one_hot(selected, self.num_experts).any(dim=-2).to(probabilities.dtype)
                     weights = probabilities * selection_mask
                     weights = weights / weights.sum(dim=-1, keepdim=True).clamp_min(1e-8)
@@ -1123,7 +1126,7 @@ class TemporalSpatialCoE(nn.Module):
                 paths = weights.argmax(dim=-1)
             else:
                 if self.top_k > 1:
-                    selected = logits.topk(self.top_k, dim=-1).indices
+                    selected = self._select_native_topk(logits)
                     selection_mask = F.one_hot(selected, self.num_experts).any(dim=-2).to(probabilities.dtype)
                     weights = probabilities * selection_mask
                     weights = weights / weights.sum(dim=-1, keepdim=True).clamp_min(1e-8)

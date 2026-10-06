@@ -1,0 +1,15 @@
+{
+  "base_variant": "N5",
+  "name": "scale_independent",
+  "override": {
+    "seed": 7,
+    "data": {
+      "loader_seed": 7
+    },
+    "model": {
+      "coe": {
+        "expert_sharing": "per_step"
+      }
+    }
+  }
+}

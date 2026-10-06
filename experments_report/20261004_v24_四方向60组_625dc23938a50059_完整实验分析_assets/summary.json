@@ -1,0 +1,2222 @@
+[
+  {
+    "variant": "M01",
+    "status": "finished",
+    "method": "M01: memory=none, single F",
+    "reference": "M01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261001_111512_round_none_seed7/random/rate0.4/20261001_111512_seed7_bs32",
+    "val_mae": 17.132734260201197,
+    "best_epoch": 95,
+    "training_seconds": 4277.43128595929,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 16.344496558179287,
+        "rmse": 29.017520629315605
+      },
+      "unseen_combinations": {
+        "mae": 27.01804235925155,
+        "rmse": 47.8520280125496
+      },
+      "unseen_geometry": {
+        "mae": 31.26965634672027,
+        "rmse": 55.96119444591506
+      },
+      "unseen_triple": {
+        "mae": 25.37878062493795,
+        "rmse": 43.54727320234648
+      },
+      "unseen_combinations_repeat": {
+        "mae": 27.229673814823716,
+        "rmse": 48.09542058429327
+      },
+      "unseen_geometry_repeat": {
+        "mae": 31.244385224200375,
+        "rmse": 55.51656768587925
+      }
+    }
+  },
+  {
+    "variant": "M02",
+    "status": "finished",
+    "method": "M02: memory=none, single F",
+    "reference": "M01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261001_122739_round_independent_seed7/random/rate0.4/20261001_122739_seed7_bs32",
+    "val_mae": 15.684299762631401,
+    "best_epoch": 95,
+    "training_seconds": 4387.293373691937,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 14.851851547920015,
+        "rmse": 26.484247496503162
+      },
+      "unseen_combinations": {
+        "mae": 18.75139100025756,
+        "rmse": 32.83771225549873
+      },
+      "unseen_geometry": {
+        "mae": 29.198297633316596,
+        "rmse": 51.061139856017476
+      },
+      "unseen_triple": {
+        "mae": 18.65611637224615,
+        "rmse": 31.979306151547636
+      },
+      "unseen_combinations_repeat": {
+        "mae": 18.954400731818566,
+        "rmse": 33.12575273681222
+      },
+      "unseen_geometry_repeat": {
+        "mae": 28.505153432252104,
+        "rmse": 49.83961254501108
+      }
+    }
+  },
+  {
+    "variant": "M03",
+    "status": "finished",
+    "method": "M03: memory=residual, single F",
+    "reference": "M01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261001_134201_round_residual_seed7/random/rate0.4/20261001_134201_seed7_bs32",
+    "val_mae": 16.63522975376726,
+    "best_epoch": 100,
+    "training_seconds": 4377.610344516957,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 15.864508157417253,
+        "rmse": 28.415342385418114
+      },
+      "unseen_combinations": {
+        "mae": 27.506412360553743,
+        "rmse": 49.76223492691566
+      },
+      "unseen_geometry": {
+        "mae": 31.49146864266793,
+        "rmse": 56.70072534870117
+      },
+      "unseen_triple": {
+        "mae": 24.83729721567928,
+        "rmse": 42.50783038482205
+      },
+      "unseen_combinations_repeat": {
+        "mae": 27.509389321434686,
+        "rmse": 49.24250462718403
+      },
+      "unseen_geometry_repeat": {
+        "mae": 31.58517984664329,
+        "rmse": 56.66420991428451
+      }
+    }
+  },
+  {
+    "variant": "M04",
+    "status": "finished",
+    "method": "M04: memory=anchor, single F",
+    "reference": "M01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261001_145610_round_anchor_seed7/random/rate0.4/20261001_145610_seed7_bs32",
+    "val_mae": 16.32951870393175,
+    "best_epoch": 90,
+    "training_seconds": 4649.640322082007,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 15.633686941621425,
+        "rmse": 28.105873798206584
+      },
+      "unseen_combinations": {
+        "mae": 23.311269237936003,
+        "rmse": 40.92877784661602
+      },
+      "unseen_geometry": {
+        "mae": 32.02488810845188,
+        "rmse": 54.82753805689987
+      },
+      "unseen_triple": {
+        "mae": 22.099630367592784,
+        "rmse": 36.87274187662748
+      },
+      "unseen_combinations_repeat": {
+        "mae": 23.239423343947532,
+        "rmse": 40.52055522414133
+      },
+      "unseen_geometry_repeat": {
+        "mae": 31.19340405529072,
+        "rmse": 53.296445720997454
+      }
+    }
+  },
+  {
+    "variant": "M05",
+    "status": "finished",
+    "method": "M05: memory=signed, single F",
+    "reference": "M01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261001_161452_round_signed_seed7/random/rate0.4/20261001_161452_seed7_bs32",
+    "val_mae": 15.71309126495452,
+    "best_epoch": 100,
+    "training_seconds": 4298.232197823061,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 14.910340255704833,
+        "rmse": 26.620162359926184
+      },
+      "unseen_combinations": {
+        "mae": 21.021494976121648,
+        "rmse": 36.74075498412544
+      },
+      "unseen_geometry": {
+        "mae": 32.027619118364385,
+        "rmse": 55.04286311749207
+      },
+      "unseen_triple": {
+        "mae": 20.13181220062131,
+        "rmse": 33.82309501797233
+      },
+      "unseen_combinations_repeat": {
+        "mae": 20.931389329348573,
+        "rmse": 36.335725312378344
+      },
+      "unseen_geometry_repeat": {
+        "mae": 31.15354986323367,
+        "rmse": 53.54967160126407
+      }
+    }
+  },
+  {
+    "variant": "M06",
+    "status": "finished",
+    "method": "M06: memory=positive, single F",
+    "reference": "M01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261001_172741_round_positive_seed7/random/rate0.4/20261001_172741_seed7_bs32",
+    "val_mae": 16.720075568286603,
+    "best_epoch": 90,
+    "training_seconds": 4256.880957592191,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 16.04232361208436,
+        "rmse": 29.301499845717647
+      },
+      "unseen_combinations": {
+        "mae": 27.68425745631895,
+        "rmse": 47.651976780497876
+      },
+      "unseen_geometry": {
+        "mae": 30.80031560215315,
+        "rmse": 53.705688935687
+      },
+      "unseen_triple": {
+        "mae": 27.313333637898015,
+        "rmse": 45.488403479153455
+      },
+      "unseen_combinations_repeat": {
+        "mae": 27.723816226630657,
+        "rmse": 47.645823810380186
+      },
+      "unseen_geometry_repeat": {
+        "mae": 30.848138258455986,
+        "rmse": 53.56020178782615
+      }
+    }
+  },
+  {
+    "variant": "M07",
+    "status": "finished",
+    "method": "M07: memory=delta, single F",
+    "reference": "M01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261001_183948_round_delta_seed7/random/rate0.4/20261001_183948_seed7_bs32",
+    "val_mae": 15.909633357724593,
+    "best_epoch": 95,
+    "training_seconds": 4503.240165780298,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 15.235231205961027,
+        "rmse": 26.973400735293996
+      },
+      "unseen_combinations": {
+        "mae": 21.81054739266253,
+        "rmse": 36.97264961052151
+      },
+      "unseen_geometry": {
+        "mae": 27.14291446007157,
+        "rmse": 47.59696355933711
+      },
+      "unseen_triple": {
+        "mae": 21.30995673802593,
+        "rmse": 35.17218549880889
+      },
+      "unseen_combinations_repeat": {
+        "mae": 21.982776543531404,
+        "rmse": 37.339821607417704
+      },
+      "unseen_geometry_repeat": {
+        "mae": 27.17667756384707,
+        "rmse": 47.89751922917097
+      }
+    }
+  },
+  {
+    "variant": "M08",
+    "status": "finished",
+    "method": "M08: memory=delta_detach, single F",
+    "reference": "M01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261001_195604_round_delta_detach_seed7/random/rate0.4/20261001_195604_seed7_bs32",
+    "val_mae": 15.539281826131962,
+    "best_epoch": 100,
+    "training_seconds": 4729.384005399013,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 14.663456357080266,
+        "rmse": 25.95138912341761
+      },
+      "unseen_combinations": {
+        "mae": 33.742838635156936,
+        "rmse": 59.157151835113424
+      },
+      "unseen_geometry": {
+        "mae": 36.605205717854155,
+        "rmse": 63.232838347906444
+      },
+      "unseen_triple": {
+        "mae": 34.00142865416465,
+        "rmse": 58.18087426935092
+      },
+      "unseen_combinations_repeat": {
+        "mae": 33.935011325849196,
+        "rmse": 59.43037195826727
+      },
+      "unseen_geometry_repeat": {
+        "mae": 36.32310172868035,
+        "rmse": 62.54630370370203
+      }
+    }
+  },
+  {
+    "variant": "M09",
+    "status": "finished",
+    "method": "M09: memory=router, single F",
+    "reference": "M01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261001_211606_round_router_seed7/random/rate0.4/20261001_211606_seed7_bs32",
+    "val_mae": 18.895012731047693,
+    "best_epoch": 95,
+    "training_seconds": 4308.376967312011,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 18.02936426049777,
+        "rmse": 31.80148889006256
+      },
+      "unseen_combinations": {
+        "mae": 25.624334662566316,
+        "rmse": 43.766661332131505
+      },
+      "unseen_geometry": {
+        "mae": 31.669083021694117,
+        "rmse": 54.18358058320641
+      },
+      "unseen_triple": {
+        "mae": 26.555944622946527,
+        "rmse": 44.2819208944618
+      },
+      "unseen_combinations_repeat": {
+        "mae": 25.970925787899237,
+        "rmse": 44.84229215212266
+      },
+      "unseen_geometry_repeat": {
+        "mae": 31.493402256680397,
+        "rmse": 53.928853585720866
+      }
+    }
+  },
+  {
+    "variant": "M10",
+    "status": "finished",
+    "method": "M10: memory=both, single F",
+    "reference": "M01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261001_222906_round_both_seed7/random/rate0.4/20261001_222906_seed7_bs32",
+    "val_mae": 14.905700415841231,
+    "best_epoch": 100,
+    "training_seconds": 4362.949834412284,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 14.118545515992524,
+        "rmse": 25.225304316239207
+      },
+      "unseen_combinations": {
+        "mae": 26.27432685210099,
+        "rmse": 49.328880799265164
+      },
+      "unseen_geometry": {
+        "mae": 36.34627227219161,
+        "rmse": 63.74909412016016
+      },
+      "unseen_triple": {
+        "mae": 29.612573311356712,
+        "rmse": 49.83063231055431
+      },
+      "unseen_combinations_repeat": {
+        "mae": 26.19769064729827,
+        "rmse": 49.02503860103312
+      },
+      "unseen_geometry_repeat": {
+        "mae": 35.0569122393274,
+        "rmse": 61.35075637828992
+      }
+    }
+  },
+  {
+    "variant": "M11",
+    "status": "finished",
+    "method": "M11: memory=message, single F",
+    "reference": "M01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261001_234300_round_message_seed7/random/rate0.4/20261001_234300_seed7_bs32",
+    "val_mae": 15.39418833621864,
+    "best_epoch": 95,
+    "training_seconds": 4528.647491903452,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 14.402869876118915,
+        "rmse": 25.176993698833694
+      },
+      "unseen_combinations": {
+        "mae": 34.579915979717434,
+        "rmse": 64.2912138849187
+      },
+      "unseen_geometry": {
+        "mae": 31.238769531109483,
+        "rmse": 54.77997192249186
+      },
+      "unseen_triple": {
+        "mae": 38.871487350013886,
+        "rmse": 66.83643796482883
+      },
+      "unseen_combinations_repeat": {
+        "mae": 34.48840487185981,
+        "rmse": 63.92073680875806
+      },
+      "unseen_geometry_repeat": {
+        "mae": 30.305880304641423,
+        "rmse": 52.89773869647559
+      }
+    }
+  },
+  {
+    "variant": "M12",
+    "status": "finished",
+    "method": "M12: memory=gru, single F",
+    "reference": "M01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261002_005941_round_gru_seed7/random/rate0.4/20261002_005941_seed7_bs32",
+    "val_mae": 17.28981501311774,
+    "best_epoch": 100,
+    "training_seconds": 4837.539665736258,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 16.5254159286369,
+        "rmse": 29.650058999880038
+      },
+      "unseen_combinations": {
+        "mae": 36.00286427794429,
+        "rmse": 63.539117793916716
+      },
+      "unseen_geometry": {
+        "mae": 35.5133905819008,
+        "rmse": 61.78699936166768
+      },
+      "unseen_triple": {
+        "mae": 35.27173587299509,
+        "rmse": 59.92336876873107
+      },
+      "unseen_combinations_repeat": {
+        "mae": 36.069765828130556,
+        "rmse": 63.7361050195694
+      },
+      "unseen_geometry_repeat": {
+        "mae": 35.2396898440389,
+        "rmse": 61.54309346022708
+      }
+    }
+  },
+  {
+    "variant": "S01",
+    "status": "finished",
+    "method": "S01: F/M/C scale mode=fixed",
+    "reference": "S01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261002_022134_scale_fixed_seed7/random/rate0.4/20261002_022134_seed7_bs32",
+    "val_mae": 14.316039781549499,
+    "best_epoch": 95,
+    "training_seconds": 3115.812941195094,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 13.733138423928136,
+        "rmse": 24.09205224071352
+      },
+      "unseen_combinations": {
+        "mae": 16.37733139467122,
+        "rmse": 28.086945313709627
+      },
+      "unseen_geometry": {
+        "mae": 18.942477699030622,
+        "rmse": 31.56102291941269
+      },
+      "unseen_triple": {
+        "mae": 15.559603535924003,
+        "rmse": 26.07852596302263
+      },
+      "unseen_combinations_repeat": {
+        "mae": 16.453777927022465,
+        "rmse": 28.39712856953479
+      },
+      "unseen_geometry_repeat": {
+        "mae": 18.849903036917556,
+        "rmse": 31.350407731178347
+      }
+    }
+  },
+  {
+    "variant": "S02",
+    "status": "finished",
+    "method": "S02: F/M/C scale mode=free",
+    "reference": "S01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261002_031430_scale_free_seed7/random/rate0.4/20261002_031430_seed7_bs32",
+    "val_mae": 14.92170361050133,
+    "best_epoch": 100,
+    "training_seconds": 3187.6130103000905,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 14.008410607628122,
+        "rmse": 25.026639791215676
+      },
+      "unseen_combinations": {
+        "mae": 26.088715163615984,
+        "rmse": 45.13127264286866
+      },
+      "unseen_geometry": {
+        "mae": 29.117465432508226,
+        "rmse": 49.44489813518354
+      },
+      "unseen_triple": {
+        "mae": 25.94601089813966,
+        "rmse": 43.85527706729508
+      },
+      "unseen_combinations_repeat": {
+        "mae": 26.267238996461774,
+        "rmse": 45.272001383294615
+      },
+      "unseen_geometry_repeat": {
+        "mae": 29.140911190377867,
+        "rmse": 49.57272640220623
+      }
+    }
+  },
+  {
+    "variant": "S03",
+    "status": "finished",
+    "method": "S03: F/M/C scale mode=sample",
+    "reference": "S01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261002_040840_scale_sample_seed7/random/rate0.4/20261002_040840_seed7_bs32",
+    "val_mae": 24.532158091056736,
+    "best_epoch": 95,
+    "training_seconds": 2034.5932817431749,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 23.18580547076107,
+        "rmse": 38.03196431431838
+      },
+      "unseen_combinations": {
+        "mae": 24.057149395091376,
+        "rmse": 38.99340793266764
+      },
+      "unseen_geometry": {
+        "mae": 28.596802970153142,
+        "rmse": 44.81904107466373
+      },
+      "unseen_triple": {
+        "mae": 23.984565953961333,
+        "rmse": 38.91680073341126
+      },
+      "unseen_combinations_repeat": {
+        "mae": 24.312700832828522,
+        "rmse": 39.58920062742422
+      },
+      "unseen_geometry_repeat": {
+        "mae": 28.286994680430112,
+        "rmse": 44.258214916883105
+      }
+    }
+  },
+  {
+    "variant": "S04",
+    "status": "finished",
+    "method": "S04: F/M/C scale mode=teacher",
+    "reference": "S01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261002_044328_scale_teacher_seed7/random/rate0.4/20261002_044328_seed7_bs32",
+    "val_mae": 15.023513620436306,
+    "best_epoch": 100,
+    "training_seconds": 3825.83130273968,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 14.119563016830677,
+        "rmse": 24.645365927657917
+      },
+      "unseen_combinations": {
+        "mae": 27.6215634492166,
+        "rmse": 48.51456199089121
+      },
+      "unseen_geometry": {
+        "mae": 30.105371945420092,
+        "rmse": 52.05156000444671
+      },
+      "unseen_triple": {
+        "mae": 26.434541753659452,
+        "rmse": 44.8623424972343
+      },
+      "unseen_combinations_repeat": {
+        "mae": 27.967098435065132,
+        "rmse": 48.72641946897366
+      },
+      "unseen_geometry_repeat": {
+        "mae": 29.616523347400864,
+        "rmse": 51.43060400992048
+      }
+    }
+  },
+  {
+    "variant": "S05",
+    "status": "finished",
+    "method": "S05: F/M/C scale mode=history",
+    "reference": "S01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261002_054821_scale_history_seed7/random/rate0.4/20261002_054821_seed7_bs32",
+    "val_mae": 15.069142825697678,
+    "best_epoch": 95,
+    "training_seconds": 3362.8623548810137,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 14.157385606584928,
+        "rmse": 24.694050742087743
+      },
+      "unseen_combinations": {
+        "mae": 32.803361719600964,
+        "rmse": 58.4416661842084
+      },
+      "unseen_geometry": {
+        "mae": 35.837910775618326,
+        "rmse": 62.188216294685894
+      },
+      "unseen_triple": {
+        "mae": 37.26308893696375,
+        "rmse": 60.23548664581212
+      },
+      "unseen_combinations_repeat": {
+        "mae": 33.03531538991714,
+        "rmse": 58.90245873498208
+      },
+      "unseen_geometry_repeat": {
+        "mae": 35.67855538496736,
+        "rmse": 61.981187265145294
+      }
+    }
+  },
+  {
+    "variant": "S06",
+    "status": "finished",
+    "method": "S06: F/M/C scale mode=bank",
+    "reference": "S01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261002_064528_scale_bank_seed7/random/rate0.4/20261002_064528_seed7_bs32",
+    "val_mae": 15.791164563664163,
+    "best_epoch": 100,
+    "training_seconds": 3966.809552030987,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 14.891767176009129,
+        "rmse": 26.14431991858826
+      },
+      "unseen_combinations": {
+        "mae": 29.601871642893833,
+        "rmse": 53.782129013224655
+      },
+      "unseen_geometry": {
+        "mae": 35.642635832850104,
+        "rmse": 64.09848703704726
+      },
+      "unseen_triple": {
+        "mae": 27.867890650967436,
+        "rmse": 49.719405767571416
+      },
+      "unseen_combinations_repeat": {
+        "mae": 29.289303376639072,
+        "rmse": 52.86028991385322
+      },
+      "unseen_geometry_repeat": {
+        "mae": 35.51401320683587,
+        "rmse": 64.31609855479064
+      }
+    }
+  },
+  {
+    "variant": "S07",
+    "status": "finished",
+    "method": "S07: F/M/C scale mode=top2",
+    "reference": "S08",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261002_075245_scale_top2_seed7/random/rate0.4/20261002_075245_seed7_bs32",
+    "val_mae": 15.824251158584831,
+    "best_epoch": 95,
+    "training_seconds": 3871.4189299100544,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 14.849578441712795,
+        "rmse": 25.82034505155799
+      },
+      "unseen_combinations": {
+        "mae": 39.692096366663264,
+        "rmse": 70.31457056897288
+      },
+      "unseen_geometry": {
+        "mae": 33.79252170203214,
+        "rmse": 59.806923899523746
+      },
+      "unseen_triple": {
+        "mae": 39.31762976254027,
+        "rmse": 61.462055240523334
+      },
+      "unseen_combinations_repeat": {
+        "mae": 39.79325690198725,
+        "rmse": 70.47508852818885
+      },
+      "unseen_geometry_repeat": {
+        "mae": 34.2753158719447,
+        "rmse": 60.057805006868385
+      }
+    }
+  },
+  {
+    "variant": "S08",
+    "status": "finished",
+    "method": "S08: F/M/C scale mode=fixed2",
+    "reference": "S01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261002_085828_scale_fixed2_seed7/random/rate0.4/20261002_085828_seed7_bs32",
+    "val_mae": 16.03604857132659,
+    "best_epoch": 90,
+    "training_seconds": 4673.115006351785,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 15.237981348590825,
+        "rmse": 26.411042053097976
+      },
+      "unseen_combinations": {
+        "mae": 17.5877507352719,
+        "rmse": 29.138344082229846
+      },
+      "unseen_geometry": {
+        "mae": 21.85531138621056,
+        "rmse": 36.15311016005073
+      },
+      "unseen_triple": {
+        "mae": 17.562517968117113,
+        "rmse": 28.64974879933113
+      },
+      "unseen_combinations_repeat": {
+        "mae": 17.746713534254894,
+        "rmse": 29.69487805384805
+      },
+      "unseen_geometry_repeat": {
+        "mae": 21.837922115856404,
+        "rmse": 36.34502619742614
+      }
+    }
+  },
+  {
+    "variant": "S09",
+    "status": "finished",
+    "method": "S09: F/M/C scale mode=soft3",
+    "reference": "S10",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261002_101739_scale_soft3_seed7/random/rate0.4/20261002_101739_seed7_bs32",
+    "val_mae": 15.712919261956179,
+    "best_epoch": 95,
+    "training_seconds": 5966.914540625992,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 14.767256451974946,
+        "rmse": 25.621474495198957
+      },
+      "unseen_combinations": {
+        "mae": 16.648191928987988,
+        "rmse": 28.546427060922145
+      },
+      "unseen_geometry": {
+        "mae": 20.997310681874755,
+        "rmse": 34.10882116588815
+      },
+      "unseen_triple": {
+        "mae": 16.4779581339274,
+        "rmse": 27.98712805639728
+      },
+      "unseen_combinations_repeat": {
+        "mae": 16.952022447376258,
+        "rmse": 29.28286294911535
+      },
+      "unseen_geometry_repeat": {
+        "mae": 20.970652426109492,
+        "rmse": 33.910095175554545
+      }
+    }
+  },
+  {
+    "variant": "S10",
+    "status": "finished",
+    "method": "S10: F/M/C scale mode=equal3",
+    "reference": "S01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261002_115841_scale_equal3_seed7/random/rate0.4/20261002_115841_seed7_bs32",
+    "val_mae": 17.622055052857643,
+    "best_epoch": 95,
+    "training_seconds": 5830.88895435509,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 16.759119439955914,
+        "rmse": 28.586654549462153
+      },
+      "unseen_combinations": {
+        "mae": 32.45939425862002,
+        "rmse": 57.90454037415911
+      },
+      "unseen_geometry": {
+        "mae": 37.283229028923095,
+        "rmse": 63.27276145973325
+      },
+      "unseen_triple": {
+        "mae": 30.62364516080296,
+        "rmse": 53.50851926080094
+      },
+      "unseen_combinations_repeat": {
+        "mae": 32.0916398074192,
+        "rmse": 56.98735252350543
+      },
+      "unseen_geometry_repeat": {
+        "mae": 36.7553460004662,
+        "rmse": 62.41702656723425
+      }
+    }
+  },
+  {
+    "variant": "G01",
+    "status": "finished",
+    "method": "G01: original R5 two-scale protocol, perturb=True, independent=False, seed=17",
+    "reference": "R2",
+    "seed": 17,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261002_133731_paths_early_seed17/random/rate0.4/20261002_133731_seed17_bs32",
+    "val_mae": 16.952383799444355,
+    "best_epoch": 95,
+    "training_seconds": 2818.890877620608,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 15.910913958439151,
+        "rmse": 27.27561088660456
+      },
+      "unseen_combinations": {
+        "mae": 20.276003147927785,
+        "rmse": 33.37792452373759
+      },
+      "unseen_geometry": {
+        "mae": 27.09022083877113,
+        "rmse": 43.94202318861558
+      },
+      "unseen_triple": {
+        "mae": 21.26708848875005,
+        "rmse": 34.21125070074299
+      },
+      "unseen_combinations_repeat": {
+        "mae": 20.40156016855137,
+        "rmse": 33.69848778652486
+      },
+      "unseen_geometry_repeat": {
+        "mae": 26.729286601000602,
+        "rmse": 43.50502168403691
+      }
+    }
+  },
+  {
+    "variant": "G02",
+    "status": "finished",
+    "method": "G02: original R5 two-scale protocol, perturb=True, independent=False, seed=27",
+    "reference": "G03",
+    "seed": 27,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261002_142526_paths_early_seed27/random/rate0.4/20261002_142526_seed27_bs32",
+    "val_mae": 15.284744531301126,
+    "best_epoch": 100,
+    "training_seconds": 3264.1726344467024,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 14.275325008885135,
+        "rmse": 24.872559305153462
+      },
+      "unseen_combinations": {
+        "mae": 27.23976043949403,
+        "rmse": 44.92900240499168
+      },
+      "unseen_geometry": {
+        "mae": 33.62828767980707,
+        "rmse": 54.6682653642495
+      },
+      "unseen_triple": {
+        "mae": 24.140200253676,
+        "rmse": 39.474564606995926
+      },
+      "unseen_combinations_repeat": {
+        "mae": 27.52575349182208,
+        "rmse": 45.33372249309894
+      },
+      "unseen_geometry_repeat": {
+        "mae": 32.90043402265673,
+        "rmse": 53.33585988692567
+      }
+    }
+  },
+  {
+    "variant": "G03",
+    "status": "finished",
+    "method": "G03: original R5 two-scale protocol, perturb=False, independent=False, seed=27",
+    "reference": "G03",
+    "seed": 27,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261002_152049_paths_fixed_seed27/random/rate0.4/20261002_152049_seed27_bs32",
+    "val_mae": 16.543306086511635,
+    "best_epoch": 100,
+    "training_seconds": 3009.64405834995,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 15.695981841589914,
+        "rmse": 27.520201994114966
+      },
+      "unseen_combinations": {
+        "mae": 21.722799184438134,
+        "rmse": 36.59833447725237
+      },
+      "unseen_geometry": {
+        "mae": 33.40095954961359,
+        "rmse": 57.58530933874636
+      },
+      "unseen_triple": {
+        "mae": 21.272059469971122,
+        "rmse": 34.57573479292848
+      },
+      "unseen_combinations_repeat": {
+        "mae": 21.871468860299778,
+        "rmse": 36.954506289114214
+      },
+      "unseen_geometry_repeat": {
+        "mae": 33.31513312054574,
+        "rmse": 57.786244781726154
+      }
+    }
+  },
+  {
+    "variant": "G04",
+    "status": "finished",
+    "method": "G04: original R5 two-scale protocol, perturb=True, independent=True, seed=7",
+    "reference": "R6",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261002_161157_paths_early_seed7/random/rate0.4/20261002_161157_seed7_bs32",
+    "val_mae": 13.79679589572439,
+    "best_epoch": 100,
+    "training_seconds": 3011.79118608078,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 13.021870471998515,
+        "rmse": 23.352077037642633
+      },
+      "unseen_combinations": {
+        "mae": 25.992173751872354,
+        "rmse": 46.65054130766286
+      },
+      "unseen_geometry": {
+        "mae": 25.375459311117858,
+        "rmse": 43.84215781594942
+      },
+      "unseen_triple": {
+        "mae": 25.926291456169306,
+        "rmse": 47.24455810643325
+      },
+      "unseen_combinations_repeat": {
+        "mae": 26.01423616257135,
+        "rmse": 46.65845956785114
+      },
+      "unseen_geometry_repeat": {
+        "mae": 25.095955141219687,
+        "rmse": 43.25964355478415
+      }
+    }
+  },
+  {
+    "variant": "G05",
+    "status": "finished",
+    "method": "G05: original R5 two-scale protocol, perturb=True, independent=True, seed=17",
+    "reference": "G06",
+    "seed": 17,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261002_170311_paths_early_seed17/random/rate0.4/20261002_170311_seed17_bs32",
+    "val_mae": 14.80068578108547,
+    "best_epoch": 95,
+    "training_seconds": 2944.345794060733,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 14.045072419245994,
+        "rmse": 24.656152771351042
+      },
+      "unseen_combinations": {
+        "mae": 26.52281503918812,
+        "rmse": 46.40639282295356
+      },
+      "unseen_geometry": {
+        "mae": 29.358045831468775,
+        "rmse": 50.09393806790466
+      },
+      "unseen_triple": {
+        "mae": 27.511480035065706,
+        "rmse": 47.683828506222305
+      },
+      "unseen_combinations_repeat": {
+        "mae": 26.554021207054582,
+        "rmse": 46.47687258844893
+      },
+      "unseen_geometry_repeat": {
+        "mae": 29.422485830547885,
+        "rmse": 50.52617368861388
+      }
+    }
+  },
+  {
+    "variant": "G06",
+    "status": "finished",
+    "method": "G06: original R5 two-scale protocol, perturb=False, independent=True, seed=17",
+    "reference": "G06",
+    "seed": 17,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261002_175318_paths_fixed_seed17/random/rate0.4/20261002_175318_seed17_bs32",
+    "val_mae": 14.006218730107738,
+    "best_epoch": 100,
+    "training_seconds": 3104.488849843852,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 13.064077088977973,
+        "rmse": 23.422150001918677
+      },
+      "unseen_combinations": {
+        "mae": 29.217461664419602,
+        "rmse": 50.609559270245484
+      },
+      "unseen_geometry": {
+        "mae": 27.365170162925317,
+        "rmse": 46.44343453394461
+      },
+      "unseen_triple": {
+        "mae": 29.68981110634679,
+        "rmse": 52.86864118433512
+      },
+      "unseen_combinations_repeat": {
+        "mae": 28.978513486339914,
+        "rmse": 49.92452993067322
+      },
+      "unseen_geometry_repeat": {
+        "mae": 27.32450797216039,
+        "rmse": 45.86139816724594
+      }
+    }
+  },
+  {
+    "variant": "G07",
+    "status": "finished",
+    "method": "G07: CMFF permutations in epochs [1, 8], fixed CMFF evaluation",
+    "reference": "S01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261002_184605_paths_g07_seed7/random/rate0.4/20261002_184605_seed7_bs32",
+    "val_mae": 15.02595215148757,
+    "best_epoch": 95,
+    "training_seconds": 2956.6549065180006,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 14.16704996251696,
+        "rmse": 24.427693499106866
+      },
+      "unseen_combinations": {
+        "mae": 25.055817991786824,
+        "rmse": 42.611011254097996
+      },
+      "unseen_geometry": {
+        "mae": 28.88349153160302,
+        "rmse": 48.24075425990057
+      },
+      "unseen_triple": {
+        "mae": 24.38594492151584,
+        "rmse": 39.4946701139612
+      },
+      "unseen_combinations_repeat": {
+        "mae": 25.063790430961422,
+        "rmse": 42.58129200391308
+      },
+      "unseen_geometry_repeat": {
+        "mae": 28.558222374064904,
+        "rmse": 47.576005227972644
+      }
+    }
+  },
+  {
+    "variant": "G08",
+    "status": "finished",
+    "method": "G08: CMFF permutations in epochs [1, 100], fixed CMFF evaluation",
+    "reference": "S01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261002_193623_paths_g08_seed7/random/rate0.4/20261002_193623_seed7_bs32",
+    "val_mae": 23.043182642941705,
+    "best_epoch": 95,
+    "training_seconds": 3419.8148843157687,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 21.857395876649864,
+        "rmse": 35.41080542274207
+      },
+      "unseen_combinations": {
+        "mae": 23.4164245857081,
+        "rmse": 37.99199025457614
+      },
+      "unseen_geometry": {
+        "mae": 29.05274570455883,
+        "rmse": 45.8684041454264
+      },
+      "unseen_triple": {
+        "mae": 22.956066829524836,
+        "rmse": 37.07127033011715
+      },
+      "unseen_combinations_repeat": {
+        "mae": 23.60678440309879,
+        "rmse": 38.50599555898739
+      },
+      "unseen_geometry_repeat": {
+        "mae": 28.686205459213994,
+        "rmse": 45.30794922225687
+      }
+    }
+  },
+  {
+    "variant": "G09",
+    "status": "finished",
+    "method": "G09: CMFF permutations in epochs [93, 100], fixed CMFF evaluation",
+    "reference": "S01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261002_203423_paths_g09_seed7/random/rate0.4/20261002_203423_seed7_bs32",
+    "val_mae": 14.265444203506393,
+    "best_epoch": 90,
+    "training_seconds": 3155.762682404078,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 13.445732482254911,
+        "rmse": 23.819699887083413
+      },
+      "unseen_combinations": {
+        "mae": 25.944857988923438,
+        "rmse": 46.057020498189594
+      },
+      "unseen_geometry": {
+        "mae": 27.433901124635064,
+        "rmse": 46.57542914983432
+      },
+      "unseen_triple": {
+        "mae": 25.6114011839892,
+        "rmse": 43.963022738948716
+      },
+      "unseen_combinations_repeat": {
+        "mae": 25.74551708517931,
+        "rmse": 45.53674802708259
+      },
+      "unseen_geometry_repeat": {
+        "mae": 27.62964255497632,
+        "rmse": 46.88185482399367
+      }
+    }
+  },
+  {
+    "variant": "P01",
+    "status": "finished",
+    "method": "P01: pair=equal, teacher=none",
+    "reference": "M01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261002_212804_pair_equal_seed7/random/rate0.4/20261002_212804_seed7_bs32",
+    "val_mae": 30.73504473713956,
+    "best_epoch": 95,
+    "training_seconds": 4476.729611220886,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 29.19698729173891,
+        "rmse": 54.123900620010915
+      },
+      "unseen_combinations": {
+        "mae": 35.05632460635614,
+        "rmse": 63.37315855780914
+      },
+      "unseen_geometry": {
+        "mae": 37.29110850692321,
+        "rmse": 65.79360107042505
+      },
+      "unseen_triple": {
+        "mae": 35.73245447537415,
+        "rmse": 64.79091030682628
+      },
+      "unseen_combinations_repeat": {
+        "mae": 35.19037126554539,
+        "rmse": 63.89367756563501
+      },
+      "unseen_geometry_repeat": {
+        "mae": 37.32259025786316,
+        "rmse": 65.59640974219089
+      }
+    }
+  },
+  {
+    "variant": "P02",
+    "status": "finished",
+    "method": "P02: pair=joint, teacher=none",
+    "reference": "M01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261002_224417_pair_joint_seed7/random/rate0.4/20261002_224417_seed7_bs32",
+    "val_mae": 20.632054874385013,
+    "best_epoch": 100,
+    "training_seconds": 3990.3309876395506,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 19.729194143437013,
+        "rmse": 35.1594736904817
+      },
+      "unseen_combinations": {
+        "mae": 34.2534734402811,
+        "rmse": 58.54623040978307
+      },
+      "unseen_geometry": {
+        "mae": 39.65750191372138,
+        "rmse": 70.3483950314892
+      },
+      "unseen_triple": {
+        "mae": 33.05433831104735,
+        "rmse": 54.181545552893525
+      },
+      "unseen_combinations_repeat": {
+        "mae": 33.990802392439505,
+        "rmse": 57.79371435483274
+      },
+      "unseen_geometry_repeat": {
+        "mae": 39.69500576274747,
+        "rmse": 69.98912611819131
+      }
+    }
+  },
+  {
+    "variant": "P03",
+    "status": "finished",
+    "method": "P03: pair=joint, teacher=final",
+    "reference": "M01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261002_235157_pair_joint_final_seed7/random/rate0.4/20261002_235157_seed7_bs32",
+    "val_mae": 19.072141017175017,
+    "best_epoch": 100,
+    "training_seconds": 4347.056557164236,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 18.107567356157936,
+        "rmse": 31.65682234614789
+      },
+      "unseen_combinations": {
+        "mae": 30.92859378529773,
+        "rmse": 53.23609559752209
+      },
+      "unseen_geometry": {
+        "mae": 33.373428841939564,
+        "rmse": 57.93537631326254
+      },
+      "unseen_triple": {
+        "mae": 30.710403782621395,
+        "rmse": 52.89658572336878
+      },
+      "unseen_combinations_repeat": {
+        "mae": 30.661185404708906,
+        "rmse": 52.420895238758966
+      },
+      "unseen_geometry_repeat": {
+        "mae": 33.46375743545507,
+        "rmse": 57.89780891431107
+      }
+    }
+  },
+  {
+    "variant": "P04",
+    "status": "finished",
+    "method": "P04: pair=joint_history, teacher=final",
+    "reference": "M01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261003_010535_pair_joint_history_final_seed7/random/rate0.4/20261003_010535_seed7_bs32",
+    "val_mae": 19.369271177264967,
+    "best_epoch": 95,
+    "training_seconds": 4626.427651985781,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 18.27609007926116,
+        "rmse": 31.877103432241828
+      },
+      "unseen_combinations": {
+        "mae": 29.101709012548543,
+        "rmse": 53.956572443183674
+      },
+      "unseen_geometry": {
+        "mae": 41.61600462818408,
+        "rmse": 71.353611348002
+      },
+      "unseen_triple": {
+        "mae": 29.085583562716103,
+        "rmse": 51.300284132101766
+      },
+      "unseen_combinations_repeat": {
+        "mae": 28.918108750455048,
+        "rmse": 53.09543937097669
+      },
+      "unseen_geometry_repeat": {
+        "mae": 41.04949748626221,
+        "rmse": 70.29989241395612
+      }
+    }
+  },
+  {
+    "variant": "P05",
+    "status": "finished",
+    "method": "P05: pair=partner, teacher=final",
+    "reference": "M01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261003_022355_pair_partner_final_seed7/random/rate0.4/20261003_022355_seed7_bs32",
+    "val_mae": 17.84966595872523,
+    "best_epoch": 100,
+    "training_seconds": 4222.952948039456,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 16.8965511647081,
+        "rmse": 30.018226374217747
+      },
+      "unseen_combinations": {
+        "mae": 27.503581374886508,
+        "rmse": 48.253689712470745
+      },
+      "unseen_geometry": {
+        "mae": 31.48947370503654,
+        "rmse": 55.158584133605025
+      },
+      "unseen_triple": {
+        "mae": 28.509259821491522,
+        "rmse": 48.94926292574129
+      },
+      "unseen_combinations_repeat": {
+        "mae": 27.258171212594302,
+        "rmse": 47.80965895767672
+      },
+      "unseen_geometry_repeat": {
+        "mae": 31.43760633384222,
+        "rmse": 54.86235779530514
+      }
+    }
+  },
+  {
+    "variant": "P06",
+    "status": "finished",
+    "method": "P06: pair=partner, teacher=current",
+    "reference": "M01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261003_033528_pair_partner_current_seed7/random/rate0.4/20261003_033528_seed7_bs32",
+    "val_mae": 17.750977435110325,
+    "best_epoch": 80,
+    "training_seconds": 4600.156072355923,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 16.761993664215282,
+        "rmse": 29.08078223112495
+      },
+      "unseen_combinations": {
+        "mae": 23.653939442229355,
+        "rmse": 42.2239418729048
+      },
+      "unseen_geometry": {
+        "mae": 32.192946263998586,
+        "rmse": 58.10716799251215
+      },
+      "unseen_triple": {
+        "mae": 22.85998864537304,
+        "rmse": 39.906785735513125
+      },
+      "unseen_combinations_repeat": {
+        "mae": 23.461895972695658,
+        "rmse": 41.90134321654442
+      },
+      "unseen_geometry_repeat": {
+        "mae": 32.57274378724023,
+        "rmse": 58.74054014848152
+      }
+    }
+  },
+  {
+    "variant": "P07",
+    "status": "finished",
+    "method": "P07: pair=bounded, teacher=none",
+    "reference": "M01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261003_045321_pair_bounded_seed7/random/rate0.4/20261003_045321_seed7_bs32",
+    "val_mae": 17.695566739840444,
+    "best_epoch": 95,
+    "training_seconds": 4356.018186327186,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 16.744142600661025,
+        "rmse": 29.38685244502485
+      },
+      "unseen_combinations": {
+        "mae": 23.870276777350746,
+        "rmse": 40.15216320051203
+      },
+      "unseen_geometry": {
+        "mae": 36.325958938086075,
+        "rmse": 63.06773968406936
+      },
+      "unseen_triple": {
+        "mae": 22.666567071617784,
+        "rmse": 37.63487686170808
+      },
+      "unseen_combinations_repeat": {
+        "mae": 23.761968829903264,
+        "rmse": 39.80201896136423
+      },
+      "unseen_geometry_repeat": {
+        "mae": 36.08421339935912,
+        "rmse": 63.228211014514415
+      }
+    }
+  },
+  {
+    "variant": "P08",
+    "status": "finished",
+    "method": "P08: pair=joint_teacher_only, teacher=final",
+    "reference": "M01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261003_060709_pair_joint_teacher_only_final_seed7/random/rate0.4/20261003_060709_seed7_bs32",
+    "val_mae": 16.658434096006378,
+    "best_epoch": 95,
+    "training_seconds": 4434.507903056801,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 15.93958115401716,
+        "rmse": 28.411506392346087
+      },
+      "unseen_combinations": {
+        "mae": 24.059735715796545,
+        "rmse": 40.30554216845773
+      },
+      "unseen_geometry": {
+        "mae": 32.40333737541026,
+        "rmse": 54.429200132624466
+      },
+      "unseen_triple": {
+        "mae": 23.170940941191198,
+        "rmse": 38.445273205667625
+      },
+      "unseen_combinations_repeat": {
+        "mae": 24.189341174434986,
+        "rmse": 40.47545498318607
+      },
+      "unseen_geometry_repeat": {
+        "mae": 31.81015536755681,
+        "rmse": 53.2966356449772
+      }
+    }
+  },
+  {
+    "variant": "M13",
+    "status": "finished",
+    "method": "M13: repeat M01, seed17; resolved source=M01",
+    "reference": "M01",
+    "seed": 17,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261003_072222_round_none_repeat_seed17/random/rate0.4/20261003_072222_seed17_bs32",
+    "val_mae": 17.300925975501656,
+    "best_epoch": 85,
+    "training_seconds": 4343.4119685362675,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 16.243495613549147,
+        "rmse": 28.615022830902905
+      },
+      "unseen_combinations": {
+        "mae": 48.74601086216745,
+        "rmse": 83.64352764937983
+      },
+      "unseen_geometry": {
+        "mae": 43.73940124801973,
+        "rmse": 74.98577143547496
+      },
+      "unseen_triple": {
+        "mae": 61.82673486757192,
+        "rmse": 95.32323502348873
+      },
+      "unseen_combinations_repeat": {
+        "mae": 49.9664609356227,
+        "rmse": 84.39036049257105
+      },
+      "unseen_geometry_repeat": {
+        "mae": 43.948377149878915,
+        "rmse": 75.41988783981321
+      }
+    }
+  },
+  {
+    "variant": "M14",
+    "status": "finished",
+    "method": "M14: repeat M01, seed27; resolved source=M01",
+    "reference": "M01",
+    "seed": 27,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261003_083557_round_none_repeat_seed27/random/rate0.4/20261003_083557_seed27_bs32",
+    "val_mae": 18.01946809206808,
+    "best_epoch": 100,
+    "training_seconds": 4375.9780910659465,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 17.311114759791995,
+        "rmse": 30.828220921533966
+      },
+      "unseen_combinations": {
+        "mae": 47.659341460414026,
+        "rmse": 79.7627791950476
+      },
+      "unseen_geometry": {
+        "mae": 47.89456452766335,
+        "rmse": 81.19290092524217
+      },
+      "unseen_triple": {
+        "mae": 52.101642940598374,
+        "rmse": 79.58248539883402
+      },
+      "unseen_combinations_repeat": {
+        "mae": 47.55929478647618,
+        "rmse": 79.30979607298568
+      },
+      "unseen_geometry_repeat": {
+        "mae": 47.57987583473505,
+        "rmse": 80.63808789559558
+      }
+    }
+  },
+  {
+    "variant": "M15",
+    "status": "finished",
+    "method": "M15: repeat $memory0, seed17; resolved source=M07",
+    "reference": "M13",
+    "seed": 17,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261003_095005_round_delta_repeat_seed17/random/rate0.4/20261003_095005_seed17_bs32",
+    "val_mae": 17.4707892357207,
+    "best_epoch": 100,
+    "training_seconds": 4129.324138168246,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 16.448206834971028,
+        "rmse": 28.934501988588426
+      },
+      "unseen_combinations": {
+        "mae": 35.66733291989277,
+        "rmse": 65.98617312899606
+      },
+      "unseen_geometry": {
+        "mae": 39.24868454137595,
+        "rmse": 69.0695351787098
+      },
+      "unseen_triple": {
+        "mae": 44.68283812794882,
+        "rmse": 76.00924212919453
+      },
+      "unseen_combinations_repeat": {
+        "mae": 35.27213749368688,
+        "rmse": 65.06074121639871
+      },
+      "unseen_geometry_repeat": {
+        "mae": 39.25702936483156,
+        "rmse": 69.39682913658905
+      }
+    }
+  },
+  {
+    "variant": "M16",
+    "status": "finished",
+    "method": "M16: repeat $memory0, seed27; resolved source=M07",
+    "reference": "M14",
+    "seed": 27,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261003_110006_round_delta_repeat_seed27/random/rate0.4/20261003_110006_seed27_bs32",
+    "val_mae": 18.149492617182155,
+    "best_epoch": 100,
+    "training_seconds": 4066.7192573858774,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 17.278790832051524,
+        "rmse": 31.00523578825509
+      },
+      "unseen_combinations": {
+        "mae": 33.578810311001305,
+        "rmse": 63.42704941912676
+      },
+      "unseen_geometry": {
+        "mae": 36.66564345823843,
+        "rmse": 65.72985466539498
+      },
+      "unseen_triple": {
+        "mae": 37.47078398546147,
+        "rmse": 64.7741569541253
+      },
+      "unseen_combinations_repeat": {
+        "mae": 34.05468948071962,
+        "rmse": 64.54708048484531
+      },
+      "unseen_geometry_repeat": {
+        "mae": 35.83547136540423,
+        "rmse": 64.25401038995973
+      }
+    }
+  },
+  {
+    "variant": "M17",
+    "status": "finished",
+    "method": "M17: repeat $memory1, seed17; resolved source=M05",
+    "reference": "M13",
+    "seed": 17,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261003_120911_round_signed_repeat_seed17/random/rate0.4/20261003_120911_seed17_bs32",
+    "val_mae": 16.06743878388749,
+    "best_epoch": 90,
+    "training_seconds": 4367.964291929966,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 15.274766792185686,
+        "rmse": 27.40757023299528
+      },
+      "unseen_combinations": {
+        "mae": 47.98462386022064,
+        "rmse": 92.24564859390041
+      },
+      "unseen_geometry": {
+        "mae": 37.225284207409985,
+        "rmse": 66.37881326189684
+      },
+      "unseen_triple": {
+        "mae": 53.8923392150289,
+        "rmse": 93.31075220094706
+      },
+      "unseen_combinations_repeat": {
+        "mae": 48.64831153657438,
+        "rmse": 94.13877371235307
+      },
+      "unseen_geometry_repeat": {
+        "mae": 37.69371558359149,
+        "rmse": 67.06644919461179
+      }
+    }
+  },
+  {
+    "variant": "M18",
+    "status": "finished",
+    "method": "M18: repeat $memory1, seed27; resolved source=M05",
+    "reference": "M14",
+    "seed": 27,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261003_132312_round_signed_repeat_seed27/random/rate0.4/20261003_132312_seed27_bs32",
+    "val_mae": 16.836461958558655,
+    "best_epoch": 100,
+    "training_seconds": 4686.021414104849,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 15.873682625855958,
+        "rmse": 27.994279611298808
+      },
+      "unseen_combinations": {
+        "mae": 26.370268305896133,
+        "rmse": 48.1500161837921
+      },
+      "unseen_geometry": {
+        "mae": 58.82424731755257,
+        "rmse": 95.62520408414554
+      },
+      "unseen_triple": {
+        "mae": 24.44739524353903,
+        "rmse": 42.089531989401436
+      },
+      "unseen_combinations_repeat": {
+        "mae": 26.00200160148263,
+        "rmse": 46.89508315911422
+      },
+      "unseen_geometry_repeat": {
+        "mae": 57.3813883760851,
+        "rmse": 93.66358703177691
+      }
+    }
+  },
+  {
+    "variant": "S11",
+    "status": "finished",
+    "method": "S11: repeat S01, seed17; resolved source=S01",
+    "reference": "S01",
+    "seed": 17,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261003_144231_scale_fixed_repeat_seed17/random/rate0.4/20261003_144231_seed17_bs32",
+    "val_mae": 15.013148004378529,
+    "best_epoch": 90,
+    "training_seconds": 2972.5634717730572,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 14.248631554315873,
+        "rmse": 25.120036608670148
+      },
+      "unseen_combinations": {
+        "mae": 18.533788369753992,
+        "rmse": 32.737077121041104
+      },
+      "unseen_geometry": {
+        "mae": 19.967648670431277,
+        "rmse": 32.92770423150434
+      },
+      "unseen_triple": {
+        "mae": 17.514079620522,
+        "rmse": 29.930170175650165
+      },
+      "unseen_combinations_repeat": {
+        "mae": 18.767694080845377,
+        "rmse": 33.412435754664244
+      },
+      "unseen_geometry_repeat": {
+        "mae": 19.959570936111923,
+        "rmse": 33.072292094646926
+      }
+    }
+  },
+  {
+    "variant": "S12",
+    "status": "finished",
+    "method": "S12: repeat S01, seed27; resolved source=S01",
+    "reference": "S01",
+    "seed": 27,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261003_153305_scale_fixed_repeat_seed27/random/rate0.4/20261003_153305_seed27_bs32",
+    "val_mae": 14.25510632507005,
+    "best_epoch": 100,
+    "training_seconds": 2951.7855279910145,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 13.460330705084024,
+        "rmse": 23.6298338303857
+      },
+      "unseen_combinations": {
+        "mae": 18.767465050303535,
+        "rmse": 32.45504273964096
+      },
+      "unseen_geometry": {
+        "mae": 21.47887016425629,
+        "rmse": 36.117934726661495
+      },
+      "unseen_triple": {
+        "mae": 18.638725779913408,
+        "rmse": 31.255531554328112
+      },
+      "unseen_combinations_repeat": {
+        "mae": 18.872389326111072,
+        "rmse": 32.73478176054494
+      },
+      "unseen_geometry_repeat": {
+        "mae": 21.29667438750124,
+        "rmse": 35.67276710288811
+      }
+    }
+  },
+  {
+    "variant": "S13",
+    "status": "finished",
+    "method": "S13: repeat $scale, seed17; resolved source=S02",
+    "reference": "S11",
+    "seed": 17,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261003_162318_scale_free_repeat_seed17/random/rate0.4/20261003_162318_seed17_bs32",
+    "val_mae": 28.823828178448835,
+    "best_epoch": 90,
+    "training_seconds": 2218.5513144472498,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 26.99607827408231,
+        "rmse": 43.67436020698278
+      },
+      "unseen_combinations": {
+        "mae": 28.186689384314104,
+        "rmse": 45.373658780095454
+      },
+      "unseen_geometry": {
+        "mae": 31.985750239934617,
+        "rmse": 50.27903674679818
+      },
+      "unseen_triple": {
+        "mae": 27.654886122786092,
+        "rmse": 44.63464828910045
+      },
+      "unseen_combinations_repeat": {
+        "mae": 28.44914105565476,
+        "rmse": 45.77996664530711
+      },
+      "unseen_geometry_repeat": {
+        "mae": 31.994482520025727,
+        "rmse": 50.434772646302655
+      }
+    }
+  },
+  {
+    "variant": "S14",
+    "status": "finished",
+    "method": "S14: repeat $scale, seed27; resolved source=S02",
+    "reference": "S12",
+    "seed": 27,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261003_170114_scale_free_repeat_seed27/random/rate0.4/20261003_170114_seed27_bs32",
+    "val_mae": 28.635154795262146,
+    "best_epoch": 100,
+    "training_seconds": 2429.8077921050135,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 26.877916086914606,
+        "rmse": 43.0801845808048
+      },
+      "unseen_combinations": {
+        "mae": 28.241664556297223,
+        "rmse": 44.78011443162931
+      },
+      "unseen_geometry": {
+        "mae": 31.983075958191662,
+        "rmse": 49.31224454085643
+      },
+      "unseen_triple": {
+        "mae": 28.14907577509313,
+        "rmse": 44.45637676571986
+      },
+      "unseen_combinations_repeat": {
+        "mae": 28.519479048707808,
+        "rmse": 45.27619560281728
+      },
+      "unseen_geometry_repeat": {
+        "mae": 31.933976891094865,
+        "rmse": 49.34070735222778
+      }
+    }
+  },
+  {
+    "variant": "S15",
+    "status": "finished",
+    "method": "S15: repeat $mixture, seed17; resolved source=S09",
+    "reference": "S17",
+    "seed": 17,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261003_174241_scale_soft3_repeat_seed17/random/rate0.4/20261003_174241_seed17_bs32",
+    "val_mae": 16.8900659158918,
+    "best_epoch": 100,
+    "training_seconds": 5913.872101685556,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 15.822487818012291,
+        "rmse": 27.096078116265943
+      },
+      "unseen_combinations": {
+        "mae": 24.64558444763238,
+        "rmse": 42.77372769668636
+      },
+      "unseen_geometry": {
+        "mae": 31.65867440980401,
+        "rmse": 51.88567662993154
+      },
+      "unseen_triple": {
+        "mae": 24.9773463591091,
+        "rmse": 43.061855288955684
+      },
+      "unseen_combinations_repeat": {
+        "mae": 24.73515632082028,
+        "rmse": 42.788870785643574
+      },
+      "unseen_geometry_repeat": {
+        "mae": 30.905060920730207,
+        "rmse": 50.66802422945277
+      }
+    }
+  },
+  {
+    "variant": "S16",
+    "status": "finished",
+    "method": "S16: repeat $mixture, seed27; resolved source=S09",
+    "reference": "S18",
+    "seed": 27,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261003_192251_scale_soft3_repeat_seed27/random/rate0.4/20261003_192251_seed27_bs32",
+    "val_mae": 18.459533859232685,
+    "best_epoch": 100,
+    "training_seconds": 6065.967800172861,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 17.46188307665965,
+        "rmse": 29.639588320783023
+      },
+      "unseen_combinations": {
+        "mae": 27.470395557576396,
+        "rmse": 44.02578869059869
+      },
+      "unseen_geometry": {
+        "mae": 30.522138671776638,
+        "rmse": 50.52527905899613
+      },
+      "unseen_triple": {
+        "mae": 28.315210307907698,
+        "rmse": 44.74798786466946
+      },
+      "unseen_combinations_repeat": {
+        "mae": 27.410351721845633,
+        "rmse": 44.110815432879505
+      },
+      "unseen_geometry_repeat": {
+        "mae": 30.331688717029675,
+        "rmse": 49.855741349149845
+      }
+    }
+  },
+  {
+    "variant": "S17",
+    "status": "finished",
+    "method": "S17: repeat $mixture_reference, seed17; resolved source=S10",
+    "reference": "S10",
+    "seed": 17,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261003_210534_scale_equal3_repeat_seed17/random/rate0.4/20261003_210534_seed17_bs32",
+    "val_mae": 20.168470727513935,
+    "best_epoch": 100,
+    "training_seconds": 6106.824083560263,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 19.08807616683046,
+        "rmse": 32.50322028378393
+      },
+      "unseen_combinations": {
+        "mae": 32.52476736774099,
+        "rmse": 54.77961019752748
+      },
+      "unseen_geometry": {
+        "mae": 36.933133999346744,
+        "rmse": 61.00381041327911
+      },
+      "unseen_triple": {
+        "mae": 31.81125822144778,
+        "rmse": 52.31873393167734
+      },
+      "unseen_combinations_repeat": {
+        "mae": 32.511711857950075,
+        "rmse": 54.78957408108992
+      },
+      "unseen_geometry_repeat": {
+        "mae": 36.447175102628705,
+        "rmse": 60.21254492799769
+      }
+    }
+  },
+  {
+    "variant": "S18",
+    "status": "finished",
+    "method": "S18: repeat $mixture_reference, seed27; resolved source=S10",
+    "reference": "S10",
+    "seed": 27,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261003_224859_scale_equal3_repeat_seed27/random/rate0.4/20261003_224859_seed27_bs32",
+    "val_mae": 18.40992173975121,
+    "best_epoch": 95,
+    "training_seconds": 5905.477697718772,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 17.385659787821538,
+        "rmse": 29.285685229983628
+      },
+      "unseen_combinations": {
+        "mae": 33.60256091533438,
+        "rmse": 56.05424189446798
+      },
+      "unseen_geometry": {
+        "mae": 36.577997465038614,
+        "rmse": 60.02587808142154
+      },
+      "unseen_triple": {
+        "mae": 36.43786233004931,
+        "rmse": 60.29400037875742
+      },
+      "unseen_combinations_repeat": {
+        "mae": 33.870766718802386,
+        "rmse": 56.42785558805115
+      },
+      "unseen_geometry_repeat": {
+        "mae": 36.09863187806573,
+        "rmse": 59.143487048635805
+      }
+    }
+  },
+  {
+    "variant": "G10",
+    "status": "finished",
+    "method": "G10: repeat $generalization, seed17; resolved source=G09",
+    "reference": "S11",
+    "seed": 17,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261004_002902_paths_g09_repeat_seed17/random/rate0.4/20261004_002902_seed17_bs32",
+    "val_mae": 14.623040147418394,
+    "best_epoch": 80,
+    "training_seconds": 2995.024155032588,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 13.75488552474816,
+        "rmse": 24.087384645290776
+      },
+      "unseen_combinations": {
+        "mae": 28.52204739230281,
+        "rmse": 52.11914926823111
+      },
+      "unseen_geometry": {
+        "mae": 28.989599989963754,
+        "rmse": 51.26957427232763
+      },
+      "unseen_triple": {
+        "mae": 36.01723676618497,
+        "rmse": 59.22785749921
+      },
+      "unseen_combinations_repeat": {
+        "mae": 28.631199099327894,
+        "rmse": 52.38089198807404
+      },
+      "unseen_geometry_repeat": {
+        "mae": 29.138542717354863,
+        "rmse": 51.62340391862059
+      }
+    }
+  },
+  {
+    "variant": "G11",
+    "status": "finished",
+    "method": "G11: repeat $generalization, seed27; resolved source=G09",
+    "reference": "S12",
+    "seed": 27,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261004_011957_paths_g09_repeat_seed27/random/rate0.4/20261004_011957_seed27_bs32",
+    "val_mae": 14.899408065773114,
+    "best_epoch": 90,
+    "training_seconds": 3144.302730812109,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 14.224702204089033,
+        "rmse": 25.13782663454112
+      },
+      "unseen_combinations": {
+        "mae": 23.651909170898197,
+        "rmse": 40.60494753980252
+      },
+      "unseen_geometry": {
+        "mae": 25.5520981508847,
+        "rmse": 43.12460598758493
+      },
+      "unseen_triple": {
+        "mae": 24.812370859778902,
+        "rmse": 41.14953365817531
+      },
+      "unseen_combinations_repeat": {
+        "mae": 23.969542314825873,
+        "rmse": 41.23318568729477
+      },
+      "unseen_geometry_repeat": {
+        "mae": 25.437846061618952,
+        "rmse": 43.17114493305346
+      }
+    }
+  },
+  {
+    "variant": "P09",
+    "status": "finished",
+    "method": "P09: repeat $pair0, seed17; resolved source=P08",
+    "reference": "M13",
+    "seed": 17,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261004_021324_pair_joint_teacher_only_final_repeat_seed17/random/rate0.4/20261004_021324_seed17_bs32",
+    "val_mae": 18.279884275371373,
+    "best_epoch": 95,
+    "training_seconds": 4204.184739991208,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 17.331009166077923,
+        "rmse": 30.871283289216063
+      },
+      "unseen_combinations": {
+        "mae": 64.23396024495634,
+        "rmse": 98.57021486629908
+      },
+      "unseen_geometry": {
+        "mae": 95.07770554159035,
+        "rmse": 141.00427860402124
+      },
+      "unseen_triple": {
+        "mae": 56.03997506766372,
+        "rmse": 83.91590476752945
+      },
+      "unseen_combinations_repeat": {
+        "mae": 64.20957216816,
+        "rmse": 98.38245801885348
+      },
+      "unseen_geometry_repeat": {
+        "mae": 93.62314012901072,
+        "rmse": 139.7217226095216
+      }
+    }
+  },
+  {
+    "variant": "P10",
+    "status": "finished",
+    "method": "P10: repeat $pair0, seed27; resolved source=P08",
+    "reference": "M14",
+    "seed": 27,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261004_032439_pair_joint_teacher_only_final_repeat_seed27/random/rate0.4/20261004_032439_seed27_bs32",
+    "val_mae": 16.644987224334148,
+    "best_epoch": 95,
+    "training_seconds": 4569.622126144997,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 15.80537970642363,
+        "rmse": 28.26250205085719
+      },
+      "unseen_combinations": {
+        "mae": 24.572292443966095,
+        "rmse": 43.038562367995425
+      },
+      "unseen_geometry": {
+        "mae": 32.46825887146555,
+        "rmse": 59.524862201505144
+      },
+      "unseen_triple": {
+        "mae": 22.441358091084503,
+        "rmse": 37.561935873861636
+      },
+      "unseen_combinations_repeat": {
+        "mae": 24.773885059447668,
+        "rmse": 43.222732559501594
+      },
+      "unseen_geometry_repeat": {
+        "mae": 32.090594868780585,
+        "rmse": 58.66242990124022
+      }
+    }
+  },
+  {
+    "variant": "P11",
+    "status": "finished",
+    "method": "P11: repeat $pair1, seed17; resolved source=P06",
+    "reference": "M13",
+    "seed": 17,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261004_044200_pair_partner_current_repeat_seed17/random/rate0.4/20261004_044200_seed17_bs32",
+    "val_mae": 17.33123940318752,
+    "best_epoch": 90,
+    "training_seconds": 4174.20214130712,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 16.63621971320079,
+        "rmse": 29.957959579535228
+      },
+      "unseen_combinations": {
+        "mae": 40.935698341033785,
+        "rmse": 76.86473007634358
+      },
+      "unseen_geometry": {
+        "mae": 43.78567878114654,
+        "rmse": 84.27965490213855
+      },
+      "unseen_triple": {
+        "mae": 39.9130697098194,
+        "rmse": 66.795609404402
+      },
+      "unseen_combinations_repeat": {
+        "mae": 40.63636950146839,
+        "rmse": 75.73872434855696
+      },
+      "unseen_geometry_repeat": {
+        "mae": 43.01726155103521,
+        "rmse": 82.58248815255634
+      }
+    }
+  },
+  {
+    "variant": "P12",
+    "status": "finished",
+    "method": "P12: repeat $pair1, seed27; resolved source=P06",
+    "reference": "M14",
+    "seed": 27,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261004_055246_pair_partner_current_repeat_seed27/random/rate0.4/20261004_055246_seed27_bs32",
+    "val_mae": 16.423535408970036,
+    "best_epoch": 100,
+    "training_seconds": 4444.491495572613,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 15.721290591037741,
+        "rmse": 28.226646483327873
+      },
+      "unseen_combinations": {
+        "mae": 30.68721527998607,
+        "rmse": 56.85596245833086
+      },
+      "unseen_geometry": {
+        "mae": 38.663823759210686,
+        "rmse": 69.29396522789959
+      },
+      "unseen_triple": {
+        "mae": 27.77646595734272,
+        "rmse": 46.64786402909008
+      },
+      "unseen_combinations_repeat": {
+        "mae": 30.691266559805232,
+        "rmse": 56.690601236687606
+      },
+      "unseen_geometry_repeat": {
+        "mae": 38.32506418340933,
+        "rmse": 68.52381288918143
+      }
+    }
+  },
+  {
+    "variant": "G12",
+    "status": "finished",
+    "method": "G12: winning memory + winning sparse three-scale method; resolved source=S02",
+    "reference": "S02",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261004_070803_scale_free_combined_seed7/random/rate0.4/20261004_070803_seed7_bs32",
+    "val_mae": 15.10362210205065,
+    "best_epoch": 90,
+    "training_seconds": 3171.164059349976,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 14.306039886342216,
+        "rmse": 25.177489180971545
+      },
+      "unseen_combinations": {
+        "mae": 15.436836888346589,
+        "rmse": 26.260746555530158
+      },
+      "unseen_geometry": {
+        "mae": 19.304854494223584,
+        "rmse": 32.05793205493857
+      },
+      "unseen_triple": {
+        "mae": 14.863636388980419,
+        "rmse": 24.937491923629796
+      },
+      "unseen_combinations_repeat": {
+        "mae": 15.619982884424179,
+        "rmse": 26.83485893260826
+      },
+      "unseen_geometry_repeat": {
+        "mae": 19.098861331281,
+        "rmse": 31.683420495698833
+      }
+    }
+  }
+]

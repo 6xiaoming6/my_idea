@@ -1,0 +1,9 @@
+{
+  "name": "cmff_response010",
+  "method": "固定CMFF，原生Top2执行后响应融合修正±0.1",
+  "module": {
+    "response_fusion": true
+  },
+  "seed": 7,
+  "reference": "U01"
+}

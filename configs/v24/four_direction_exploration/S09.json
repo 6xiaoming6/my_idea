@@ -1,0 +1,8 @@
+{
+  "name": "scale_soft3",
+  "method": "S09: F/M/C scale mode=soft3",
+  "module": {
+    "scale": "soft3"
+  },
+  "reference": "S10"
+}

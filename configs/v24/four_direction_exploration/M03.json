@@ -1,0 +1,9 @@
+{
+  "name": "round_residual",
+  "method": "M03: memory=residual, single F",
+  "module": {
+    "memory": "residual"
+  },
+  "sharing": "shared",
+  "reference": "M01"
+}

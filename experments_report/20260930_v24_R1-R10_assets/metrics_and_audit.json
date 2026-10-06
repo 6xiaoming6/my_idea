@@ -1,0 +1,3764 @@
+{
+  "source_suite": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/experiments/r_exploration/taxibj/b21d7928e67f4565",
+  "experiments": {
+    "R1": {
+      "summary": {
+        "variant": "R1",
+        "status": "finished",
+        "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20260930_102254_shared_repeat_seed17/random/rate0.4/20260930_102254_seed17_bs32",
+        "best_epoch": 95,
+        "val_mae": 18.126003611096237,
+        "training_seconds": 4090.5214916510013,
+        "evaluations": {
+          "in_distribution": {
+            "mae": 17.306156422801486,
+            "rmse": 30.378026756043745
+          },
+          "unseen_combinations": {
+            "mae": 34.452729885781054,
+            "rmse": 58.54771923840326
+          },
+          "unseen_geometry": {
+            "mae": 46.66357429195906,
+            "rmse": 81.32324743009715
+          },
+          "unseen_triple": {
+            "mae": 33.32980392629439,
+            "rmse": 54.10792199976561
+          },
+          "unseen_combinations_repeat": {
+            "mae": 34.45893778031342,
+            "rmse": 58.46760461636463
+          },
+          "unseen_geometry_repeat": {
+            "mae": 45.06468416043028,
+            "rmse": 78.87203219742867
+          }
+        }
+      },
+      "audit": {
+        "epochs": 100,
+        "last_epoch": 100,
+        "validations": 20,
+        "checkpoints": {
+          "best.pth": true,
+          "last.pth": true
+        },
+        "amp_skips": 11.0,
+        "nonfinite": [],
+        "eval_samples": {
+          "in_distribution": 707,
+          "unseen_combinations": 707,
+          "unseen_geometry": 707,
+          "unseen_triple": 707,
+          "unseen_combinations_repeat": 707,
+          "unseen_geometry_repeat": 707
+        },
+        "eval_counts": {
+          "in_distribution": 6949810.0,
+          "unseen_combinations": 6949810.0,
+          "unseen_geometry": 6949810.0,
+          "unseen_triple": 6949810.0,
+          "unseen_combinations_repeat": 6949810.0,
+          "unseen_geometry_repeat": 6949810.0
+        },
+        "peak_gib": 11.011528491973877,
+        "receipt_sha_matches": true,
+        "receipt_test_matches": true,
+        "attempt_count": 1
+      },
+      "curves": [
+        {
+          "epoch": 1,
+          "train_loss": 110.03017375995586,
+          "train_mae": 110.01780911714481,
+          "val_mae": null
+        },
+        {
+          "epoch": 5,
+          "train_loss": 65.46601436664531,
+          "train_mae": 65.47187978671677,
+          "val_mae": 55.49279149042494
+        },
+        {
+          "epoch": 20,
+          "train_loss": 38.566724876304725,
+          "train_mae": 38.56201244981986,
+          "val_mae": 32.52844883487117
+        },
+        {
+          "epoch": 40,
+          "train_loss": 25.808206483915253,
+          "train_mae": 25.78425700198646,
+          "val_mae": 23.58445533127495
+        },
+        {
+          "epoch": 60,
+          "train_loss": 21.959558908041423,
+          "train_mae": 21.93738439275182,
+          "val_mae": 20.52748701611608
+        },
+        {
+          "epoch": 70,
+          "train_loss": 20.947668818684367,
+          "train_mae": 20.914504716394035,
+          "val_mae": 19.92170926213465
+        },
+        {
+          "epoch": 80,
+          "train_loss": 19.86453140556038,
+          "train_mae": 19.826755931587392,
+          "val_mae": 19.104065457812045
+        },
+        {
+          "epoch": 90,
+          "train_loss": 19.0801984613592,
+          "train_mae": 19.047386691205634,
+          "val_mae": 18.67271629395632
+        },
+        {
+          "epoch": 95,
+          "train_loss": 18.773855023569876,
+          "train_mae": 18.75758267795592,
+          "val_mae": 18.126003611096237
+        },
+        {
+          "epoch": 100,
+          "train_loss": 18.7132659639631,
+          "train_mae": 18.673599084103497,
+          "val_mae": 18.293116682431748
+        }
+      ],
+      "families": {
+        "in_distribution": {
+          "random_point": 10.780520975222856,
+          "node_outage": 16.908392316269232,
+          "temporal_gap": 15.776708242092981,
+          "spatial_region": 25.8070315299726
+        },
+        "unseen_combinations": {
+          "node_plus_space": 21.637303579549375,
+          "time_plus_space": 47.784947066227566,
+          "node_plus_time": 33.93373993528279
+        },
+        "unseen_geometry": {
+          "moving_region": 49.49402381983838,
+          "multi_block": 43.825105151599864
+        },
+        "unseen_triple": {
+          "node_plus_time_plus_space": 33.32980392629439
+        },
+        "unseen_combinations_repeat": {
+          "node_plus_space": 21.691595807218476,
+          "time_plus_space": 47.65757668500095,
+          "node_plus_time": 34.025804149260836
+        },
+        "unseen_geometry_repeat": {
+          "moving_region": 48.714010925852484,
+          "multi_block": 41.40502000275937
+        }
+      },
+      "diagnostics": {
+        "in_distribution": {
+          "forward_ms_per_sample_per_rank": 6.396028625205339
+        },
+        "unseen_combinations": {
+          "forward_ms_per_sample_per_rank": 6.260321452615807
+        },
+        "unseen_geometry": {
+          "forward_ms_per_sample_per_rank": 6.083310956162232
+        },
+        "unseen_triple": {
+          "forward_ms_per_sample_per_rank": 6.247226032551939
+        },
+        "unseen_combinations_repeat": {
+          "forward_ms_per_sample_per_rank": 6.2532688797439375
+        },
+        "unseen_geometry_repeat": {
+          "forward_ms_per_sample_per_rank": 6.087577666171307
+        }
+      }
+    },
+    "R2": {
+      "summary": {
+        "variant": "R2",
+        "status": "finished",
+        "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20260930_113144_scale_fixed_repeat_seed17/random/rate0.4/20260930_113144_seed17_bs32",
+        "best_epoch": 100,
+        "val_mae": 15.878259876972866,
+        "training_seconds": 2983.3133254190034,
+        "evaluations": {
+          "in_distribution": {
+            "mae": 14.964809037944923,
+            "rmse": 25.934102716432296
+          },
+          "unseen_combinations": {
+            "mae": 30.004111910973105,
+            "rmse": 54.387038069723374
+          },
+          "unseen_geometry": {
+            "mae": 32.52465051202839,
+            "rmse": 55.71482565559478
+          },
+          "unseen_triple": {
+            "mae": 29.57307169188798,
+            "rmse": 53.13581109054738
+          },
+          "unseen_combinations_repeat": {
+            "mae": 29.92701714147581,
+            "rmse": 54.31688291338882
+          },
+          "unseen_geometry_repeat": {
+            "mae": 32.64715544381789,
+            "rmse": 55.64442136945043
+          }
+        }
+      },
+      "audit": {
+        "epochs": 100,
+        "last_epoch": 100,
+        "validations": 20,
+        "checkpoints": {
+          "best.pth": true,
+          "last.pth": true
+        },
+        "amp_skips": 12.0,
+        "nonfinite": [],
+        "eval_samples": {
+          "in_distribution": 707,
+          "unseen_combinations": 707,
+          "unseen_geometry": 707,
+          "unseen_triple": 707,
+          "unseen_combinations_repeat": 707,
+          "unseen_geometry_repeat": 707
+        },
+        "eval_counts": {
+          "in_distribution": 6949810.0,
+          "unseen_combinations": 6949810.0,
+          "unseen_geometry": 6949810.0,
+          "unseen_triple": 6949810.0,
+          "unseen_combinations_repeat": 6949810.0,
+          "unseen_geometry_repeat": 6949810.0
+        },
+        "peak_gib": 8.498819351196289,
+        "receipt_sha_matches": true,
+        "receipt_test_matches": true,
+        "attempt_count": 1
+      },
+      "curves": [
+        {
+          "epoch": 1,
+          "train_loss": 110.04705949263139,
+          "train_mae": 110.03192054485802,
+          "val_mae": null
+        },
+        {
+          "epoch": 5,
+          "train_loss": 66.63663789823458,
+          "train_mae": 66.64411006689579,
+          "val_mae": 55.97665280529231
+        },
+        {
+          "epoch": 20,
+          "train_loss": 36.39064241384531,
+          "train_mae": 36.37399981994062,
+          "val_mae": 32.197343583611456
+        },
+        {
+          "epoch": 40,
+          "train_loss": 23.369251746635932,
+          "train_mae": 23.336739332104173,
+          "val_mae": 21.14560853218159
+        },
+        {
+          "epoch": 60,
+          "train_loss": 18.688567384496913,
+          "train_mae": 18.66013551750061,
+          "val_mae": 17.600725342518725
+        },
+        {
+          "epoch": 70,
+          "train_loss": 18.297923719728146,
+          "train_mae": 18.265019005806707,
+          "val_mae": 17.372722986679992
+        },
+        {
+          "epoch": 80,
+          "train_loss": 17.193355064887506,
+          "train_mae": 17.152489320902323,
+          "val_mae": 17.029271593701107
+        },
+        {
+          "epoch": 90,
+          "train_loss": 17.21010517764401,
+          "train_mae": 17.166890772828125,
+          "val_mae": 16.693944721077024
+        },
+        {
+          "epoch": 95,
+          "train_loss": 16.690769393722732,
+          "train_mae": 16.667849308970276,
+          "val_mae": 16.60715838851112
+        },
+        {
+          "epoch": 100,
+          "train_loss": 16.267041862785042,
+          "train_mae": 16.227008201414254,
+          "val_mae": 15.878259876972866
+        }
+      ],
+      "families": {
+        "in_distribution": {
+          "random_point": 9.65962486924611,
+          "node_outage": 14.360955972579042,
+          "temporal_gap": 15.019249073946353,
+          "spatial_region": 20.852671588886064
+        },
+        "unseen_combinations": {
+          "node_plus_space": 17.03444107965714,
+          "time_plus_space": 39.22832937479525,
+          "node_plus_time": 33.76550299235947
+        },
+        "unseen_geometry": {
+          "moving_region": 36.24314829861889,
+          "multi_block": 28.795618665327567
+        },
+        "unseen_triple": {
+          "node_plus_time_plus_space": 29.57307169188798
+        },
+        "unseen_combinations_repeat": {
+          "node_plus_space": 17.11337251953765,
+          "time_plus_space": 38.61941598272325,
+          "node_plus_time": 34.06579998268436
+        },
+        "unseen_geometry_repeat": {
+          "moving_region": 36.352258988970696,
+          "multi_block": 28.931554845979385
+        }
+      },
+      "diagnostics": {
+        "in_distribution": {
+          "coe_step1_coarse_fraction": 1.0,
+          "coe_step1_coarse_probability": 1.0,
+          "coe_step2_coarse_fraction": 1.0,
+          "coe_step2_coarse_probability": 1.0,
+          "coe_step3_coarse_fraction": 0.0,
+          "coe_step3_coarse_probability": 0.0,
+          "coe_step4_coarse_fraction": 0.0,
+          "coe_step4_coarse_probability": 0.0,
+          "coe_coarse_rounds_mean": 2.0,
+          "coe_expert_grid_equivalents": 5.0,
+          "coe_scale_path_ccff_fraction": 1.0,
+          "forward_ms_per_sample_per_rank": 5.384752101930454
+        },
+        "unseen_combinations": {
+          "coe_step1_coarse_fraction": 1.0,
+          "coe_step1_coarse_probability": 1.0,
+          "coe_step2_coarse_fraction": 1.0,
+          "coe_step2_coarse_probability": 1.0,
+          "coe_step3_coarse_fraction": 0.0,
+          "coe_step3_coarse_probability": 0.0,
+          "coe_step4_coarse_fraction": 0.0,
+          "coe_step4_coarse_probability": 0.0,
+          "coe_coarse_rounds_mean": 2.0,
+          "coe_expert_grid_equivalents": 5.0,
+          "coe_scale_path_ccff_fraction": 1.0,
+          "forward_ms_per_sample_per_rank": 5.101349323828569
+        },
+        "unseen_geometry": {
+          "coe_step1_coarse_fraction": 1.0,
+          "coe_step1_coarse_probability": 1.0,
+          "coe_step2_coarse_fraction": 1.0,
+          "coe_step2_coarse_probability": 1.0,
+          "coe_step3_coarse_fraction": 0.0,
+          "coe_step3_coarse_probability": 0.0,
+          "coe_step4_coarse_fraction": 0.0,
+          "coe_step4_coarse_probability": 0.0,
+          "coe_coarse_rounds_mean": 2.0,
+          "coe_expert_grid_equivalents": 5.0,
+          "coe_scale_path_ccff_fraction": 1.0,
+          "forward_ms_per_sample_per_rank": 5.051549670328959
+        },
+        "unseen_triple": {
+          "coe_step1_coarse_fraction": 1.0,
+          "coe_step1_coarse_probability": 1.0,
+          "coe_step2_coarse_fraction": 1.0,
+          "coe_step2_coarse_probability": 1.0,
+          "coe_step3_coarse_fraction": 0.0,
+          "coe_step3_coarse_probability": 0.0,
+          "coe_step4_coarse_fraction": 0.0,
+          "coe_step4_coarse_probability": 0.0,
+          "coe_coarse_rounds_mean": 2.0,
+          "coe_expert_grid_equivalents": 5.0,
+          "coe_scale_path_ccff_fraction": 1.0,
+          "forward_ms_per_sample_per_rank": 5.101659700290604
+        },
+        "unseen_combinations_repeat": {
+          "coe_step1_coarse_fraction": 1.0,
+          "coe_step1_coarse_probability": 1.0,
+          "coe_step2_coarse_fraction": 1.0,
+          "coe_step2_coarse_probability": 1.0,
+          "coe_step3_coarse_fraction": 0.0,
+          "coe_step3_coarse_probability": 0.0,
+          "coe_step4_coarse_fraction": 0.0,
+          "coe_step4_coarse_probability": 0.0,
+          "coe_coarse_rounds_mean": 2.0,
+          "coe_expert_grid_equivalents": 5.0,
+          "coe_scale_path_ccff_fraction": 1.0,
+          "forward_ms_per_sample_per_rank": 5.095555797687572
+        },
+        "unseen_geometry_repeat": {
+          "coe_step1_coarse_fraction": 1.0,
+          "coe_step1_coarse_probability": 1.0,
+          "coe_step2_coarse_fraction": 1.0,
+          "coe_step2_coarse_probability": 1.0,
+          "coe_step3_coarse_fraction": 0.0,
+          "coe_step3_coarse_probability": 0.0,
+          "coe_step4_coarse_fraction": 0.0,
+          "coe_step4_coarse_probability": 0.0,
+          "coe_coarse_rounds_mean": 2.0,
+          "coe_expert_grid_equivalents": 5.0,
+          "coe_scale_path_ccff_fraction": 1.0,
+          "forward_ms_per_sample_per_rank": 5.045654766737119
+        }
+      }
+    },
+    "R3": {
+      "summary": {
+        "variant": "R3",
+        "status": "finished",
+        "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20260930_122203_scale_budget_repeat_seed17/random/rate0.4/20260930_122203_seed17_bs32",
+        "best_epoch": 90,
+        "val_mae": 24.7191505595117,
+        "training_seconds": 2937.6077524590073,
+        "evaluations": {
+          "in_distribution": {
+            "mae": 23.11254367925166,
+            "rmse": 36.46775075254461
+          },
+          "unseen_combinations": {
+            "mae": 26.25766156736659,
+            "rmse": 41.51506221084565
+          },
+          "unseen_geometry": {
+            "mae": 30.683836464593995,
+            "rmse": 47.59184791289044
+          },
+          "unseen_triple": {
+            "mae": 25.640178490491106,
+            "rmse": 40.24526923093957
+          },
+          "unseen_combinations_repeat": {
+            "mae": 26.184801113267845,
+            "rmse": 41.29518773779082
+          },
+          "unseen_geometry_repeat": {
+            "mae": 30.50138054133854,
+            "rmse": 47.51906694898164
+          }
+        }
+      },
+      "audit": {
+        "epochs": 100,
+        "last_epoch": 100,
+        "validations": 20,
+        "checkpoints": {
+          "best.pth": true,
+          "last.pth": true
+        },
+        "amp_skips": 12.0,
+        "nonfinite": [],
+        "eval_samples": {
+          "in_distribution": 707,
+          "unseen_combinations": 707,
+          "unseen_geometry": 707,
+          "unseen_triple": 707,
+          "unseen_combinations_repeat": 707,
+          "unseen_geometry_repeat": 707
+        },
+        "eval_counts": {
+          "in_distribution": 6949810.0,
+          "unseen_combinations": 6949810.0,
+          "unseen_geometry": 6949810.0,
+          "unseen_triple": 6949810.0,
+          "unseen_combinations_repeat": 6949810.0,
+          "unseen_geometry_repeat": 6949810.0
+        },
+        "peak_gib": 9.250263214111328,
+        "receipt_sha_matches": true,
+        "receipt_test_matches": true,
+        "attempt_count": 1
+      },
+      "curves": [
+        {
+          "epoch": 1,
+          "train_loss": 110.04696873256138,
+          "train_mae": 110.03320942150324,
+          "val_mae": null
+        },
+        {
+          "epoch": 5,
+          "train_loss": 68.30601749172459,
+          "train_mae": 68.32256650165372,
+          "val_mae": 59.0924874920431
+        },
+        {
+          "epoch": 20,
+          "train_loss": 46.30803675465769,
+          "train_mae": 46.28263576228179,
+          "val_mae": 41.95515428958969
+        },
+        {
+          "epoch": 40,
+          "train_loss": 33.285699547111214,
+          "train_mae": 33.23942408381308,
+          "val_mae": 34.32675215505702
+        },
+        {
+          "epoch": 60,
+          "train_loss": 29.098568854393896,
+          "train_mae": 29.069355097008028,
+          "val_mae": 27.172743808486967
+        },
+        {
+          "epoch": 70,
+          "train_loss": 27.800064483246246,
+          "train_mae": 27.77187258849047,
+          "val_mae": 26.09949700463434
+        },
+        {
+          "epoch": 80,
+          "train_loss": 26.910896276498768,
+          "train_mae": 26.865201533740805,
+          "val_mae": 25.902371603814554
+        },
+        {
+          "epoch": 90,
+          "train_loss": 26.406482721303966,
+          "train_mae": 26.368954796798427,
+          "val_mae": 24.7191505595117
+        },
+        {
+          "epoch": 95,
+          "train_loss": 26.131014018863826,
+          "train_mae": 26.113403076609043,
+          "val_mae": 24.726123633940734
+        },
+        {
+          "epoch": 100,
+          "train_loss": 25.95345568966556,
+          "train_mae": 25.89592955861389,
+          "val_mae": 25.953910484077266
+        }
+      ],
+      "families": {
+        "in_distribution": {
+          "random_point": 19.68503248731256,
+          "node_outage": 20.64184408245254,
+          "temporal_gap": 24.19264110643654,
+          "spatial_region": 27.958032856500857
+        },
+        "unseen_combinations": {
+          "node_plus_space": 24.173803015942635,
+          "time_plus_space": 30.23656374467645,
+          "node_plus_time": 24.35455474448605
+        },
+        "unseen_geometry": {
+          "moving_region": 31.26739201848084,
+          "multi_block": 30.098628778469102
+        },
+        "unseen_triple": {
+          "node_plus_time_plus_space": 25.640178490491106
+        },
+        "unseen_combinations_repeat": {
+          "node_plus_space": 24.42780477869545,
+          "time_plus_space": 29.704028063951583,
+          "node_plus_time": 24.415068978485316
+        },
+        "unseen_geometry_repeat": {
+          "moving_region": 31.244692649332436,
+          "multi_block": 29.755963093553582
+        }
+      },
+      "diagnostics": {
+        "in_distribution": {
+          "coe_step1_coarse_fraction": 1.0,
+          "coe_step1_coarse_probability": 0.9991920529700068,
+          "coe_step2_coarse_fraction": 0.0,
+          "coe_step2_coarse_probability": 1.37881261201458e-05,
+          "coe_step3_coarse_fraction": 0.0,
+          "coe_step3_coarse_probability": 1.4654198422005689e-06,
+          "coe_step4_coarse_fraction": 1.0,
+          "coe_step4_coarse_probability": 1.0,
+          "coe_coarse_rounds_mean": 2.0,
+          "coe_expert_grid_equivalents": 5.0,
+          "coe_scale_path_cffc_fraction": 1.0,
+          "forward_ms_per_sample_per_rank": 5.244920465476413
+        },
+        "unseen_combinations": {
+          "coe_step1_coarse_fraction": 1.0,
+          "coe_step1_coarse_probability": 0.9991955451108778,
+          "coe_step2_coarse_fraction": 0.0,
+          "coe_step2_coarse_probability": 1.4466772697903176e-05,
+          "coe_step3_coarse_fraction": 0.0,
+          "coe_step3_coarse_probability": 1.7314008596938033e-06,
+          "coe_step4_coarse_fraction": 1.0,
+          "coe_step4_coarse_probability": 1.0,
+          "coe_coarse_rounds_mean": 2.0,
+          "coe_expert_grid_equivalents": 5.0,
+          "coe_scale_path_cffc_fraction": 1.0,
+          "forward_ms_per_sample_per_rank": 4.915012848634955
+        },
+        "unseen_geometry": {
+          "coe_step1_coarse_fraction": 1.0,
+          "coe_step1_coarse_probability": 0.9993196835443694,
+          "coe_step2_coarse_fraction": 0.0,
+          "coe_step2_coarse_probability": 1.2879201275335369e-05,
+          "coe_step3_coarse_fraction": 0.0,
+          "coe_step3_coarse_probability": 9.790177357737577e-07,
+          "coe_step4_coarse_fraction": 1.0,
+          "coe_step4_coarse_probability": 1.0,
+          "coe_coarse_rounds_mean": 2.0,
+          "coe_expert_grid_equivalents": 5.0,
+          "coe_scale_path_cffc_fraction": 1.0,
+          "forward_ms_per_sample_per_rank": 4.914323820429887
+        },
+        "unseen_triple": {
+          "coe_step1_coarse_fraction": 1.0,
+          "coe_step1_coarse_probability": 0.9991873610643551,
+          "coe_step2_coarse_fraction": 0.0,
+          "coe_step2_coarse_probability": 1.453669394433419e-05,
+          "coe_step3_coarse_fraction": 0.0,
+          "coe_step3_coarse_probability": 1.7569449975049057e-06,
+          "coe_step4_coarse_fraction": 1.0,
+          "coe_step4_coarse_probability": 1.0,
+          "coe_coarse_rounds_mean": 2.0,
+          "coe_expert_grid_equivalents": 5.0,
+          "coe_scale_path_cffc_fraction": 1.0,
+          "forward_ms_per_sample_per_rank": 4.912971247490127
+        },
+        "unseen_combinations_repeat": {
+          "coe_step1_coarse_fraction": 1.0,
+          "coe_step1_coarse_probability": 0.999202061829169,
+          "coe_step2_coarse_fraction": 0.0,
+          "coe_step2_coarse_probability": 1.4463799067026516e-05,
+          "coe_step3_coarse_fraction": 0.0,
+          "coe_step3_coarse_probability": 1.689117219186569e-06,
+          "coe_step4_coarse_fraction": 1.0,
+          "coe_step4_coarse_probability": 1.0,
+          "coe_coarse_rounds_mean": 2.0,
+          "coe_expert_grid_equivalents": 5.0,
+          "coe_scale_path_cffc_fraction": 1.0,
+          "forward_ms_per_sample_per_rank": 4.91098016133279
+        },
+        "unseen_geometry_repeat": {
+          "coe_step1_coarse_fraction": 1.0,
+          "coe_step1_coarse_probability": 0.9993205226462498,
+          "coe_step2_coarse_fraction": 0.0,
+          "coe_step2_coarse_probability": 1.284726461844693e-05,
+          "coe_step3_coarse_fraction": 0.0,
+          "coe_step3_coarse_probability": 9.795973317746858e-07,
+          "coe_step4_coarse_fraction": 1.0,
+          "coe_step4_coarse_probability": 1.0,
+          "coe_coarse_rounds_mean": 2.0,
+          "coe_expert_grid_equivalents": 5.0,
+          "coe_scale_path_cffc_fraction": 1.0,
+          "forward_ms_per_sample_per_rank": 4.9089362220018655
+        }
+      }
+    },
+    "R4": {
+      "summary": {
+        "variant": "R4",
+        "status": "finished",
+        "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20260930_131135_scale_fixed_gradient_seed7/random/rate0.4/20260930_131135_seed7_bs32",
+        "best_epoch": 100,
+        "val_mae": 15.102306386940562,
+        "training_seconds": 3263.7441768459976,
+        "evaluations": {
+          "in_distribution": {
+            "mae": 14.263101387843696,
+            "rmse": 25.404064889254926
+          },
+          "unseen_combinations": {
+            "mae": 25.68491353990253,
+            "rmse": 43.337693397363694
+          },
+          "unseen_geometry": {
+            "mae": 29.19513155755337,
+            "rmse": 49.71128634392869
+          },
+          "unseen_triple": {
+            "mae": 25.749516101879045,
+            "rmse": 42.78507251091514
+          },
+          "unseen_combinations_repeat": {
+            "mae": 25.8216509606018,
+            "rmse": 43.34804171892601
+          },
+          "unseen_geometry_repeat": {
+            "mae": 29.114581387836502,
+            "rmse": 49.37971512528955
+          }
+        }
+      },
+      "audit": {
+        "epochs": 100,
+        "last_epoch": 100,
+        "validations": 20,
+        "checkpoints": {
+          "best.pth": true,
+          "last.pth": true
+        },
+        "amp_skips": 12.0,
+        "nonfinite": [],
+        "eval_samples": {
+          "in_distribution": 707,
+          "unseen_combinations": 707,
+          "unseen_geometry": 707,
+          "unseen_triple": 707,
+          "unseen_combinations_repeat": 707,
+          "unseen_geometry_repeat": 707
+        },
+        "eval_counts": {
+          "in_distribution": 6949810.0,
+          "unseen_combinations": 6949810.0,
+          "unseen_geometry": 6949810.0,
+          "unseen_triple": 6949810.0,
+          "unseen_combinations_repeat": 6949810.0,
+          "unseen_geometry_repeat": 6949810.0
+        },
+        "peak_gib": 9.195410251617432,
+        "receipt_sha_matches": true,
+        "receipt_test_matches": true,
+        "attempt_count": 1
+      },
+      "curves": [
+        {
+          "epoch": 1,
+          "train_loss": 108.73810081977349,
+          "train_mae": 108.73301699860102,
+          "val_mae": null
+        },
+        {
+          "epoch": 5,
+          "train_loss": 64.57432447160993,
+          "train_mae": 64.5594684680349,
+          "val_mae": 54.699801300470575
+        },
+        {
+          "epoch": 20,
+          "train_loss": 33.91239931676295,
+          "train_mae": 33.87437213626761,
+          "val_mae": 30.228666571481263
+        },
+        {
+          "epoch": 40,
+          "train_loss": 21.14232942655489,
+          "train_mae": 21.10744601537724,
+          "val_mae": 20.0254432070342
+        },
+        {
+          "epoch": 60,
+          "train_loss": 17.568939085130566,
+          "train_mae": 17.538386595367577,
+          "val_mae": 18.010340258071423
+        },
+        {
+          "epoch": 70,
+          "train_loss": 17.097071300853383,
+          "train_mae": 17.044566293382278,
+          "val_mae": 18.919869581124736
+        },
+        {
+          "epoch": 80,
+          "train_loss": 16.33721077906621,
+          "train_mae": 16.314664342766676,
+          "val_mae": 16.057021931311834
+        },
+        {
+          "epoch": 90,
+          "train_loss": 15.505622578905774,
+          "train_mae": 15.49058636917317,
+          "val_mae": 15.601426739959427
+        },
+        {
+          "epoch": 95,
+          "train_loss": 15.416529036187507,
+          "train_mae": 15.396744596974006,
+          "val_mae": 15.47069189377309
+        },
+        {
+          "epoch": 100,
+          "train_loss": 15.465107409985034,
+          "train_mae": 15.431730123768004,
+          "val_mae": 15.102306386940562
+        }
+      ],
+      "families": {
+        "in_distribution": {
+          "random_point": 8.669833622859803,
+          "node_outage": 12.936558967130484,
+          "temporal_gap": 14.672371631291274,
+          "spatial_region": 20.810632302769235
+        },
+        "unseen_combinations": {
+          "node_plus_space": 16.447564586449516,
+          "time_plus_space": 33.93362092004759,
+          "node_plus_time": 26.677763603601655
+        },
+        "unseen_geometry": {
+          "moving_region": 32.03137030974303,
+          "multi_block": 26.350858409354206
+        },
+        "unseen_triple": {
+          "node_plus_time_plus_space": 25.749516101879045
+        },
+        "unseen_combinations_repeat": {
+          "node_plus_space": 16.63150546849406,
+          "time_plus_space": 34.34559804817491,
+          "node_plus_time": 26.490682858596134
+        },
+        "unseen_geometry_repeat": {
+          "moving_region": 32.12438051752677,
+          "multi_block": 26.096258445629527
+        }
+      },
+      "diagnostics": {
+        "in_distribution": {
+          "coe_step1_coarse_fraction": 1.0,
+          "coe_step1_coarse_probability": 0.9999824216038705,
+          "coe_step2_coarse_fraction": 1.0,
+          "coe_step2_coarse_probability": 0.9999738388722486,
+          "coe_step3_coarse_fraction": 0.0,
+          "coe_step3_coarse_probability": 0.0,
+          "coe_step4_coarse_fraction": 0.0,
+          "coe_step4_coarse_probability": 0.0,
+          "coe_coarse_rounds_mean": 2.0,
+          "coe_expert_grid_equivalents": 5.0,
+          "coe_scale_path_ccff_fraction": 1.0,
+          "forward_ms_per_sample_per_rank": 5.447397702913652
+        },
+        "unseen_combinations": {
+          "coe_step1_coarse_fraction": 1.0,
+          "coe_step1_coarse_probability": 0.9999819082620289,
+          "coe_step2_coarse_fraction": 1.0,
+          "coe_step2_coarse_probability": 0.9999714890834803,
+          "coe_step3_coarse_fraction": 0.0,
+          "coe_step3_coarse_probability": 0.0,
+          "coe_step4_coarse_fraction": 0.0,
+          "coe_step4_coarse_probability": 0.0,
+          "coe_coarse_rounds_mean": 2.0,
+          "coe_expert_grid_equivalents": 5.0,
+          "coe_scale_path_ccff_fraction": 1.0,
+          "forward_ms_per_sample_per_rank": 5.102602265958965
+        },
+        "unseen_geometry": {
+          "coe_step1_coarse_fraction": 1.0,
+          "coe_step1_coarse_probability": 0.9999900646560431,
+          "coe_step2_coarse_fraction": 1.0,
+          "coe_step2_coarse_probability": 0.9999806211557888,
+          "coe_step3_coarse_fraction": 0.0,
+          "coe_step3_coarse_probability": 0.0,
+          "coe_step4_coarse_fraction": 0.0,
+          "coe_step4_coarse_probability": 0.0,
+          "coe_coarse_rounds_mean": 2.0,
+          "coe_expert_grid_equivalents": 5.0,
+          "coe_scale_path_ccff_fraction": 1.0,
+          "forward_ms_per_sample_per_rank": 5.1470883365172515
+        },
+        "unseen_triple": {
+          "coe_step1_coarse_fraction": 1.0,
+          "coe_step1_coarse_probability": 0.9999826673571088,
+          "coe_step2_coarse_fraction": 1.0,
+          "coe_step2_coarse_probability": 0.9999723157923157,
+          "coe_step3_coarse_fraction": 0.0,
+          "coe_step3_coarse_probability": 0.0,
+          "coe_step4_coarse_fraction": 0.0,
+          "coe_step4_coarse_probability": 0.0,
+          "coe_coarse_rounds_mean": 2.0,
+          "coe_expert_grid_equivalents": 5.0,
+          "coe_scale_path_ccff_fraction": 1.0,
+          "forward_ms_per_sample_per_rank": 5.076026495194057
+        },
+        "unseen_combinations_repeat": {
+          "coe_step1_coarse_fraction": 1.0,
+          "coe_step1_coarse_probability": 0.9999817265816761,
+          "coe_step2_coarse_fraction": 1.0,
+          "coe_step2_coarse_probability": 0.9999710576031805,
+          "coe_step3_coarse_fraction": 0.0,
+          "coe_step3_coarse_probability": 0.0,
+          "coe_step4_coarse_fraction": 0.0,
+          "coe_step4_coarse_probability": 0.0,
+          "coe_coarse_rounds_mean": 2.0,
+          "coe_expert_grid_equivalents": 5.0,
+          "coe_scale_path_ccff_fraction": 1.0,
+          "forward_ms_per_sample_per_rank": 5.100299988597002
+        },
+        "unseen_geometry_repeat": {
+          "coe_step1_coarse_fraction": 1.0,
+          "coe_step1_coarse_probability": 0.9999920039568123,
+          "coe_step2_coarse_fraction": 1.0,
+          "coe_step2_coarse_probability": 0.9999811382071132,
+          "coe_step3_coarse_fraction": 0.0,
+          "coe_step3_coarse_probability": 0.0,
+          "coe_step4_coarse_fraction": 0.0,
+          "coe_step4_coarse_probability": 0.0,
+          "coe_coarse_rounds_mean": 2.0,
+          "coe_expert_grid_equivalents": 5.0,
+          "coe_scale_path_ccff_fraction": 1.0,
+          "forward_ms_per_sample_per_rank": 5.142731158547907
+        }
+      }
+    },
+    "R5": {
+      "summary": {
+        "variant": "R5",
+        "status": "finished",
+        "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20260930_140635_scale_early_paths_seed7/random/rate0.4/20260930_140635_seed7_bs32",
+        "best_epoch": 100,
+        "val_mae": 15.09239773518231,
+        "training_seconds": 3092.5307412440015,
+        "evaluations": {
+          "in_distribution": {
+            "mae": 14.324871453320307,
+            "rmse": 25.212925354872073
+          },
+          "unseen_combinations": {
+            "mae": 15.61294808778945,
+            "rmse": 26.672102822051478
+          },
+          "unseen_geometry": {
+            "mae": 20.30264798606005,
+            "rmse": 34.047480190460035
+          },
+          "unseen_triple": {
+            "mae": 14.927916909778828,
+            "rmse": 25.282799876807157
+          },
+          "unseen_combinations_repeat": {
+            "mae": 15.850506776444249,
+            "rmse": 27.46851367561895
+          },
+          "unseen_geometry_repeat": {
+            "mae": 20.08880877229018,
+            "rmse": 33.67261710673606
+          }
+        }
+      },
+      "audit": {
+        "epochs": 100,
+        "last_epoch": 100,
+        "validations": 20,
+        "checkpoints": {
+          "best.pth": true,
+          "last.pth": true
+        },
+        "amp_skips": 12.0,
+        "nonfinite": [],
+        "eval_samples": {
+          "in_distribution": 707,
+          "unseen_combinations": 707,
+          "unseen_geometry": 707,
+          "unseen_triple": 707,
+          "unseen_combinations_repeat": 707,
+          "unseen_geometry_repeat": 707
+        },
+        "eval_counts": {
+          "in_distribution": 6949810.0,
+          "unseen_combinations": 6949810.0,
+          "unseen_geometry": 6949810.0,
+          "unseen_triple": 6949810.0,
+          "unseen_combinations_repeat": 6949810.0,
+          "unseen_geometry_repeat": 6949810.0
+        },
+        "peak_gib": 9.169331550598145,
+        "receipt_sha_matches": true,
+        "receipt_test_matches": true,
+        "attempt_count": 1
+      },
+      "curves": [
+        {
+          "epoch": 1,
+          "train_loss": 108.73549840357397,
+          "train_mae": 108.73111616900025,
+          "val_mae": null
+        },
+        {
+          "epoch": 5,
+          "train_loss": 68.35586126748618,
+          "train_mae": 68.33911196706158,
+          "val_mae": 58.32959552152678
+        },
+        {
+          "epoch": 20,
+          "train_loss": 39.60421477974235,
+          "train_mae": 39.5646080223506,
+          "val_mae": 34.65801416477783
+        },
+        {
+          "epoch": 40,
+          "train_loss": 23.23977671041117,
+          "train_mae": 23.198991169622573,
+          "val_mae": 20.791201894189527
+        },
+        {
+          "epoch": 60,
+          "train_loss": 19.06023035421,
+          "train_mae": 19.02869474375974,
+          "val_mae": 17.995239837470923
+        },
+        {
+          "epoch": 70,
+          "train_loss": 19.38058667368703,
+          "train_mae": 19.31295267923376,
+          "val_mae": 18.2368737841552
+        },
+        {
+          "epoch": 80,
+          "train_loss": 17.034874135797676,
+          "train_mae": 17.00110057146034,
+          "val_mae": 16.267941109980786
+        },
+        {
+          "epoch": 90,
+          "train_loss": 15.97504677710595,
+          "train_mae": 15.951517643329755,
+          "val_mae": 15.70116051828452
+        },
+        {
+          "epoch": 95,
+          "train_loss": 15.91465018631576,
+          "train_mae": 15.889165611479989,
+          "val_mae": 15.182737755290226
+        },
+        {
+          "epoch": 100,
+          "train_loss": 15.577411602069805,
+          "train_mae": 15.533457915891526,
+          "val_mae": 15.09239773518231
+        }
+      ],
+      "families": {
+        "in_distribution": {
+          "random_point": 9.608158216516946,
+          "node_outage": 12.038332559227202,
+          "temporal_gap": 15.812983394256024,
+          "spatial_region": 19.87134815478186
+        },
+        "unseen_combinations": {
+          "node_plus_space": 15.505924892262746,
+          "time_plus_space": 17.671951566460333,
+          "node_plus_time": 13.652661711867708
+        },
+        "unseen_geometry": {
+          "moving_region": 20.089590661298573,
+          "multi_block": 20.516308908671206
+        },
+        "unseen_triple": {
+          "node_plus_time_plus_space": 14.927916909778828
+        },
+        "unseen_combinations_repeat": {
+          "node_plus_space": 15.624436622260633,
+          "time_plus_space": 17.718022807214165,
+          "node_plus_time": 14.202075144477392
+        },
+        "unseen_geometry_repeat": {
+          "moving_region": 20.20903466271244,
+          "multi_block": 19.96824151510523
+        }
+      },
+      "diagnostics": {
+        "in_distribution": {
+          "coe_step1_coarse_fraction": 1.0,
+          "coe_step1_coarse_probability": 1.0,
+          "coe_step2_coarse_fraction": 1.0,
+          "coe_step2_coarse_probability": 1.0,
+          "coe_step3_coarse_fraction": 0.0,
+          "coe_step3_coarse_probability": 0.0,
+          "coe_step4_coarse_fraction": 0.0,
+          "coe_step4_coarse_probability": 0.0,
+          "coe_coarse_rounds_mean": 2.0,
+          "coe_expert_grid_equivalents": 5.0,
+          "coe_scale_path_ccff_fraction": 1.0,
+          "forward_ms_per_sample_per_rank": 5.109561141374517
+        },
+        "unseen_combinations": {
+          "coe_step1_coarse_fraction": 1.0,
+          "coe_step1_coarse_probability": 1.0,
+          "coe_step2_coarse_fraction": 1.0,
+          "coe_step2_coarse_probability": 1.0,
+          "coe_step3_coarse_fraction": 0.0,
+          "coe_step3_coarse_probability": 0.0,
+          "coe_step4_coarse_fraction": 0.0,
+          "coe_step4_coarse_probability": 0.0,
+          "coe_coarse_rounds_mean": 2.0,
+          "coe_expert_grid_equivalents": 5.0,
+          "coe_scale_path_ccff_fraction": 1.0,
+          "forward_ms_per_sample_per_rank": 4.756134642161959
+        },
+        "unseen_geometry": {
+          "coe_step1_coarse_fraction": 1.0,
+          "coe_step1_coarse_probability": 1.0,
+          "coe_step2_coarse_fraction": 1.0,
+          "coe_step2_coarse_probability": 1.0,
+          "coe_step3_coarse_fraction": 0.0,
+          "coe_step3_coarse_probability": 0.0,
+          "coe_step4_coarse_fraction": 0.0,
+          "coe_step4_coarse_probability": 0.0,
+          "coe_coarse_rounds_mean": 2.0,
+          "coe_expert_grid_equivalents": 5.0,
+          "coe_scale_path_ccff_fraction": 1.0,
+          "forward_ms_per_sample_per_rank": 4.7589688486689
+        },
+        "unseen_triple": {
+          "coe_step1_coarse_fraction": 1.0,
+          "coe_step1_coarse_probability": 1.0,
+          "coe_step2_coarse_fraction": 1.0,
+          "coe_step2_coarse_probability": 1.0,
+          "coe_step3_coarse_fraction": 0.0,
+          "coe_step3_coarse_probability": 0.0,
+          "coe_step4_coarse_fraction": 0.0,
+          "coe_step4_coarse_probability": 0.0,
+          "coe_coarse_rounds_mean": 2.0,
+          "coe_expert_grid_equivalents": 5.0,
+          "coe_scale_path_ccff_fraction": 1.0,
+          "forward_ms_per_sample_per_rank": 4.749741046740495
+        },
+        "unseen_combinations_repeat": {
+          "coe_step1_coarse_fraction": 1.0,
+          "coe_step1_coarse_probability": 1.0,
+          "coe_step2_coarse_fraction": 1.0,
+          "coe_step2_coarse_probability": 1.0,
+          "coe_step3_coarse_fraction": 0.0,
+          "coe_step3_coarse_probability": 0.0,
+          "coe_step4_coarse_fraction": 0.0,
+          "coe_step4_coarse_probability": 0.0,
+          "coe_coarse_rounds_mean": 2.0,
+          "coe_expert_grid_equivalents": 5.0,
+          "coe_scale_path_ccff_fraction": 1.0,
+          "forward_ms_per_sample_per_rank": 4.749275687482614
+        },
+        "unseen_geometry_repeat": {
+          "coe_step1_coarse_fraction": 1.0,
+          "coe_step1_coarse_probability": 1.0,
+          "coe_step2_coarse_fraction": 1.0,
+          "coe_step2_coarse_probability": 1.0,
+          "coe_step3_coarse_fraction": 0.0,
+          "coe_step3_coarse_probability": 0.0,
+          "coe_step4_coarse_fraction": 0.0,
+          "coe_step4_coarse_probability": 0.0,
+          "coe_coarse_rounds_mean": 2.0,
+          "coe_expert_grid_equivalents": 5.0,
+          "coe_scale_path_ccff_fraction": 1.0,
+          "forward_ms_per_sample_per_rank": 4.752182645003326
+        }
+      }
+    },
+    "R6": {
+      "summary": {
+        "variant": "R6",
+        "status": "finished",
+        "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20260930_145841_scale_independent_seed7/random/rate0.4/20260930_145841_seed7_bs32",
+        "best_epoch": 95,
+        "val_mae": 14.19510694972426,
+        "training_seconds": 3363.056641983014,
+        "evaluations": {
+          "in_distribution": {
+            "mae": 13.29563150827145,
+            "rmse": 23.61461086849883
+          },
+          "unseen_combinations": {
+            "mae": 26.066339259634436,
+            "rmse": 47.313324803654204
+          },
+          "unseen_geometry": {
+            "mae": 25.433603292751886,
+            "rmse": 45.94497946099649
+          },
+          "unseen_triple": {
+            "mae": 25.93128518081789,
+            "rmse": 47.2585837888546
+          },
+          "unseen_combinations_repeat": {
+            "mae": 26.061875396593575,
+            "rmse": 47.27592460810196
+          },
+          "unseen_geometry_repeat": {
+            "mae": 25.731365506754862,
+            "rmse": 46.21791926034336
+          }
+        }
+      },
+      "audit": {
+        "epochs": 100,
+        "last_epoch": 100,
+        "validations": 20,
+        "checkpoints": {
+          "best.pth": true,
+          "last.pth": true
+        },
+        "amp_skips": 11.0,
+        "nonfinite": [],
+        "eval_samples": {
+          "in_distribution": 707,
+          "unseen_combinations": 707,
+          "unseen_geometry": 707,
+          "unseen_triple": 707,
+          "unseen_combinations_repeat": 707,
+          "unseen_geometry_repeat": 707
+        },
+        "eval_counts": {
+          "in_distribution": 6949810.0,
+          "unseen_combinations": 6949810.0,
+          "unseen_geometry": 6949810.0,
+          "unseen_triple": 6949810.0,
+          "unseen_combinations_repeat": 6949810.0,
+          "unseen_geometry_repeat": 6949810.0
+        },
+        "peak_gib": 8.96656322479248,
+        "receipt_sha_matches": true,
+        "receipt_test_matches": true,
+        "attempt_count": 1
+      },
+      "curves": [
+        {
+          "epoch": 1,
+          "train_loss": 108.92848205566406,
+          "train_mae": 108.9269857562245,
+          "val_mae": null
+        },
+        {
+          "epoch": 5,
+          "train_loss": 61.07728903634207,
+          "train_mae": 61.042230230393024,
+          "val_mae": 51.151981046206565
+        },
+        {
+          "epoch": 20,
+          "train_loss": 25.299372412941672,
+          "train_mae": 25.2762208565184,
+          "val_mae": 22.48733290499902
+        },
+        {
+          "epoch": 40,
+          "train_loss": 18.0991403777878,
+          "train_mae": 18.066222914339864,
+          "val_mae": 17.106818398148643
+        },
+        {
+          "epoch": 60,
+          "train_loss": 16.08473085428213,
+          "train_mae": 16.065318914615347,
+          "val_mae": 15.575055103424889
+        },
+        {
+          "epoch": 70,
+          "train_loss": 16.064869323334136,
+          "train_mae": 16.03151304642213,
+          "val_mae": 14.989736038978423
+        },
+        {
+          "epoch": 80,
+          "train_loss": 14.834699345873547,
+          "train_mae": 14.816474955980876,
+          "val_mae": 14.556905254829172
+        },
+        {
+          "epoch": 90,
+          "train_loss": 14.174263520674272,
+          "train_mae": 14.162929435393533,
+          "val_mae": 14.567954941609704
+        },
+        {
+          "epoch": 95,
+          "train_loss": 14.148023159472974,
+          "train_mae": 14.135727753124486,
+          "val_mae": 14.19510694972426
+        },
+        {
+          "epoch": 100,
+          "train_loss": 14.580598955030565,
+          "train_mae": 14.556678211487622,
+          "val_mae": 14.269913455646577
+        }
+      ],
+      "families": {
+        "in_distribution": {
+          "random_point": 10.00915155094229,
+          "node_outage": 10.908257179969079,
+          "temporal_gap": 14.618728806375042,
+          "spatial_region": 17.671108629189114
+        },
+        "unseen_combinations": {
+          "node_plus_space": 14.088188020501061,
+          "time_plus_space": 33.37991458609928,
+          "node_plus_time": 30.750766081902988
+        },
+        "unseen_geometry": {
+          "moving_region": 27.032599297521138,
+          "multi_block": 23.830077788408612
+        },
+        "unseen_triple": {
+          "node_plus_time_plus_space": 25.93128518081789
+        },
+        "unseen_combinations_repeat": {
+          "node_plus_space": 14.328020839170561,
+          "time_plus_space": 32.44033915547356,
+          "node_plus_time": 31.440054638968853
+        },
+        "unseen_geometry_repeat": {
+          "moving_region": 27.64145856502635,
+          "multi_block": 23.815862217002067
+        }
+      },
+      "diagnostics": {
+        "in_distribution": {
+          "coe_step1_coarse_fraction": 1.0,
+          "coe_step1_coarse_probability": 1.0,
+          "coe_step2_coarse_fraction": 1.0,
+          "coe_step2_coarse_probability": 1.0,
+          "coe_step3_coarse_fraction": 0.0,
+          "coe_step3_coarse_probability": 0.0,
+          "coe_step4_coarse_fraction": 0.0,
+          "coe_step4_coarse_probability": 0.0,
+          "coe_coarse_rounds_mean": 2.0,
+          "coe_expert_grid_equivalents": 5.0,
+          "coe_scale_path_ccff_fraction": 1.0,
+          "forward_ms_per_sample_per_rank": 5.563595601014366
+        },
+        "unseen_combinations": {
+          "coe_step1_coarse_fraction": 1.0,
+          "coe_step1_coarse_probability": 1.0,
+          "coe_step2_coarse_fraction": 1.0,
+          "coe_step2_coarse_probability": 1.0,
+          "coe_step3_coarse_fraction": 0.0,
+          "coe_step3_coarse_probability": 0.0,
+          "coe_step4_coarse_fraction": 0.0,
+          "coe_step4_coarse_probability": 0.0,
+          "coe_coarse_rounds_mean": 2.0,
+          "coe_expert_grid_equivalents": 5.0,
+          "coe_scale_path_ccff_fraction": 1.0,
+          "forward_ms_per_sample_per_rank": 5.156993810517208
+        },
+        "unseen_geometry": {
+          "coe_step1_coarse_fraction": 1.0,
+          "coe_step1_coarse_probability": 1.0,
+          "coe_step2_coarse_fraction": 1.0,
+          "coe_step2_coarse_probability": 1.0,
+          "coe_step3_coarse_fraction": 0.0,
+          "coe_step3_coarse_probability": 0.0,
+          "coe_step4_coarse_fraction": 0.0,
+          "coe_step4_coarse_probability": 0.0,
+          "coe_coarse_rounds_mean": 2.0,
+          "coe_expert_grid_equivalents": 5.0,
+          "coe_scale_path_ccff_fraction": 1.0,
+          "forward_ms_per_sample_per_rank": 5.275876964725649
+        },
+        "unseen_triple": {
+          "coe_step1_coarse_fraction": 1.0,
+          "coe_step1_coarse_probability": 1.0,
+          "coe_step2_coarse_fraction": 1.0,
+          "coe_step2_coarse_probability": 1.0,
+          "coe_step3_coarse_fraction": 0.0,
+          "coe_step3_coarse_probability": 0.0,
+          "coe_step4_coarse_fraction": 0.0,
+          "coe_step4_coarse_probability": 0.0,
+          "coe_coarse_rounds_mean": 2.0,
+          "coe_expert_grid_equivalents": 5.0,
+          "coe_scale_path_ccff_fraction": 1.0,
+          "forward_ms_per_sample_per_rank": 5.104641910931201
+        },
+        "unseen_combinations_repeat": {
+          "coe_step1_coarse_fraction": 1.0,
+          "coe_step1_coarse_probability": 1.0,
+          "coe_step2_coarse_fraction": 1.0,
+          "coe_step2_coarse_probability": 1.0,
+          "coe_step3_coarse_fraction": 0.0,
+          "coe_step3_coarse_probability": 0.0,
+          "coe_step4_coarse_fraction": 0.0,
+          "coe_step4_coarse_probability": 0.0,
+          "coe_coarse_rounds_mean": 2.0,
+          "coe_expert_grid_equivalents": 5.0,
+          "coe_scale_path_ccff_fraction": 1.0,
+          "forward_ms_per_sample_per_rank": 5.153951732721048
+        },
+        "unseen_geometry_repeat": {
+          "coe_step1_coarse_fraction": 1.0,
+          "coe_step1_coarse_probability": 1.0,
+          "coe_step2_coarse_fraction": 1.0,
+          "coe_step2_coarse_probability": 1.0,
+          "coe_step3_coarse_fraction": 0.0,
+          "coe_step3_coarse_probability": 0.0,
+          "coe_step4_coarse_fraction": 0.0,
+          "coe_step4_coarse_probability": 0.0,
+          "coe_coarse_rounds_mean": 2.0,
+          "coe_expert_grid_equivalents": 5.0,
+          "coe_scale_path_ccff_fraction": 1.0,
+          "forward_ms_per_sample_per_rank": 5.262153893862317
+        }
+      }
+    },
+    "R7": {
+      "summary": {
+        "variant": "R7",
+        "status": "finished",
+        "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20260930_155521_scale_free_seed7/random/rate0.4/20260930_155521_seed7_bs32",
+        "best_epoch": 90,
+        "val_mae": 16.289830257654987,
+        "training_seconds": 4336.204415643995,
+        "evaluations": {
+          "in_distribution": {
+            "mae": 15.496911579237418,
+            "rmse": 27.75113445821113
+          },
+          "unseen_combinations": {
+            "mae": 25.817552125525733,
+            "rmse": 45.866431176452686
+          },
+          "unseen_geometry": {
+            "mae": 30.6363438712713,
+            "rmse": 54.31251758075073
+          },
+          "unseen_triple": {
+            "mae": 25.25967747679433,
+            "rmse": 43.315439192050825
+          },
+          "unseen_combinations_repeat": {
+            "mae": 25.726937552969073,
+            "rmse": 45.63497001991342
+          },
+          "unseen_geometry_repeat": {
+            "mae": 31.18172049847406,
+            "rmse": 55.44970736708006
+          }
+        }
+      },
+      "audit": {
+        "epochs": 100,
+        "last_epoch": 100,
+        "validations": 20,
+        "checkpoints": {
+          "best.pth": true,
+          "last.pth": true
+        },
+        "amp_skips": 11.0,
+        "nonfinite": [],
+        "eval_samples": {
+          "in_distribution": 707,
+          "unseen_combinations": 707,
+          "unseen_geometry": 707,
+          "unseen_triple": 707,
+          "unseen_combinations_repeat": 707,
+          "unseen_geometry_repeat": 707
+        },
+        "eval_counts": {
+          "in_distribution": 6949810.0,
+          "unseen_combinations": 6949810.0,
+          "unseen_geometry": 6949810.0,
+          "unseen_triple": 6949810.0,
+          "unseen_combinations_repeat": 6949810.0,
+          "unseen_geometry_repeat": 6949810.0
+        },
+        "peak_gib": 11.705185890197754,
+        "receipt_sha_matches": true,
+        "receipt_test_matches": true,
+        "attempt_count": 1
+      },
+      "curves": [
+        {
+          "epoch": 1,
+          "train_loss": 108.73591336337003,
+          "train_mae": 108.73110953086649,
+          "val_mae": null
+        },
+        {
+          "epoch": 5,
+          "train_loss": 67.02053302913517,
+          "train_mae": 67.00087793467745,
+          "val_mae": 56.37518486790051
+        },
+        {
+          "epoch": 20,
+          "train_loss": 34.42931427893701,
+          "train_mae": 34.39808730473515,
+          "val_mae": 30.019364726669167
+        },
+        {
+          "epoch": 40,
+          "train_loss": 23.000601855191317,
+          "train_mae": 22.972624025231546,
+          "val_mae": 21.817861838387085
+        },
+        {
+          "epoch": 60,
+          "train_loss": 18.955527491383737,
+          "train_mae": 18.93432906722604,
+          "val_mae": 17.745391093025884
+        },
+        {
+          "epoch": 70,
+          "train_loss": 18.059952104246463,
+          "train_mae": 18.008399085431122,
+          "val_mae": 17.724222826054625
+        },
+        {
+          "epoch": 80,
+          "train_loss": 17.54683324888155,
+          "train_mae": 17.53604573010344,
+          "val_mae": 16.84918408262093
+        },
+        {
+          "epoch": 90,
+          "train_loss": 16.879719907587226,
+          "train_mae": 16.876083333056744,
+          "val_mae": 16.289830257654987
+        },
+        {
+          "epoch": 95,
+          "train_loss": 16.819898716815107,
+          "train_mae": 16.805204649514835,
+          "val_mae": 16.701525792269756
+        },
+        {
+          "epoch": 100,
+          "train_loss": 16.604040517435447,
+          "train_mae": 16.57044871917209,
+          "val_mae": 16.439047506439888
+        }
+      ],
+      "families": {
+        "in_distribution": {
+          "random_point": 8.744281924065039,
+          "node_outage": 14.62351905055434,
+          "temporal_gap": 14.510761296561316,
+          "spatial_region": 24.158016175552575
+        },
+        "unseen_combinations": {
+          "node_plus_space": 19.18826635160008,
+          "time_plus_space": 35.77232593927272,
+          "node_plus_time": 22.477912707517152
+        },
+        "unseen_geometry": {
+          "moving_region": 34.906498001333404,
+          "multi_block": 26.354093203438627
+        },
+        "unseen_triple": {
+          "node_plus_time_plus_space": 25.25967747679433
+        },
+        "unseen_combinations_repeat": {
+          "node_plus_space": 19.296195223459833,
+          "time_plus_space": 35.466441798713724,
+          "node_plus_time": 22.404096407545293
+        },
+        "unseen_geometry_repeat": {
+          "moving_region": 35.86303110685323,
+          "multi_block": 26.487148094266843
+        }
+      },
+      "diagnostics": {
+        "in_distribution": {
+          "coe_step1_coarse_fraction": 0.0,
+          "coe_step1_coarse_probability": 2.5328829208798993e-06,
+          "coe_step2_coarse_fraction": 0.0,
+          "coe_step2_coarse_probability": 0.0001751405823551141,
+          "coe_step3_coarse_fraction": 0.0,
+          "coe_step3_coarse_probability": 1.6484213982499578e-06,
+          "coe_step4_coarse_fraction": 0.0,
+          "coe_step4_coarse_probability": 4.1326589412596e-05,
+          "coe_coarse_rounds_mean": 0.0,
+          "coe_expert_grid_equivalents": 8.0,
+          "coe_scale_path_ffff_fraction": 1.0,
+          "forward_ms_per_sample_per_rank": 6.718468823155014
+        },
+        "unseen_combinations": {
+          "coe_step1_coarse_fraction": 0.0,
+          "coe_step1_coarse_probability": 2.4023597861799908e-06,
+          "coe_step2_coarse_fraction": 0.0,
+          "coe_step2_coarse_probability": 0.0001672997620801278,
+          "coe_step3_coarse_fraction": 0.0,
+          "coe_step3_coarse_probability": 1.3923678633513128e-06,
+          "coe_step4_coarse_fraction": 0.0,
+          "coe_step4_coarse_probability": 2.9277536740853902e-05,
+          "coe_coarse_rounds_mean": 0.0,
+          "coe_expert_grid_equivalents": 8.0,
+          "coe_scale_path_ffff_fraction": 1.0,
+          "forward_ms_per_sample_per_rank": 6.392941719956454
+        },
+        "unseen_geometry": {
+          "coe_step1_coarse_fraction": 0.0,
+          "coe_step1_coarse_probability": 1.7736669170823583e-06,
+          "coe_step2_coarse_fraction": 0.0,
+          "coe_step2_coarse_probability": 0.00016546842859769135,
+          "coe_step3_coarse_fraction": 0.0,
+          "coe_step3_coarse_probability": 1.403435092805107e-06,
+          "coe_step4_coarse_fraction": 0.0,
+          "coe_step4_coarse_probability": 4.242561897413184e-05,
+          "coe_coarse_rounds_mean": 0.0,
+          "coe_expert_grid_equivalents": 8.0,
+          "coe_scale_path_ffff_fraction": 1.0,
+          "forward_ms_per_sample_per_rank": 6.483134203743587
+        },
+        "unseen_triple": {
+          "coe_step1_coarse_fraction": 0.0,
+          "coe_step1_coarse_probability": 2.16792183773301e-06,
+          "coe_step2_coarse_fraction": 0.0,
+          "coe_step2_coarse_probability": 0.00015591587186529192,
+          "coe_step3_coarse_fraction": 0.0,
+          "coe_step3_coarse_probability": 1.3347183028225482e-06,
+          "coe_step4_coarse_fraction": 0.0,
+          "coe_step4_coarse_probability": 2.9394340371894003e-05,
+          "coe_coarse_rounds_mean": 0.0,
+          "coe_expert_grid_equivalents": 8.0,
+          "coe_scale_path_ffff_fraction": 1.0,
+          "forward_ms_per_sample_per_rank": 6.422732012706007
+        },
+        "unseen_combinations_repeat": {
+          "coe_step1_coarse_fraction": 0.0,
+          "coe_step1_coarse_probability": 2.4242480819788226e-06,
+          "coe_step2_coarse_fraction": 0.0,
+          "coe_step2_coarse_probability": 0.00018012431082829486,
+          "coe_step3_coarse_fraction": 0.0,
+          "coe_step3_coarse_probability": 1.3968131755482357e-06,
+          "coe_step4_coarse_fraction": 0.0,
+          "coe_step4_coarse_probability": 2.9518658994280278e-05,
+          "coe_coarse_rounds_mean": 0.0,
+          "coe_expert_grid_equivalents": 8.0,
+          "coe_scale_path_ffff_fraction": 1.0,
+          "forward_ms_per_sample_per_rank": 6.383673847158001
+        },
+        "unseen_geometry_repeat": {
+          "coe_step1_coarse_fraction": 0.0,
+          "coe_step1_coarse_probability": 1.7677352281343817e-06,
+          "coe_step2_coarse_fraction": 0.0,
+          "coe_step2_coarse_probability": 0.00016519747832704395,
+          "coe_step3_coarse_fraction": 0.0,
+          "coe_step3_coarse_probability": 1.4015580630146686e-06,
+          "coe_step4_coarse_fraction": 0.0,
+          "coe_step4_coarse_probability": 4.214939105366765e-05,
+          "coe_coarse_rounds_mean": 0.0,
+          "coe_expert_grid_equivalents": 8.0,
+          "coe_scale_path_ffff_fraction": 1.0,
+          "forward_ms_per_sample_per_rank": 6.486766879808071
+        }
+      }
+    },
+    "R8": {
+      "summary": {
+        "variant": "R8",
+        "status": "finished",
+        "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20260930_170818_memory_uniform_seed7/random/rate0.4/20260930_170818_seed7_bs32",
+        "best_epoch": 100,
+        "val_mae": 15.163405897330644,
+        "training_seconds": 4562.6565662130015,
+        "evaluations": {
+          "in_distribution": {
+            "mae": 14.42992771564978,
+            "rmse": 25.882355761329976
+          },
+          "unseen_combinations": {
+            "mae": 34.766397750442096,
+            "rmse": 65.70523045624097
+          },
+          "unseen_geometry": {
+            "mae": 36.02803164762778,
+            "rmse": 63.95472836692221
+          },
+          "unseen_triple": {
+            "mae": 31.710783442281155,
+            "rmse": 56.627097282738745
+          },
+          "unseen_combinations_repeat": {
+            "mae": 34.78424007275019,
+            "rmse": 64.915364946745
+          },
+          "unseen_geometry_repeat": {
+            "mae": 35.30008361739386,
+            "rmse": 62.603158363257634
+          }
+        }
+      },
+      "audit": {
+        "epochs": 100,
+        "last_epoch": 100,
+        "validations": 20,
+        "checkpoints": {
+          "best.pth": true,
+          "last.pth": true
+        },
+        "amp_skips": 11.0,
+        "nonfinite": [],
+        "eval_samples": {
+          "in_distribution": 707,
+          "unseen_combinations": 707,
+          "unseen_geometry": 707,
+          "unseen_triple": 707,
+          "unseen_combinations_repeat": 707,
+          "unseen_geometry_repeat": 707
+        },
+        "eval_counts": {
+          "in_distribution": 6949810.0,
+          "unseen_combinations": 6949810.0,
+          "unseen_geometry": 6949810.0,
+          "unseen_triple": 6949810.0,
+          "unseen_combinations_repeat": 6949810.0,
+          "unseen_geometry_repeat": 6949810.0
+        },
+        "peak_gib": 11.811487674713135,
+        "receipt_sha_matches": true,
+        "receipt_test_matches": true,
+        "attempt_count": 1
+      },
+      "curves": [
+        {
+          "epoch": 1,
+          "train_loss": 108.72071303330459,
+          "train_mae": 108.71602536762815,
+          "val_mae": null
+        },
+        {
+          "epoch": 5,
+          "train_loss": 59.0653387292639,
+          "train_mae": 59.04319578843604,
+          "val_mae": 48.53025140844652
+        },
+        {
+          "epoch": 20,
+          "train_loss": 27.355688788674094,
+          "train_mae": 27.32763187482471,
+          "val_mae": 25.532375827666826
+        },
+        {
+          "epoch": 40,
+          "train_loss": 20.587848118373326,
+          "train_mae": 20.557888094341155,
+          "val_mae": 19.79173448626653
+        },
+        {
+          "epoch": 60,
+          "train_loss": 17.85172837740415,
+          "train_mae": 17.819697707686462,
+          "val_mae": 17.75322038990321
+        },
+        {
+          "epoch": 70,
+          "train_loss": 16.984428380990956,
+          "train_mae": 16.933277192700043,
+          "val_mae": 16.133482506707598
+        },
+        {
+          "epoch": 80,
+          "train_loss": 16.183084723237272,
+          "train_mae": 16.162930348136925,
+          "val_mae": 16.151623059853772
+        },
+        {
+          "epoch": 90,
+          "train_loss": 16.265737570725477,
+          "train_mae": 16.25670929662335,
+          "val_mae": 15.415527565097893
+        },
+        {
+          "epoch": 95,
+          "train_loss": 15.642203578701267,
+          "train_mae": 15.620987911958432,
+          "val_mae": 15.560576139399023
+        },
+        {
+          "epoch": 100,
+          "train_loss": 15.501252558324245,
+          "train_mae": 15.46480968677966,
+          "val_mae": 15.163405897330644
+        }
+      ],
+      "families": {
+        "in_distribution": {
+          "random_point": 8.54240140294613,
+          "node_outage": 12.712414650757799,
+          "temporal_gap": 14.444886696725693,
+          "spatial_region": 22.06313468885832
+        },
+        "unseen_combinations": {
+          "node_plus_space": 17.353502100593566,
+          "time_plus_space": 54.85471209717744,
+          "node_plus_time": 32.07959424579555
+        },
+        "unseen_geometry": {
+          "moving_region": 40.937457231085226,
+          "multi_block": 31.104697194732548
+        },
+        "unseen_triple": {
+          "node_plus_time_plus_space": 31.710783442281155
+        },
+        "unseen_combinations_repeat": {
+          "node_plus_space": 17.578275573521044,
+          "time_plus_space": 53.739099005120956,
+          "node_plus_time": 33.02790432025281
+        },
+        "unseen_geometry_repeat": {
+          "moving_region": 40.12975074860194,
+          "multi_block": 30.456734732124588
+        }
+      },
+      "diagnostics": {
+        "in_distribution": {
+          "coe_step1_memory_gate_abs_mean": 0.0,
+          "coe_step1_memory_gate_signed_mean": 0.0,
+          "coe_step1_memory_input_delta": 0.0,
+          "coe_step2_memory_gate_abs_mean": 0.9261265863542971,
+          "coe_step2_memory_gate_signed_mean": -0.43125659356946533,
+          "coe_step2_memory_input_delta": 0.8637111757112585,
+          "coe_step2_memory_from_h0_weight": 1.0,
+          "coe_step3_memory_gate_abs_mean": 0.9448461999063906,
+          "coe_step3_memory_gate_signed_mean": -0.2985275556211886,
+          "coe_step3_memory_input_delta": 0.7813136422115824,
+          "coe_step3_memory_from_h0_weight": 0.5,
+          "coe_step3_memory_from_h1_weight": 0.5,
+          "coe_step4_memory_gate_abs_mean": 0.886415958404541,
+          "coe_step4_memory_gate_signed_mean": -0.31111912623695703,
+          "coe_step4_memory_input_delta": 0.7353708666303883,
+          "coe_step4_memory_from_h0_weight": 0.3333333432674408,
+          "coe_step4_memory_from_h1_weight": 0.3333333432674408,
+          "coe_step4_memory_from_h2_weight": 0.3333333432674408,
+          "forward_ms_per_sample_per_rank": 6.867760782206795
+        },
+        "unseen_combinations": {
+          "coe_step1_memory_gate_abs_mean": 0.0,
+          "coe_step1_memory_gate_signed_mean": 0.0,
+          "coe_step1_memory_input_delta": 0.0,
+          "coe_step2_memory_gate_abs_mean": 0.9206596431524857,
+          "coe_step2_memory_gate_signed_mean": -0.465637752543325,
+          "coe_step2_memory_input_delta": 0.8569625486498293,
+          "coe_step2_memory_from_h0_weight": 1.0,
+          "coe_step3_memory_gate_abs_mean": 0.9561802822610607,
+          "coe_step3_memory_gate_signed_mean": -0.30949022329371906,
+          "coe_step3_memory_input_delta": 0.7447072785833607,
+          "coe_step3_memory_from_h0_weight": 0.5,
+          "coe_step3_memory_from_h1_weight": 0.5,
+          "coe_step4_memory_gate_abs_mean": 0.9103344938029414,
+          "coe_step4_memory_gate_signed_mean": -0.3982163006844728,
+          "coe_step4_memory_input_delta": 0.6427179004835046,
+          "coe_step4_memory_from_h0_weight": 0.3333333432674408,
+          "coe_step4_memory_from_h1_weight": 0.3333333432674408,
+          "coe_step4_memory_from_h2_weight": 0.3333333432674408,
+          "forward_ms_per_sample_per_rank": 6.571745512029946
+        },
+        "unseen_geometry": {
+          "coe_step1_memory_gate_abs_mean": 0.0,
+          "coe_step1_memory_gate_signed_mean": 0.0,
+          "coe_step1_memory_input_delta": 0.0,
+          "coe_step2_memory_gate_abs_mean": 0.91273098665735,
+          "coe_step2_memory_gate_signed_mean": -0.4366863033045893,
+          "coe_step2_memory_input_delta": 0.8314705905706986,
+          "coe_step2_memory_from_h0_weight": 1.0,
+          "coe_step3_memory_gate_abs_mean": 0.9550168773402339,
+          "coe_step3_memory_gate_signed_mean": -0.29758088225903717,
+          "coe_step3_memory_input_delta": 0.7374112320982892,
+          "coe_step3_memory_from_h0_weight": 0.5,
+          "coe_step3_memory_from_h1_weight": 0.5,
+          "coe_step4_memory_gate_abs_mean": 0.8848682382832402,
+          "coe_step4_memory_gate_signed_mean": -0.31433071001716284,
+          "coe_step4_memory_input_delta": 0.6636601168176403,
+          "coe_step4_memory_from_h0_weight": 0.3333333432674408,
+          "coe_step4_memory_from_h1_weight": 0.3333333432674408,
+          "coe_step4_memory_from_h2_weight": 0.3333333432674408,
+          "forward_ms_per_sample_per_rank": 6.511920205181757
+        },
+        "unseen_triple": {
+          "coe_step1_memory_gate_abs_mean": 0.0,
+          "coe_step1_memory_gate_signed_mean": 0.0,
+          "coe_step1_memory_input_delta": 0.0,
+          "coe_step2_memory_gate_abs_mean": 0.923625453658726,
+          "coe_step2_memory_gate_signed_mean": -0.47196274736653204,
+          "coe_step2_memory_input_delta": 0.8621262830236683,
+          "coe_step2_memory_from_h0_weight": 1.0,
+          "coe_step3_memory_gate_abs_mean": 0.9608163522637408,
+          "coe_step3_memory_gate_signed_mean": -0.31191810965538025,
+          "coe_step3_memory_input_delta": 0.7462636776592421,
+          "coe_step3_memory_from_h0_weight": 0.5,
+          "coe_step3_memory_from_h1_weight": 0.5,
+          "coe_step4_memory_gate_abs_mean": 0.9162560571794924,
+          "coe_step4_memory_gate_signed_mean": -0.40354845705239667,
+          "coe_step4_memory_input_delta": 0.6472075788871102,
+          "coe_step4_memory_from_h0_weight": 0.3333333432674408,
+          "coe_step4_memory_from_h1_weight": 0.3333333432674408,
+          "coe_step4_memory_from_h2_weight": 0.3333333432674408,
+          "forward_ms_per_sample_per_rank": 6.633384828892098
+        },
+        "unseen_combinations_repeat": {
+          "coe_step1_memory_gate_abs_mean": 0.0,
+          "coe_step1_memory_gate_signed_mean": 0.0,
+          "coe_step1_memory_input_delta": 0.0,
+          "coe_step2_memory_gate_abs_mean": 0.9208758965782498,
+          "coe_step2_memory_gate_signed_mean": -0.46634260856586957,
+          "coe_step2_memory_input_delta": 0.8569946470467941,
+          "coe_step2_memory_from_h0_weight": 1.0,
+          "coe_step3_memory_gate_abs_mean": 0.9563009816667308,
+          "coe_step3_memory_gate_signed_mean": -0.3097986047682555,
+          "coe_step3_memory_input_delta": 0.7447106242179871,
+          "coe_step3_memory_from_h0_weight": 0.5,
+          "coe_step3_memory_from_h1_weight": 0.5,
+          "coe_step4_memory_gate_abs_mean": 0.9107967459637186,
+          "coe_step4_memory_gate_signed_mean": -0.39922103804090747,
+          "coe_step4_memory_input_delta": 0.6413904946783314,
+          "coe_step4_memory_from_h0_weight": 0.3333333432674408,
+          "coe_step4_memory_from_h1_weight": 0.3333333432674408,
+          "coe_step4_memory_from_h2_weight": 0.3333333432674408,
+          "forward_ms_per_sample_per_rank": 6.562892932079593
+        },
+        "unseen_geometry_repeat": {
+          "coe_step1_memory_gate_abs_mean": 0.0,
+          "coe_step1_memory_gate_signed_mean": 0.0,
+          "coe_step1_memory_input_delta": 0.0,
+          "coe_step2_memory_gate_abs_mean": 0.9131089552589085,
+          "coe_step2_memory_gate_signed_mean": -0.4369358459244604,
+          "coe_step2_memory_input_delta": 0.8319450824157052,
+          "coe_step2_memory_from_h0_weight": 1.0,
+          "coe_step3_memory_gate_abs_mean": 0.954673126987789,
+          "coe_step3_memory_gate_signed_mean": -0.2981784006823664,
+          "coe_step3_memory_input_delta": 0.7384257783060488,
+          "coe_step3_memory_from_h0_weight": 0.5,
+          "coe_step3_memory_from_h1_weight": 0.5,
+          "coe_step4_memory_gate_abs_mean": 0.8844281668248384,
+          "coe_step4_memory_gate_signed_mean": -0.3155628079953401,
+          "coe_step4_memory_input_delta": 0.6624612523161847,
+          "coe_step4_memory_from_h0_weight": 0.3333333432674408,
+          "coe_step4_memory_from_h1_weight": 0.3333333432674408,
+          "coe_step4_memory_from_h2_weight": 0.3333333432674408,
+          "forward_ms_per_sample_per_rank": 6.51230076946222
+        }
+      }
+    },
+    "R9": {
+      "summary": {
+        "variant": "R9",
+        "status": "finished",
+        "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20260930_182502_memory_recent_seed7/random/rate0.4/20260930_182502_seed7_bs32",
+        "best_epoch": 100,
+        "val_mae": 15.491210817821088,
+        "training_seconds": 4571.236088160978,
+        "evaluations": {
+          "in_distribution": {
+            "mae": 14.700994379702466,
+            "rmse": 26.489323278838256
+          },
+          "unseen_combinations": {
+            "mae": 22.516374908091013,
+            "rmse": 37.653377502587844
+          },
+          "unseen_geometry": {
+            "mae": 32.59951038229822,
+            "rmse": 57.29458246910022
+          },
+          "unseen_triple": {
+            "mae": 22.7344028110121,
+            "rmse": 36.22316650583455
+          },
+          "unseen_combinations_repeat": {
+            "mae": 22.67679329542822,
+            "rmse": 38.000930082200746
+          },
+          "unseen_geometry_repeat": {
+            "mae": 31.951036233364654,
+            "rmse": 56.03201919350386
+          }
+        }
+      },
+      "audit": {
+        "epochs": 100,
+        "last_epoch": 100,
+        "validations": 20,
+        "checkpoints": {
+          "best.pth": true,
+          "last.pth": true
+        },
+        "amp_skips": 10.0,
+        "nonfinite": [
+          [
+            "/1/train/coe_step3_router_grad_norm",
+            "inf"
+          ]
+        ],
+        "eval_samples": {
+          "in_distribution": 707,
+          "unseen_combinations": 707,
+          "unseen_geometry": 707,
+          "unseen_triple": 707,
+          "unseen_combinations_repeat": 707,
+          "unseen_geometry_repeat": 707
+        },
+        "eval_counts": {
+          "in_distribution": 6949810.0,
+          "unseen_combinations": 6949810.0,
+          "unseen_geometry": 6949810.0,
+          "unseen_triple": 6949810.0,
+          "unseen_combinations_repeat": 6949810.0,
+          "unseen_geometry_repeat": 6949810.0
+        },
+        "peak_gib": 11.87943696975708,
+        "receipt_sha_matches": true,
+        "receipt_test_matches": true,
+        "attempt_count": 1
+      },
+      "curves": [
+        {
+          "epoch": 1,
+          "train_loss": 108.71655957110517,
+          "train_mae": 108.71187802761132,
+          "val_mae": null
+        },
+        {
+          "epoch": 5,
+          "train_loss": 63.010581474799615,
+          "train_mae": 62.98850661075145,
+          "val_mae": 52.26001261206594
+        },
+        {
+          "epoch": 20,
+          "train_loss": 29.401302535812576,
+          "train_mae": 29.364355150942863,
+          "val_mae": 25.54760430238023
+        },
+        {
+          "epoch": 40,
+          "train_loss": 20.961803857382243,
+          "train_mae": 20.924182327130552,
+          "val_mae": 18.925607253127733
+        },
+        {
+          "epoch": 60,
+          "train_loss": 18.756141613056133,
+          "train_mae": 18.720946371762043,
+          "val_mae": 17.781021220395854
+        },
+        {
+          "epoch": 70,
+          "train_loss": 18.16397004313283,
+          "train_mae": 18.083999421652596,
+          "val_mae": 18.320714723397167
+        },
+        {
+          "epoch": 80,
+          "train_loss": 16.662377530878242,
+          "train_mae": 16.637429708386783,
+          "val_mae": 16.817572712724505
+        },
+        {
+          "epoch": 90,
+          "train_loss": 16.216029390112148,
+          "train_mae": 16.199229571973135,
+          "val_mae": 15.66133539171768
+        },
+        {
+          "epoch": 95,
+          "train_loss": 15.940031150718788,
+          "train_mae": 15.914212908182993,
+          "val_mae": 15.640475882398434
+        },
+        {
+          "epoch": 100,
+          "train_loss": 15.788113804606649,
+          "train_mae": 15.743296397650765,
+          "val_mae": 15.491210817821088
+        }
+      ],
+      "families": {
+        "in_distribution": {
+          "random_point": 8.51927335681156,
+          "node_outage": 13.32764496439471,
+          "temporal_gap": 14.549717011224718,
+          "spatial_region": 22.45112682650513
+        },
+        "unseen_combinations": {
+          "node_plus_space": 17.466896489527475,
+          "time_plus_space": 27.31916640084832,
+          "node_plus_time": 22.76411220806909
+        },
+        "unseen_geometry": {
+          "moving_region": 34.56851756161238,
+          "multi_block": 30.6249250538186
+        },
+        "unseen_triple": {
+          "node_plus_time_plus_space": 22.7344028110121
+        },
+        "unseen_combinations_repeat": {
+          "node_plus_space": 17.622987227518234,
+          "time_plus_space": 27.35208302800145,
+          "node_plus_time": 23.056919466028873
+        },
+        "unseen_geometry_repeat": {
+          "moving_region": 34.32418113580587,
+          "multi_block": 29.571168955097853
+        }
+      },
+      "diagnostics": {
+        "in_distribution": {
+          "coe_step1_memory_gate_abs_mean": 0.0,
+          "coe_step1_memory_gate_signed_mean": 0.0,
+          "coe_step1_memory_input_delta": 0.0,
+          "coe_step2_memory_gate_abs_mean": 0.937910574933757,
+          "coe_step2_memory_gate_signed_mean": -0.11270591163116953,
+          "coe_step2_memory_input_delta": 1.053871240304864,
+          "coe_step2_memory_from_h0_weight": 1.0,
+          "coe_step3_memory_gate_abs_mean": 0.9183411650035692,
+          "coe_step3_memory_gate_signed_mean": -0.5547511577606201,
+          "coe_step3_memory_input_delta": 0.7281870712404666,
+          "coe_step3_memory_from_h0_weight": 0.0,
+          "coe_step3_memory_from_h1_weight": 1.0,
+          "coe_step4_memory_gate_abs_mean": 0.8867667861606764,
+          "coe_step4_memory_gate_signed_mean": -0.47693380324736884,
+          "coe_step4_memory_input_delta": 0.7208185921544614,
+          "coe_step4_memory_from_h0_weight": 0.0,
+          "coe_step4_memory_from_h1_weight": 0.0,
+          "coe_step4_memory_from_h2_weight": 1.0,
+          "forward_ms_per_sample_per_rank": 6.912305345166017
+        },
+        "unseen_combinations": {
+          "coe_step1_memory_gate_abs_mean": 0.0,
+          "coe_step1_memory_gate_signed_mean": 0.0,
+          "coe_step1_memory_input_delta": 0.0,
+          "coe_step2_memory_gate_abs_mean": 0.9376761939214624,
+          "coe_step2_memory_gate_signed_mean": -0.10092268009548602,
+          "coe_step2_memory_input_delta": 1.0238763534504434,
+          "coe_step2_memory_from_h0_weight": 1.0,
+          "coe_step3_memory_gate_abs_mean": 0.9304753671521726,
+          "coe_step3_memory_gate_signed_mean": -0.5680853568989298,
+          "coe_step3_memory_input_delta": 0.692585157311481,
+          "coe_step3_memory_from_h0_weight": 0.0,
+          "coe_step3_memory_from_h1_weight": 1.0,
+          "coe_step4_memory_gate_abs_mean": 0.9210687357446422,
+          "coe_step4_memory_gate_signed_mean": -0.5114201099976249,
+          "coe_step4_memory_input_delta": 0.7203142668889917,
+          "coe_step4_memory_from_h0_weight": 0.0,
+          "coe_step4_memory_from_h1_weight": 0.0,
+          "coe_step4_memory_from_h2_weight": 1.0,
+          "forward_ms_per_sample_per_rank": 6.534031167031296
+        },
+        "unseen_geometry": {
+          "coe_step1_memory_gate_abs_mean": 0.0,
+          "coe_step1_memory_gate_signed_mean": 0.0,
+          "coe_step1_memory_input_delta": 0.0,
+          "coe_step2_memory_gate_abs_mean": 0.9377774751704672,
+          "coe_step2_memory_gate_signed_mean": -0.09807424603596977,
+          "coe_step2_memory_input_delta": 1.0280501816583716,
+          "coe_step2_memory_from_h0_weight": 1.0,
+          "coe_step3_memory_gate_abs_mean": 0.929377934207087,
+          "coe_step3_memory_gate_signed_mean": -0.5844955211100371,
+          "coe_step3_memory_input_delta": 0.692050576210022,
+          "coe_step3_memory_from_h0_weight": 0.0,
+          "coe_step3_memory_from_h1_weight": 1.0,
+          "coe_step4_memory_gate_abs_mean": 0.90930008629094,
+          "coe_step4_memory_gate_signed_mean": -0.5223795434702998,
+          "coe_step4_memory_input_delta": 0.6736439829287322,
+          "coe_step4_memory_from_h0_weight": 0.0,
+          "coe_step4_memory_from_h1_weight": 0.0,
+          "coe_step4_memory_from_h2_weight": 1.0,
+          "forward_ms_per_sample_per_rank": 6.565481147042553
+        },
+        "unseen_triple": {
+          "coe_step1_memory_gate_abs_mean": 0.0,
+          "coe_step1_memory_gate_signed_mean": 0.0,
+          "coe_step1_memory_input_delta": 0.0,
+          "coe_step2_memory_gate_abs_mean": 0.9408188954643582,
+          "coe_step2_memory_gate_signed_mean": -0.10001968462830005,
+          "coe_step2_memory_input_delta": 1.0324375396189482,
+          "coe_step2_memory_from_h0_weight": 1.0,
+          "coe_step3_memory_gate_abs_mean": 0.9303349075110062,
+          "coe_step3_memory_gate_signed_mean": -0.5666849976000579,
+          "coe_step3_memory_input_delta": 0.687822559605474,
+          "coe_step3_memory_from_h0_weight": 0.0,
+          "coe_step3_memory_from_h1_weight": 1.0,
+          "coe_step4_memory_gate_abs_mean": 0.9240265877350516,
+          "coe_step4_memory_gate_signed_mean": -0.5102461680122043,
+          "coe_step4_memory_input_delta": 0.7263148271519205,
+          "coe_step4_memory_from_h0_weight": 0.0,
+          "coe_step4_memory_from_h1_weight": 0.0,
+          "coe_step4_memory_from_h2_weight": 1.0,
+          "forward_ms_per_sample_per_rank": 6.47600602406002
+        },
+        "unseen_combinations_repeat": {
+          "coe_step1_memory_gate_abs_mean": 0.0,
+          "coe_step1_memory_gate_signed_mean": 0.0,
+          "coe_step1_memory_input_delta": 0.0,
+          "coe_step2_memory_gate_abs_mean": 0.9382026584252067,
+          "coe_step2_memory_gate_signed_mean": -0.10117723339277765,
+          "coe_step2_memory_input_delta": 1.0243937450906504,
+          "coe_step2_memory_from_h0_weight": 1.0,
+          "coe_step3_memory_gate_abs_mean": 0.9311841622642849,
+          "coe_step3_memory_gate_signed_mean": -0.5685940203459366,
+          "coe_step3_memory_input_delta": 0.6928810555001964,
+          "coe_step3_memory_from_h0_weight": 0.0,
+          "coe_step3_memory_from_h1_weight": 1.0,
+          "coe_step4_memory_gate_abs_mean": 0.922936763452447,
+          "coe_step4_memory_gate_signed_mean": -0.5124803146590358,
+          "coe_step4_memory_input_delta": 0.7212523325629856,
+          "coe_step4_memory_from_h0_weight": 0.0,
+          "coe_step4_memory_from_h1_weight": 0.0,
+          "coe_step4_memory_from_h2_weight": 1.0,
+          "forward_ms_per_sample_per_rank": 6.524351080751133
+        },
+        "unseen_geometry_repeat": {
+          "coe_step1_memory_gate_abs_mean": 0.0,
+          "coe_step1_memory_gate_signed_mean": 0.0,
+          "coe_step1_memory_input_delta": 0.0,
+          "coe_step2_memory_gate_abs_mean": 0.9371528444082841,
+          "coe_step2_memory_gate_signed_mean": -0.09709246974924336,
+          "coe_step2_memory_input_delta": 1.0267356815545454,
+          "coe_step2_memory_from_h0_weight": 1.0,
+          "coe_step3_memory_gate_abs_mean": 0.9284880083540211,
+          "coe_step3_memory_gate_signed_mean": -0.5842738980832307,
+          "coe_step3_memory_input_delta": 0.6913955030233964,
+          "coe_step3_memory_from_h0_weight": 0.0,
+          "coe_step3_memory_from_h1_weight": 1.0,
+          "coe_step4_memory_gate_abs_mean": 0.9091999971348307,
+          "coe_step4_memory_gate_signed_mean": -0.5219445008298625,
+          "coe_step4_memory_input_delta": 0.6731527136719745,
+          "coe_step4_memory_from_h0_weight": 0.0,
+          "coe_step4_memory_from_h1_weight": 0.0,
+          "coe_step4_memory_from_h2_weight": 1.0,
+          "forward_ms_per_sample_per_rank": 6.565522094773553
+        }
+      }
+    },
+    "R10": {
+      "summary": {
+        "variant": "R10",
+        "status": "finished",
+        "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20260930_194155_direction_pairs_seed7/random/rate0.4/20260930_194155_seed7_bs32",
+        "best_epoch": 70,
+        "val_mae": 16.606404044189823,
+        "training_seconds": 4349.342805460998,
+        "evaluations": {
+          "in_distribution": {
+            "mae": 15.695521496271121,
+            "rmse": 27.78912500334718
+          },
+          "unseen_combinations": {
+            "mae": 27.563169559671415,
+            "rmse": 47.60808802682157
+          },
+          "unseen_geometry": {
+            "mae": 32.433688654797756,
+            "rmse": 57.873438996166435
+          },
+          "unseen_triple": {
+            "mae": 27.42360885585361,
+            "rmse": 45.53058242109357
+          },
+          "unseen_combinations_repeat": {
+            "mae": 27.469725413356624,
+            "rmse": 47.47254559571106
+          },
+          "unseen_geometry_repeat": {
+            "mae": 33.01673459418315,
+            "rmse": 58.46656708856885
+          }
+        }
+      },
+      "audit": {
+        "epochs": 100,
+        "last_epoch": 100,
+        "validations": 20,
+        "checkpoints": {
+          "best.pth": true,
+          "last.pth": true
+        },
+        "amp_skips": 11.0,
+        "nonfinite": [],
+        "eval_samples": {
+          "in_distribution": 707,
+          "unseen_combinations": 707,
+          "unseen_geometry": 707,
+          "unseen_triple": 707,
+          "unseen_combinations_repeat": 707,
+          "unseen_geometry_repeat": 707
+        },
+        "eval_counts": {
+          "in_distribution": 6949810.0,
+          "unseen_combinations": 6949810.0,
+          "unseen_geometry": 6949810.0,
+          "unseen_triple": 6949810.0,
+          "unseen_combinations_repeat": 6949810.0,
+          "unseen_geometry_repeat": 6949810.0
+        },
+        "peak_gib": 11.52408504486084,
+        "receipt_sha_matches": true,
+        "receipt_test_matches": true,
+        "attempt_count": 1
+      },
+      "curves": [
+        {
+          "epoch": 1,
+          "train_loss": 108.77653879933543,
+          "train_mae": 108.7734317823887,
+          "val_mae": null
+        },
+        {
+          "epoch": 5,
+          "train_loss": 62.84302476164582,
+          "train_mae": 62.82389329863802,
+          "val_mae": 53.49862338110451
+        },
+        {
+          "epoch": 20,
+          "train_loss": 35.773599352155415,
+          "train_mae": 35.74693971661807,
+          "val_mae": 30.675258934042464
+        },
+        {
+          "epoch": 40,
+          "train_loss": 22.49175279790705,
+          "train_mae": 22.455286485257535,
+          "val_mae": 21.446582992748063
+        },
+        {
+          "epoch": 60,
+          "train_loss": 18.80621570735783,
+          "train_mae": 18.788421279616447,
+          "val_mae": 17.137126546019168
+        },
+        {
+          "epoch": 70,
+          "train_loss": 17.826698142212706,
+          "train_mae": 17.77677677947622,
+          "val_mae": 16.606404044189823
+        },
+        {
+          "epoch": 80,
+          "train_loss": 20.702094734489144,
+          "train_mae": 20.676132921990312,
+          "val_mae": 18.930754998720946
+        },
+        {
+          "epoch": 90,
+          "train_loss": 20.29891755983427,
+          "train_mae": 20.304439189716202,
+          "val_mae": 18.45432781257994
+        },
+        {
+          "epoch": 95,
+          "train_loss": 18.536347946563325,
+          "train_mae": 18.527773132236604,
+          "val_mae": 17.44840817285669
+        },
+        {
+          "epoch": 100,
+          "train_loss": 17.63223257931796,
+          "train_mae": 17.605921671681223,
+          "val_mae": 17.20914991998477
+        }
+      ],
+      "families": {
+        "in_distribution": {
+          "random_point": 8.96027001755838,
+          "node_outage": 14.990948867326471,
+          "temporal_gap": 14.536538797265376,
+          "spatial_region": 24.343184943037315
+        },
+        "unseen_combinations": {
+          "node_plus_space": 19.115022153624324,
+          "time_plus_space": 34.8062052778592,
+          "node_plus_time": 28.773408908898077
+        },
+        "unseen_geometry": {
+          "moving_region": 35.629502172526166,
+          "multi_block": 29.228820715261428
+        },
+        "unseen_triple": {
+          "node_plus_time_plus_space": 27.42360885585361
+        },
+        "unseen_combinations_repeat": {
+          "node_plus_space": 19.29143634988663,
+          "time_plus_space": 34.15948739805507,
+          "node_plus_time": 28.964586291422265
+        },
+        "unseen_geometry_repeat": {
+          "moving_region": 36.35490065757712,
+          "multi_block": 29.669112771218362
+        }
+      },
+      "diagnostics": {
+        "in_distribution": {
+          "forward_ms_per_sample_per_rank": 6.710497529090802
+        },
+        "unseen_combinations": {
+          "forward_ms_per_sample_per_rank": 6.399341874113412
+        },
+        "unseen_geometry": {
+          "forward_ms_per_sample_per_rank": 6.325776824558712
+        },
+        "unseen_triple": {
+          "forward_ms_per_sample_per_rank": 6.409586702934183
+        },
+        "unseen_combinations_repeat": {
+          "forward_ms_per_sample_per_rank": 6.395904857049797
+        },
+        "unseen_geometry_repeat": {
+          "forward_ms_per_sample_per_rank": 6.324152810401263
+        }
+      }
+    },
+    "N2": {
+      "summary": {
+        "variant": "N2",
+        "status": "reference",
+        "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20260930_012215_primitive_moe_independent_seed7/random/rate0.4/20260930_012215_seed7_bs32",
+        "best_epoch": 100,
+        "val_mae": 15.693555204559381,
+        "training_seconds": 4315.367427311998,
+        "evaluations": {
+          "in_distribution": {
+            "mae": 14.909307507147677,
+            "rmse": 26.528708236234227
+          },
+          "unseen_combinations": {
+            "mae": 28.213574085118875,
+            "rmse": 50.27124942843778
+          },
+          "unseen_geometry": {
+            "mae": 29.718558223174448,
+            "rmse": 50.92894675473251
+          },
+          "unseen_triple": {
+            "mae": 27.8882393457519,
+            "rmse": 50.29264834727682
+          },
+          "unseen_combinations_repeat": {
+            "mae": 28.100369128796327,
+            "rmse": 49.84027999760684
+          },
+          "unseen_geometry_repeat": {
+            "mae": 29.859153658517283,
+            "rmse": 51.34555802465941
+          }
+        }
+      },
+      "audit": {
+        "epochs": 100,
+        "last_epoch": 100,
+        "validations": 20,
+        "checkpoints": {
+          "best.pth": true,
+          "last.pth": true
+        },
+        "amp_skips": 12.0,
+        "nonfinite": [],
+        "eval_samples": {
+          "in_distribution": 707,
+          "unseen_combinations": 707,
+          "unseen_geometry": 707,
+          "unseen_triple": 707,
+          "unseen_combinations_repeat": 707,
+          "unseen_geometry_repeat": 707
+        },
+        "eval_counts": {
+          "in_distribution": 6949810.0,
+          "unseen_combinations": 6949810.0,
+          "unseen_geometry": 6949810.0,
+          "unseen_triple": 6949810.0,
+          "unseen_combinations_repeat": 6949810.0,
+          "unseen_geometry_repeat": 6949810.0
+        },
+        "peak_gib": 11.598856925964355
+      },
+      "curves": [
+        {
+          "epoch": 1,
+          "train_loss": 108.91058914382737,
+          "train_mae": 108.90893791519453,
+          "val_mae": null
+        },
+        {
+          "epoch": 5,
+          "train_loss": 60.38490657063274,
+          "train_mae": 60.353737269304105,
+          "val_mae": 50.22703146472488
+        },
+        {
+          "epoch": 20,
+          "train_loss": 30.08088931789646,
+          "train_mae": 30.05305721324507,
+          "val_mae": 26.422857138607796
+        },
+        {
+          "epoch": 40,
+          "train_loss": 21.282665054519455,
+          "train_mae": 21.25685798044738,
+          "val_mae": 20.102229123163962
+        },
+        {
+          "epoch": 60,
+          "train_loss": 18.228868695048543,
+          "train_mae": 18.208137698542433,
+          "val_mae": 17.161534091247105
+        },
+        {
+          "epoch": 70,
+          "train_loss": 17.406313314066306,
+          "train_mae": 17.37246399434763,
+          "val_mae": 16.693150294777297
+        },
+        {
+          "epoch": 80,
+          "train_loss": 16.70913063396107,
+          "train_mae": 16.697334924134427,
+          "val_mae": 16.34451345386185
+        },
+        {
+          "epoch": 90,
+          "train_loss": 16.89609601900175,
+          "train_mae": 16.893242172395652,
+          "val_mae": 16.074604683121844
+        },
+        {
+          "epoch": 95,
+          "train_loss": 16.588918128570953,
+          "train_mae": 16.579619228350143,
+          "val_mae": 15.857206055576377
+        },
+        {
+          "epoch": 100,
+          "train_loss": 15.9286000511863,
+          "train_mae": 15.901480594245733,
+          "val_mae": 15.693555204559381
+        }
+      ],
+      "families": {
+        "in_distribution": {
+          "random_point": 9.011449586472864,
+          "node_outage": 12.740557440830273,
+          "temporal_gap": 15.52219134179354,
+          "spatial_region": 22.40538334029351
+        },
+        "unseen_combinations": {
+          "node_plus_space": 17.224160409159094,
+          "time_plus_space": 37.44735331137817,
+          "node_plus_time": 29.976679252072465
+        },
+        "unseen_geometry": {
+          "moving_region": 31.413001067583956,
+          "multi_block": 28.019316049902162
+        },
+        "unseen_triple": {
+          "node_plus_time_plus_space": 27.8882393457519
+        },
+        "unseen_combinations_repeat": {
+          "node_plus_space": 17.34621734879606,
+          "time_plus_space": 36.7930729714468,
+          "node_plus_time": 30.170588569511484
+        },
+        "unseen_geometry_repeat": {
+          "moving_region": 31.97989407498089,
+          "multi_block": 27.73240518614607
+        }
+      },
+      "diagnostics": {
+        "in_distribution": {
+          "forward_ms_per_sample_per_rank": 6.603575254628458
+        },
+        "unseen_combinations": {
+          "forward_ms_per_sample_per_rank": 6.244889859930458
+        },
+        "unseen_geometry": {
+          "forward_ms_per_sample_per_rank": 6.221385195151023
+        },
+        "unseen_triple": {
+          "forward_ms_per_sample_per_rank": 6.232604777962075
+        },
+        "unseen_combinations_repeat": {
+          "forward_ms_per_sample_per_rank": 6.25352739884032
+        },
+        "unseen_geometry_repeat": {
+          "forward_ms_per_sample_per_rank": 6.224955554418938
+        }
+      }
+    },
+    "N3": {
+      "summary": {
+        "variant": "N3",
+        "status": "reference",
+        "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20260930_023432_primitive_coe_shared_seed7/random/rate0.4/20260930_023432_seed7_bs32",
+        "best_epoch": 90,
+        "val_mae": 17.7395433629003,
+        "training_seconds": 3969.624345797012,
+        "evaluations": {
+          "in_distribution": {
+            "mae": 17.12034896457601,
+            "rmse": 30.438539436144474
+          },
+          "unseen_combinations": {
+            "mae": 24.422723822665656,
+            "rmse": 43.18946019274788
+          },
+          "unseen_geometry": {
+            "mae": 33.88395853627653,
+            "rmse": 57.350751111404925
+          },
+          "unseen_triple": {
+            "mae": 22.56983574910681,
+            "rmse": 38.585235637365784
+          },
+          "unseen_combinations_repeat": {
+            "mae": 24.02489593690331,
+            "rmse": 42.344324872571235
+          },
+          "unseen_geometry_repeat": {
+            "mae": 33.65361272466441,
+            "rmse": 56.917127270542764
+          }
+        }
+      },
+      "audit": {
+        "epochs": 100,
+        "last_epoch": 100,
+        "validations": 20,
+        "checkpoints": {
+          "best.pth": true,
+          "last.pth": true
+        },
+        "amp_skips": 12.0,
+        "nonfinite": [],
+        "eval_samples": {
+          "in_distribution": 707,
+          "unseen_combinations": 707,
+          "unseen_geometry": 707,
+          "unseen_triple": 707,
+          "unseen_combinations_repeat": 707,
+          "unseen_geometry_repeat": 707
+        },
+        "eval_counts": {
+          "in_distribution": 6949810.0,
+          "unseen_combinations": 6949810.0,
+          "unseen_geometry": 6949810.0,
+          "unseen_triple": 6949810.0,
+          "unseen_combinations_repeat": 6949810.0,
+          "unseen_geometry_repeat": 6949810.0
+        },
+        "peak_gib": 11.524083137512207
+      },
+      "curves": [
+        {
+          "epoch": 1,
+          "train_loss": 108.73718608509411,
+          "train_mae": 108.73205422027651,
+          "val_mae": null
+        },
+        {
+          "epoch": 5,
+          "train_loss": 67.01050339735947,
+          "train_mae": 66.97514288582907,
+          "val_mae": 56.46301660390379
+        },
+        {
+          "epoch": 20,
+          "train_loss": 42.18695526618462,
+          "train_mae": 42.1474438621326,
+          "val_mae": 35.34017508165123
+        },
+        {
+          "epoch": 40,
+          "train_loss": 27.33715602329799,
+          "train_mae": 27.29696369687626,
+          "val_mae": 24.00472536036599
+        },
+        {
+          "epoch": 60,
+          "train_loss": 22.368838644646978,
+          "train_mae": 22.349374158823988,
+          "val_mae": 20.165015794827863
+        },
+        {
+          "epoch": 70,
+          "train_loss": 20.45712542843509,
+          "train_mae": 20.406379308771132,
+          "val_mae": 19.338408202602132
+        },
+        {
+          "epoch": 80,
+          "train_loss": 19.442960095095945,
+          "train_mae": 19.43273333247591,
+          "val_mae": 18.89938620287579
+        },
+        {
+          "epoch": 90,
+          "train_loss": 18.572924490098828,
+          "train_mae": 18.57389126570956,
+          "val_mae": 17.7395433629003
+        },
+        {
+          "epoch": 95,
+          "train_loss": 18.263290207107346,
+          "train_mae": 18.251258839089978,
+          "val_mae": 18.212925508498273
+        },
+        {
+          "epoch": 100,
+          "train_loss": 18.102110008140663,
+          "train_mae": 18.070282184991513,
+          "val_mae": 18.18328968190228
+        }
+      ],
+      "families": {
+        "in_distribution": {
+          "random_point": 9.519818176658562,
+          "node_outage": 16.09433250139375,
+          "temporal_gap": 15.645781444873585,
+          "spatial_region": 27.278856152966913
+        },
+        "unseen_combinations": {
+          "node_plus_space": 21.54493861212649,
+          "time_plus_space": 33.90729326516889,
+          "node_plus_time": 17.78782653513993
+        },
+        "unseen_geometry": {
+          "moving_region": 34.76797468152088,
+          "multi_block": 32.997437240453145
+        },
+        "unseen_triple": {
+          "node_plus_time_plus_space": 22.56983574910681
+        },
+        "unseen_combinations_repeat": {
+          "node_plus_space": 21.34137000081901,
+          "time_plus_space": 32.61230645550632,
+          "node_plus_time": 18.095888630657345
+        },
+        "unseen_geometry_repeat": {
+          "moving_region": 35.117104979567905,
+          "multi_block": 32.18597416707253
+        }
+      },
+      "diagnostics": {
+        "in_distribution": {
+          "forward_ms_per_sample_per_rank": 6.235726797723381
+        },
+        "unseen_combinations": {
+          "forward_ms_per_sample_per_rank": 5.929191347920959
+        },
+        "unseen_geometry": {
+          "forward_ms_per_sample_per_rank": 5.924402797710588
+        },
+        "unseen_triple": {
+          "forward_ms_per_sample_per_rank": 5.930036521943047
+        },
+        "unseen_combinations_repeat": {
+          "forward_ms_per_sample_per_rank": 5.932819291443269
+        },
+        "unseen_geometry_repeat": {
+          "forward_ms_per_sample_per_rank": 5.927591304122859
+        }
+      }
+    },
+    "N5": {
+      "summary": {
+        "variant": "N5",
+        "status": "reference",
+        "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20260930_044705_primitive_scale_fixed_seed7/random/rate0.4/20260930_044705_seed7_bs32",
+        "best_epoch": 95,
+        "val_mae": 14.585855002885307,
+        "training_seconds": 3268.9934307309886,
+        "evaluations": {
+          "in_distribution": {
+            "mae": 13.581105868361869,
+            "rmse": 24.054158355053683
+          },
+          "unseen_combinations": {
+            "mae": 25.371445532323904,
+            "rmse": 44.46041399950043
+          },
+          "unseen_geometry": {
+            "mae": 28.262439656623705,
+            "rmse": 48.80273382526619
+          },
+          "unseen_triple": {
+            "mae": 23.893360969580463,
+            "rmse": 40.43677772400417
+          },
+          "unseen_combinations_repeat": {
+            "mae": 25.345640168580147,
+            "rmse": 44.27111564479067
+          },
+          "unseen_geometry_repeat": {
+            "mae": 28.558931961809026,
+            "rmse": 49.02175830411713
+          }
+        }
+      },
+      "audit": {
+        "epochs": 100,
+        "last_epoch": 100,
+        "validations": 20,
+        "checkpoints": {
+          "best.pth": true,
+          "last.pth": true
+        },
+        "amp_skips": 13.0,
+        "nonfinite": [],
+        "eval_samples": {
+          "in_distribution": 707,
+          "unseen_combinations": 707,
+          "unseen_geometry": 707,
+          "unseen_triple": 707,
+          "unseen_combinations_repeat": 707,
+          "unseen_geometry_repeat": 707
+        },
+        "eval_counts": {
+          "in_distribution": 6949810.0,
+          "unseen_combinations": 6949810.0,
+          "unseen_geometry": 6949810.0,
+          "unseen_triple": 6949810.0,
+          "unseen_combinations_repeat": 6949810.0,
+          "unseen_geometry_repeat": 6949810.0
+        },
+        "peak_gib": 8.913848876953125
+      },
+      "curves": [
+        {
+          "epoch": 1,
+          "train_loss": 108.73810270235136,
+          "train_mae": 108.7330199857612,
+          "val_mae": null
+        },
+        {
+          "epoch": 5,
+          "train_loss": 66.92687700940417,
+          "train_mae": 66.87047963835447,
+          "val_mae": 56.744762125728016
+        },
+        {
+          "epoch": 20,
+          "train_loss": 31.07853433683321,
+          "train_mae": 31.053111085849324,
+          "val_mae": 26.441492209669647
+        },
+        {
+          "epoch": 40,
+          "train_loss": 19.661351885114396,
+          "train_mae": 19.631267238403595,
+          "val_mae": 17.853702935279873
+        },
+        {
+          "epoch": 60,
+          "train_loss": 16.381296876188998,
+          "train_mae": 16.35356931414802,
+          "val_mae": 16.119677053773803
+        },
+        {
+          "epoch": 70,
+          "train_loss": 15.86869644809079,
+          "train_mae": 15.818734369269423,
+          "val_mae": 15.59839501050014
+        },
+        {
+          "epoch": 80,
+          "train_loss": 15.264476602727717,
+          "train_mae": 15.243949724849356,
+          "val_mae": 15.11944206480936
+        },
+        {
+          "epoch": 90,
+          "train_loss": 14.758000386225714,
+          "train_mae": 14.744467405933495,
+          "val_mae": 14.683388436758223
+        },
+        {
+          "epoch": 95,
+          "train_loss": 14.747986459112786,
+          "train_mae": 14.72925189062347,
+          "val_mae": 14.585855002885307
+        },
+        {
+          "epoch": 100,
+          "train_loss": 14.809532487547242,
+          "train_mae": 14.77157149726426,
+          "val_mae": 15.44762445491484
+        }
+      ],
+      "families": {
+        "in_distribution": {
+          "random_point": 8.610757452971706,
+          "node_outage": 12.323586367254627,
+          "temporal_gap": 14.600430589800622,
+          "spatial_region": 18.819243180770542
+        },
+        "unseen_combinations": {
+          "node_plus_space": 15.299849089715847,
+          "time_plus_space": 33.265038708898736,
+          "node_plus_time": 27.558717100279214
+        },
+        "unseen_geometry": {
+          "moving_region": 30.15902021333,
+          "multi_block": 26.36048698987605
+        },
+        "unseen_triple": {
+          "node_plus_time_plus_space": 23.893360969580463
+        },
+        "unseen_combinations_repeat": {
+          "node_plus_space": 15.39054919462429,
+          "time_plus_space": 32.87897121833888,
+          "node_plus_time": 27.777705285058765
+        },
+        "unseen_geometry_repeat": {
+          "moving_region": 30.59025195627935,
+          "multi_block": 26.521856866842555
+        }
+      },
+      "diagnostics": {
+        "in_distribution": {
+          "coe_step1_coarse_fraction": 1.0,
+          "coe_step1_coarse_probability": 1.0,
+          "coe_step2_coarse_fraction": 1.0,
+          "coe_step2_coarse_probability": 1.0,
+          "coe_step3_coarse_fraction": 0.0,
+          "coe_step3_coarse_probability": 0.0,
+          "coe_step4_coarse_fraction": 0.0,
+          "coe_step4_coarse_probability": 0.0,
+          "coe_coarse_rounds_mean": 2.0,
+          "coe_expert_grid_equivalents": 5.0,
+          "coe_scale_path_ccff_fraction": 1.0,
+          "forward_ms_per_sample_per_rank": 5.45901924051783
+        },
+        "unseen_combinations": {
+          "coe_step1_coarse_fraction": 1.0,
+          "coe_step1_coarse_probability": 1.0,
+          "coe_step2_coarse_fraction": 1.0,
+          "coe_step2_coarse_probability": 1.0,
+          "coe_step3_coarse_fraction": 0.0,
+          "coe_step3_coarse_probability": 0.0,
+          "coe_step4_coarse_fraction": 0.0,
+          "coe_step4_coarse_probability": 0.0,
+          "coe_coarse_rounds_mean": 2.0,
+          "coe_expert_grid_equivalents": 5.0,
+          "coe_scale_path_ccff_fraction": 1.0,
+          "forward_ms_per_sample_per_rank": 5.115861448295819
+        },
+        "unseen_geometry": {
+          "coe_step1_coarse_fraction": 1.0,
+          "coe_step1_coarse_probability": 1.0,
+          "coe_step2_coarse_fraction": 1.0,
+          "coe_step2_coarse_probability": 1.0,
+          "coe_step3_coarse_fraction": 0.0,
+          "coe_step3_coarse_probability": 0.0,
+          "coe_step4_coarse_fraction": 0.0,
+          "coe_step4_coarse_probability": 0.0,
+          "coe_coarse_rounds_mean": 2.0,
+          "coe_expert_grid_equivalents": 5.0,
+          "coe_scale_path_ccff_fraction": 1.0,
+          "forward_ms_per_sample_per_rank": 5.131875199467982
+        },
+        "unseen_triple": {
+          "coe_step1_coarse_fraction": 1.0,
+          "coe_step1_coarse_probability": 1.0,
+          "coe_step2_coarse_fraction": 1.0,
+          "coe_step2_coarse_probability": 1.0,
+          "coe_step3_coarse_fraction": 0.0,
+          "coe_step3_coarse_probability": 0.0,
+          "coe_step4_coarse_fraction": 0.0,
+          "coe_step4_coarse_probability": 0.0,
+          "coe_coarse_rounds_mean": 2.0,
+          "coe_expert_grid_equivalents": 5.0,
+          "coe_scale_path_ccff_fraction": 1.0,
+          "forward_ms_per_sample_per_rank": 5.105634804799741
+        },
+        "unseen_combinations_repeat": {
+          "coe_step1_coarse_fraction": 1.0,
+          "coe_step1_coarse_probability": 1.0,
+          "coe_step2_coarse_fraction": 1.0,
+          "coe_step2_coarse_probability": 1.0,
+          "coe_step3_coarse_fraction": 0.0,
+          "coe_step3_coarse_probability": 0.0,
+          "coe_step4_coarse_fraction": 0.0,
+          "coe_step4_coarse_probability": 0.0,
+          "coe_coarse_rounds_mean": 2.0,
+          "coe_expert_grid_equivalents": 5.0,
+          "coe_scale_path_ccff_fraction": 1.0,
+          "forward_ms_per_sample_per_rank": 5.120186814749343
+        },
+        "unseen_geometry_repeat": {
+          "coe_step1_coarse_fraction": 1.0,
+          "coe_step1_coarse_probability": 1.0,
+          "coe_step2_coarse_fraction": 1.0,
+          "coe_step2_coarse_probability": 1.0,
+          "coe_step3_coarse_fraction": 0.0,
+          "coe_step3_coarse_probability": 0.0,
+          "coe_step4_coarse_fraction": 0.0,
+          "coe_step4_coarse_probability": 0.0,
+          "coe_coarse_rounds_mean": 2.0,
+          "coe_expert_grid_equivalents": 5.0,
+          "coe_scale_path_ccff_fraction": 1.0,
+          "forward_ms_per_sample_per_rank": 5.136888933547837
+        }
+      }
+    },
+    "N6": {
+      "summary": {
+        "variant": "N6",
+        "status": "reference",
+        "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20260930_054153_primitive_scale_adaptive_seed7/random/rate0.4/20260930_054153_seed7_bs32",
+        "best_epoch": 95,
+        "val_mae": 15.42508923631561,
+        "training_seconds": 3212.1638987319893,
+        "evaluations": {
+          "in_distribution": {
+            "mae": 14.578788116149937,
+            "rmse": 25.51429410358294
+          },
+          "unseen_combinations": {
+            "mae": 15.960345853879458,
+            "rmse": 26.949697838379183
+          },
+          "unseen_geometry": {
+            "mae": 21.615997118985987,
+            "rmse": 36.368888095872265
+          },
+          "unseen_triple": {
+            "mae": 15.427540078433799,
+            "rmse": 25.67162135582799
+          },
+          "unseen_combinations_repeat": {
+            "mae": 16.133794381608993,
+            "rmse": 27.515984059974535
+          },
+          "unseen_geometry_repeat": {
+            "mae": 21.640391418974044,
+            "rmse": 36.557845690144084
+          }
+        }
+      },
+      "audit": {
+        "epochs": 100,
+        "last_epoch": 100,
+        "validations": 20,
+        "checkpoints": {
+          "best.pth": true,
+          "last.pth": true
+        },
+        "amp_skips": 11.0,
+        "nonfinite": [],
+        "eval_samples": {
+          "in_distribution": 707,
+          "unseen_combinations": 707,
+          "unseen_geometry": 707,
+          "unseen_triple": 707,
+          "unseen_combinations_repeat": 707,
+          "unseen_geometry_repeat": 707
+        },
+        "eval_counts": {
+          "in_distribution": 6949810.0,
+          "unseen_combinations": 6949810.0,
+          "unseen_geometry": 6949810.0,
+          "unseen_triple": 6949810.0,
+          "unseen_combinations_repeat": 6949810.0,
+          "unseen_geometry_repeat": 6949810.0
+        },
+        "peak_gib": 9.1954026222229
+      },
+      "curves": [
+        {
+          "epoch": 1,
+          "train_loss": 108.73030754188439,
+          "train_mae": 108.72618536324698,
+          "val_mae": null
+        },
+        {
+          "epoch": 5,
+          "train_loss": 66.469133500929,
+          "train_mae": 66.44286060416974,
+          "val_mae": 56.52774535524977
+        },
+        {
+          "epoch": 20,
+          "train_loss": 37.054243781349875,
+          "train_mae": 37.02761038386668,
+          "val_mae": 32.232944709178845
+        },
+        {
+          "epoch": 40,
+          "train_loss": 23.20765428419237,
+          "train_mae": 23.170308976084463,
+          "val_mae": 20.423338717257707
+        },
+        {
+          "epoch": 60,
+          "train_loss": 18.510386367896935,
+          "train_mae": 18.477960462445587,
+          "val_mae": 17.022783072465838
+        },
+        {
+          "epoch": 70,
+          "train_loss": 17.459641642384714,
+          "train_mae": 17.402575305478617,
+          "val_mae": 16.530443117797887
+        },
+        {
+          "epoch": 80,
+          "train_loss": 16.53432831206879,
+          "train_mae": 16.492793579762985,
+          "val_mae": 16.302265710053362
+        },
+        {
+          "epoch": 90,
+          "train_loss": 16.162383872193175,
+          "train_mae": 16.139889334012636,
+          "val_mae": 15.564957568131927
+        },
+        {
+          "epoch": 95,
+          "train_loss": 15.995806916967615,
+          "train_mae": 15.96818794714054,
+          "val_mae": 15.42508923631561
+        },
+        {
+          "epoch": 100,
+          "train_loss": 15.687486041675914,
+          "train_mae": 15.641626129105063,
+          "val_mae": 15.850058672877514
+        }
+      ],
+      "families": {
+        "in_distribution": {
+          "random_point": 9.79026677385612,
+          "node_outage": 12.414051885226822,
+          "temporal_gap": 16.06496196283141,
+          "spatial_region": 20.076934204270902
+        },
+        "unseen_combinations": {
+          "node_plus_space": 15.787134824188104,
+          "time_plus_space": 18.206765328379053,
+          "node_plus_time": 13.878314998593105
+        },
+        "unseen_geometry": {
+          "moving_region": 21.741565830811652,
+          "multi_block": 21.4900725488402
+        },
+        "unseen_triple": {
+          "node_plus_time_plus_space": 15.427540078433799
+        },
+        "unseen_combinations_repeat": {
+          "node_plus_space": 16.09018055352001,
+          "time_plus_space": 18.111377635912202,
+          "node_plus_time": 14.191594770675959
+        },
+        "unseen_geometry_repeat": {
+          "moving_region": 22.209782187009672,
+          "multi_block": 21.06938792961219
+        }
+      },
+      "diagnostics": {
+        "in_distribution": {
+          "coe_step1_coarse_fraction": 1.0,
+          "coe_step1_coarse_probability": 0.9991259176963795,
+          "coe_step2_coarse_fraction": 1.0,
+          "coe_step2_coarse_probability": 0.9999989205404927,
+          "coe_step3_coarse_fraction": 0.0,
+          "coe_step3_coarse_probability": 0.0,
+          "coe_step4_coarse_fraction": 0.0,
+          "coe_step4_coarse_probability": 0.0,
+          "coe_coarse_rounds_mean": 2.0,
+          "coe_expert_grid_equivalents": 5.0,
+          "coe_scale_path_ccff_fraction": 1.0,
+          "forward_ms_per_sample_per_rank": 5.2525676789204825
+        },
+        "unseen_combinations": {
+          "coe_step1_coarse_fraction": 1.0,
+          "coe_step1_coarse_probability": 0.9990294522578174,
+          "coe_step2_coarse_fraction": 1.0,
+          "coe_step2_coarse_probability": 0.9999989374017783,
+          "coe_step3_coarse_fraction": 0.0,
+          "coe_step3_coarse_probability": 0.0,
+          "coe_step4_coarse_fraction": 0.0,
+          "coe_step4_coarse_probability": 0.0,
+          "coe_coarse_rounds_mean": 2.0,
+          "coe_expert_grid_equivalents": 5.0,
+          "coe_scale_path_ccff_fraction": 1.0,
+          "forward_ms_per_sample_per_rank": 4.919285169755513
+        },
+        "unseen_geometry": {
+          "coe_step1_coarse_fraction": 1.0,
+          "coe_step1_coarse_probability": 0.9992298299217494,
+          "coe_step2_coarse_fraction": 1.0,
+          "coe_step2_coarse_probability": 0.999998993044021,
+          "coe_step3_coarse_fraction": 0.0,
+          "coe_step3_coarse_probability": 0.0,
+          "coe_step4_coarse_fraction": 0.0,
+          "coe_step4_coarse_probability": 0.0,
+          "coe_coarse_rounds_mean": 2.0,
+          "coe_expert_grid_equivalents": 5.0,
+          "coe_scale_path_ccff_fraction": 1.0,
+          "forward_ms_per_sample_per_rank": 4.904113606807659
+        },
+        "unseen_triple": {
+          "coe_step1_coarse_fraction": 1.0,
+          "coe_step1_coarse_probability": 0.9990411595542832,
+          "coe_step2_coarse_fraction": 1.0,
+          "coe_step2_coarse_probability": 0.9999989350411983,
+          "coe_step3_coarse_fraction": 0.0,
+          "coe_step3_coarse_probability": 0.0,
+          "coe_step4_coarse_fraction": 0.0,
+          "coe_step4_coarse_probability": 0.0,
+          "coe_coarse_rounds_mean": 2.0,
+          "coe_expert_grid_equivalents": 5.0,
+          "coe_scale_path_ccff_fraction": 1.0,
+          "forward_ms_per_sample_per_rank": 4.879818649144509
+        },
+        "unseen_combinations_repeat": {
+          "coe_step1_coarse_fraction": 1.0,
+          "coe_step1_coarse_probability": 0.9990405409980191,
+          "coe_step2_coarse_fraction": 1.0,
+          "coe_step2_coarse_probability": 0.999998944820744,
+          "coe_step3_coarse_fraction": 0.0,
+          "coe_step3_coarse_probability": 0.0,
+          "coe_step4_coarse_fraction": 0.0,
+          "coe_step4_coarse_probability": 0.0,
+          "coe_coarse_rounds_mean": 2.0,
+          "coe_expert_grid_equivalents": 5.0,
+          "coe_scale_path_ccff_fraction": 1.0,
+          "forward_ms_per_sample_per_rank": 4.914547468197553
+        },
+        "unseen_geometry_repeat": {
+          "coe_step1_coarse_fraction": 1.0,
+          "coe_step1_coarse_probability": 0.9992526009194078,
+          "coe_step2_coarse_fraction": 1.0,
+          "coe_step2_coarse_probability": 0.9999990055213723,
+          "coe_step3_coarse_fraction": 0.0,
+          "coe_step3_coarse_probability": 0.0,
+          "coe_step4_coarse_fraction": 0.0,
+          "coe_step4_coarse_probability": 0.0,
+          "coe_coarse_rounds_mean": 2.0,
+          "coe_expert_grid_equivalents": 5.0,
+          "coe_scale_path_ccff_fraction": 1.0,
+          "forward_ms_per_sample_per_rank": 4.900761200877465
+        }
+      }
+    },
+    "N7": {
+      "summary": {
+        "variant": "N7",
+        "status": "reference",
+        "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20260930_063544_primitive_round_memory_seed7/random/rate0.4/20260930_063544_seed7_bs32",
+        "best_epoch": 100,
+        "val_mae": 16.033608627366995,
+        "training_seconds": 4184.184568757992,
+        "evaluations": {
+          "in_distribution": {
+            "mae": 15.240321907181634,
+            "rmse": 27.25735393881967
+          },
+          "unseen_combinations": {
+            "mae": 24.38372785550972,
+            "rmse": 42.17879147168992
+          },
+          "unseen_geometry": {
+            "mae": 32.827963228491136,
+            "rmse": 55.70695103061461
+          },
+          "unseen_triple": {
+            "mae": 24.093912927115994,
+            "rmse": 41.16906141107275
+          },
+          "unseen_combinations_repeat": {
+            "mae": 24.505753376711017,
+            "rmse": 42.1662252891752
+          },
+          "unseen_geometry_repeat": {
+            "mae": 32.54225653291241,
+            "rmse": 55.49596243574112
+          }
+        }
+      },
+      "audit": {
+        "epochs": 100,
+        "last_epoch": 100,
+        "validations": 20,
+        "checkpoints": {
+          "best.pth": true,
+          "last.pth": true
+        },
+        "amp_skips": 11.0,
+        "nonfinite": [
+          [
+            "/1/train/coe_step3_router_grad_norm",
+            "inf"
+          ]
+        ],
+        "eval_samples": {
+          "in_distribution": 707,
+          "unseen_combinations": 707,
+          "unseen_geometry": 707,
+          "unseen_triple": 707,
+          "unseen_combinations_repeat": 707,
+          "unseen_geometry_repeat": 707
+        },
+        "eval_counts": {
+          "in_distribution": 6949810.0,
+          "unseen_combinations": 6949810.0,
+          "unseen_geometry": 6949810.0,
+          "unseen_triple": 6949810.0,
+          "unseen_combinations_repeat": 6949810.0,
+          "unseen_geometry_repeat": 6949810.0
+        },
+        "peak_gib": 11.858599185943604
+      },
+      "curves": [
+        {
+          "epoch": 1,
+          "train_loss": 108.72499302455357,
+          "train_mae": 108.7195262363939,
+          "val_mae": null
+        },
+        {
+          "epoch": 5,
+          "train_loss": 62.66748725593864,
+          "train_mae": 62.64498389422798,
+          "val_mae": 51.691205166187764
+        },
+        {
+          "epoch": 20,
+          "train_loss": 28.500121302418894,
+          "train_mae": 28.475792904332877,
+          "val_mae": 24.871195260956732
+        },
+        {
+          "epoch": 40,
+          "train_loss": 21.004816104839374,
+          "train_mae": 20.976096432998826,
+          "val_mae": 19.50017995990315
+        },
+        {
+          "epoch": 60,
+          "train_loss": 18.820009157255097,
+          "train_mae": 18.79498065813777,
+          "val_mae": 18.219505868775023
+        },
+        {
+          "epoch": 70,
+          "train_loss": 17.58671066977761,
+          "train_mae": 17.541359991801905,
+          "val_mae": 16.76184433617105
+        },
+        {
+          "epoch": 80,
+          "train_loss": 16.821350010958586,
+          "train_mae": 16.810711738626804,
+          "val_mae": 16.37184125751816
+        },
+        {
+          "epoch": 90,
+          "train_loss": 16.594782593962435,
+          "train_mae": 16.5912492594332,
+          "val_mae": 16.574744263592176
+        },
+        {
+          "epoch": 95,
+          "train_loss": 16.348967267321303,
+          "train_mae": 16.337768388045387,
+          "val_mae": 16.203403844895384
+        },
+        {
+          "epoch": 100,
+          "train_loss": 16.06267044760964,
+          "train_mae": 16.031560550566812,
+          "val_mae": 16.033608627366995
+        }
+      ],
+      "families": {
+        "in_distribution": {
+          "random_point": 8.926442836842135,
+          "node_outage": 13.909680098395894,
+          "temporal_gap": 14.775944301716756,
+          "spatial_region": 23.395294735286807
+        },
+        "unseen_combinations": {
+          "node_plus_space": 18.564171409189267,
+          "time_plus_space": 29.553060610893667,
+          "node_plus_time": 25.03671914568949
+        },
+        "unseen_geometry": {
+          "moving_region": 35.78156454572363,
+          "multi_block": 29.86599431842743
+        },
+        "unseen_triple": {
+          "node_plus_time_plus_space": 24.093912927115994
+        },
+        "unseen_combinations_repeat": {
+          "node_plus_space": 18.72270720899357,
+          "time_plus_space": 29.390622413659326,
+          "node_plus_time": 25.407751915542953
+        },
+        "unseen_geometry_repeat": {
+          "moving_region": 35.67108516029565,
+          "multi_block": 29.404563206594254
+        }
+      },
+      "diagnostics": {
+        "in_distribution": {
+          "coe_step1_memory_gate_abs_mean": 0.0,
+          "coe_step1_memory_gate_signed_mean": 0.0,
+          "coe_step1_memory_input_delta": 0.0,
+          "coe_step2_memory_gate_abs_mean": 0.9230255640071371,
+          "coe_step2_memory_gate_signed_mean": -0.34696256984835083,
+          "coe_step2_memory_input_delta": 0.9787862741428873,
+          "coe_step2_memory_from_h0_weight": 1.0,
+          "coe_step3_memory_gate_abs_mean": 0.9510182686474012,
+          "coe_step3_memory_gate_signed_mean": -0.5471000671386719,
+          "coe_step3_memory_input_delta": 0.6666672955388608,
+          "coe_step3_memory_from_h0_weight": 0.007496707455214599,
+          "coe_step3_memory_from_h1_weight": 0.9925032931825389,
+          "coe_step4_memory_gate_abs_mean": 0.9006719718808713,
+          "coe_step4_memory_gate_signed_mean": -0.37057886175487353,
+          "coe_step4_memory_input_delta": 0.8385387114856554,
+          "coe_step4_memory_from_h0_weight": 0.007394091752560243,
+          "coe_step4_memory_from_h1_weight": 0.37172704351984936,
+          "coe_step4_memory_from_h2_weight": 0.6208788648895596,
+          "forward_ms_per_sample_per_rank": 6.692027164137556
+        },
+        "unseen_combinations": {
+          "coe_step1_memory_gate_abs_mean": 0.0,
+          "coe_step1_memory_gate_signed_mean": 0.0,
+          "coe_step1_memory_input_delta": 0.0,
+          "coe_step2_memory_gate_abs_mean": 0.9131826162338257,
+          "coe_step2_memory_gate_signed_mean": -0.35091142291608063,
+          "coe_step2_memory_input_delta": 0.9470862487088079,
+          "coe_step2_memory_from_h0_weight": 1.0,
+          "coe_step3_memory_gate_abs_mean": 0.9661292278248331,
+          "coe_step3_memory_gate_signed_mean": -0.5851720675178196,
+          "coe_step3_memory_input_delta": 0.6222419142723083,
+          "coe_step3_memory_from_h0_weight": 0.006760162787268991,
+          "coe_step3_memory_from_h1_weight": 0.9932398355525472,
+          "coe_step4_memory_gate_abs_mean": 0.9096415898074275,
+          "coe_step4_memory_gate_signed_mean": -0.45618275974107825,
+          "coe_step4_memory_input_delta": 0.6679272599842238,
+          "coe_step4_memory_from_h0_weight": 0.008091698684122252,
+          "coe_step4_memory_from_h1_weight": 0.5483211615811223,
+          "coe_step4_memory_from_h2_weight": 0.44358713989672455,
+          "forward_ms_per_sample_per_rank": 6.420810760984025
+        },
+        "unseen_geometry": {
+          "coe_step1_memory_gate_abs_mean": 0.0,
+          "coe_step1_memory_gate_signed_mean": 0.0,
+          "coe_step1_memory_input_delta": 0.0,
+          "coe_step2_memory_gate_abs_mean": 0.9202839110208594,
+          "coe_step2_memory_gate_signed_mean": -0.34165431364722876,
+          "coe_step2_memory_input_delta": 0.9805869460105896,
+          "coe_step2_memory_from_h0_weight": 1.0,
+          "coe_step3_memory_gate_abs_mean": 0.955778629883476,
+          "coe_step3_memory_gate_signed_mean": -0.5604530080505039,
+          "coe_step3_memory_input_delta": 0.6295660475026006,
+          "coe_step3_memory_from_h0_weight": 0.0077471110726828165,
+          "coe_step3_memory_from_h1_weight": 0.9922528785207997,
+          "coe_step4_memory_gate_abs_mean": 0.8994376063346863,
+          "coe_step4_memory_gate_signed_mean": -0.37987758024879126,
+          "coe_step4_memory_input_delta": 0.7362423901972563,
+          "coe_step4_memory_from_h0_weight": 0.012172152268011932,
+          "coe_step4_memory_from_h1_weight": 0.3455860945193664,
+          "coe_step4_memory_from_h2_weight": 0.6422417552574821,
+          "forward_ms_per_sample_per_rank": 6.4623447101253
+        },
+        "unseen_triple": {
+          "coe_step1_memory_gate_abs_mean": 0.0,
+          "coe_step1_memory_gate_signed_mean": 0.0,
+          "coe_step1_memory_input_delta": 0.0,
+          "coe_step2_memory_gate_abs_mean": 0.9137700355571249,
+          "coe_step2_memory_gate_signed_mean": -0.35883413838303607,
+          "coe_step2_memory_input_delta": 0.9505067882330521,
+          "coe_step2_memory_from_h0_weight": 1.0,
+          "coe_step3_memory_gate_abs_mean": 0.9693698546160823,
+          "coe_step3_memory_gate_signed_mean": -0.5891988173775051,
+          "coe_step3_memory_input_delta": 0.6201683982558872,
+          "coe_step3_memory_from_h0_weight": 0.006104614241453616,
+          "coe_step3_memory_from_h1_weight": 0.9938953778018123,
+          "coe_step4_memory_gate_abs_mean": 0.9164744641469873,
+          "coe_step4_memory_gate_signed_mean": -0.46496419802955957,
+          "coe_step4_memory_input_delta": 0.6691155174504155,
+          "coe_step4_memory_from_h0_weight": 0.007107032655292879,
+          "coe_step4_memory_from_h1_weight": 0.5890583681023639,
+          "coe_step4_memory_from_h2_weight": 0.40383460081141925,
+          "forward_ms_per_sample_per_rank": 6.410919783552621
+        },
+        "unseen_combinations_repeat": {
+          "coe_step1_memory_gate_abs_mean": 0.0,
+          "coe_step1_memory_gate_signed_mean": 0.0,
+          "coe_step1_memory_input_delta": 0.0,
+          "coe_step2_memory_gate_abs_mean": 0.9134149059005405,
+          "coe_step2_memory_gate_signed_mean": -0.3512069479278896,
+          "coe_step2_memory_input_delta": 0.9472136056941488,
+          "coe_step2_memory_from_h0_weight": 1.0,
+          "coe_step3_memory_gate_abs_mean": 0.9655630873597186,
+          "coe_step3_memory_gate_signed_mean": -0.5840715610462687,
+          "coe_step3_memory_input_delta": 0.6210335311682328,
+          "coe_step3_memory_from_h0_weight": 0.006859894821663265,
+          "coe_step3_memory_from_h1_weight": 0.9931401066158129,
+          "coe_step4_memory_gate_abs_mean": 0.908254395360532,
+          "coe_step4_memory_gate_signed_mean": -0.45501590163811395,
+          "coe_step4_memory_input_delta": 0.6676504482393679,
+          "coe_step4_memory_from_h0_weight": 0.007792494280020828,
+          "coe_step4_memory_from_h1_weight": 0.5457426685353984,
+          "coe_step4_memory_from_h2_weight": 0.4464648378931958,
+          "forward_ms_per_sample_per_rank": 6.4221018683833835
+        },
+        "unseen_geometry_repeat": {
+          "coe_step1_memory_gate_abs_mean": 0.0,
+          "coe_step1_memory_gate_signed_mean": 0.0,
+          "coe_step1_memory_input_delta": 0.0,
+          "coe_step2_memory_gate_abs_mean": 0.920492304408032,
+          "coe_step2_memory_gate_signed_mean": -0.3411115965117579,
+          "coe_step2_memory_input_delta": 0.9791168129962423,
+          "coe_step2_memory_from_h0_weight": 1.0,
+          "coe_step3_memory_gate_abs_mean": 0.9557293109271837,
+          "coe_step3_memory_gate_signed_mean": -0.5608987367671469,
+          "coe_step3_memory_input_delta": 0.6294542214144832,
+          "coe_step3_memory_from_h0_weight": 0.0077178482087733955,
+          "coe_step3_memory_from_h1_weight": 0.992282149584397,
+          "coe_step4_memory_gate_abs_mean": 0.898305242476256,
+          "coe_step4_memory_gate_signed_mean": -0.37718994461971783,
+          "coe_step4_memory_input_delta": 0.7354763461195905,
+          "coe_step4_memory_from_h0_weight": 0.01337446622631472,
+          "coe_step4_memory_from_h1_weight": 0.34824073703392694,
+          "coe_step4_memory_from_h2_weight": 0.6383847931156987,
+          "forward_ms_per_sample_per_rank": 6.463824680328298
+        }
+      }
+    }
+  },
+  "checkpoint_audit": {
+    "R1": {
+      "total_parameters": 250043,
+      "trainable_parameters": 250043,
+      "best_epoch_verified": 95,
+      "last_epoch_verified": 100,
+      "model_finite": true,
+      "checkpoint_config_sha256": "c7c236c2507d98b78ab53d1a3b6a861346571e226260fc5e1b8dd73cbe0f2779",
+      "best_size_mb": 3.3365488052368164,
+      "last_training_state": {
+        "optimizer": true,
+        "scheduler": true,
+        "scaler": true,
+        "rng_states": true,
+        "training_state": true
+      }
+    },
+    "R2": {
+      "total_parameters": 308899,
+      "trainable_parameters": 250043,
+      "best_epoch_verified": 100,
+      "last_epoch_verified": 100,
+      "model_finite": true,
+      "checkpoint_config_sha256": "87c42cfcf50a0980845dfdbb19a6eda4b7e7bb027e5f3599aab050c862274132",
+      "best_size_mb": 3.5994043350219727,
+      "last_training_state": {
+        "optimizer": true,
+        "scheduler": true,
+        "scaler": true,
+        "rng_states": true,
+        "training_state": true
+      }
+    },
+    "R3": {
+      "total_parameters": 308899,
+      "trainable_parameters": 308899,
+      "best_epoch_verified": 90,
+      "last_epoch_verified": 100,
+      "model_finite": true,
+      "checkpoint_config_sha256": "22c77427813a2db079820edb3276760b276893c7453acf2b5ab3be5b6411a663",
+      "best_size_mb": 4.038666725158691,
+      "last_training_state": {
+        "optimizer": true,
+        "scheduler": true,
+        "scaler": true,
+        "rng_states": true,
+        "training_state": true
+      }
+    },
+    "R4": {
+      "total_parameters": 308899,
+      "trainable_parameters": 308899,
+      "best_epoch_verified": 100,
+      "last_epoch_verified": 100,
+      "model_finite": true,
+      "checkpoint_config_sha256": "0721b6427b11a59b999a2e28bcc1bc564aaf4a76d8857c6105c9c3d7ba97495d",
+      "best_size_mb": 4.053437232971191,
+      "last_training_state": {
+        "optimizer": true,
+        "scheduler": true,
+        "scaler": true,
+        "rng_states": true,
+        "training_state": true
+      }
+    },
+    "R5": {
+      "total_parameters": 308899,
+      "trainable_parameters": 250043,
+      "best_epoch_verified": 100,
+      "last_epoch_verified": 100,
+      "model_finite": true,
+      "checkpoint_config_sha256": "5e69c82c6c0e210428c8ad2cb8d399ea043ffa34842689bf70b2972b665cd34b",
+      "best_size_mb": 3.5888442993164062,
+      "last_training_state": {
+        "optimizer": true,
+        "scheduler": true,
+        "scaler": true,
+        "rng_states": true,
+        "training_state": true
+      }
+    },
+    "R6": {
+      "total_parameters": 799267,
+      "trainable_parameters": 740411,
+      "best_epoch_verified": 95,
+      "last_epoch_verified": 100,
+      "model_finite": true,
+      "checkpoint_config_sha256": "7a2eb1d8177b251b40fe6a33480c85eee478708a3cb14796d98da318a470ad1a",
+      "best_size_mb": 9.50532341003418,
+      "last_training_state": {
+        "optimizer": true,
+        "scheduler": true,
+        "scaler": true,
+        "rng_states": true,
+        "training_state": true
+      }
+    },
+    "R7": {
+      "total_parameters": 308899,
+      "trainable_parameters": 308899,
+      "best_epoch_verified": 90,
+      "last_epoch_verified": 100,
+      "model_finite": true,
+      "checkpoint_config_sha256": "4461f4e25d797bf4aecef3f00a4ff806aeaef0f891e861825413833c6b4470ba",
+      "best_size_mb": 4.050263404846191,
+      "last_training_state": {
+        "optimizer": true,
+        "scheduler": true,
+        "scaler": true,
+        "rng_states": true,
+        "training_state": true
+      }
+    },
+    "R8": {
+      "total_parameters": 271611,
+      "trainable_parameters": 267003,
+      "best_epoch_verified": 100,
+      "last_epoch_verified": 100,
+      "model_finite": true,
+      "checkpoint_config_sha256": "a2c23c4fe02815ad4f89df746cb61199e2e4e358c3870384f1b53450a6e1103f",
+      "best_size_mb": 3.5465497970581055,
+      "last_training_state": {
+        "optimizer": true,
+        "scheduler": true,
+        "scaler": true,
+        "rng_states": true,
+        "training_state": true
+      }
+    },
+    "R9": {
+      "total_parameters": 271611,
+      "trainable_parameters": 267003,
+      "best_epoch_verified": 100,
+      "last_epoch_verified": 100,
+      "model_finite": true,
+      "checkpoint_config_sha256": "f433ce1d09f221e579ff8be2b87fa0038c8310a9d35fcfa50d4d12bfb17e5f69",
+      "best_size_mb": 3.5464887619018555,
+      "last_training_state": {
+        "optimizer": true,
+        "scheduler": true,
+        "scaler": true,
+        "rng_states": true,
+        "training_state": true
+      }
+    },
+    "R10": {
+      "total_parameters": 250043,
+      "trainable_parameters": 250043,
+      "best_epoch_verified": 70,
+      "last_epoch_verified": 100,
+      "model_finite": true,
+      "checkpoint_config_sha256": "97c50a9609a68a527d5442d43feee5eeffdf697b146e9d96d3ffb0f6c38e7a47",
+      "best_size_mb": 3.3203744888305664,
+      "last_training_state": {
+        "optimizer": true,
+        "scheduler": true,
+        "scaler": true,
+        "rng_states": true,
+        "training_state": true
+      }
+    },
+    "N2": {
+      "total_parameters": 740411,
+      "trainable_parameters": 740411,
+      "best_epoch_verified": 100,
+      "last_epoch_verified": 100,
+      "model_finite": true,
+      "checkpoint_config_sha256": "954ce281b920f69aae6a6168942c21166a177f05c8530982c23164cb177caf9b",
+      "best_size_mb": 9.25806999206543,
+      "last_training_state": {
+        "optimizer": true,
+        "scheduler": true,
+        "scaler": true,
+        "rng_states": true,
+        "training_state": true
+      }
+    },
+    "N3": {
+      "total_parameters": 250043,
+      "trainable_parameters": 250043,
+      "best_epoch_verified": 90,
+      "last_epoch_verified": 100,
+      "model_finite": true,
+      "checkpoint_config_sha256": "7e71e61df5f671f09c1c7a739398349d12b54bcd5fe79e0622750dc86e6ea17c",
+      "best_size_mb": 3.3132333755493164,
+      "last_training_state": {
+        "optimizer": true,
+        "scheduler": true,
+        "scaler": true,
+        "rng_states": true,
+        "training_state": true
+      }
+    },
+    "N5": {
+      "total_parameters": 308899,
+      "trainable_parameters": 250043,
+      "best_epoch_verified": 95,
+      "last_epoch_verified": 100,
+      "model_finite": true,
+      "checkpoint_config_sha256": "0a36a12d01444ba24d977d607a5973f204c198b0e7b4c439c9794e4ad2ac7176",
+      "best_size_mb": 3.5604028701782227,
+      "last_training_state": {
+        "optimizer": true,
+        "scheduler": true,
+        "scaler": true,
+        "rng_states": true,
+        "training_state": true
+      }
+    },
+    "N6": {
+      "total_parameters": 308899,
+      "trainable_parameters": 308899,
+      "best_epoch_verified": 95,
+      "last_epoch_verified": 100,
+      "model_finite": true,
+      "checkpoint_config_sha256": "fb093afc3e8e89ff5d3fb02fa6d3f210be28653c80834271e2f215ba176c2c75",
+      "best_size_mb": 4.012848854064941,
+      "last_training_state": {
+        "optimizer": true,
+        "scheduler": true,
+        "scaler": true,
+        "rng_states": true,
+        "training_state": true
+      }
+    },
+    "N7": {
+      "total_parameters": 271611,
+      "trainable_parameters": 271611,
+      "best_epoch_verified": 100,
+      "last_epoch_verified": 100,
+      "model_finite": true,
+      "checkpoint_config_sha256": "bb5ebc37b0eaf0c065f6f57ed63690b3dd70770a72434ff19030a10ec8388fdf",
+      "best_size_mb": 3.57784366607666,
+      "last_training_state": {
+        "optimizer": true,
+        "scheduler": true,
+        "scaler": true,
+        "rng_states": true,
+        "training_state": true
+      }
+    }
+  }
+}

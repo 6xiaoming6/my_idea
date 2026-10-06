@@ -1,0 +1,8 @@
+{
+  "variant": "D7",
+  "seed": 27,
+  "path": "CMFF",
+  "memory": "delta",
+  "reference": "S12",
+  "method": "固定CMFF，归一化跨轮差分传递"
+}

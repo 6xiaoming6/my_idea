@@ -1,0 +1,321 @@
+{
+  "M01": {
+    "epochs": 100,
+    "validations": 20,
+    "best_exists": true,
+    "last_exists": true,
+    "amp_skips": 11.0,
+    "nonfinite_diagnostics": []
+  },
+  "M02": {
+    "epochs": 100,
+    "validations": 20,
+    "best_exists": true,
+    "last_exists": true,
+    "amp_skips": 11.0,
+    "nonfinite_diagnostics": []
+  },
+  "M03": {
+    "epochs": 100,
+    "validations": 20,
+    "best_exists": true,
+    "last_exists": true,
+    "amp_skips": 12.0,
+    "nonfinite_diagnostics": []
+  },
+  "M04": {
+    "epochs": 100,
+    "validations": 20,
+    "best_exists": true,
+    "last_exists": true,
+    "amp_skips": 10.0,
+    "nonfinite_diagnostics": []
+  },
+  "M05": {
+    "epochs": 100,
+    "validations": 20,
+    "best_exists": true,
+    "last_exists": true,
+    "amp_skips": 11.0,
+    "nonfinite_diagnostics": []
+  },
+  "M06": {
+    "epochs": 100,
+    "validations": 20,
+    "best_exists": true,
+    "last_exists": true,
+    "amp_skips": 11.0,
+    "nonfinite_diagnostics": []
+  },
+  "M07": {
+    "epochs": 100,
+    "validations": 20,
+    "best_exists": true,
+    "last_exists": true,
+    "amp_skips": 11.0,
+    "nonfinite_diagnostics": []
+  },
+  "M08": {
+    "epochs": 100,
+    "validations": 20,
+    "best_exists": true,
+    "last_exists": true,
+    "amp_skips": 10.0,
+    "nonfinite_diagnostics": []
+  },
+  "M09": {
+    "epochs": 100,
+    "validations": 20,
+    "best_exists": true,
+    "last_exists": true,
+    "amp_skips": 11.0,
+    "nonfinite_diagnostics": []
+  },
+  "M10": {
+    "epochs": 100,
+    "validations": 20,
+    "best_exists": true,
+    "last_exists": true,
+    "amp_skips": 10.0,
+    "nonfinite_diagnostics": []
+  },
+  "M11": {
+    "epochs": 100,
+    "validations": 20,
+    "best_exists": true,
+    "last_exists": true,
+    "amp_skips": 10.0,
+    "nonfinite_diagnostics": []
+  },
+  "M12": {
+    "epochs": 100,
+    "validations": 20,
+    "best_exists": true,
+    "last_exists": true,
+    "amp_skips": 11.0,
+    "nonfinite_diagnostics": []
+  },
+  "S01": {
+    "epochs": 100,
+    "validations": 20,
+    "best_exists": true,
+    "last_exists": true,
+    "amp_skips": 12.0,
+    "nonfinite_diagnostics": []
+  },
+  "S02": {
+    "epochs": 100,
+    "validations": 20,
+    "best_exists": true,
+    "last_exists": true,
+    "amp_skips": 11.0,
+    "nonfinite_diagnostics": []
+  },
+  "S03": {
+    "epochs": 100,
+    "validations": 20,
+    "best_exists": true,
+    "last_exists": true,
+    "amp_skips": 12.0,
+    "nonfinite_diagnostics": []
+  },
+  "S04": {
+    "epochs": 100,
+    "validations": 20,
+    "best_exists": true,
+    "last_exists": true,
+    "amp_skips": 11.0,
+    "nonfinite_diagnostics": []
+  },
+  "S05": {
+    "epochs": 100,
+    "validations": 20,
+    "best_exists": true,
+    "last_exists": true,
+    "amp_skips": 12.0,
+    "nonfinite_diagnostics": []
+  },
+  "S06": {
+    "epochs": 100,
+    "validations": 20,
+    "best_exists": true,
+    "last_exists": true,
+    "amp_skips": 12.0,
+    "nonfinite_diagnostics": []
+  },
+  "S07": {
+    "epochs": 100,
+    "validations": 20,
+    "best_exists": true,
+    "last_exists": true,
+    "amp_skips": 11.0,
+    "nonfinite_diagnostics": []
+  },
+  "S08": {
+    "epochs": 100,
+    "validations": 20,
+    "best_exists": true,
+    "last_exists": true,
+    "amp_skips": 13.0,
+    "nonfinite_diagnostics": []
+  },
+  "S09": {
+    "epochs": 100,
+    "validations": 20,
+    "best_exists": true,
+    "last_exists": true,
+    "amp_skips": 12.0,
+    "nonfinite_diagnostics": []
+  },
+  "S10": {
+    "epochs": 100,
+    "validations": 20,
+    "best_exists": true,
+    "last_exists": true,
+    "amp_skips": 12.0,
+    "nonfinite_diagnostics": []
+  },
+  "G01": {
+    "epochs": 100,
+    "validations": 20,
+    "best_exists": true,
+    "last_exists": true,
+    "amp_skips": 11.0,
+    "nonfinite_diagnostics": []
+  },
+  "G02": {
+    "epochs": 100,
+    "validations": 20,
+    "best_exists": true,
+    "last_exists": true,
+    "amp_skips": 11.0,
+    "nonfinite_diagnostics": []
+  },
+  "G03": {
+    "epochs": 100,
+    "validations": 20,
+    "best_exists": true,
+    "last_exists": true,
+    "amp_skips": 11.0,
+    "nonfinite_diagnostics": []
+  },
+  "G04": {
+    "epochs": 100,
+    "validations": 20,
+    "best_exists": true,
+    "last_exists": true,
+    "amp_skips": 11.0,
+    "nonfinite_diagnostics": []
+  },
+  "G05": {
+    "epochs": 100,
+    "validations": 20,
+    "best_exists": true,
+    "last_exists": true,
+    "amp_skips": 11.0,
+    "nonfinite_diagnostics": []
+  },
+  "G06": {
+    "epochs": 100,
+    "validations": 20,
+    "best_exists": true,
+    "last_exists": true,
+    "amp_skips": 11.0,
+    "nonfinite_diagnostics": []
+  },
+  "G07": {
+    "epochs": 100,
+    "validations": 20,
+    "best_exists": true,
+    "last_exists": true,
+    "amp_skips": 11.0,
+    "nonfinite_diagnostics": []
+  },
+  "G08": {
+    "epochs": 100,
+    "validations": 20,
+    "best_exists": true,
+    "last_exists": true,
+    "amp_skips": 11.0,
+    "nonfinite_diagnostics": []
+  },
+  "G09": {
+    "epochs": 100,
+    "validations": 20,
+    "best_exists": true,
+    "last_exists": true,
+    "amp_skips": 11.0,
+    "nonfinite_diagnostics": []
+  },
+  "P01": {
+    "epochs": 100,
+    "validations": 20,
+    "best_exists": true,
+    "last_exists": true,
+    "amp_skips": 11.0,
+    "nonfinite_diagnostics": []
+  },
+  "P02": {
+    "epochs": 100,
+    "validations": 20,
+    "best_exists": true,
+    "last_exists": true,
+    "amp_skips": 13.0,
+    "nonfinite_diagnostics": []
+  },
+  "P03": {
+    "epochs": 100,
+    "validations": 20,
+    "best_exists": true,
+    "last_exists": true,
+    "amp_skips": 11.0,
+    "nonfinite_diagnostics": []
+  },
+  "P04": {
+    "epochs": 100,
+    "validations": 20,
+    "best_exists": true,
+    "last_exists": true,
+    "amp_skips": 11.0,
+    "nonfinite_diagnostics": [
+      [
+        2,
+        "train",
+        "coe_step4_router_grad_norm",
+        "inf"
+      ]
+    ]
+  },
+  "P05": {
+    "epochs": 100,
+    "validations": 20,
+    "best_exists": true,
+    "last_exists": true,
+    "amp_skips": 11.0,
+    "nonfinite_diagnostics": []
+  },
+  "P06": {
+    "epochs": 100,
+    "validations": 20,
+    "best_exists": true,
+    "last_exists": true,
+    "amp_skips": 11.0,
+    "nonfinite_diagnostics": []
+  },
+  "P07": {
+    "epochs": 100,
+    "validations": 20,
+    "best_exists": true,
+    "last_exists": true,
+    "amp_skips": 12.0,
+    "nonfinite_diagnostics": []
+  },
+  "P08": {
+    "epochs": 100,
+    "validations": 20,
+    "best_exists": true,
+    "last_exists": true,
+    "amp_skips": 11.0,
+    "nonfinite_diagnostics": []
+  }
+}

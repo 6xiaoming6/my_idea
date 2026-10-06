@@ -1,0 +1,8 @@
+{
+  "name": "paths_fixed",
+  "method": "G06: original R5 two-scale protocol, perturb=False, independent=True, seed=17",
+  "legacy": "R2",
+  "seed": 17,
+  "sharing": "per_step",
+  "reference": "G06"
+}

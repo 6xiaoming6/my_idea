@@ -1,0 +1,66 @@
+{
+  "D1": {
+    "epochs": 100,
+    "validations": 20,
+    "best": true,
+    "last": true,
+    "amp_skips": 12.0,
+    "nonfinite": []
+  },
+  "D2": {
+    "epochs": 100,
+    "validations": 20,
+    "best": true,
+    "last": true,
+    "amp_skips": 12.0,
+    "nonfinite": []
+  },
+  "D3": {
+    "epochs": 100,
+    "validations": 20,
+    "best": true,
+    "last": true,
+    "amp_skips": 12.0,
+    "nonfinite": []
+  },
+  "D4": {
+    "epochs": 100,
+    "validations": 20,
+    "best": true,
+    "last": true,
+    "amp_skips": 11.0,
+    "nonfinite": []
+  },
+  "D5": {
+    "epochs": 100,
+    "validations": 20,
+    "best": true,
+    "last": true,
+    "amp_skips": 11.0,
+    "nonfinite": []
+  },
+  "D6": {
+    "epochs": 100,
+    "validations": 20,
+    "best": true,
+    "last": true,
+    "amp_skips": 12.0,
+    "nonfinite": []
+  },
+  "D7": {
+    "epochs": 100,
+    "validations": 20,
+    "best": true,
+    "last": true,
+    "amp_skips": 12.0,
+    "nonfinite": []
+  },
+  "D8": {
+    "epochs": 100,
+    "validations": 20,
+    "best": true,
+    "last": true,
+    "amp_skips": 11.0,
+    "nonfinite": []
+  }
+}

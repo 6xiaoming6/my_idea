@@ -1,0 +1,6 @@
+{
+  "name": "p12_repeat",
+  "source": "$pair1",
+  "seed": 27,
+  "method": "P12: repeat $pair1, seed27"
+}

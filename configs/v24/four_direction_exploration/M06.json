@@ -1,0 +1,9 @@
+{
+  "name": "round_positive",
+  "method": "M06: memory=positive, single F",
+  "module": {
+    "memory": "positive"
+  },
+  "sharing": "shared",
+  "reference": "M01"
+}

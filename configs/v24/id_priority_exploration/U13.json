@@ -1,0 +1,10 @@
+{
+  "name": "scale_warm_top2",
+  "method": "前20epoch CMFF，之后三选二尺度softmax融合",
+  "module": {
+    "scale_policy": "top2",
+    "fixed_epochs": 20
+  },
+  "seed": 7,
+  "reference": "U14"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "pair_joint_final",
+  "method": "P03: pair=joint, teacher=final",
+  "module": {
+    "pair": "joint",
+    "teacher": "final"
+  },
+  "reference": "M01"
+}

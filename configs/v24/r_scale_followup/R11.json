@@ -1,0 +1,15 @@
+{
+  "base_variant": "R7",
+  "name": "scale_soft_start",
+  "override": {
+    "model": {
+      "coe": {
+        "spatial_scale": {
+          "mode": "soft_start",
+          "warmup_epochs": 5,
+          "transition_epochs": 5
+        }
+      }
+    }
+  }
+}

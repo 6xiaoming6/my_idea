@@ -1,0 +1,8 @@
+{
+  "name": "scale_sample",
+  "method": "S03: F/M/C scale mode=sample",
+  "module": {
+    "scale": "sample"
+  },
+  "reference": "S01"
+}

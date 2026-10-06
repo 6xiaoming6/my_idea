@@ -1,0 +1,9 @@
+{
+  "name": "pair_bounded",
+  "method": "P07: pair=bounded, teacher=none",
+  "module": {
+    "pair": "bounded",
+    "teacher": "none"
+  },
+  "reference": "M01"
+}

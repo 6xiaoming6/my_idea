@@ -1,0 +1,8 @@
+{
+  "variant": "D6",
+  "seed": 17,
+  "path": "MCFF",
+  "memory": "delta",
+  "reference": "D5",
+  "method": "固定MCFF，归一化跨轮差分传递"
+}

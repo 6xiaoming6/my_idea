@@ -1,0 +1,6 @@
+{
+  "name": "s15_repeat",
+  "source": "$mixture",
+  "seed": 17,
+  "method": "S15: repeat $mixture, seed17"
+}

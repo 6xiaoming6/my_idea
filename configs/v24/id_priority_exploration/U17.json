@@ -1,0 +1,7 @@
+{
+  "source": "$scale0",
+  "memory_source": "$memory0",
+  "seed": 7,
+  "reference": "U01",
+  "method": "第一通信候选＋第一Top1尺度候选"
+}

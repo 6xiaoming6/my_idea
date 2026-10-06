@@ -1,0 +1,11 @@
+{
+  "name": "scale_teacher_two",
+  "method": "前20epoch CMFF，之后前两轮尺度头仅教师、后两轮F",
+  "module": {
+    "scale_policy": "teacher",
+    "constraint": "last_two_fine",
+    "fixed_epochs": 20
+  },
+  "seed": 7,
+  "reference": "U01"
+}

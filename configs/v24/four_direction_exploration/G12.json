@@ -1,0 +1,7 @@
+{
+  "name": "memory_scale_combined",
+  "source": "$scale",
+  "memory_source": "$memory0",
+  "seed": 7,
+  "method": "G12: winning memory + winning sparse three-scale method"
+}

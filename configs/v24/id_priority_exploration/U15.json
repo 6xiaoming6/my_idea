@@ -1,0 +1,11 @@
+{
+  "name": "scale_teacher_ordered",
+  "method": "前20epoch CMFF，之后单调升分辨率Top1教师、末轮F",
+  "module": {
+    "scale_policy": "teacher",
+    "constraint": "monotone",
+    "fixed_epochs": 20
+  },
+  "seed": 7,
+  "reference": "U01"
+}

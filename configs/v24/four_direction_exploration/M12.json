@@ -1,0 +1,9 @@
+{
+  "name": "round_gru",
+  "method": "M12: memory=gru, single F",
+  "module": {
+    "memory": "gru"
+  },
+  "sharing": "shared",
+  "reference": "M01"
+}

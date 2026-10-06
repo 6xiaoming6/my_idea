@@ -1,0 +1,9 @@
+{
+  "name": "scale_teacher",
+  "method": "S04: F/M/C scale mode=teacher",
+  "module": {
+    "scale": "teacher",
+    "teacher": "scale"
+  },
+  "reference": "S01"
+}

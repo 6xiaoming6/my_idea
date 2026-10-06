@@ -1,0 +1,13 @@
+{
+  "source": "A",
+  "override": {
+    "model": {
+      "coe": {
+        "triscale": {
+          "recent_memory": true
+        }
+      }
+    }
+  },
+  "suffix": "memory"
+}

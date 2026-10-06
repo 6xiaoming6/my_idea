@@ -1,0 +1,15 @@
+{
+  "base_variant": "N3",
+  "name": "direction_pairs",
+  "override": {
+    "seed": 7,
+    "data": {
+      "loader_seed": 7
+    },
+    "model": {
+      "coe": {
+        "expert_pair_constraint": "cross_direction"
+      }
+    }
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "rate": 0.4,
+  "split": "test",
+  "evaluations": {
+    "unseen_combinations": {
+      "families": [
+        "node_plus_space",
+        "time_plus_space",
+        "node_plus_time"
+      ],
+      "seed": 20261101
+    },
+    "unseen_geometry": {
+      "families": [
+        "moving_region",
+        "multi_block"
+      ],
+      "seed": 20261102
+    },
+    "unseen_triple": {
+      "families": [
+        "node_plus_time_plus_space"
+      ],
+      "seed": 20261103
+    }
+  }
+}

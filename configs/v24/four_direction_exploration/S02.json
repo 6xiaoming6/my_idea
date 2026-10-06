@@ -1,0 +1,8 @@
+{
+  "name": "scale_free",
+  "method": "S02: F/M/C scale mode=free",
+  "module": {
+    "scale": "free"
+  },
+  "reference": "S01"
+}

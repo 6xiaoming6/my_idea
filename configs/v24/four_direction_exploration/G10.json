@@ -1,0 +1,6 @@
+{
+  "name": "g10_repeat",
+  "source": "$generalization",
+  "seed": 17,
+  "method": "G10: repeat $generalization, seed17"
+}

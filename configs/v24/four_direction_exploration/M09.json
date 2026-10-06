@@ -1,0 +1,9 @@
+{
+  "name": "round_router",
+  "method": "M09: memory=router, single F",
+  "module": {
+    "memory": "router"
+  },
+  "sharing": "shared",
+  "reference": "M01"
+}

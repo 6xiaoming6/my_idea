@@ -1,0 +1,537 @@
+[
+  {
+    "variant": "U01",
+    "status": "finished",
+    "method": "原生固定CMFF",
+    "reference": "U01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261005_114808_cmff_reference_seed7/random/rate0.4/20261005_114808_seed7_bs32",
+    "best_epoch": 100,
+    "val_mae": 14.809677306610032,
+    "training_seconds": 3085.3061206226703,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 14.061151195140587,
+        "rmse": 24.59639196993723
+      },
+      "unseen_combinations": {
+        "mae": 28.52129516850101,
+        "rmse": 52.90492848208498
+      },
+      "unseen_geometry": {
+        "mae": 27.417656130167586,
+        "rmse": 48.63753199468082
+      },
+      "unseen_triple": {
+        "mae": 24.83536456392333,
+        "rmse": 42.985217757775835
+      },
+      "unseen_combinations_repeat": {
+        "mae": 28.84270433292421,
+        "rmse": 53.27259676759005
+      },
+      "unseen_geometry_repeat": {
+        "mae": 26.983896340331608,
+        "rmse": 47.36843335862503
+      }
+    }
+  },
+  {
+    "variant": "U02",
+    "status": "finished",
+    "method": "CMFF＋RMS状态差分，幅度0.1",
+    "reference": "U01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261005_124024_cmff_delta010_seed7/random/rate0.4/20261005_124024_seed7_bs32",
+    "best_epoch": 100,
+    "val_mae": 14.22888319263741,
+    "training_seconds": 3278.741178084165,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 13.355547831523452,
+        "rmse": 23.686229588171138
+      },
+      "unseen_combinations": {
+        "mae": 19.39569004404437,
+        "rmse": 32.79446619100342
+      },
+      "unseen_geometry": {
+        "mae": 22.311931567193923,
+        "rmse": 37.82782685438692
+      },
+      "unseen_triple": {
+        "mae": 19.76828636322432,
+        "rmse": 32.35323064826833
+      },
+      "unseen_combinations_repeat": {
+        "mae": 19.63282189099414,
+        "rmse": 33.29980062285484
+      },
+      "unseen_geometry_repeat": {
+        "mae": 22.19222804742144,
+        "rmse": 37.46509116321104
+      }
+    }
+  },
+  {
+    "variant": "U03",
+    "status": "finished",
+    "method": "CMFF＋RMS状态差分，幅度0.25",
+    "reference": "U01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261005_133554_cmff_delta025_seed7/random/rate0.4/20261005_133554_seed7_bs32",
+    "best_epoch": 90,
+    "val_mae": 14.596152353161642,
+    "training_seconds": 3281.5710595136043,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 13.762041057597258,
+        "rmse": 24.353163375827155
+      },
+      "unseen_combinations": {
+        "mae": 21.70293263862609,
+        "rmse": 37.59284966116375
+      },
+      "unseen_geometry": {
+        "mae": 24.49035069843636,
+        "rmse": 41.37687806817574
+      },
+      "unseen_triple": {
+        "mae": 21.366032794421717,
+        "rmse": 35.36395135585613
+      },
+      "unseen_combinations_repeat": {
+        "mae": 21.726506610432516,
+        "rmse": 37.7487828159857
+      },
+      "unseen_geometry_repeat": {
+        "mae": 24.49116608943266,
+        "rmse": 41.238332844938796
+      }
+    }
+  },
+  {
+    "variant": "U04",
+    "status": "finished",
+    "method": "CMFF＋原始状态差分，幅度0.1",
+    "reference": "U01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261005_143128_cmff_raw_delta_seed7/random/rate0.4/20261005_143128_seed7_bs32",
+    "best_epoch": 95,
+    "val_mae": 14.685134047818767,
+    "training_seconds": 3183.64695003035,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 13.827534691595885,
+        "rmse": 24.442816800215088
+      },
+      "unseen_combinations": {
+        "mae": 16.39431460176609,
+        "rmse": 27.95369149425721
+      },
+      "unseen_geometry": {
+        "mae": 22.068240291820928,
+        "rmse": 38.2656855615843
+      },
+      "unseen_triple": {
+        "mae": 15.834405041288898,
+        "rmse": 26.54615809490223
+      },
+      "unseen_combinations_repeat": {
+        "mae": 16.496013721957866,
+        "rmse": 28.250755222559146
+      },
+      "unseen_geometry_repeat": {
+        "mae": 22.251035010309636,
+        "rmse": 38.80536692232548
+      }
+    }
+  },
+  {
+    "variant": "U05",
+    "status": "finished",
+    "method": "CMFF＋操作内变化输入，幅度0.1",
+    "reference": "U01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261005_152523_cmff_innovation_seed7/random/rate0.4/20261005_152523_seed7_bs32",
+    "best_epoch": 100,
+    "val_mae": 15.500889091157871,
+    "training_seconds": 3412.5458845206304,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 14.864600785848822,
+        "rmse": 25.85186377535477
+      },
+      "unseen_combinations": {
+        "mae": 18.371393565975186,
+        "rmse": 31.45996906572589
+      },
+      "unseen_geometry": {
+        "mae": 25.096003640747014,
+        "rmse": 42.74527947549332
+      },
+      "unseen_triple": {
+        "mae": 17.60543937532105,
+        "rmse": 29.69011763883886
+      },
+      "unseen_combinations_repeat": {
+        "mae": 18.337353557147605,
+        "rmse": 31.597864361300193
+      },
+      "unseen_geometry_repeat": {
+        "mae": 25.187851322554142,
+        "rmse": 42.76314327878705
+      }
+    }
+  },
+  {
+    "variant": "U06",
+    "status": "finished",
+    "method": "U05消息内容detach，门输入梯度保留",
+    "reference": "U01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261005_162311_cmff_innovation_detach_seed7/random/rate0.4/20261005_162311_seed7_bs32",
+    "best_epoch": 100,
+    "val_mae": 15.808100054731607,
+    "training_seconds": 3390.4212873884244,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 14.889976281725687,
+        "rmse": 25.613582001711183
+      },
+      "unseen_combinations": {
+        "mae": 18.01777665954177,
+        "rmse": 30.704191975902628
+      },
+      "unseen_geometry": {
+        "mae": 24.271890382614778,
+        "rmse": 40.92300248396857
+      },
+      "unseen_triple": {
+        "mae": 17.438818363379717,
+        "rmse": 29.26413993116063
+      },
+      "unseen_combinations_repeat": {
+        "mae": 18.220115513949303,
+        "rmse": 31.19419006438877
+      },
+      "unseen_geometry_repeat": {
+        "mae": 24.409303671611166,
+        "rmse": 41.41086509036809
+      }
+    }
+  },
+  {
+    "variant": "U07",
+    "status": "finished",
+    "method": "操作内变化只修正专家Router，幅度0.1",
+    "reference": "U01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261005_172035_cmff_innovation_router_seed7/random/rate0.4/20261005_172035_seed7_bs32",
+    "best_epoch": 100,
+    "val_mae": 14.856707001481324,
+    "training_seconds": 3447.7043886715546,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 14.01691972964009,
+        "rmse": 24.528001999029634
+      },
+      "unseen_combinations": {
+        "mae": 22.324813025464007,
+        "rmse": 39.12873129185599
+      },
+      "unseen_geometry": {
+        "mae": 26.157138207735176,
+        "rmse": 44.11313770620919
+      },
+      "unseen_triple": {
+        "mae": 21.532609884298996,
+        "rmse": 35.966251068240965
+      },
+      "unseen_combinations_repeat": {
+        "mae": 22.200639959042046,
+        "rmse": 38.93029924645329
+      },
+      "unseen_geometry_repeat": {
+        "mae": 26.306775814734504,
+        "rmse": 44.35627325557362
+      }
+    }
+  },
+  {
+    "variant": "U08",
+    "status": "pending",
+    "method": "前两轮自由Top1，后两轮F，从头训练",
+    "reference": "U01",
+    "seed": 7,
+    "run_dir": null,
+    "best_epoch": null,
+    "val_mae": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "U09",
+    "status": "pending",
+    "method": "前20epoch CMFF，之后四轮自由Top1直通",
+    "reference": "U01",
+    "seed": 7,
+    "run_dir": null,
+    "best_epoch": null,
+    "val_mae": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "U10",
+    "status": "pending",
+    "method": "前20epoch CMFF，之后前两轮自由Top1直通、后两轮F",
+    "reference": "U01",
+    "seed": 7,
+    "run_dir": null,
+    "best_epoch": null,
+    "val_mae": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "U11",
+    "status": "pending",
+    "method": "前20epoch CMFF，之后四轮自由Top1、尺度头仅教师监督",
+    "reference": "U01",
+    "seed": 7,
+    "run_dir": null,
+    "best_epoch": null,
+    "val_mae": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "U12",
+    "status": "pending",
+    "method": "前20epoch CMFF，之后前两轮尺度头仅教师、后两轮F",
+    "reference": "U01",
+    "seed": 7,
+    "run_dir": null,
+    "best_epoch": null,
+    "val_mae": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "U13",
+    "status": "pending",
+    "method": "前20epoch CMFF，之后三选二尺度softmax融合",
+    "reference": "U14",
+    "seed": 7,
+    "run_dir": null,
+    "best_epoch": null,
+    "val_mae": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "U14",
+    "status": "pending",
+    "method": "前20epoch CMFF，之后固定CM/MF/CF/MF等权",
+    "reference": "U01",
+    "seed": 7,
+    "run_dir": null,
+    "best_epoch": null,
+    "val_mae": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "U15",
+    "status": "pending",
+    "method": "前20epoch CMFF，之后单调升分辨率Top1教师、末轮F",
+    "reference": "U01",
+    "seed": 7,
+    "run_dir": null,
+    "best_epoch": null,
+    "val_mae": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "U16",
+    "status": "pending",
+    "method": "U12＋第21epoch启用零初始化尺度身份向量",
+    "reference": "U01",
+    "seed": 7,
+    "run_dir": null,
+    "best_epoch": null,
+    "val_mae": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "U18",
+    "status": "pending",
+    "method": "固定CMFF，原生Top2执行后响应融合修正±0.1",
+    "reference": "U01",
+    "seed": 7,
+    "run_dir": null,
+    "best_epoch": null,
+    "val_mae": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "U17",
+    "status": "awaiting_selection",
+    "method": "第一通信候选＋第一Top1尺度候选",
+    "reference": "U01",
+    "seed": 7,
+    "run_dir": null,
+    "best_epoch": null,
+    "val_mae": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "U29",
+    "status": "awaiting_selection",
+    "method": "U01复验，seed17",
+    "reference": "U29",
+    "seed": 17,
+    "run_dir": null,
+    "best_epoch": null,
+    "val_mae": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "U30",
+    "status": "awaiting_selection",
+    "method": "U01复验，seed27",
+    "reference": "U30",
+    "seed": 27,
+    "run_dir": null,
+    "best_epoch": null,
+    "val_mae": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "U19",
+    "status": "awaiting_selection",
+    "method": "$memory0复验，seed17",
+    "reference": "U29",
+    "seed": 17,
+    "run_dir": null,
+    "best_epoch": null,
+    "val_mae": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "U20",
+    "status": "awaiting_selection",
+    "method": "$memory0复验，seed27",
+    "reference": "U30",
+    "seed": 27,
+    "run_dir": null,
+    "best_epoch": null,
+    "val_mae": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "U21",
+    "status": "awaiting_selection",
+    "method": "$memory1复验，seed17",
+    "reference": "U29",
+    "seed": 17,
+    "run_dir": null,
+    "best_epoch": null,
+    "val_mae": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "U22",
+    "status": "awaiting_selection",
+    "method": "$memory1复验，seed27",
+    "reference": "U30",
+    "seed": 27,
+    "run_dir": null,
+    "best_epoch": null,
+    "val_mae": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "U23",
+    "status": "awaiting_selection",
+    "method": "$scale0复验，seed17",
+    "reference": "U29",
+    "seed": 17,
+    "run_dir": null,
+    "best_epoch": null,
+    "val_mae": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "U24",
+    "status": "awaiting_selection",
+    "method": "$scale0复验，seed27",
+    "reference": "U30",
+    "seed": 27,
+    "run_dir": null,
+    "best_epoch": null,
+    "val_mae": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "U25",
+    "status": "awaiting_selection",
+    "method": "$scale1复验，seed17",
+    "reference": "U29",
+    "seed": 17,
+    "run_dir": null,
+    "best_epoch": null,
+    "val_mae": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "U26",
+    "status": "awaiting_selection",
+    "method": "$scale1复验，seed27",
+    "reference": "U30",
+    "seed": 27,
+    "run_dir": null,
+    "best_epoch": null,
+    "val_mae": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "U27",
+    "status": "awaiting_selection",
+    "method": "U17复验，seed17",
+    "reference": "U29",
+    "seed": 17,
+    "run_dir": null,
+    "best_epoch": null,
+    "val_mae": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "U28",
+    "status": "awaiting_selection",
+    "method": "U17复验，seed27",
+    "reference": "U30",
+    "seed": 27,
+    "run_dir": null,
+    "best_epoch": null,
+    "val_mae": null,
+    "training_seconds": null,
+    "evaluations": {}
+  }
+]

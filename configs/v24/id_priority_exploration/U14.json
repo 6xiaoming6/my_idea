@@ -1,0 +1,10 @@
+{
+  "name": "scale_warm_fixed2",
+  "method": "前20epoch CMFF，之后固定CM/MF/CF/MF等权",
+  "module": {
+    "scale_policy": "fixed2",
+    "fixed_epochs": 20
+  },
+  "seed": 7,
+  "reference": "U01"
+}

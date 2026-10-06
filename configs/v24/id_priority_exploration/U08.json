@@ -1,0 +1,10 @@
+{
+  "name": "scale_two_free",
+  "method": "前两轮自由Top1，后两轮F，从头训练",
+  "module": {
+    "scale_policy": "st",
+    "constraint": "last_two_fine"
+  },
+  "seed": 7,
+  "reference": "U01"
+}

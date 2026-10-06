@@ -1,0 +1,8 @@
+{
+  "name": "scale_bank",
+  "method": "S06: F/M/C scale mode=bank",
+  "module": {
+    "scale": "bank"
+  },
+  "reference": "S01"
+}

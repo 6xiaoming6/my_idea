@@ -34,6 +34,15 @@ def build_model_backbone(cfg: dict) -> nn.Module:
         raise ValueError(
             f"Unknown model architecture {architecture!r}; supported: {supported}"
         ) from error
+    if architecture == "v24_ts_coe" and cfg["model"].get("coe", {}).get("id_priority", {}).get("enabled", False):
+        from .id_priority_coe import IDPriorityCoE
+        return IDPriorityCoE.from_config(cfg)
+    if architecture == "v24_ts_coe" and cfg["model"].get("coe", {}).get("four_direction", {}).get("enabled", False):
+        from .four_direction_coe import FourDirectionCoE
+        return FourDirectionCoE.from_config(cfg)
+    if architecture == "v24_ts_coe" and cfg["model"].get("coe", {}).get("triscale", {}).get("enabled", False):
+        from .triscale_coe import TriScaleCoE
+        return TriScaleCoE.from_config(cfg)
     if architecture == "v24_ts_coe" and cfg["model"].get("coe", {}).get("local_routing", {}).get("enabled", False):
         from .local_support_coe import LocalSupportCoE
         builder = LocalSupportCoE.from_config
@@ -47,4 +56,11 @@ def build_model_backbone(cfg: dict) -> nn.Module:
             raise ValueError("Round-memory baseline cannot combine local routing or spatial scales")
         from .round_memory_coe import RoundMemoryCoE
         builder = RoundMemoryCoE.from_config
+    constraint=cfg.get('model',{}).get('coe',{}).get('expert_pair_constraint','none')
+    if architecture == 'v24_ts_coe' and constraint != 'none':
+        if constraint != 'cross_direction' or any(cfg['model']['coe'].get(k,{}).get('enabled',False)
+                                                for k in ('local_routing','spatial_scale','round_memory')):
+            raise ValueError('Direction constraint is a standalone baseline experiment')
+        from .direction_pair_coe import DirectionPairCoE
+        builder=DirectionPairCoE.from_config
     return builder(cfg)

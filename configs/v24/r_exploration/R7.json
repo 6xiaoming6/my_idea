@@ -1,0 +1,17 @@
+{
+  "base_variant": "N6",
+  "name": "scale_free",
+  "override": {
+    "seed": 7,
+    "data": {
+      "loader_seed": 7
+    },
+    "model": {
+      "coe": {
+        "spatial_scale": {
+          "mode": "free"
+        }
+      }
+    }
+  }
+}

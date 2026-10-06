@@ -1,0 +1,19 @@
+{
+  "base_variant": "N5",
+  "name": "scale_early_paths",
+  "override": {
+    "seed": 7,
+    "data": {
+      "loader_seed": 7
+    },
+    "model": {
+      "coe": {
+        "spatial_scale": {
+          "mode": "perturb",
+          "perturb_epochs": 8,
+          "perturb_seed": 20260930
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "round_none",
+  "method": "M01: memory=none, single F",
+  "module": {
+    "memory": "none"
+  },
+  "sharing": "shared",
+  "reference": "M01"
+}

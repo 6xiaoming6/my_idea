@@ -1,0 +1,10 @@
+{
+  "name": "scale_teacher_free",
+  "method": "前20epoch CMFF，之后四轮自由Top1、尺度头仅教师监督",
+  "module": {
+    "scale_policy": "teacher",
+    "fixed_epochs": 20
+  },
+  "seed": 7,
+  "reference": "U01"
+}

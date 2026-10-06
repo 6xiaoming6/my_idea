@@ -1,0 +1,9 @@
+{
+  "name": "round_anchor",
+  "method": "M04: memory=anchor, single F",
+  "module": {
+    "memory": "anchor"
+  },
+  "sharing": "shared",
+  "reference": "M01"
+}
