@@ -13,6 +13,8 @@ from run_b3_c3 import digest,load,write
 def evaluate_sets(checkpoint,protocol,npz,output,expected_sha=None,device='cuda'):
     saved=torch.load(checkpoint,map_location='cpu',weights_only=False);cfg=saved['config'];sha=digest(cfg)
     if expected_sha and sha!=expected_sha:raise ValueError('Saved config differs from frozen job')
+    from stmoe_imputer.utils.deterministic import configure
+    configure(cfg)
     model=DualBranchSTImputer.from_config(cfg);model.load_state_dict(saved['model']);model.to(device).eval()
     split=protocol.get('split','test')
     if split not in ('val','test'):raise ValueError('Unknown evaluation split')

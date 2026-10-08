@@ -198,6 +198,8 @@ class IDPriorityCoE(FourDirectionCoE):
                 update = a * within[:, 0, None, None, None, None].to(a.dtype) + b * within[:, 1, None, None, None, None].to(b.dtype)
             else:
                 update = TemporalSpatialCoE._dispatch_weighted(self, z, w, step)
+            if hasattr(self, '_record_native_scale'):
+                self._record_native_scale(c, update, sid, step, selected)
             if innovation is not None:
                 change = update - z
                 if factor > 1:

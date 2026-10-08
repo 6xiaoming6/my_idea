@@ -1,0 +1,782 @@
+[
+  {
+    "variant": "W01",
+    "method": "CMFF＋±0.1差分，严格确定性基准",
+    "reference": "W01",
+    "status": "finished",
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261006_223952_cmff_replay_seed7/random/rate0.4/20261006_223952_seed7_bs32",
+    "best_epoch": 100,
+    "val_mae": 14.341614612149227,
+    "training_seconds": 4718.713295637863,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 13.51282794961301,
+        "rmse": 24.148973123681294
+      },
+      "unseen_combinations": {
+        "mae": 22.128486947844618,
+        "rmse": 38.2790630217423
+      },
+      "unseen_geometry": {
+        "mae": 25.97744488698252,
+        "rmse": 44.29221365879767
+      },
+      "unseen_triple": {
+        "mae": 22.33873289341723,
+        "rmse": 37.11130000540129
+      },
+      "unseen_combinations_repeat": {
+        "mae": 22.312937781752307,
+        "rmse": 38.4998018505619
+      },
+      "unseen_geometry_repeat": {
+        "mae": 25.88692628827263,
+        "rmse": 43.95711047847427
+      }
+    }
+  },
+  {
+    "variant": "W02",
+    "method": "W01同seed完整重放，非独立训练种子",
+    "reference": "W01",
+    "status": "finished",
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261006_235916_cmff_replay_repeat_seed7/random/rate0.4/20261006_235916_seed7_bs32",
+    "best_epoch": 100,
+    "val_mae": 14.341614612149227,
+    "training_seconds": 4719.3070329426555,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 13.51282794961301,
+        "rmse": 24.148973123681294
+      },
+      "unseen_combinations": {
+        "mae": 22.128486947844618,
+        "rmse": 38.2790630217423
+      },
+      "unseen_geometry": {
+        "mae": 25.97744488698252,
+        "rmse": 44.29221365879767
+      },
+      "unseen_triple": {
+        "mae": 22.33873289341723,
+        "rmse": 37.11130000540129
+      },
+      "unseen_combinations_repeat": {
+        "mae": 22.312937781752307,
+        "rmse": 38.4998018505619
+      },
+      "unseen_geometry_repeat": {
+        "mae": 25.88692628827263,
+        "rmse": 43.95711047847427
+      }
+    }
+  },
+  {
+    "variant": "W03",
+    "method": "零初始化尺度身份向量",
+    "reference": "W01",
+    "status": "finished",
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261007_011840_scale_id_seed7/random/rate0.4/20261007_011840_seed7_bs32",
+    "best_epoch": 95,
+    "val_mae": 13.926932412414557,
+    "training_seconds": 4097.458223654772,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 13.217991004430337,
+        "rmse": 23.45520674774566
+      },
+      "unseen_combinations": {
+        "mae": 26.297056421326626,
+        "rmse": 48.19935589856323
+      },
+      "unseen_geometry": {
+        "mae": 28.148175921356124,
+        "rmse": 48.513680330729784
+      },
+      "unseen_triple": {
+        "mae": 27.33293287874057,
+        "rmse": 46.725090954153444
+      },
+      "unseen_combinations_repeat": {
+        "mae": 26.340933205368206,
+        "rmse": 48.32350741930495
+      },
+      "unseen_geometry_repeat": {
+        "mae": 28.26299096665952,
+        "rmse": 48.64382318562021
+      }
+    }
+  },
+  {
+    "variant": "W04",
+    "method": "零初始化轮次身份向量",
+    "reference": "W03",
+    "status": "finished",
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261007_022741_round_id_seed7/random/rate0.4/20261007_022741_seed7_bs32",
+    "best_epoch": 95,
+    "val_mae": 14.176322928378934,
+    "training_seconds": 4722.769667064305,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 13.283619426286474,
+        "rmse": 23.358320958555232
+      },
+      "unseen_combinations": {
+        "mae": 22.991273610357695,
+        "rmse": 40.38977203745322
+      },
+      "unseen_geometry": {
+        "mae": 26.40551988111905,
+        "rmse": 45.92462335330873
+      },
+      "unseen_triple": {
+        "mae": 22.801152252723455,
+        "rmse": 37.69710353472078
+      },
+      "unseen_combinations_repeat": {
+        "mae": 23.063339977999398,
+        "rmse": 40.5106195206946
+      },
+      "unseen_geometry_repeat": {
+        "mae": 26.25054385479603,
+        "rmse": 45.54869131229061
+      }
+    }
+  },
+  {
+    "variant": "W05",
+    "method": "尺度独立零初始化通道仿射",
+    "reference": "W01",
+    "status": "finished",
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261007_034709_scale_affine_seed7/random/rate0.4/20261007_034709_seed7_bs32",
+    "best_epoch": 100,
+    "val_mae": 14.236809087826382,
+    "training_seconds": 4782.432294018799,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 13.402826525113635,
+        "rmse": 23.91690573930429
+      },
+      "unseen_combinations": {
+        "mae": 26.4770935329527,
+        "rmse": 49.5377446687897
+      },
+      "unseen_geometry": {
+        "mae": 27.166423641437678,
+        "rmse": 49.400682707564954
+      },
+      "unseen_triple": {
+        "mae": 24.58274285556008,
+        "rmse": 42.53194508880342
+      },
+      "unseen_combinations_repeat": {
+        "mae": 26.268198339235173,
+        "rmse": 48.75595378832669
+      },
+      "unseen_geometry_repeat": {
+        "mae": 27.356386474054688,
+        "rmse": 49.636365550329344
+      }
+    }
+  },
+  {
+    "variant": "W06",
+    "method": "轮次独立零初始化通道仿射",
+    "reference": "W05",
+    "status": "finished",
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261007_050736_round_affine_seed7/random/rate0.4/20261007_050736_seed7_bs32",
+    "best_epoch": 95,
+    "val_mae": 14.558160214881047,
+    "training_seconds": 4752.188344354508,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 13.946563125466739,
+        "rmse": 24.2795302633204
+      },
+      "unseen_combinations": {
+        "mae": 16.36608177957383,
+        "rmse": 27.86466719297691
+      },
+      "unseen_geometry": {
+        "mae": 20.658592662964885,
+        "rmse": 34.4971177895552
+      },
+      "unseen_triple": {
+        "mae": 16.198890014619106,
+        "rmse": 27.094036375581727
+      },
+      "unseen_combinations_repeat": {
+        "mae": 16.466532326962895,
+        "rmse": 28.10544946287237
+      },
+      "unseen_geometry_repeat": {
+        "mae": 20.438617260759646,
+        "rmse": 34.33717114976903
+      }
+    }
+  },
+  {
+    "variant": "W07",
+    "method": "跨尺度/轮共享rank8残差适配",
+    "reference": "W01",
+    "status": "finished",
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261007_062734_shared_rank_seed7/random/rate0.4/20261007_062734_seed7_bs32",
+    "best_epoch": 100,
+    "val_mae": 15.638923096143207,
+    "training_seconds": 4677.975707926787,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 14.568008675776747,
+        "rmse": 25.282213790019302
+      },
+      "unseen_combinations": {
+        "mae": 26.49882378978706,
+        "rmse": 45.756848801278565
+      },
+      "unseen_geometry": {
+        "mae": 30.279188324932623,
+        "rmse": 52.806988922991565
+      },
+      "unseen_triple": {
+        "mae": 27.491931407117605,
+        "rmse": 44.82199740038958
+      },
+      "unseen_combinations_repeat": {
+        "mae": 26.69551388814946,
+        "rmse": 46.29395722145197
+      },
+      "unseen_geometry_repeat": {
+        "mae": 29.98200679227202,
+        "rmse": 51.99946263333535
+      }
+    }
+  },
+  {
+    "variant": "W08",
+    "method": "三尺度独立rank8适配",
+    "reference": "W07",
+    "status": "finished",
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261007_074617_scale_rank_seed7/random/rate0.4/20261007_074617_seed7_bs32",
+    "best_epoch": 85,
+    "val_mae": 14.635596068842842,
+    "training_seconds": 4743.111830785056,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 14.015519345133177,
+        "rmse": 24.78336162928377
+      },
+      "unseen_combinations": {
+        "mae": 15.804709436301136,
+        "rmse": 26.942535825291543
+      },
+      "unseen_geometry": {
+        "mae": 21.067203078213648,
+        "rmse": 35.644858899853105
+      },
+      "unseen_triple": {
+        "mae": 15.417545295303038,
+        "rmse": 25.87604211286369
+      },
+      "unseen_combinations_repeat": {
+        "mae": 15.949514662990786,
+        "rmse": 27.474114669131826
+      },
+      "unseen_geometry_repeat": {
+        "mae": 20.954768035025417,
+        "rmse": 35.616589067676195
+      }
+    }
+  },
+  {
+    "variant": "W09",
+    "method": "四轮独立rank8适配",
+    "reference": "W08",
+    "status": "finished",
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261007_090604_round_rank_seed7/random/rate0.4/20261007_090604_seed7_bs32",
+    "best_epoch": 95,
+    "val_mae": 13.961888285056487,
+    "training_seconds": 4776.424261817359,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 12.977811362828625,
+        "rmse": 22.843521843634267
+      },
+      "unseen_combinations": {
+        "mae": 27.36485335570325,
+        "rmse": 51.60160685957686
+      },
+      "unseen_geometry": {
+        "mae": 25.960625578253218,
+        "rmse": 45.380185684433606
+      },
+      "unseen_triple": {
+        "mae": 28.279691306309093,
+        "rmse": 47.980303681947696
+      },
+      "unseen_combinations_repeat": {
+        "mae": 27.25509867356086,
+        "rmse": 51.278770789854896
+      },
+      "unseen_geometry_repeat": {
+        "mae": 25.96985822274278,
+        "rmse": 45.50934436275859
+      }
+    }
+  },
+  {
+    "variant": "W10",
+    "method": "尺度rank8＋局部覆盖率调制，初始倍率1",
+    "reference": "W08",
+    "status": "finished",
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261007_102626_coverage_rank_seed7/random/rate0.4/20261007_102626_seed7_bs32",
+    "best_epoch": 95,
+    "val_mae": 13.724461458835288,
+    "training_seconds": 4808.770965550444,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 12.819967515298979,
+        "rmse": 22.955046608946244
+      },
+      "unseen_combinations": {
+        "mae": 26.7275308425698,
+        "rmse": 49.913045052100735
+      },
+      "unseen_geometry": {
+        "mae": 26.46225123870293,
+        "rmse": 47.73517840552224
+      },
+      "unseen_triple": {
+        "mae": 29.33915308476059,
+        "rmse": 49.41851485388294
+      },
+      "unseen_combinations_repeat": {
+        "mae": 26.709311441607756,
+        "rmse": 49.74725536261809
+      },
+      "unseen_geometry_repeat": {
+        "mae": 26.527679650594763,
+        "rmse": 47.93869829912499
+      }
+    }
+  },
+  {
+    "variant": "W11",
+    "method": "四轮可见重建L1平均×0.02",
+    "reference": "W01",
+    "status": "finished",
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261007_114721_visible_supervision_seed7/random/rate0.4/20261007_114721_seed7_bs32",
+    "best_epoch": 90,
+    "val_mae": 16.409983089718192,
+    "training_seconds": 4757.365364204394,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 15.731189728568118,
+        "rmse": 26.975955612558185
+      },
+      "unseen_combinations": {
+        "mae": 18.440304258317852,
+        "rmse": 30.85100119409438
+      },
+      "unseen_geometry": {
+        "mae": 22.810318348631114,
+        "rmse": 37.50981731141823
+      },
+      "unseen_triple": {
+        "mae": 18.22953751163701,
+        "rmse": 30.270692314691466
+      },
+      "unseen_combinations_repeat": {
+        "mae": 18.66799041988198,
+        "rmse": 31.441043126302613
+      },
+      "unseen_geometry_repeat": {
+        "mae": 22.600480696594584,
+        "rmse": 37.285266379161385
+      }
+    }
+  },
+  {
+    "variant": "W12",
+    "method": "观测残差不扩散，detach，修正专家输入",
+    "reference": "W01",
+    "status": "finished",
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261007_130722_residual_point_seed7/random/rate0.4/20261007_130722_seed7_bs32",
+    "best_epoch": 95,
+    "val_mae": 14.877130665762405,
+    "training_seconds": 4788.741374287638,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 14.244701725658688,
+        "rmse": 25.12539407395227
+      },
+      "unseen_combinations": {
+        "mae": 16.07696688830342,
+        "rmse": 27.588564645651946
+      },
+      "unseen_geometry": {
+        "mae": 24.21753471497782,
+        "rmse": 41.529205984161116
+      },
+      "unseen_triple": {
+        "mae": 15.492261578014363,
+        "rmse": 26.34394663699609
+      },
+      "unseen_combinations_repeat": {
+        "mae": 16.28918470882657,
+        "rmse": 28.29360405220052
+      },
+      "unseen_geometry_repeat": {
+        "mae": 23.96164889759576,
+        "rmse": 40.89737777938518
+      }
+    }
+  },
+  {
+    "variant": "W13",
+    "method": "观测残差3×3×3归一化传播，修正专家输入",
+    "reference": "W12",
+    "status": "finished",
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261007_142757_residual_local_seed7/random/rate0.4/20261007_142757_seed7_bs32",
+    "best_epoch": 75,
+    "val_mae": 14.062218459424248,
+    "training_seconds": 4838.870296686888,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 13.219331238911568,
+        "rmse": 23.53540639922316
+      },
+      "unseen_combinations": {
+        "mae": 26.780339264670545,
+        "rmse": 49.51943836225622
+      },
+      "unseen_geometry": {
+        "mae": 26.485278599343005,
+        "rmse": 48.37906816757953
+      },
+      "unseen_triple": {
+        "mae": 28.01203872839689,
+        "rmse": 48.53661521158604
+      },
+      "unseen_combinations_repeat": {
+        "mae": 26.866319367004277,
+        "rmse": 49.5558347207426
+      },
+      "unseen_geometry_repeat": {
+        "mae": 27.0291069962704,
+        "rmse": 49.35032952512144
+      }
+    }
+  },
+  {
+    "variant": "W14",
+    "method": "传播残差仅修正含缺失位置",
+    "reference": "W13",
+    "status": "finished",
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261007_154922_residual_missing_seed7/random/rate0.4/20261007_154922_seed7_bs32",
+    "best_epoch": 95,
+    "val_mae": 15.869516800223685,
+    "training_seconds": 4817.031407513889,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 14.981765823454166,
+        "rmse": 25.73766202475011
+      },
+      "unseen_combinations": {
+        "mae": 17.061366201018444,
+        "rmse": 28.81537319234755
+      },
+      "unseen_geometry": {
+        "mae": 23.171106476292156,
+        "rmse": 38.33547956693856
+      },
+      "unseen_triple": {
+        "mae": 16.738687523471864,
+        "rmse": 27.80655310382516
+      },
+      "unseen_combinations_repeat": {
+        "mae": 17.095349710999294,
+        "rmse": 28.94301538149739
+      },
+      "unseen_geometry_repeat": {
+        "mae": 23.056145995358147,
+        "rmse": 38.2852371726295
+      }
+    }
+  },
+  {
+    "variant": "W15",
+    "method": "W14保留残差内容梯度",
+    "reference": "W14",
+    "status": "finished",
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261007_171025_residual_missing_grad_seed7/random/rate0.4/20261007_171025_seed7_bs32",
+    "best_epoch": 95,
+    "val_mae": 14.676064291790853,
+    "training_seconds": 4664.181777504506,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 13.700728077458233,
+        "rmse": 24.048458229601618
+      },
+      "unseen_combinations": {
+        "mae": 26.648113131869792,
+        "rmse": 48.434155878440386
+      },
+      "unseen_geometry": {
+        "mae": 32.14433238102912,
+        "rmse": 57.86794064872642
+      },
+      "unseen_triple": {
+        "mae": 25.850312661425278,
+        "rmse": 45.338903331044506
+      },
+      "unseen_combinations_repeat": {
+        "mae": 26.307618445684128,
+        "rmse": 47.555495103084915
+      },
+      "unseen_geometry_repeat": {
+        "mae": 31.97051203558083,
+        "rmse": 57.39768884374081
+      }
+    }
+  },
+  {
+    "variant": "W16",
+    "method": "传播残差只修正Router logits",
+    "reference": "W01",
+    "status": "finished",
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261007_182855_residual_router_seed7/random/rate0.4/20261007_182855_seed7_bs32",
+    "best_epoch": 80,
+    "val_mae": 14.978824742850684,
+    "training_seconds": 4772.183836647891,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 14.265944509634076,
+        "rmse": 24.980225215744767
+      },
+      "unseen_combinations": {
+        "mae": 18.499546066727003,
+        "rmse": 32.3345699753007
+      },
+      "unseen_geometry": {
+        "mae": 21.852838332990398,
+        "rmse": 36.86393261870735
+      },
+      "unseen_triple": {
+        "mae": 17.24319502079913,
+        "rmse": 29.70405652815912
+      },
+      "unseen_combinations_repeat": {
+        "mae": 18.710697558638294,
+        "rmse": 32.894043731550575
+      },
+      "unseen_geometry_repeat": {
+        "mae": 21.41453532992269,
+        "rmse": 35.94505166388674
+      }
+    }
+  },
+  {
+    "variant": "W17",
+    "method": "传播残差同时修正专家输入和Router",
+    "reference": "W14",
+    "status": "finished",
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261007_194912_residual_both_seed7/random/rate0.4/20261007_194912_seed7_bs32",
+    "best_epoch": 90,
+    "val_mae": 14.717813055867882,
+    "training_seconds": 4880.759069719585,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 14.156641993630041,
+        "rmse": 24.82859645461739
+      },
+      "unseen_combinations": {
+        "mae": 15.54283652628633,
+        "rmse": 26.48269325258476
+      },
+      "unseen_geometry": {
+        "mae": 22.625997860013438,
+        "rmse": 38.44130739787352
+      },
+      "unseen_triple": {
+        "mae": 15.264098083256952,
+        "rmse": 25.591525007817417
+      },
+      "unseen_combinations_repeat": {
+        "mae": 15.737957071848008,
+        "rmse": 27.097324528392637
+      },
+      "unseen_geometry_repeat": {
+        "mae": 22.21783912977477,
+        "rmse": 37.30862228217118
+      }
+    }
+  },
+  {
+    "variant": "W18",
+    "method": "W14＋逐轮可见重建监督",
+    "reference": "W14",
+    "status": "finished",
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261007_211120_residual_missing_supervised_seed7/random/rate0.4/20261007_211120_seed7_bs32",
+    "best_epoch": 100,
+    "val_mae": 16.861260135758183,
+    "training_seconds": 4104.593462261953,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 15.802603344551866,
+        "rmse": 27.212501694390838
+      },
+      "unseen_combinations": {
+        "mae": 28.35464600830814,
+        "rmse": 49.95791335576291
+      },
+      "unseen_geometry": {
+        "mae": 29.507197049271852,
+        "rmse": 50.42781329629161
+      },
+      "unseen_triple": {
+        "mae": 26.230714526728068,
+        "rmse": 44.35823497807445
+      },
+      "unseen_combinations_repeat": {
+        "mae": 28.313834676775336,
+        "rmse": 49.87426129052979
+      },
+      "unseen_geometry_repeat": {
+        "mae": 29.148186713018053,
+        "rmse": 49.802929874009195
+      }
+    }
+  },
+  {
+    "variant": "W19",
+    "method": "前8窗口增加rate0.5嵌套视图，补全L1×0.25",
+    "reference": "W01",
+    "status": "pending",
+    "run_dir": null,
+    "best_epoch": null,
+    "val_mae": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "W20",
+    "method": "增强＋共同缺失预测一致性×0.05",
+    "reference": "W19",
+    "status": "pending",
+    "run_dir": null,
+    "best_epoch": null,
+    "val_mae": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "W21",
+    "method": "一致性教师改为0.99 EMA，评估学生",
+    "reference": "W20",
+    "status": "pending",
+    "run_dir": null,
+    "best_epoch": null,
+    "val_mae": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "W22",
+    "method": "一致性按教师可见误差启发式加权",
+    "reference": "W20",
+    "status": "pending",
+    "run_dir": null,
+    "best_epoch": null,
+    "val_mae": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "W23",
+    "method": "最终F的C/M区域均值监督，各0.025，区域等权",
+    "reference": "W01",
+    "status": "pending",
+    "run_dir": null,
+    "best_epoch": null,
+    "val_mae": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "W24",
+    "method": "区域均值监督改按有效缺失数量加权",
+    "reference": "W23",
+    "status": "pending",
+    "run_dir": null,
+    "best_epoch": null,
+    "val_mae": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "W25",
+    "method": "最终补全的相邻时间差分L1×0.05",
+    "reference": "W01",
+    "status": "pending",
+    "run_dir": null,
+    "best_epoch": null,
+    "val_mae": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "W26",
+    "method": "最终补全的空间邻接差分L1×0.05",
+    "reference": "W01",
+    "status": "pending",
+    "run_dir": null,
+    "best_epoch": null,
+    "val_mae": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "W27",
+    "method": "A+B，仅ID验证冻结候选，从头训练",
+    "reference": "W01",
+    "status": "awaiting_selection",
+    "run_dir": null,
+    "best_epoch": null,
+    "val_mae": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "W28",
+    "method": "A+C，仅ID验证冻结候选，从头训练",
+    "reference": "W01",
+    "status": "awaiting_selection",
+    "run_dir": null,
+    "best_epoch": null,
+    "val_mae": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "W29",
+    "method": "B+C，仅ID验证冻结候选，从头训练",
+    "reference": "W01",
+    "status": "awaiting_selection",
+    "run_dir": null,
+    "best_epoch": null,
+    "val_mae": null,
+    "training_seconds": null,
+    "evaluations": {}
+  },
+  {
+    "variant": "W30",
+    "method": "A+B+C，仅ID验证冻结候选，从头训练",
+    "reference": "W01",
+    "status": "awaiting_selection",
+    "run_dir": null,
+    "best_epoch": null,
+    "val_mae": null,
+    "training_seconds": null,
+    "evaluations": {}
+  }
+]

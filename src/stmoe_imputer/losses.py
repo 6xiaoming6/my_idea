@@ -143,6 +143,18 @@ def compute_coe_loss(outputs: dict, batch: dict, cfg: dict) -> tuple[torch.Tenso
     }
     logs.update({f"l_coe_balance_step{step}": value.detach()
                  for step, value in enumerate(balance_steps, start=1)})
+    if "w_spec" in outputs:
+        from .backbone_training import structural_loss
+        extra, extra_logs = structural_loss(outputs, batch)
+        total = total + extra
+        logs.update(extra_logs)
+        logs["loss"] = total.detach()
+    if "coordination" in outputs:
+        from .coordination import auxiliary_loss
+        auxiliary, coordination_logs = auxiliary_loss(outputs, batch)
+        total = total + auxiliary
+        logs.update(coordination_logs)
+        logs["loss"] = total.detach()
     return total, logs
 
 

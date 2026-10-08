@@ -1,0 +1,452 @@
+{
+  "W01": {
+    "best": {
+      "epoch": 100,
+      "config_match": true,
+      "model_finite": true
+    },
+    "last": {
+      "epoch": 100,
+      "config_match": true,
+      "model_finite": true,
+      "audit_model_match": true,
+      "optimizer_match": true,
+      "ema_saved": false
+    }
+  },
+  "W02": {
+    "best": {
+      "epoch": 100,
+      "config_match": true,
+      "model_finite": true
+    },
+    "last": {
+      "epoch": 100,
+      "config_match": true,
+      "model_finite": true,
+      "audit_model_match": true,
+      "optimizer_match": true,
+      "ema_saved": false
+    }
+  },
+  "W03": {
+    "best": {
+      "epoch": 95,
+      "config_match": true,
+      "model_finite": true
+    },
+    "last": {
+      "epoch": 100,
+      "config_match": true,
+      "model_finite": true,
+      "audit_model_match": true,
+      "optimizer_match": true,
+      "ema_saved": false
+    }
+  },
+  "W04": {
+    "best": {
+      "epoch": 95,
+      "config_match": true,
+      "model_finite": true
+    },
+    "last": {
+      "epoch": 100,
+      "config_match": true,
+      "model_finite": true,
+      "audit_model_match": true,
+      "optimizer_match": true,
+      "ema_saved": false
+    }
+  },
+  "W05": {
+    "best": {
+      "epoch": 100,
+      "config_match": true,
+      "model_finite": true
+    },
+    "last": {
+      "epoch": 100,
+      "config_match": true,
+      "model_finite": true,
+      "audit_model_match": true,
+      "optimizer_match": true,
+      "ema_saved": false
+    }
+  },
+  "W06": {
+    "best": {
+      "epoch": 95,
+      "config_match": true,
+      "model_finite": true
+    },
+    "last": {
+      "epoch": 100,
+      "config_match": true,
+      "model_finite": true,
+      "audit_model_match": true,
+      "optimizer_match": true,
+      "ema_saved": false
+    }
+  },
+  "W07": {
+    "best": {
+      "epoch": 100,
+      "config_match": true,
+      "model_finite": true
+    },
+    "last": {
+      "epoch": 100,
+      "config_match": true,
+      "model_finite": true,
+      "audit_model_match": true,
+      "optimizer_match": true,
+      "ema_saved": false
+    }
+  },
+  "W08": {
+    "best": {
+      "epoch": 85,
+      "config_match": true,
+      "model_finite": true
+    },
+    "last": {
+      "epoch": 100,
+      "config_match": true,
+      "model_finite": true,
+      "audit_model_match": true,
+      "optimizer_match": true,
+      "ema_saved": false
+    }
+  },
+  "W09": {
+    "best": {
+      "epoch": 95,
+      "config_match": true,
+      "model_finite": true
+    },
+    "last": {
+      "epoch": 100,
+      "config_match": true,
+      "model_finite": true,
+      "audit_model_match": true,
+      "optimizer_match": true,
+      "ema_saved": false
+    }
+  },
+  "W10": {
+    "best": {
+      "epoch": 95,
+      "config_match": true,
+      "model_finite": true
+    },
+    "last": {
+      "epoch": 100,
+      "config_match": true,
+      "model_finite": true,
+      "audit_model_match": true,
+      "optimizer_match": true,
+      "ema_saved": false
+    }
+  },
+  "W11": {
+    "best": {
+      "epoch": 90,
+      "config_match": true,
+      "model_finite": true
+    },
+    "last": {
+      "epoch": 100,
+      "config_match": true,
+      "model_finite": true,
+      "audit_model_match": true,
+      "optimizer_match": true,
+      "ema_saved": false
+    }
+  },
+  "W12": {
+    "best": {
+      "epoch": 95,
+      "config_match": true,
+      "model_finite": true
+    },
+    "last": {
+      "epoch": 100,
+      "config_match": true,
+      "model_finite": true,
+      "audit_model_match": true,
+      "optimizer_match": true,
+      "ema_saved": false
+    }
+  },
+  "W13": {
+    "best": {
+      "epoch": 75,
+      "config_match": true,
+      "model_finite": true
+    },
+    "last": {
+      "epoch": 100,
+      "config_match": true,
+      "model_finite": true,
+      "audit_model_match": true,
+      "optimizer_match": true,
+      "ema_saved": false
+    }
+  },
+  "W14": {
+    "best": {
+      "epoch": 95,
+      "config_match": true,
+      "model_finite": true
+    },
+    "last": {
+      "epoch": 100,
+      "config_match": true,
+      "model_finite": true,
+      "audit_model_match": true,
+      "optimizer_match": true,
+      "ema_saved": false
+    }
+  },
+  "W15": {
+    "best": {
+      "epoch": 95,
+      "config_match": true,
+      "model_finite": true
+    },
+    "last": {
+      "epoch": 100,
+      "config_match": true,
+      "model_finite": true,
+      "audit_model_match": true,
+      "optimizer_match": true,
+      "ema_saved": false
+    }
+  },
+  "W16": {
+    "best": {
+      "epoch": 80,
+      "config_match": true,
+      "model_finite": true
+    },
+    "last": {
+      "epoch": 100,
+      "config_match": true,
+      "model_finite": true,
+      "audit_model_match": true,
+      "optimizer_match": true,
+      "ema_saved": false
+    }
+  },
+  "W17": {
+    "best": {
+      "epoch": 90,
+      "config_match": true,
+      "model_finite": true
+    },
+    "last": {
+      "epoch": 100,
+      "config_match": true,
+      "model_finite": true,
+      "audit_model_match": true,
+      "optimizer_match": true,
+      "ema_saved": false
+    }
+  },
+  "W18": {
+    "best": {
+      "epoch": 100,
+      "config_match": true,
+      "model_finite": true
+    },
+    "last": {
+      "epoch": 100,
+      "config_match": true,
+      "model_finite": true,
+      "audit_model_match": true,
+      "optimizer_match": true,
+      "ema_saved": false
+    }
+  },
+  "W19": {
+    "best": {
+      "epoch": 90,
+      "config_match": true,
+      "model_finite": true
+    },
+    "last": {
+      "epoch": 100,
+      "config_match": true,
+      "model_finite": true,
+      "audit_model_match": true,
+      "optimizer_match": true,
+      "ema_saved": false
+    }
+  },
+  "W20": {
+    "best": {
+      "epoch": 80,
+      "config_match": true,
+      "model_finite": true
+    },
+    "last": {
+      "epoch": 100,
+      "config_match": true,
+      "model_finite": true,
+      "audit_model_match": true,
+      "optimizer_match": true,
+      "ema_saved": false
+    }
+  },
+  "W21": {
+    "best": {
+      "epoch": 100,
+      "config_match": true,
+      "model_finite": true
+    },
+    "last": {
+      "epoch": 100,
+      "config_match": true,
+      "model_finite": true,
+      "audit_model_match": true,
+      "optimizer_match": true,
+      "ema_saved": true
+    }
+  },
+  "W22": {
+    "best": {
+      "epoch": 100,
+      "config_match": true,
+      "model_finite": true
+    },
+    "last": {
+      "epoch": 100,
+      "config_match": true,
+      "model_finite": true,
+      "audit_model_match": true,
+      "optimizer_match": true,
+      "ema_saved": false
+    }
+  },
+  "W23": {
+    "best": {
+      "epoch": 100,
+      "config_match": true,
+      "model_finite": true
+    },
+    "last": {
+      "epoch": 100,
+      "config_match": true,
+      "model_finite": true,
+      "audit_model_match": true,
+      "optimizer_match": true,
+      "ema_saved": false
+    }
+  },
+  "W24": {
+    "best": {
+      "epoch": 85,
+      "config_match": true,
+      "model_finite": true
+    },
+    "last": {
+      "epoch": 100,
+      "config_match": true,
+      "model_finite": true,
+      "audit_model_match": true,
+      "optimizer_match": true,
+      "ema_saved": false
+    }
+  },
+  "W25": {
+    "best": {
+      "epoch": 100,
+      "config_match": true,
+      "model_finite": true
+    },
+    "last": {
+      "epoch": 100,
+      "config_match": true,
+      "model_finite": true,
+      "audit_model_match": true,
+      "optimizer_match": true,
+      "ema_saved": false
+    }
+  },
+  "W26": {
+    "best": {
+      "epoch": 90,
+      "config_match": true,
+      "model_finite": true
+    },
+    "last": {
+      "epoch": 100,
+      "config_match": true,
+      "model_finite": true,
+      "audit_model_match": true,
+      "optimizer_match": true,
+      "ema_saved": false
+    }
+  },
+  "W27": {
+    "best": {
+      "epoch": 100,
+      "config_match": true,
+      "model_finite": true
+    },
+    "last": {
+      "epoch": 100,
+      "config_match": true,
+      "model_finite": true,
+      "audit_model_match": true,
+      "optimizer_match": true,
+      "ema_saved": false
+    }
+  },
+  "W28": {
+    "best": {
+      "epoch": 95,
+      "config_match": true,
+      "model_finite": true
+    },
+    "last": {
+      "epoch": 100,
+      "config_match": true,
+      "model_finite": true,
+      "audit_model_match": true,
+      "optimizer_match": true,
+      "ema_saved": false
+    }
+  },
+  "W29": {
+    "best": {
+      "epoch": 95,
+      "config_match": true,
+      "model_finite": true
+    },
+    "last": {
+      "epoch": 100,
+      "config_match": true,
+      "model_finite": true,
+      "audit_model_match": true,
+      "optimizer_match": true,
+      "ema_saved": false
+    }
+  },
+  "W30": {
+    "best": {
+      "epoch": 100,
+      "config_match": true,
+      "model_finite": true
+    },
+    "last": {
+      "epoch": 100,
+      "config_match": true,
+      "model_finite": true,
+      "audit_model_match": true,
+      "optimizer_match": true,
+      "ema_saved": false
+    }
+  }
+}

@@ -1,0 +1,146 @@
+{
+  "W01": {
+    "epochs": 100,
+    "validations": 20,
+    "best": true,
+    "last": true,
+    "nonfinite": [],
+    "amp_skips": 11.0
+  },
+  "W02": {
+    "epochs": 100,
+    "validations": 20,
+    "best": true,
+    "last": true,
+    "nonfinite": [],
+    "amp_skips": 11.0
+  },
+  "W03": {
+    "epochs": 100,
+    "validations": 20,
+    "best": true,
+    "last": true,
+    "nonfinite": [],
+    "amp_skips": 12.0
+  },
+  "W04": {
+    "epochs": 100,
+    "validations": 20,
+    "best": true,
+    "last": true,
+    "nonfinite": [],
+    "amp_skips": 11.0
+  },
+  "W05": {
+    "epochs": 100,
+    "validations": 20,
+    "best": true,
+    "last": true,
+    "nonfinite": [],
+    "amp_skips": 11.0
+  },
+  "W06": {
+    "epochs": 100,
+    "validations": 20,
+    "best": true,
+    "last": true,
+    "nonfinite": [],
+    "amp_skips": 12.0
+  },
+  "W07": {
+    "epochs": 100,
+    "validations": 20,
+    "best": true,
+    "last": true,
+    "nonfinite": [],
+    "amp_skips": 12.0
+  },
+  "W08": {
+    "epochs": 100,
+    "validations": 20,
+    "best": true,
+    "last": true,
+    "nonfinite": [],
+    "amp_skips": 13.0
+  },
+  "W09": {
+    "epochs": 100,
+    "validations": 20,
+    "best": true,
+    "last": true,
+    "nonfinite": [],
+    "amp_skips": 12.0
+  },
+  "W10": {
+    "epochs": 100,
+    "validations": 20,
+    "best": true,
+    "last": true,
+    "nonfinite": [],
+    "amp_skips": 12.0
+  },
+  "W11": {
+    "epochs": 100,
+    "validations": 20,
+    "best": true,
+    "last": true,
+    "nonfinite": [],
+    "amp_skips": 12.0
+  },
+  "W12": {
+    "epochs": 100,
+    "validations": 20,
+    "best": true,
+    "last": true,
+    "nonfinite": [],
+    "amp_skips": 12.0
+  },
+  "W13": {
+    "epochs": 100,
+    "validations": 20,
+    "best": true,
+    "last": true,
+    "nonfinite": [],
+    "amp_skips": 12.0
+  },
+  "W14": {
+    "epochs": 100,
+    "validations": 20,
+    "best": true,
+    "last": true,
+    "nonfinite": [],
+    "amp_skips": 12.0
+  },
+  "W15": {
+    "epochs": 100,
+    "validations": 20,
+    "best": true,
+    "last": true,
+    "nonfinite": [],
+    "amp_skips": 12.0
+  },
+  "W16": {
+    "epochs": 100,
+    "validations": 20,
+    "best": true,
+    "last": true,
+    "nonfinite": [],
+    "amp_skips": 13.0
+  },
+  "W17": {
+    "epochs": 100,
+    "validations": 20,
+    "best": true,
+    "last": true,
+    "nonfinite": [],
+    "amp_skips": 12.0
+  },
+  "W18": {
+    "epochs": 100,
+    "validations": 20,
+    "best": true,
+    "last": true,
+    "nonfinite": [],
+    "amp_skips": 11.0
+  }
+}

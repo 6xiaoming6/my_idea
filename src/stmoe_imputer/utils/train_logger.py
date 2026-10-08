@@ -6,10 +6,12 @@ import json
 from datetime import datetime
 from pathlib import Path
 from typing import Any
+from .metric_logging import MetricLogPolicy, compact_metrics, compact_epoch, write_compressed, CORE
 
 
 class TrainLogger:
-    def __init__(self, log_dir: Path) -> None:
+    def __init__(self, log_dir: Path, logging_cfg: dict | None = None, total_epochs: int | None = None) -> None:
+        self._policy = MetricLogPolicy(logging_cfg, total_epochs)
         log_dir.mkdir(parents=True, exist_ok=True)
         self._train_path = log_dir / "train.log"
         self._val_path = log_dir / "val.log"
@@ -32,7 +34,8 @@ class TrainLogger:
             lines.append("Run")
             for k, v in extra.items():
                 lines.append(f"  {k}: {v}")
-        lines += ["Config", json.dumps(cfg, indent=2, ensure_ascii=False), "-" * 96]
+        lines += [f"Config: {self.log_dir.parent / 'config.json'}",
+                  "Logging: " + json.dumps(self._policy.describe(), ensure_ascii=False), "-" * 96]
         for line in lines:
             self._train_f.write(line + "\n")
 
@@ -98,9 +101,11 @@ class TrainLogger:
                 f"{train['mae']:>10.4f}  {epoch_s:>8.1f}  {best_mark:>5}"
             )
             self._val_f.write(v_line + "\n")
+        row = {"epoch": epoch, "train": train, "val": val, "perf": perf, "is_best": is_best}
+        self._policy.write_diagnostics(self.log_dir, row)
         self._metrics_f.write(
             json.dumps(
-                {"epoch": epoch, "train": train, "val": val, "perf": perf, "is_best": is_best},
+                compact_epoch(row),
                 ensure_ascii=False,
                 sort_keys=True,
             )
@@ -117,11 +122,15 @@ class TrainLogger:
         self._test_f.write("-" * 96 + "\nResults\n")
         if metrics:
             for key, value in metrics.items():
+                if key not in CORE:
+                    continue
                 text = f"{value:.6f}" if isinstance(value, float) else str(value)
                 self._test_f.write(f"  {key}: {text}\n")
         else:
             self._test_f.write("  status: skipped (no test dataset)\n")
-        self._metrics_f.write(json.dumps({"stage": "test", "metrics": metrics, "extra": extra},
+        if metrics is not None:
+            write_compressed(self.log_dir.parent/"diagnostics"/"test.json.gz", {"metrics": metrics, "extra": extra})
+        self._metrics_f.write(json.dumps({"stage": "test", "metrics": compact_metrics(metrics), "extra": extra},
                                          ensure_ascii=False, sort_keys=True) + "\n")
         self._test_f.write(f"Testing finished: {datetime.now():%Y-%m-%d %H:%M:%S}\n" + "-" * 96 + "\n")
 

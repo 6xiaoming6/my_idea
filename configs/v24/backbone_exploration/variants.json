@@ -1,0 +1,244 @@
+{
+  "W01": {
+    "name": "cmff_replay",
+    "method": "CMFF＋±0.1差分，严格确定性基准",
+    "reference": "W01",
+    "module": {}
+  },
+  "W02": {
+    "name": "cmff_replay_repeat",
+    "method": "W01同seed完整重放，非独立训练种子",
+    "reference": "W01",
+    "module": {}
+  },
+  "W03": {
+    "name": "scale_id",
+    "method": "零初始化尺度身份向量",
+    "reference": "W01",
+    "module": {
+      "adapter": "scale_id"
+    }
+  },
+  "W04": {
+    "name": "round_id",
+    "method": "零初始化轮次身份向量",
+    "reference": "W03",
+    "module": {
+      "adapter": "round_id"
+    }
+  },
+  "W05": {
+    "name": "scale_affine",
+    "method": "尺度独立零初始化通道仿射",
+    "reference": "W01",
+    "module": {
+      "adapter": "scale_affine"
+    }
+  },
+  "W06": {
+    "name": "round_affine",
+    "method": "轮次独立零初始化通道仿射",
+    "reference": "W05",
+    "module": {
+      "adapter": "round_affine"
+    }
+  },
+  "W07": {
+    "name": "shared_rank",
+    "method": "跨尺度/轮共享rank8残差适配",
+    "reference": "W01",
+    "module": {
+      "adapter": "shared_rank"
+    }
+  },
+  "W08": {
+    "name": "scale_rank",
+    "method": "三尺度独立rank8适配",
+    "reference": "W07",
+    "module": {
+      "adapter": "scale_rank"
+    }
+  },
+  "W09": {
+    "name": "round_rank",
+    "method": "四轮独立rank8适配",
+    "reference": "W08",
+    "module": {
+      "adapter": "round_rank"
+    }
+  },
+  "W10": {
+    "name": "coverage_rank",
+    "method": "尺度rank8＋局部覆盖率调制，初始倍率1",
+    "reference": "W08",
+    "module": {
+      "adapter": "coverage_rank"
+    }
+  },
+  "W11": {
+    "name": "visible_supervision",
+    "method": "四轮可见重建L1平均×0.02",
+    "reference": "W01",
+    "module": {
+      "observed_loss": true
+    }
+  },
+  "W12": {
+    "name": "residual_point",
+    "method": "观测残差不扩散，detach，修正专家输入",
+    "reference": "W01",
+    "module": {
+      "feedback": "point"
+    }
+  },
+  "W13": {
+    "name": "residual_local",
+    "method": "观测残差3×3×3归一化传播，修正专家输入",
+    "reference": "W12",
+    "module": {
+      "feedback": "local"
+    }
+  },
+  "W14": {
+    "name": "residual_missing",
+    "method": "传播残差仅修正含缺失位置",
+    "reference": "W13",
+    "module": {
+      "feedback": "missing"
+    }
+  },
+  "W15": {
+    "name": "residual_missing_grad",
+    "method": "W14保留残差内容梯度",
+    "reference": "W14",
+    "module": {
+      "feedback": "missing_grad"
+    }
+  },
+  "W16": {
+    "name": "residual_router",
+    "method": "传播残差只修正Router logits",
+    "reference": "W01",
+    "module": {
+      "feedback": "router"
+    }
+  },
+  "W17": {
+    "name": "residual_both",
+    "method": "传播残差同时修正专家输入和Router",
+    "reference": "W14",
+    "module": {
+      "feedback": "both"
+    }
+  },
+  "W18": {
+    "name": "residual_missing_supervised",
+    "method": "W14＋逐轮可见重建监督",
+    "reference": "W14",
+    "module": {
+      "feedback": "missing",
+      "observed_loss": true
+    }
+  },
+  "W19": {
+    "name": "view_augment",
+    "method": "前8窗口增加rate0.5嵌套视图，补全L1×0.25",
+    "reference": "W01",
+    "module": {
+      "view": "augment"
+    }
+  },
+  "W20": {
+    "name": "view_consistency",
+    "method": "增强＋共同缺失预测一致性×0.05",
+    "reference": "W19",
+    "module": {
+      "view": "consistency"
+    }
+  },
+  "W21": {
+    "name": "view_ema",
+    "method": "一致性教师改为0.99 EMA，评估学生",
+    "reference": "W20",
+    "module": {
+      "view": "ema"
+    }
+  },
+  "W22": {
+    "name": "view_reliability",
+    "method": "一致性按教师可见误差启发式加权",
+    "reference": "W20",
+    "module": {
+      "view": "reliability"
+    }
+  },
+  "W23": {
+    "name": "structure_region",
+    "method": "最终F的C/M区域均值监督，各0.025，区域等权",
+    "reference": "W01",
+    "module": {
+      "structure": "region"
+    }
+  },
+  "W24": {
+    "name": "structure_region_count",
+    "method": "区域均值监督改按有效缺失数量加权",
+    "reference": "W23",
+    "module": {
+      "structure": "region_count"
+    }
+  },
+  "W25": {
+    "name": "structure_temporal",
+    "method": "最终补全的相邻时间差分L1×0.05",
+    "reference": "W01",
+    "module": {
+      "structure": "temporal"
+    }
+  },
+  "W26": {
+    "name": "structure_spatial",
+    "method": "最终补全的空间邻接差分L1×0.05",
+    "reference": "W01",
+    "module": {
+      "structure": "spatial"
+    }
+  },
+  "W27": {
+    "name": "combined_ab",
+    "method": "A+B，仅ID验证冻结候选，从头训练",
+    "reference": "W01",
+    "sources": [
+      "A",
+      "B"
+    ]
+  },
+  "W28": {
+    "name": "combined_ac",
+    "method": "A+C，仅ID验证冻结候选，从头训练",
+    "reference": "W01",
+    "sources": [
+      "A",
+      "C"
+    ]
+  },
+  "W29": {
+    "name": "combined_bc",
+    "method": "B+C，仅ID验证冻结候选，从头训练",
+    "reference": "W01",
+    "sources": [
+      "B",
+      "C"
+    ]
+  },
+  "W30": {
+    "name": "combined_abc",
+    "method": "A+B+C，仅ID验证冻结候选，从头训练",
+    "reference": "W01",
+    "sources": [
+      "A",
+      "B",
+      "C"
+    ]
+  }
+}

@@ -1,0 +1,1569 @@
+{
+  "W01": {
+    "val_mae": 14.341614612149227,
+    "best_epoch": 100,
+    "mean4_mae": 20.989373169464344,
+    "mean4_rmse": 35.95788745240564,
+    "mean4_relative": 1.0,
+    "train_seconds": 4718.713295637863,
+    "peak_gib": 7.869661331176758,
+    "params": 271163,
+    "checks": {
+      "epochs100": true,
+      "val20": true,
+      "receipt_finished": true,
+      "config_match": true,
+      "eval6": true,
+      "eval_protocol": true,
+      "eval_cp": true,
+      "best_metric": true,
+      "audit100": true,
+      "checkpoints": true,
+      "primary_finite": true,
+      "evaluation_finite": true,
+      "path_budget": true
+    },
+    "nonfinite": [],
+    "sets": {
+      "in_distribution": {
+        "mae": 13.51282794961301,
+        "rmse": 24.148973123681294
+      },
+      "unseen_combinations": {
+        "mae": 22.128486947844618,
+        "rmse": 38.2790630217423
+      },
+      "unseen_geometry": {
+        "mae": 25.97744488698252,
+        "rmse": 44.29221365879767
+      },
+      "unseen_triple": {
+        "mae": 22.33873289341723,
+        "rmse": 37.11130000540129
+      },
+      "unseen_combinations_repeat": {
+        "mae": 22.312937781752307,
+        "rmse": 38.4998018505619
+      },
+      "unseen_geometry_repeat": {
+        "mae": 25.88692628827263,
+        "rmse": 43.95711047847427
+      }
+    }
+  },
+  "W02": {
+    "val_mae": 14.341614612149227,
+    "best_epoch": 100,
+    "mean4_mae": 20.989373169464344,
+    "mean4_rmse": 35.95788745240564,
+    "mean4_relative": 1.0,
+    "train_seconds": 4719.3070329426555,
+    "peak_gib": 7.869661331176758,
+    "params": 271163,
+    "checks": {
+      "epochs100": true,
+      "val20": true,
+      "receipt_finished": true,
+      "config_match": true,
+      "eval6": true,
+      "eval_protocol": true,
+      "eval_cp": true,
+      "best_metric": true,
+      "audit100": true,
+      "checkpoints": true,
+      "primary_finite": true,
+      "evaluation_finite": true,
+      "path_budget": true
+    },
+    "nonfinite": [],
+    "sets": {
+      "in_distribution": {
+        "mae": 13.51282794961301,
+        "rmse": 24.148973123681294
+      },
+      "unseen_combinations": {
+        "mae": 22.128486947844618,
+        "rmse": 38.2790630217423
+      },
+      "unseen_geometry": {
+        "mae": 25.97744488698252,
+        "rmse": 44.29221365879767
+      },
+      "unseen_triple": {
+        "mae": 22.33873289341723,
+        "rmse": 37.11130000540129
+      },
+      "unseen_combinations_repeat": {
+        "mae": 22.312937781752307,
+        "rmse": 38.4998018505619
+      },
+      "unseen_geometry_repeat": {
+        "mae": 25.88692628827263,
+        "rmse": 43.95711047847427
+      }
+    }
+  },
+  "W03": {
+    "val_mae": 13.926932412414557,
+    "best_epoch": 95,
+    "mean4_mae": 23.749039056463417,
+    "mean4_rmse": 41.723333482798026,
+    "mean4_relative": 1.1184225445534595,
+    "train_seconds": 4097.458223654772,
+    "peak_gib": 7.9556121826171875,
+    "params": 271355,
+    "checks": {
+      "epochs100": true,
+      "val20": true,
+      "receipt_finished": true,
+      "config_match": true,
+      "eval6": true,
+      "eval_protocol": true,
+      "eval_cp": true,
+      "best_metric": true,
+      "audit100": true,
+      "checkpoints": true,
+      "primary_finite": true,
+      "evaluation_finite": true,
+      "path_budget": true
+    },
+    "nonfinite": [],
+    "sets": {
+      "in_distribution": {
+        "mae": 13.217991004430337,
+        "rmse": 23.45520674774566
+      },
+      "unseen_combinations": {
+        "mae": 26.297056421326626,
+        "rmse": 48.19935589856323
+      },
+      "unseen_geometry": {
+        "mae": 28.148175921356124,
+        "rmse": 48.513680330729784
+      },
+      "unseen_triple": {
+        "mae": 27.33293287874057,
+        "rmse": 46.725090954153444
+      },
+      "unseen_combinations_repeat": {
+        "mae": 26.340933205368206,
+        "rmse": 48.32350741930495
+      },
+      "unseen_geometry_repeat": {
+        "mae": 28.26299096665952,
+        "rmse": 48.64382318562021
+      }
+    }
+  },
+  "W04": {
+    "val_mae": 14.176322928378934,
+    "best_epoch": 95,
+    "mean4_mae": 21.37039129262167,
+    "mean4_rmse": 36.84245497100949,
+    "mean4_relative": 1.0148016572786709,
+    "train_seconds": 4722.769667064305,
+    "peak_gib": 7.958423614501953,
+    "params": 271419,
+    "checks": {
+      "epochs100": true,
+      "val20": true,
+      "receipt_finished": true,
+      "config_match": true,
+      "eval6": true,
+      "eval_protocol": true,
+      "eval_cp": true,
+      "best_metric": true,
+      "audit100": true,
+      "checkpoints": true,
+      "primary_finite": true,
+      "evaluation_finite": true,
+      "path_budget": true
+    },
+    "nonfinite": [],
+    "sets": {
+      "in_distribution": {
+        "mae": 13.283619426286474,
+        "rmse": 23.358320958555232
+      },
+      "unseen_combinations": {
+        "mae": 22.991273610357695,
+        "rmse": 40.38977203745322
+      },
+      "unseen_geometry": {
+        "mae": 26.40551988111905,
+        "rmse": 45.92462335330873
+      },
+      "unseen_triple": {
+        "mae": 22.801152252723455,
+        "rmse": 37.69710353472078
+      },
+      "unseen_combinations_repeat": {
+        "mae": 23.063339977999398,
+        "rmse": 40.5106195206946
+      },
+      "unseen_geometry_repeat": {
+        "mae": 26.25054385479603,
+        "rmse": 45.54869131229061
+      }
+    }
+  },
+  "W05": {
+    "val_mae": 14.236809087826382,
+    "best_epoch": 100,
+    "mean4_mae": 22.907271638766023,
+    "mean4_rmse": 41.34681955111559,
+    "mean4_relative": 1.083649782286213,
+    "train_seconds": 4782.432294018799,
+    "peak_gib": 8.091426849365234,
+    "params": 271547,
+    "checks": {
+      "epochs100": true,
+      "val20": true,
+      "receipt_finished": true,
+      "config_match": true,
+      "eval6": true,
+      "eval_protocol": true,
+      "eval_cp": true,
+      "best_metric": true,
+      "audit100": true,
+      "checkpoints": true,
+      "primary_finite": true,
+      "evaluation_finite": true,
+      "path_budget": true
+    },
+    "nonfinite": [],
+    "sets": {
+      "in_distribution": {
+        "mae": 13.402826525113635,
+        "rmse": 23.91690573930429
+      },
+      "unseen_combinations": {
+        "mae": 26.4770935329527,
+        "rmse": 49.5377446687897
+      },
+      "unseen_geometry": {
+        "mae": 27.166423641437678,
+        "rmse": 49.400682707564954
+      },
+      "unseen_triple": {
+        "mae": 24.58274285556008,
+        "rmse": 42.53194508880342
+      },
+      "unseen_combinations_repeat": {
+        "mae": 26.268198339235173,
+        "rmse": 48.75595378832669
+      },
+      "unseen_geometry_repeat": {
+        "mae": 27.356386474054688,
+        "rmse": 49.636365550329344
+      }
+    }
+  },
+  "W06": {
+    "val_mae": 14.558160214881047,
+    "best_epoch": 95,
+    "mean4_mae": 16.79253189565614,
+    "mean4_rmse": 28.433837905358555,
+    "mean4_relative": 0.8230226585936767,
+    "train_seconds": 4752.188344354508,
+    "peak_gib": 8.055705070495605,
+    "params": 271675,
+    "checks": {
+      "epochs100": true,
+      "val20": true,
+      "receipt_finished": true,
+      "config_match": true,
+      "eval6": true,
+      "eval_protocol": true,
+      "eval_cp": true,
+      "best_metric": true,
+      "audit100": true,
+      "checkpoints": true,
+      "primary_finite": true,
+      "evaluation_finite": true,
+      "path_budget": true
+    },
+    "nonfinite": [],
+    "sets": {
+      "in_distribution": {
+        "mae": 13.946563125466739,
+        "rmse": 24.2795302633204
+      },
+      "unseen_combinations": {
+        "mae": 16.36608177957383,
+        "rmse": 27.86466719297691
+      },
+      "unseen_geometry": {
+        "mae": 20.658592662964885,
+        "rmse": 34.4971177895552
+      },
+      "unseen_triple": {
+        "mae": 16.198890014619106,
+        "rmse": 27.094036375581727
+      },
+      "unseen_combinations_repeat": {
+        "mae": 16.466532326962895,
+        "rmse": 28.10544946287237
+      },
+      "unseen_geometry_repeat": {
+        "mae": 20.438617260759646,
+        "rmse": 34.33717114976903
+      }
+    }
+  },
+  "W07": {
+    "val_mae": 15.638923096143207,
+    "best_epoch": 100,
+    "mean4_mae": 24.709488049403507,
+    "mean4_rmse": 42.16701222866975,
+    "mean4_relative": 1.1679663355755694,
+    "train_seconds": 4677.975707926787,
+    "peak_gib": 8.110288619995117,
+    "params": 272259,
+    "checks": {
+      "epochs100": true,
+      "val20": true,
+      "receipt_finished": true,
+      "config_match": true,
+      "eval6": true,
+      "eval_protocol": true,
+      "eval_cp": true,
+      "best_metric": true,
+      "audit100": true,
+      "checkpoints": true,
+      "primary_finite": true,
+      "evaluation_finite": true,
+      "path_budget": true
+    },
+    "nonfinite": [],
+    "sets": {
+      "in_distribution": {
+        "mae": 14.568008675776747,
+        "rmse": 25.282213790019302
+      },
+      "unseen_combinations": {
+        "mae": 26.49882378978706,
+        "rmse": 45.756848801278565
+      },
+      "unseen_geometry": {
+        "mae": 30.279188324932623,
+        "rmse": 52.806988922991565
+      },
+      "unseen_triple": {
+        "mae": 27.491931407117605,
+        "rmse": 44.82199740038958
+      },
+      "unseen_combinations_repeat": {
+        "mae": 26.69551388814946,
+        "rmse": 46.29395722145197
+      },
+      "unseen_geometry_repeat": {
+        "mae": 29.98200679227202,
+        "rmse": 51.99946263333535
+      }
+    }
+  },
+  "W08": {
+    "val_mae": 14.635596068842842,
+    "best_epoch": 85,
+    "mean4_mae": 16.57624428873775,
+    "mean4_rmse": 28.311699616823027,
+    "mean4_relative": 0.8131442982451699,
+    "train_seconds": 4743.111830785056,
+    "peak_gib": 8.087835311889648,
+    "params": 274451,
+    "checks": {
+      "epochs100": true,
+      "val20": true,
+      "receipt_finished": true,
+      "config_match": true,
+      "eval6": true,
+      "eval_protocol": true,
+      "eval_cp": true,
+      "best_metric": true,
+      "audit100": true,
+      "checkpoints": true,
+      "primary_finite": true,
+      "evaluation_finite": true,
+      "path_budget": true
+    },
+    "nonfinite": [],
+    "sets": {
+      "in_distribution": {
+        "mae": 14.015519345133177,
+        "rmse": 24.78336162928377
+      },
+      "unseen_combinations": {
+        "mae": 15.804709436301136,
+        "rmse": 26.942535825291543
+      },
+      "unseen_geometry": {
+        "mae": 21.067203078213648,
+        "rmse": 35.644858899853105
+      },
+      "unseen_triple": {
+        "mae": 15.417545295303038,
+        "rmse": 25.87604211286369
+      },
+      "unseen_combinations_repeat": {
+        "mae": 15.949514662990786,
+        "rmse": 27.474114669131826
+      },
+      "unseen_geometry_repeat": {
+        "mae": 20.954768035025417,
+        "rmse": 35.616589067676195
+      }
+    }
+  },
+  "W09": {
+    "val_mae": 13.961888285056487,
+    "best_epoch": 95,
+    "mean4_mae": 23.645745400773546,
+    "mean4_rmse": 41.95140451739811,
+    "mean4_relative": 1.1155856760409657,
+    "train_seconds": 4776.424261817359,
+    "peak_gib": 8.10621690750122,
+    "params": 275547,
+    "checks": {
+      "epochs100": true,
+      "val20": true,
+      "receipt_finished": true,
+      "config_match": true,
+      "eval6": true,
+      "eval_protocol": true,
+      "eval_cp": true,
+      "best_metric": true,
+      "audit100": true,
+      "checkpoints": true,
+      "primary_finite": true,
+      "evaluation_finite": true,
+      "path_budget": true
+    },
+    "nonfinite": [],
+    "sets": {
+      "in_distribution": {
+        "mae": 12.977811362828625,
+        "rmse": 22.843521843634267
+      },
+      "unseen_combinations": {
+        "mae": 27.36485335570325,
+        "rmse": 51.60160685957686
+      },
+      "unseen_geometry": {
+        "mae": 25.960625578253218,
+        "rmse": 45.380185684433606
+      },
+      "unseen_triple": {
+        "mae": 28.279691306309093,
+        "rmse": 47.980303681947696
+      },
+      "unseen_combinations_repeat": {
+        "mae": 27.25509867356086,
+        "rmse": 51.278770789854896
+      },
+      "unseen_geometry_repeat": {
+        "mae": 25.96985822274278,
+        "rmse": 45.50934436275859
+      }
+    }
+  },
+  "W10": {
+    "val_mae": 13.724461458835288,
+    "best_epoch": 95,
+    "mean4_mae": 23.837225670333076,
+    "mean4_rmse": 42.50544623011304,
+    "mean4_relative": 1.1221494588469962,
+    "train_seconds": 4808.770965550444,
+    "peak_gib": 8.216059684753418,
+    "params": 274457,
+    "checks": {
+      "epochs100": true,
+      "val20": true,
+      "receipt_finished": true,
+      "config_match": true,
+      "eval6": true,
+      "eval_protocol": true,
+      "eval_cp": true,
+      "best_metric": true,
+      "audit100": true,
+      "checkpoints": true,
+      "primary_finite": true,
+      "evaluation_finite": true,
+      "path_budget": true
+    },
+    "nonfinite": [],
+    "sets": {
+      "in_distribution": {
+        "mae": 12.819967515298979,
+        "rmse": 22.955046608946244
+      },
+      "unseen_combinations": {
+        "mae": 26.7275308425698,
+        "rmse": 49.913045052100735
+      },
+      "unseen_geometry": {
+        "mae": 26.46225123870293,
+        "rmse": 47.73517840552224
+      },
+      "unseen_triple": {
+        "mae": 29.33915308476059,
+        "rmse": 49.41851485388294
+      },
+      "unseen_combinations_repeat": {
+        "mae": 26.709311441607756,
+        "rmse": 49.74725536261809
+      },
+      "unseen_geometry_repeat": {
+        "mae": 26.527679650594763,
+        "rmse": 47.93869829912499
+      }
+    }
+  },
+  "W11": {
+    "val_mae": 16.409983089718192,
+    "best_epoch": 90,
+    "mean4_mae": 18.802837461788524,
+    "mean4_rmse": 31.401866608190566,
+    "mean4_relative": 0.9229070429892812,
+    "train_seconds": 4757.365364204394,
+    "peak_gib": 7.282378673553467,
+    "params": 271163,
+    "checks": {
+      "epochs100": true,
+      "val20": true,
+      "receipt_finished": true,
+      "config_match": true,
+      "eval6": true,
+      "eval_protocol": true,
+      "eval_cp": true,
+      "best_metric": true,
+      "audit100": true,
+      "checkpoints": true,
+      "primary_finite": true,
+      "evaluation_finite": true,
+      "path_budget": true
+    },
+    "nonfinite": [],
+    "sets": {
+      "in_distribution": {
+        "mae": 15.731189728568118,
+        "rmse": 26.975955612558185
+      },
+      "unseen_combinations": {
+        "mae": 18.440304258317852,
+        "rmse": 30.85100119409438
+      },
+      "unseen_geometry": {
+        "mae": 22.810318348631114,
+        "rmse": 37.50981731141823
+      },
+      "unseen_triple": {
+        "mae": 18.22953751163701,
+        "rmse": 30.270692314691466
+      },
+      "unseen_combinations_repeat": {
+        "mae": 18.66799041988198,
+        "rmse": 31.441043126302613
+      },
+      "unseen_geometry_repeat": {
+        "mae": 22.600480696594584,
+        "rmse": 37.285266379161385
+      }
+    }
+  },
+  "W12": {
+    "val_mae": 14.877130665762405,
+    "best_epoch": 95,
+    "mean4_mae": 17.507866226738575,
+    "mean4_rmse": 30.146777835190356,
+    "mean4_relative": 0.8516143834620463,
+    "train_seconds": 4788.741374287638,
+    "peak_gib": 8.266142845153809,
+    "params": 273435,
+    "checks": {
+      "epochs100": true,
+      "val20": true,
+      "receipt_finished": true,
+      "config_match": true,
+      "eval6": true,
+      "eval_protocol": true,
+      "eval_cp": true,
+      "best_metric": true,
+      "audit100": true,
+      "checkpoints": true,
+      "primary_finite": true,
+      "evaluation_finite": true,
+      "path_budget": true
+    },
+    "nonfinite": [],
+    "sets": {
+      "in_distribution": {
+        "mae": 14.244701725658688,
+        "rmse": 25.12539407395227
+      },
+      "unseen_combinations": {
+        "mae": 16.07696688830342,
+        "rmse": 27.588564645651946
+      },
+      "unseen_geometry": {
+        "mae": 24.21753471497782,
+        "rmse": 41.529205984161116
+      },
+      "unseen_triple": {
+        "mae": 15.492261578014363,
+        "rmse": 26.34394663699609
+      },
+      "unseen_combinations_repeat": {
+        "mae": 16.28918470882657,
+        "rmse": 28.29360405220052
+      },
+      "unseen_geometry_repeat": {
+        "mae": 23.96164889759576,
+        "rmse": 40.89737777938518
+      }
+    }
+  },
+  "W13": {
+    "val_mae": 14.062218459424248,
+    "best_epoch": 75,
+    "mean4_mae": 23.6242469578305,
+    "mean4_rmse": 42.492632035161236,
+    "mean4_relative": 1.1155041161617694,
+    "train_seconds": 4838.870296686888,
+    "peak_gib": 8.302920818328857,
+    "params": 273435,
+    "checks": {
+      "epochs100": true,
+      "val20": true,
+      "receipt_finished": true,
+      "config_match": true,
+      "eval6": true,
+      "eval_protocol": true,
+      "eval_cp": true,
+      "best_metric": true,
+      "audit100": true,
+      "checkpoints": true,
+      "primary_finite": true,
+      "evaluation_finite": true,
+      "path_budget": true
+    },
+    "nonfinite": [],
+    "sets": {
+      "in_distribution": {
+        "mae": 13.219331238911568,
+        "rmse": 23.53540639922316
+      },
+      "unseen_combinations": {
+        "mae": 26.780339264670545,
+        "rmse": 49.51943836225622
+      },
+      "unseen_geometry": {
+        "mae": 26.485278599343005,
+        "rmse": 48.37906816757953
+      },
+      "unseen_triple": {
+        "mae": 28.01203872839689,
+        "rmse": 48.53661521158604
+      },
+      "unseen_combinations_repeat": {
+        "mae": 26.866319367004277,
+        "rmse": 49.5558347207426
+      },
+      "unseen_geometry_repeat": {
+        "mae": 27.0291069962704,
+        "rmse": 49.35032952512144
+      }
+    }
+  },
+  "W14": {
+    "val_mae": 15.869516800223685,
+    "best_epoch": 95,
+    "mean4_mae": 17.988231506059158,
+    "mean4_rmse": 30.173766971965343,
+    "mean4_relative": 0.880250774890725,
+    "train_seconds": 4817.031407513889,
+    "peak_gib": 8.298563003540039,
+    "params": 273435,
+    "checks": {
+      "epochs100": true,
+      "val20": true,
+      "receipt_finished": true,
+      "config_match": true,
+      "eval6": true,
+      "eval_protocol": true,
+      "eval_cp": true,
+      "best_metric": true,
+      "audit100": true,
+      "checkpoints": true,
+      "primary_finite": true,
+      "evaluation_finite": true,
+      "path_budget": true
+    },
+    "nonfinite": [],
+    "sets": {
+      "in_distribution": {
+        "mae": 14.981765823454166,
+        "rmse": 25.73766202475011
+      },
+      "unseen_combinations": {
+        "mae": 17.061366201018444,
+        "rmse": 28.81537319234755
+      },
+      "unseen_geometry": {
+        "mae": 23.171106476292156,
+        "rmse": 38.33547956693856
+      },
+      "unseen_triple": {
+        "mae": 16.738687523471864,
+        "rmse": 27.80655310382516
+      },
+      "unseen_combinations_repeat": {
+        "mae": 17.095349710999294,
+        "rmse": 28.94301538149739
+      },
+      "unseen_geometry_repeat": {
+        "mae": 23.056145995358147,
+        "rmse": 38.2852371726295
+      }
+    }
+  },
+  "W15": {
+    "val_mae": 14.676064291790853,
+    "best_epoch": 95,
+    "mean4_mae": 24.585871562945606,
+    "mean4_rmse": 43.92236452195323,
+    "mean4_relative": 1.1531852113109033,
+    "train_seconds": 4664.181777504506,
+    "peak_gib": 7.758031845092773,
+    "params": 273435,
+    "checks": {
+      "epochs100": true,
+      "val20": true,
+      "receipt_finished": true,
+      "config_match": true,
+      "eval6": true,
+      "eval_protocol": true,
+      "eval_cp": true,
+      "best_metric": true,
+      "audit100": true,
+      "checkpoints": true,
+      "primary_finite": true,
+      "evaluation_finite": true,
+      "path_budget": true
+    },
+    "nonfinite": [],
+    "sets": {
+      "in_distribution": {
+        "mae": 13.700728077458233,
+        "rmse": 24.048458229601618
+      },
+      "unseen_combinations": {
+        "mae": 26.648113131869792,
+        "rmse": 48.434155878440386
+      },
+      "unseen_geometry": {
+        "mae": 32.14433238102912,
+        "rmse": 57.86794064872642
+      },
+      "unseen_triple": {
+        "mae": 25.850312661425278,
+        "rmse": 45.338903331044506
+      },
+      "unseen_combinations_repeat": {
+        "mae": 26.307618445684128,
+        "rmse": 47.555495103084915
+      },
+      "unseen_geometry_repeat": {
+        "mae": 31.97051203558083,
+        "rmse": 57.39768884374081
+      }
+    }
+  },
+  "W16": {
+    "val_mae": 14.978824742850684,
+    "best_epoch": 80,
+    "mean4_mae": 17.965380982537653,
+    "mean4_rmse": 30.970696084477986,
+    "mean4_relative": 0.8762149139089835,
+    "train_seconds": 4772.183836647891,
+    "peak_gib": 7.849284648895264,
+    "params": 286663,
+    "checks": {
+      "epochs100": true,
+      "val20": true,
+      "receipt_finished": true,
+      "config_match": true,
+      "eval6": true,
+      "eval_protocol": true,
+      "eval_cp": true,
+      "best_metric": true,
+      "audit100": true,
+      "checkpoints": true,
+      "primary_finite": true,
+      "evaluation_finite": true,
+      "path_budget": true
+    },
+    "nonfinite": [],
+    "sets": {
+      "in_distribution": {
+        "mae": 14.265944509634076,
+        "rmse": 24.980225215744767
+      },
+      "unseen_combinations": {
+        "mae": 18.499546066727003,
+        "rmse": 32.3345699753007
+      },
+      "unseen_geometry": {
+        "mae": 21.852838332990398,
+        "rmse": 36.86393261870735
+      },
+      "unseen_triple": {
+        "mae": 17.24319502079913,
+        "rmse": 29.70405652815912
+      },
+      "unseen_combinations_repeat": {
+        "mae": 18.710697558638294,
+        "rmse": 32.894043731550575
+      },
+      "unseen_geometry_repeat": {
+        "mae": 21.41453532992269,
+        "rmse": 35.94505166388674
+      }
+    }
+  },
+  "W17": {
+    "val_mae": 14.717813055867882,
+    "best_epoch": 90,
+    "mean4_mae": 16.89739361579669,
+    "mean4_rmse": 28.83603052822327,
+    "mean4_relative": 0.8260807977206908,
+    "train_seconds": 4880.759069719585,
+    "peak_gib": 8.30697250366211,
+    "params": 288935,
+    "checks": {
+      "epochs100": true,
+      "val20": true,
+      "receipt_finished": true,
+      "config_match": true,
+      "eval6": true,
+      "eval_protocol": true,
+      "eval_cp": true,
+      "best_metric": true,
+      "audit100": true,
+      "checkpoints": true,
+      "primary_finite": true,
+      "evaluation_finite": true,
+      "path_budget": true
+    },
+    "nonfinite": [],
+    "sets": {
+      "in_distribution": {
+        "mae": 14.156641993630041,
+        "rmse": 24.82859645461739
+      },
+      "unseen_combinations": {
+        "mae": 15.54283652628633,
+        "rmse": 26.48269325258476
+      },
+      "unseen_geometry": {
+        "mae": 22.625997860013438,
+        "rmse": 38.44130739787352
+      },
+      "unseen_triple": {
+        "mae": 15.264098083256952,
+        "rmse": 25.591525007817417
+      },
+      "unseen_combinations_repeat": {
+        "mae": 15.737957071848008,
+        "rmse": 27.097324528392637
+      },
+      "unseen_geometry_repeat": {
+        "mae": 22.21783912977477,
+        "rmse": 37.30862228217118
+      }
+    }
+  },
+  "W18": {
+    "val_mae": 16.861260135758183,
+    "best_epoch": 100,
+    "mean4_mae": 24.97379023221498,
+    "mean4_rmse": 42.98911583112995,
+    "mean4_relative": 1.1902298089600667,
+    "train_seconds": 4104.593462261953,
+    "peak_gib": 7.7495222091674805,
+    "params": 273435,
+    "checks": {
+      "epochs100": true,
+      "val20": true,
+      "receipt_finished": true,
+      "config_match": true,
+      "eval6": true,
+      "eval_protocol": true,
+      "eval_cp": true,
+      "best_metric": true,
+      "audit100": true,
+      "checkpoints": true,
+      "primary_finite": true,
+      "evaluation_finite": true,
+      "path_budget": true
+    },
+    "nonfinite": [],
+    "sets": {
+      "in_distribution": {
+        "mae": 15.802603344551866,
+        "rmse": 27.212501694390838
+      },
+      "unseen_combinations": {
+        "mae": 28.35464600830814,
+        "rmse": 49.95791335576291
+      },
+      "unseen_geometry": {
+        "mae": 29.507197049271852,
+        "rmse": 50.42781329629161
+      },
+      "unseen_triple": {
+        "mae": 26.230714526728068,
+        "rmse": 44.35823497807445
+      },
+      "unseen_combinations_repeat": {
+        "mae": 28.313834676775336,
+        "rmse": 49.87426129052979
+      },
+      "unseen_geometry_repeat": {
+        "mae": 29.148186713018053,
+        "rmse": 49.802929874009195
+      }
+    }
+  },
+  "W19": {
+    "val_mae": 14.046832333886599,
+    "best_epoch": 90,
+    "mean4_mae": 17.09805086735285,
+    "mean4_rmse": 29.540574670195284,
+    "mean4_relative": 0.829170213939376,
+    "train_seconds": 5720.962107415777,
+    "peak_gib": 8.444005966186523,
+    "params": 271163,
+    "checks": {
+      "epochs100": true,
+      "val20": true,
+      "receipt_finished": true,
+      "config_match": true,
+      "eval6": true,
+      "eval_protocol": true,
+      "eval_cp": true,
+      "best_metric": true,
+      "audit100": true,
+      "checkpoints": true,
+      "primary_finite": true,
+      "evaluation_finite": true,
+      "path_budget": true
+    },
+    "nonfinite": [
+      [
+        2,
+        "train",
+        "coe_step4_router_grad_norm",
+        "inf"
+      ]
+    ],
+    "sets": {
+      "in_distribution": {
+        "mae": 13.17954011512545,
+        "rmse": 23.519515386300807
+      },
+      "unseen_combinations": {
+        "mae": 17.01770033551277,
+        "rmse": 29.35724004198057
+      },
+      "unseen_geometry": {
+        "mae": 21.92916420556821,
+        "rmse": 38.06099082212341
+      },
+      "unseen_triple": {
+        "mae": 16.265798813204967,
+        "rmse": 27.22455243037634
+      },
+      "unseen_combinations_repeat": {
+        "mae": 17.57299694164301,
+        "rmse": 30.929310803763197
+      },
+      "unseen_geometry_repeat": {
+        "mae": 21.833843533132562,
+        "rmse": 38.05134237298718
+      }
+    }
+  },
+  "W20": {
+    "val_mae": 14.380735961640282,
+    "best_epoch": 80,
+    "mean4_mae": 15.087735665165667,
+    "mean4_rmse": 25.629881194568537,
+    "mean4_relative": 0.7455002076157962,
+    "train_seconds": 5671.4116400288185,
+    "peak_gib": 8.451467037200928,
+    "params": 271163,
+    "checks": {
+      "epochs100": true,
+      "val20": true,
+      "receipt_finished": true,
+      "config_match": true,
+      "eval6": true,
+      "eval_protocol": true,
+      "eval_cp": true,
+      "best_metric": true,
+      "audit100": true,
+      "checkpoints": true,
+      "primary_finite": true,
+      "evaluation_finite": true,
+      "path_budget": true
+    },
+    "nonfinite": [],
+    "sets": {
+      "in_distribution": {
+        "mae": 13.497787835207006,
+        "rmse": 23.708945279880613
+      },
+      "unseen_combinations": {
+        "mae": 14.089190333980353,
+        "rmse": 24.005459399431484
+      },
+      "unseen_geometry": {
+        "mae": 19.18133555539648,
+        "rmse": 31.86723799911929
+      },
+      "unseen_triple": {
+        "mae": 13.582628936078828,
+        "rmse": 22.937882099842756
+      },
+      "unseen_combinations_repeat": {
+        "mae": 14.245491612360626,
+        "rmse": 24.597147941766288
+      },
+      "unseen_geometry_repeat": {
+        "mae": 19.24062161411607,
+        "rmse": 32.119979110883655
+      }
+    }
+  },
+  "W21": {
+    "val_mae": 17.32588500116007,
+    "best_epoch": 100,
+    "mean4_mae": 19.227196239222728,
+    "mean4_rmse": 32.657235112079185,
+    "mean4_relative": 0.9422532826545748,
+    "train_seconds": 6070.139343260904,
+    "peak_gib": 8.76032829284668,
+    "params": 271163,
+    "checks": {
+      "epochs100": true,
+      "val20": true,
+      "receipt_finished": true,
+      "config_match": true,
+      "eval6": true,
+      "eval_protocol": true,
+      "eval_cp": true,
+      "best_metric": true,
+      "audit100": true,
+      "checkpoints": true,
+      "primary_finite": true,
+      "evaluation_finite": true,
+      "path_budget": true
+    },
+    "nonfinite": [],
+    "sets": {
+      "in_distribution": {
+        "mae": 16.445804237813697,
+        "rmse": 28.62651495334048
+      },
+      "unseen_combinations": {
+        "mae": 17.681738453101595,
+        "rmse": 29.827319523276138
+      },
+      "unseen_geometry": {
+        "mae": 25.868006985083046,
+        "rmse": 43.958078890821064
+      },
+      "unseen_triple": {
+        "mae": 16.91323528089257,
+        "rmse": 28.217027080879063
+      },
+      "unseen_combinations_repeat": {
+        "mae": 17.81462766608008,
+        "rmse": 30.30118372863994
+      },
+      "unseen_geometry_repeat": {
+        "mae": 25.865580232589092,
+        "rmse": 44.27945139688791
+      }
+    }
+  },
+  "W22": {
+    "val_mae": 14.022862641513925,
+    "best_epoch": 100,
+    "mean4_mae": 15.630325740245057,
+    "mean4_rmse": 27.154470154422732,
+    "mean4_relative": 0.7663158289598714,
+    "train_seconds": 5747.455434248899,
+    "peak_gib": 8.460639476776123,
+    "params": 271163,
+    "checks": {
+      "epochs100": true,
+      "val20": true,
+      "receipt_finished": true,
+      "config_match": true,
+      "eval6": true,
+      "eval_protocol": true,
+      "eval_cp": true,
+      "best_metric": true,
+      "audit100": true,
+      "checkpoints": true,
+      "primary_finite": true,
+      "evaluation_finite": true,
+      "path_budget": true
+    },
+    "nonfinite": [],
+    "sets": {
+      "in_distribution": {
+        "mae": 13.230502888748038,
+        "rmse": 23.56100195727816
+      },
+      "unseen_combinations": {
+        "mae": 14.831904019678236,
+        "rmse": 25.29869876538355
+      },
+      "unseen_geometry": {
+        "mae": 20.201249211309374,
+        "rmse": 35.8010942248395
+      },
+      "unseen_triple": {
+        "mae": 14.257646841244581,
+        "rmse": 23.957085670189713
+      },
+      "unseen_combinations_repeat": {
+        "mae": 15.088857941799848,
+        "rmse": 26.09226503315821
+      },
+      "unseen_geometry_repeat": {
+        "mae": 20.386114427049083,
+        "rmse": 36.46581790505138
+      }
+    }
+  },
+  "W23": {
+    "val_mae": 13.832630374257107,
+    "best_epoch": 100,
+    "mean4_mae": 22.48084503164475,
+    "mean4_rmse": 39.17960941803413,
+    "mean4_relative": 1.0623107518525927,
+    "train_seconds": 4628.033573552151,
+    "peak_gib": 7.871994972229004,
+    "params": 271163,
+    "checks": {
+      "epochs100": true,
+      "val20": true,
+      "receipt_finished": true,
+      "config_match": true,
+      "eval6": true,
+      "eval_protocol": true,
+      "eval_cp": true,
+      "best_metric": true,
+      "audit100": true,
+      "checkpoints": true,
+      "primary_finite": true,
+      "evaluation_finite": true,
+      "path_budget": true
+    },
+    "nonfinite": [],
+    "sets": {
+      "in_distribution": {
+        "mae": 13.041089891306381,
+        "rmse": 23.42299259904796
+      },
+      "unseen_combinations": {
+        "mae": 26.190333296881498,
+        "rmse": 46.33011658938633
+      },
+      "unseen_geometry": {
+        "mae": 26.895479408789594,
+        "rmse": 46.79599396609483
+      },
+      "unseen_triple": {
+        "mae": 23.79647752960153,
+        "rmse": 40.16933451760743
+      },
+      "unseen_combinations_repeat": {
+        "mae": 25.936926513098918,
+        "rmse": 45.84368173627218
+      },
+      "unseen_geometry_repeat": {
+        "mae": 26.55360801230537,
+        "rmse": 46.14873279950758
+      }
+    }
+  },
+  "W24": {
+    "val_mae": 14.339314843568738,
+    "best_epoch": 85,
+    "mean4_mae": 16.714136013700376,
+    "mean4_rmse": 28.593468449873225,
+    "mean4_relative": 0.8175938890062127,
+    "train_seconds": 4685.2236151766265,
+    "peak_gib": 7.862817764282227,
+    "params": 271163,
+    "checks": {
+      "epochs100": true,
+      "val20": true,
+      "receipt_finished": true,
+      "config_match": true,
+      "eval6": true,
+      "eval_protocol": true,
+      "eval_cp": true,
+      "best_metric": true,
+      "audit100": true,
+      "checkpoints": true,
+      "primary_finite": true,
+      "evaluation_finite": true,
+      "path_budget": true
+    },
+    "nonfinite": [],
+    "sets": {
+      "in_distribution": {
+        "mae": 13.857467137590811,
+        "rmse": 24.567155249657095
+      },
+      "unseen_combinations": {
+        "mae": 16.095499197999658,
+        "rmse": 27.647580608516144
+      },
+      "unseen_geometry": {
+        "mae": 21.449185571260223,
+        "rmse": 35.92527797435005
+      },
+      "unseen_triple": {
+        "mae": 15.454392147950808,
+        "rmse": 26.233859966969607
+      },
+      "unseen_combinations_repeat": {
+        "mae": 16.197203556643995,
+        "rmse": 28.157864049472206
+      },
+      "unseen_geometry_repeat": {
+        "mae": 21.094293818823825,
+        "rmse": 35.045259473425794
+      }
+    }
+  },
+  "W25": {
+    "val_mae": 15.330283310429346,
+    "best_epoch": 100,
+    "mean4_mae": 29.024898759597384,
+    "mean4_rmse": 51.361196657985936,
+    "mean4_relative": 1.356373882588142,
+    "train_seconds": 4526.116250211839,
+    "peak_gib": 7.87589693069458,
+    "params": 271163,
+    "checks": {
+      "epochs100": true,
+      "val20": true,
+      "receipt_finished": true,
+      "config_match": true,
+      "eval6": true,
+      "eval_protocol": true,
+      "eval_cp": true,
+      "best_metric": true,
+      "audit100": true,
+      "checkpoints": true,
+      "primary_finite": true,
+      "evaluation_finite": true,
+      "path_budget": true
+    },
+    "nonfinite": [],
+    "sets": {
+      "in_distribution": {
+        "mae": 14.266697061682262,
+        "rmse": 24.862071738327497
+      },
+      "unseen_combinations": {
+        "mae": 33.40637056984291,
+        "rmse": 60.93877615101257
+      },
+      "unseen_geometry": {
+        "mae": 32.38758479548362,
+        "rmse": 57.94476253716672
+      },
+      "unseen_triple": {
+        "mae": 36.03894261138074,
+        "rmse": 61.69917620543697
+      },
+      "unseen_combinations_repeat": {
+        "mae": 33.22235769754857,
+        "rmse": 60.29958605345451
+      },
+      "unseen_geometry_repeat": {
+        "mae": 32.739319303333474,
+        "rmse": 58.69081133596565
+      }
+    }
+  },
+  "W26": {
+    "val_mae": 14.005238915362328,
+    "best_epoch": 90,
+    "mean4_mae": 18.398710176069564,
+    "mean4_rmse": 30.795414049732486,
+    "mean4_relative": 0.8881157634122847,
+    "train_seconds": 4805.189911248395,
+    "peak_gib": 7.864820957183838,
+    "params": 271163,
+    "checks": {
+      "epochs100": true,
+      "val20": true,
+      "receipt_finished": true,
+      "config_match": true,
+      "eval6": true,
+      "eval_protocol": true,
+      "eval_cp": true,
+      "best_metric": true,
+      "audit100": true,
+      "checkpoints": true,
+      "primary_finite": true,
+      "evaluation_finite": true,
+      "path_budget": true
+    },
+    "nonfinite": [],
+    "sets": {
+      "in_distribution": {
+        "mae": 13.326889858319868,
+        "rmse": 23.782515951191595
+      },
+      "unseen_combinations": {
+        "mae": 18.98373439345824,
+        "rmse": 31.665291997709183
+      },
+      "unseen_geometry": {
+        "mae": 22.289570119542837,
+        "rmse": 36.83476344796945
+      },
+      "unseen_triple": {
+        "mae": 18.994646332957302,
+        "rmse": 30.899084802059726
+      },
+      "unseen_combinations_repeat": {
+        "mae": 19.32691343360466,
+        "rmse": 32.523971608023245
+      },
+      "unseen_geometry_repeat": {
+        "mae": 22.042537439872458,
+        "rmse": 36.54702578253558
+      }
+    }
+  },
+  "W27": {
+    "val_mae": 14.689316628295051,
+    "best_epoch": 100,
+    "mean4_mae": 16.57030789780584,
+    "mean4_rmse": 28.510979015460975,
+    "mean4_relative": 0.8137854125288093,
+    "train_seconds": 4856.154303620686,
+    "peak_gib": 8.616705894470215,
+    "params": 276729,
+    "checks": {
+      "epochs100": true,
+      "val20": true,
+      "receipt_finished": true,
+      "config_match": true,
+      "eval6": true,
+      "eval_protocol": true,
+      "eval_cp": true,
+      "best_metric": true,
+      "audit100": true,
+      "checkpoints": true,
+      "primary_finite": true,
+      "evaluation_finite": true,
+      "path_budget": true
+    },
+    "nonfinite": [],
+    "sets": {
+      "in_distribution": {
+        "mae": 14.1075084336838,
+        "rmse": 24.843388761575177
+      },
+      "unseen_combinations": {
+        "mae": 15.749214780691846,
+        "rmse": 27.195109381146704
+      },
+      "unseen_geometry": {
+        "mae": 20.913875712069828,
+        "rmse": 35.48087850943829
+      },
+      "unseen_triple": {
+        "mae": 15.510632664777885,
+        "rmse": 26.524539409683747
+      },
+      "unseen_combinations_repeat": {
+        "mae": 15.971928387250875,
+        "rmse": 27.845485604700567
+      },
+      "unseen_geometry_repeat": {
+        "mae": 20.621873336285454,
+        "rmse": 34.67802358721184
+      }
+    }
+  },
+  "W28": {
+    "val_mae": 14.092517460572422,
+    "best_epoch": 95,
+    "mean4_mae": 21.934044476125962,
+    "mean4_rmse": 39.052835408186354,
+    "mean4_relative": 1.0406271538529968,
+    "train_seconds": 4818.1210960060125,
+    "peak_gib": 8.218902587890625,
+    "params": 274457,
+    "checks": {
+      "epochs100": true,
+      "val20": true,
+      "receipt_finished": true,
+      "config_match": true,
+      "eval6": true,
+      "eval_protocol": true,
+      "eval_cp": true,
+      "best_metric": true,
+      "audit100": true,
+      "checkpoints": true,
+      "primary_finite": true,
+      "evaluation_finite": true,
+      "path_budget": true
+    },
+    "nonfinite": [],
+    "sets": {
+      "in_distribution": {
+        "mae": 13.39244045880391,
+        "rmse": 23.778063051651163
+      },
+      "unseen_combinations": {
+        "mae": 25.026413491879634,
+        "rmse": 45.076998948655074
+      },
+      "unseen_geometry": {
+        "mae": 26.672453226239277,
+        "rmse": 45.921495333405986
+      },
+      "unseen_triple": {
+        "mae": 22.644870727581043,
+        "rmse": 41.43478429903319
+      },
+      "unseen_combinations_repeat": {
+        "mae": 24.991275408968015,
+        "rmse": 44.92056103993857
+      },
+      "unseen_geometry_repeat": {
+        "mae": 26.604667672569466,
+        "rmse": 45.62898586011457
+      }
+    }
+  },
+  "W29": {
+    "val_mae": 14.923441487747853,
+    "best_epoch": 95,
+    "mean4_mae": 16.977283422361545,
+    "mean4_rmse": 28.923529828259955,
+    "mean4_relative": 0.830971587588015,
+    "train_seconds": 4844.567554224748,
+    "peak_gib": 8.298665046691895,
+    "params": 273435,
+    "checks": {
+      "epochs100": true,
+      "val20": true,
+      "receipt_finished": true,
+      "config_match": true,
+      "eval6": true,
+      "eval_protocol": true,
+      "eval_cp": true,
+      "best_metric": true,
+      "audit100": true,
+      "checkpoints": true,
+      "primary_finite": true,
+      "evaluation_finite": true,
+      "path_budget": true
+    },
+    "nonfinite": [],
+    "sets": {
+      "in_distribution": {
+        "mae": 14.243461511897447,
+        "rmse": 24.909574826954202
+      },
+      "unseen_combinations": {
+        "mae": 15.873250266913772,
+        "rmse": 27.01794044286342
+      },
+      "unseen_geometry": {
+        "mae": 22.214698724677366,
+        "rmse": 37.73542374609961
+      },
+      "unseen_triple": {
+        "mae": 15.577723185957602,
+        "rmse": 26.031180297122585
+      },
+      "unseen_combinations_repeat": {
+        "mae": 16.046445820101557,
+        "rmse": 27.651454613432342
+      },
+      "unseen_geometry_repeat": {
+        "mae": 22.10279684804333,
+        "rmse": 37.10529713504207
+      }
+    }
+  },
+  "W30": {
+    "val_mae": 14.012774104216119,
+    "best_epoch": 100,
+    "mean4_mae": 16.41802683049968,
+    "mean4_rmse": 28.447545421557965,
+    "mean4_relative": 0.8019133644753454,
+    "train_seconds": 4873.322490050341,
+    "peak_gib": 8.6430025100708,
+    "params": 276729,
+    "checks": {
+      "epochs100": true,
+      "val20": true,
+      "receipt_finished": true,
+      "config_match": true,
+      "eval6": true,
+      "eval_protocol": true,
+      "eval_cp": true,
+      "best_metric": true,
+      "audit100": true,
+      "checkpoints": true,
+      "primary_finite": true,
+      "evaluation_finite": true,
+      "path_budget": true
+    },
+    "nonfinite": [],
+    "sets": {
+      "in_distribution": {
+        "mae": 13.388557335560252,
+        "rmse": 23.86911084034695
+      },
+      "unseen_combinations": {
+        "mae": 16.149156541689628,
+        "rmse": 28.529243712655617
+      },
+      "unseen_geometry": {
+        "mae": 20.813346637354115,
+        "rmse": 35.031684736559406
+      },
+      "unseen_triple": {
+        "mae": 15.321046807394735,
+        "rmse": 26.360142396669904
+      },
+      "unseen_combinations_repeat": {
+        "mae": 16.187212339258195,
+        "rmse": 28.601525217107223
+      },
+      "unseen_geometry_repeat": {
+        "mae": 20.650221202090417,
+        "rmse": 34.73078170122382
+      }
+    }
+  }
+}

@@ -38,6 +38,7 @@ from stmoe_imputer.utils import get_device, set_seed
 from stmoe_imputer.utils.run_naming import experiment_label
 from stmoe_imputer.utils.checkpoint import load_checkpoint, save_checkpoint, snapshot_model_state
 from stmoe_imputer.utils.train_logger import TrainLogger
+from stmoe_imputer.utils.metric_logging import compact_metrics
 
 
 def _rng_snapshot(device: torch.device) -> dict:
@@ -426,7 +427,7 @@ def main() -> None:
     git_meta = _git_metadata()
     git_commit = git_meta["git_commit"]
     started_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    logger = TrainLogger(log_dir) if is_main else _SilentLogger()
+    logger = TrainLogger(log_dir, cfg["train"].get("logging"), cfg["train"]["epochs"]) if is_main else _SilentLogger()
     logger.log_header(cfg, extra={
         "run_dir": str(run_dir),
         "command": " ".join(sys.argv),
@@ -547,9 +548,9 @@ def main() -> None:
             history["val_loss"].append(float(val_logs["loss"]) if val_logs else float("nan"))
             history["val_mae"].append(float(val_logs["mae"]) if val_logs else float("nan"))
 
-            metrics = {f"train_{key}": value for key, value in train_logs.items()}
+            metrics = {f"train_{key}": value for key, value in compact_metrics(train_logs).items()}
             if val_logs is not None:
-                metrics.update({f"val_{key}": value for key, value in val_logs.items()})
+                metrics.update({f"val_{key}": value for key, value in compact_metrics(val_logs).items()})
             if is_best:
                 best_mae = val_logs["mae"]
                 best_epoch = epoch

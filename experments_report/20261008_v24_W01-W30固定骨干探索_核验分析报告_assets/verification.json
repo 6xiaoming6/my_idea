@@ -1,0 +1,28 @@
+{
+  "source_bad": [],
+  "source_count": 421,
+  "current_changed": [],
+  "data_bad": [],
+  "issues": [],
+  "common_initializations": 1,
+  "all_data_order_same": true,
+  "all_second_view_same": true,
+  "W01_W02_exact": true,
+  "training_hours": 40.4637709810068,
+  "test_hours": 0.2650582020528964,
+  "confirmation_hours": 0.037643236409930975,
+  "amp_skips_range": [
+    11.0,
+    13.0
+  ],
+  "best_epoch_distribution": {
+    "100": 11,
+    "95": 10,
+    "85": 2,
+    "90": 4,
+    "75": 1,
+    "80": 2
+  },
+  "confirmation_protocols_verified": 24,
+  "selection_recomputed_matches": true
+}

@@ -1,0 +1,6 @@
+{
+  "V1": {"name": "cmff_delta_base", "mode": "none", "reference": "V1", "method": "U02：固定CMFF＋±0.1 RMS差分通信，无区域预测头和修正"},
+  "V2": {"name": "region_supervision", "mode": "aux", "reference": "V1", "method": "V1＋C/M原生尺度缺失均值预测头，各0.05辅助L1；输出不修正"},
+  "V3": {"name": "region_uniform", "mode": "uniform", "reference": "V2", "method": "V2＋输出端C→M协调，强度0.1，缺失位置均匀分配"},
+  "V4": {"name": "region_adaptive", "mode": "learned", "reference": "V3", "method": "V3的均匀分配替换为零输出初始化的共享条件分配头，区域缺失位置softmax"}
+}

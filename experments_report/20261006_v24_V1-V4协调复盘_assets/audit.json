@@ -1,0 +1,91 @@
+{
+  "source_hash_mismatches": [],
+  "runs": {
+    "V1": {
+      "epochs": 100,
+      "continuous_epochs": true,
+      "val_count": 20,
+      "receipt_config_match": true,
+      "protocol_match": true,
+      "best_matches_log": true,
+      "checkpoints": {
+        "best": {
+          "epoch": 95,
+          "config_match": true
+        },
+        "last": {
+          "epoch": 100,
+          "config_match": true
+        }
+      },
+      "evaluation_count": 6,
+      "nonfinite": [],
+      "amp_skips": 13.0
+    },
+    "V2": {
+      "epochs": 100,
+      "continuous_epochs": true,
+      "val_count": 20,
+      "receipt_config_match": true,
+      "protocol_match": true,
+      "best_matches_log": true,
+      "checkpoints": {
+        "best": {
+          "epoch": 100,
+          "config_match": true
+        },
+        "last": {
+          "epoch": 100,
+          "config_match": true
+        }
+      },
+      "evaluation_count": 6,
+      "nonfinite": [],
+      "amp_skips": 12.0
+    },
+    "V3": {
+      "epochs": 100,
+      "continuous_epochs": true,
+      "val_count": 20,
+      "receipt_config_match": true,
+      "protocol_match": true,
+      "best_matches_log": true,
+      "checkpoints": {
+        "best": {
+          "epoch": 100,
+          "config_match": true
+        },
+        "last": {
+          "epoch": 100,
+          "config_match": true
+        }
+      },
+      "evaluation_count": 6,
+      "nonfinite": [],
+      "amp_skips": 12.0
+    },
+    "V4": {
+      "epochs": 100,
+      "continuous_epochs": true,
+      "val_count": 20,
+      "receipt_config_match": true,
+      "protocol_match": true,
+      "best_matches_log": true,
+      "checkpoints": {
+        "best": {
+          "epoch": 100,
+          "config_match": true
+        },
+        "last": {
+          "epoch": 100,
+          "config_match": true
+        }
+      },
+      "evaluation_count": 6,
+      "nonfinite": [],
+      "amp_skips": 11.0
+    }
+  },
+  "invalid_diagnostics": "coord_*_demeaned_mae sums signed residuals without abs; invalid MAE, excluded",
+  "failures": []
+}

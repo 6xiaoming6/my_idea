@@ -228,10 +228,16 @@ class _CoEQualityMetrics:
     def __init__(self) -> None:
         self.family = {name: MaskedMetricAccumulator() for name in FAMILIES}
         self.acceptance: dict[str, list[float]] = defaultdict(_zero_pair)
+        self.coordination = None
 
     @torch.no_grad()
     def update(self, outputs: dict, batch: dict) -> None:
         target, mask = batch["x_f_gt"], batch["m_f"]
+        if "coordination" in outputs:
+            if self.coordination is None:
+                from .coordination import CoordinationMetrics
+                self.coordination = CoordinationMetrics()
+            self.coordination.update(outputs, batch)
         family_ids = batch.get("mask_family")
         if family_ids is not None:
             for family_id in family_ids.unique().tolist():
@@ -262,6 +268,11 @@ class _CoEQualityMetrics:
             old = accepted
 
     def merge(self, other: "_CoEQualityMetrics") -> None:
+        if other.coordination is not None:
+            if self.coordination is None:
+                from .coordination import CoordinationMetrics
+                self.coordination = CoordinationMetrics()
+            self.coordination.merge(other.coordination)
         for name, metric in other.family.items():
             self.family[name].merge(metric)
         for name, values in other.acceptance.items():
@@ -277,6 +288,8 @@ class _CoEQualityMetrics:
                 result[f"coe_family_{name}_count"] = metric.count
                 result[f"coe_family_{name}_mae"] = metric.absolute_error / metric.count
                 result[f"coe_family_{name}_rmse"] = (metric.squared_error / metric.count) ** 0.5
+        if self.coordination is not None:
+            result.update(self.coordination.compute())
         for key, (total, count) in self.acceptance.items():
             result[key] = total / count
         return result
@@ -418,6 +431,7 @@ def train_one_epoch(
     scaler: torch.amp.GradScaler | None = None,
     show_progress: bool = True,
     total_epochs: int | None = None,
+    training_context=None,
 ) -> dict[str, float]:
     model.train()
     if hasattr(getattr(loader, 'dataset', None), 'set_epoch'):
@@ -458,6 +472,8 @@ def train_one_epoch(
     total_epochs = int(total_epochs or cfg["train"]["epochs"])
     progress = tqdm(loader, desc=f"train epoch {epoch}/{total_epochs}", leave=True, disable=not show_progress)
     for batch_index, batch in enumerate(progress):
+        if training_context is not None:
+            training_context.record_batch(batch)
         batch = move_batch_to_device(batch, device)
         if is_coe and not (dist.is_available() and dist.is_initialized()) and not bool(supervision_mask(
             batch["x_f_gt"], batch["m_f"], batch.get("target_mask")
@@ -473,6 +489,11 @@ def train_one_epoch(
         with torch.autocast(device_type=device.type, enabled=use_amp):
             outputs = model(batch)
             loss, loss_dict = compute_main_stage_loss(outputs, batch, cfg, epoch=epoch)
+            if training_context is not None:
+                extra, extra_logs = training_context.extra_loss(core_model, batch, outputs)
+                loss = loss + extra
+                loss_dict.update(extra_logs)
+                loss_dict["loss"] = loss.detach()
             if four_direction and "four_probe" in outputs:
                 auxiliary, probe_logs = core_model.main_branch.candidate_loss(batch, outputs)
                 loss = loss + 0.1 * auxiliary
@@ -560,6 +581,11 @@ def train_one_epoch(
                 if gradients:
                     logs["coe_acceptance_head_grad_norm"].append(
                         float(torch.stack(gradients).sum().sqrt().cpu()))
+        if training_context is not None:
+            for group in ('adapter','feedback','coverage'):
+                gs=[p.grad.detach().float().square().sum() for n,p in core_model.main_branch.named_parameters()
+                    if n.startswith(group) and p.grad is not None]
+                if gs:logs[f'w_{group}_grad_norm'].append(float(torch.stack(gs).sum().sqrt()))
         if grad_clip:
             torch.nn.utils.clip_grad_norm_(model.parameters(), grad_clip)
         previous_scale = scaler.get_scale()
@@ -569,6 +595,8 @@ def train_one_epoch(
             skipped_amp_steps += 1
         else:
             optimizer_steps += 1
+            if training_context is not None:
+                training_context.after_update(core_model)
 
         metrics = masked_metrics(outputs["x_hat_final"], batch["x_f_gt"], batch["m_f"], target_mask=batch.get("target_mask"))
         exact_metrics[""].update(outputs["x_hat_final"], batch["x_f_gt"], batch["m_f"], target_mask=batch.get("target_mask"))
