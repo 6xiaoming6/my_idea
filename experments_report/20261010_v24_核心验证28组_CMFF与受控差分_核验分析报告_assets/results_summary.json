@@ -1,0 +1,1822 @@
+{
+  "taxibj_K01_seed7": {
+    "name": "taxibj_K01_seed7",
+    "dataset": "taxibj",
+    "method": "K01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261009_112416_fine_plain_seed7/random/rate0.4/20261009_112416_seed7_bs32",
+    "best_epoch": 90,
+    "best_val_mae": 16.497243862028757,
+    "minutes": 106.3765379037126,
+    "peak_gib": 11.099058628082275,
+    "parameters": 330807,
+    "trainable": 250043,
+    "samples": {
+      "train": 2452,
+      "val": 342,
+      "test": 707
+    },
+    "steps": {
+      "train": 77,
+      "val": 11,
+      "test": 23
+    },
+    "runtime": {
+      "torch": "2.6.0+cu124",
+      "python": "3.9.25 (main, Nov  3 2025, 22:33:05) \n[GCC 11.2.0]",
+      "cuda": "12.4",
+      "cudnn": 90100,
+      "device": "cuda",
+      "gpu_name": "NVIDIA GeForce RTX 3090",
+      "deterministic": true,
+      "cublas_workspace": ":4096:8",
+      "tf32": false,
+      "cudnn_benchmark": false
+    },
+    "amp_skips": 11.0,
+    "optimizer_steps": 7689.0,
+    "empty_skips": 0.0,
+    "test": {
+      "in_distribution": {
+        "mae": 15.937231044805541,
+        "rmse": 28.47551388721385
+      },
+      "unseen_combinations": {
+        "mae": 25.332755688644724,
+        "rmse": 46.97523656499151
+      },
+      "unseen_geometry": {
+        "mae": 31.654311880468676,
+        "rmse": 57.24015337229154
+      },
+      "unseen_triple": {
+        "mae": 24.221693524715064,
+        "rmse": 42.48105711680489
+      },
+      "unseen_combinations_repeat": {
+        "mae": 25.22670886865972,
+        "rmse": 46.45565558232765
+      },
+      "unseen_geometry_repeat": {
+        "mae": 31.478640153471822,
+        "rmse": 56.98372995819397
+      }
+    },
+    "issues": []
+  },
+  "taxibj_K02_seed7": {
+    "name": "taxibj_K02_seed7",
+    "dataset": "taxibj",
+    "method": "K02",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261009_131133_cmff_plain_seed7/random/rate0.4/20261009_131133_seed7_bs32",
+    "best_epoch": 100,
+    "best_val_mae": 15.467767842801306,
+    "minutes": 74.48299959978516,
+    "peak_gib": 7.473761558532715,
+    "parameters": 330807,
+    "trainable": 250043,
+    "samples": {
+      "train": 2452,
+      "val": 342,
+      "test": 707
+    },
+    "steps": {
+      "train": 77,
+      "val": 11,
+      "test": 23
+    },
+    "runtime": {
+      "torch": "2.6.0+cu124",
+      "python": "3.9.25 (main, Nov  3 2025, 22:33:05) \n[GCC 11.2.0]",
+      "cuda": "12.4",
+      "cudnn": 90100,
+      "device": "cuda",
+      "gpu_name": "NVIDIA GeForce RTX 3090",
+      "deterministic": true,
+      "cublas_workspace": ":4096:8",
+      "tf32": false,
+      "cudnn_benchmark": false
+    },
+    "amp_skips": 13.0,
+    "optimizer_steps": 7687.0,
+    "empty_skips": 0.0,
+    "test": {
+      "in_distribution": {
+        "mae": 14.76482837300588,
+        "rmse": 25.79473803910485
+      },
+      "unseen_combinations": {
+        "mae": 17.406888673035667,
+        "rmse": 29.81831284410353
+      },
+      "unseen_geometry": {
+        "mae": 20.982201253523478,
+        "rmse": 35.010043310507704
+      },
+      "unseen_triple": {
+        "mae": 16.422897622381043,
+        "rmse": 27.50204661288937
+      },
+      "unseen_combinations_repeat": {
+        "mae": 17.59447473653956,
+        "rmse": 30.195090727914987
+      },
+      "unseen_geometry_repeat": {
+        "mae": 20.92147049703517,
+        "rmse": 34.80647272807547
+      }
+    },
+    "issues": []
+  },
+  "taxibj_K03_seed7": {
+    "name": "taxibj_K03_seed7",
+    "dataset": "taxibj",
+    "method": "K03",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261009_142644_fine_delta_seed7/random/rate0.4/20261009_142644_seed7_bs32",
+    "best_epoch": 90,
+    "best_val_mae": 16.413775781858853,
+    "minutes": 106.04211323767474,
+    "peak_gib": 11.476171970367432,
+    "parameters": 330807,
+    "trainable": 271163,
+    "samples": {
+      "train": 2452,
+      "val": 342,
+      "test": 707
+    },
+    "steps": {
+      "train": 77,
+      "val": 11,
+      "test": 23
+    },
+    "runtime": {
+      "torch": "2.6.0+cu124",
+      "python": "3.9.25 (main, Nov  3 2025, 22:33:05) \n[GCC 11.2.0]",
+      "cuda": "12.4",
+      "cudnn": 90100,
+      "device": "cuda",
+      "gpu_name": "NVIDIA GeForce RTX 3090",
+      "deterministic": true,
+      "cublas_workspace": ":4096:8",
+      "tf32": false,
+      "cudnn_benchmark": false
+    },
+    "amp_skips": 12.0,
+    "optimizer_steps": 7688.0,
+    "empty_skips": 0.0,
+    "test": {
+      "in_distribution": {
+        "mae": 15.634775689910947,
+        "rmse": 28.168748581994063
+      },
+      "unseen_combinations": {
+        "mae": 28.48322825102413,
+        "rmse": 53.293828865308214
+      },
+      "unseen_geometry": {
+        "mae": 32.061021695197425,
+        "rmse": 55.394921318114264
+      },
+      "unseen_triple": {
+        "mae": 27.967321570661642,
+        "rmse": 49.13622649587281
+      },
+      "unseen_combinations_repeat": {
+        "mae": 28.177069148293263,
+        "rmse": 52.007347387942836
+      },
+      "unseen_geometry_repeat": {
+        "mae": 31.546811027927383,
+        "rmse": 54.592897349504135
+      }
+    },
+    "issues": []
+  },
+  "taxibj_K04_seed7": {
+    "name": "taxibj_K04_seed7",
+    "dataset": "taxibj",
+    "method": "K04",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261009_161342_cmff_delta_seed7/random/rate0.4/20261009_161342_seed7_bs32",
+    "best_epoch": 100,
+    "best_val_mae": 14.341614612149227,
+    "minutes": 78.57385656998376,
+    "peak_gib": 7.869661331176758,
+    "parameters": 330807,
+    "trainable": 271163,
+    "samples": {
+      "train": 2452,
+      "val": 342,
+      "test": 707
+    },
+    "steps": {
+      "train": 77,
+      "val": 11,
+      "test": 23
+    },
+    "runtime": {
+      "torch": "2.6.0+cu124",
+      "python": "3.9.25 (main, Nov  3 2025, 22:33:05) \n[GCC 11.2.0]",
+      "cuda": "12.4",
+      "cudnn": 90100,
+      "device": "cuda",
+      "gpu_name": "NVIDIA GeForce RTX 3090",
+      "deterministic": true,
+      "cublas_workspace": ":4096:8",
+      "tf32": false,
+      "cudnn_benchmark": false
+    },
+    "amp_skips": 11.0,
+    "optimizer_steps": 7689.0,
+    "empty_skips": 0.0,
+    "test": {
+      "in_distribution": {
+        "mae": 13.51282794961301,
+        "rmse": 24.148973123681294
+      },
+      "unseen_combinations": {
+        "mae": 22.128486947844618,
+        "rmse": 38.2790630217423
+      },
+      "unseen_geometry": {
+        "mae": 25.97744488698252,
+        "rmse": 44.29221365879767
+      },
+      "unseen_triple": {
+        "mae": 22.33873289341723,
+        "rmse": 37.11130000540129
+      },
+      "unseen_combinations_repeat": {
+        "mae": 22.312937781752307,
+        "rmse": 38.4998018505619
+      },
+      "unseen_geometry_repeat": {
+        "mae": 25.88692628827263,
+        "rmse": 43.95711047847427
+      }
+    },
+    "issues": []
+  },
+  "taxibj_K05_seed7": {
+    "name": "taxibj_K05_seed7",
+    "dataset": "taxibj",
+    "method": "K05",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261009_173301_cmff_independent_plain_seed7/random/rate0.4/20261009_173301_seed7_bs32",
+    "best_epoch": 80,
+    "best_val_mae": 14.306369242026735,
+    "minutes": 74.70613071624538,
+    "peak_gib": 7.473747253417969,
+    "parameters": 821175,
+    "trainable": 740411,
+    "samples": {
+      "train": 2452,
+      "val": 342,
+      "test": 707
+    },
+    "steps": {
+      "train": 77,
+      "val": 11,
+      "test": 23
+    },
+    "runtime": {
+      "torch": "2.6.0+cu124",
+      "python": "3.9.25 (main, Nov  3 2025, 22:33:05) \n[GCC 11.2.0]",
+      "cuda": "12.4",
+      "cudnn": 90100,
+      "device": "cuda",
+      "gpu_name": "NVIDIA GeForce RTX 3090",
+      "deterministic": true,
+      "cublas_workspace": ":4096:8",
+      "tf32": false,
+      "cudnn_benchmark": false
+    },
+    "amp_skips": 12.0,
+    "optimizer_steps": 7688.0,
+    "empty_skips": 0.0,
+    "test": {
+      "in_distribution": {
+        "mae": 13.515570915787626,
+        "rmse": 23.79842105826062
+      },
+      "unseen_combinations": {
+        "mae": 17.669424469877594,
+        "rmse": 31.22783168288077
+      },
+      "unseen_geometry": {
+        "mae": 22.25887982908885,
+        "rmse": 37.419609184672666
+      },
+      "unseen_triple": {
+        "mae": 17.46488456159233,
+        "rmse": 30.288974174961336
+      },
+      "unseen_combinations_repeat": {
+        "mae": 17.91391289833823,
+        "rmse": 32.10253316345766
+      },
+      "unseen_geometry_repeat": {
+        "mae": 21.881884855485257,
+        "rmse": 36.30478252791516
+      }
+    },
+    "issues": []
+  },
+  "taxibj_K06_seed7": {
+    "name": "taxibj_K06_seed7",
+    "dataset": "taxibj",
+    "method": "K06",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261009_184831_cmff_independent_delta_seed7/random/rate0.4/20261009_184831_seed7_bs32",
+    "best_epoch": 100,
+    "best_val_mae": 13.534147391622495,
+    "minutes": 75.65088613574432,
+    "peak_gib": 7.8744001388549805,
+    "parameters": 821175,
+    "trainable": 761531,
+    "samples": {
+      "train": 2452,
+      "val": 342,
+      "test": 707
+    },
+    "steps": {
+      "train": 77,
+      "val": 11,
+      "test": 23
+    },
+    "runtime": {
+      "torch": "2.6.0+cu124",
+      "python": "3.9.25 (main, Nov  3 2025, 22:33:05) \n[GCC 11.2.0]",
+      "cuda": "12.4",
+      "cudnn": 90100,
+      "device": "cuda",
+      "gpu_name": "NVIDIA GeForce RTX 3090",
+      "deterministic": true,
+      "cublas_workspace": ":4096:8",
+      "tf32": false,
+      "cudnn_benchmark": false
+    },
+    "amp_skips": 12.0,
+    "optimizer_steps": 7688.0,
+    "empty_skips": 0.0,
+    "test": {
+      "in_distribution": {
+        "mae": 12.69169562729053,
+        "rmse": 22.6919967433013
+      },
+      "unseen_combinations": {
+        "mae": 24.56731322510975,
+        "rmse": 45.59821434320678
+      },
+      "unseen_geometry": {
+        "mae": 24.93391788768326,
+        "rmse": 43.422242450960546
+      },
+      "unseen_triple": {
+        "mae": 22.75051661484271,
+        "rmse": 41.96370913276813
+      },
+      "unseen_combinations_repeat": {
+        "mae": 24.565601127944504,
+        "rmse": 45.467885215406085
+      },
+      "unseen_geometry_repeat": {
+        "mae": 24.673587731175385,
+        "rmse": 42.69174195939735
+      }
+    },
+    "issues": []
+  },
+  "taxibj_K07_seed7": {
+    "name": "taxibj_K07_seed7",
+    "dataset": "taxibj",
+    "method": "K07",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261009_200500_cmff_unconditional_delta_seed7/random/rate0.4/20261009_200500_seed7_bs32",
+    "best_epoch": 100,
+    "best_val_mae": 14.346897550760591,
+    "minutes": 77.4001145520849,
+    "peak_gib": 7.865882396697998,
+    "parameters": 330807,
+    "trainable": 271163,
+    "samples": {
+      "train": 2452,
+      "val": 342,
+      "test": 707
+    },
+    "steps": {
+      "train": 77,
+      "val": 11,
+      "test": 23
+    },
+    "runtime": {
+      "torch": "2.6.0+cu124",
+      "python": "3.9.25 (main, Nov  3 2025, 22:33:05) \n[GCC 11.2.0]",
+      "cuda": "12.4",
+      "cudnn": 90100,
+      "device": "cuda",
+      "gpu_name": "NVIDIA GeForce RTX 3090",
+      "deterministic": true,
+      "cublas_workspace": ":4096:8",
+      "tf32": false,
+      "cudnn_benchmark": false
+    },
+    "amp_skips": 12.0,
+    "optimizer_steps": 7688.0,
+    "empty_skips": 0.0,
+    "test": {
+      "in_distribution": {
+        "mae": 13.423781099771073,
+        "rmse": 24.141917318530627
+      },
+      "unseen_combinations": {
+        "mae": 21.3326619001095,
+        "rmse": 36.38085040512875
+      },
+      "unseen_geometry": {
+        "mae": 23.457607249334874,
+        "rmse": 40.23674806864465
+      },
+      "unseen_triple": {
+        "mae": 21.490545236128757,
+        "rmse": 36.328160988696176
+      },
+      "unseen_combinations_repeat": {
+        "mae": 21.72044003720965,
+        "rmse": 37.47652278629538
+      },
+      "unseen_geometry_repeat": {
+        "mae": 23.596795577864718,
+        "rmse": 40.6616559454119
+      }
+    },
+    "issues": []
+  },
+  "taxibj_K08_seed7": {
+    "name": "taxibj_K08_seed7",
+    "dataset": "taxibj",
+    "method": "K08",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261009_212308_cmff_raw_delta_seed7/random/rate0.4/20261009_212308_seed7_bs32",
+    "best_epoch": 90,
+    "best_val_mae": 14.765518938920717,
+    "minutes": 78.48172522039773,
+    "peak_gib": 7.878287315368652,
+    "parameters": 330807,
+    "trainable": 271163,
+    "samples": {
+      "train": 2452,
+      "val": 342,
+      "test": 707
+    },
+    "steps": {
+      "train": 77,
+      "val": 11,
+      "test": 23
+    },
+    "runtime": {
+      "torch": "2.6.0+cu124",
+      "python": "3.9.25 (main, Nov  3 2025, 22:33:05) \n[GCC 11.2.0]",
+      "cuda": "12.4",
+      "cudnn": 90100,
+      "device": "cuda",
+      "gpu_name": "NVIDIA GeForce RTX 3090",
+      "deterministic": true,
+      "cublas_workspace": ":4096:8",
+      "tf32": false,
+      "cudnn_benchmark": false
+    },
+    "amp_skips": 12.0,
+    "optimizer_steps": 7688.0,
+    "empty_skips": 0.0,
+    "test": {
+      "in_distribution": {
+        "mae": 13.824986375526812,
+        "rmse": 24.227781847917708
+      },
+      "unseen_combinations": {
+        "mae": 24.265756649282498,
+        "rmse": 42.20655797993894
+      },
+      "unseen_geometry": {
+        "mae": 26.627185563346337,
+        "rmse": 45.15345474254535
+      },
+      "unseen_triple": {
+        "mae": 24.43640586936909,
+        "rmse": 40.38523645016149
+      },
+      "unseen_combinations_repeat": {
+        "mae": 24.265260111427505,
+        "rmse": 42.19447635613162
+      },
+      "unseen_geometry_repeat": {
+        "mae": 26.44183019032175,
+        "rmse": 44.769266324970864
+      }
+    },
+    "issues": []
+  },
+  "taxibj_K01_seed17": {
+    "name": "taxibj_K01_seed17",
+    "dataset": "taxibj",
+    "method": "K01",
+    "seed": 17,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261009_224222_fine_plain_seed17/random/rate0.4/20261009_224222_seed17_bs32",
+    "best_epoch": 100,
+    "best_val_mae": 17.85267277637974,
+    "minutes": 70.58970132778632,
+    "peak_gib": 11.140829086303711,
+    "parameters": 330807,
+    "trainable": 250043,
+    "samples": {
+      "train": 2452,
+      "val": 342,
+      "test": 707
+    },
+    "steps": {
+      "train": 77,
+      "val": 11,
+      "test": 23
+    },
+    "runtime": {
+      "torch": "2.6.0+cu124",
+      "python": "3.9.25 (main, Nov  3 2025, 22:33:05) \n[GCC 11.2.0]",
+      "cuda": "12.4",
+      "cudnn": 90100,
+      "device": "cuda",
+      "gpu_name": "NVIDIA GeForce RTX 3090",
+      "deterministic": true,
+      "cublas_workspace": ":4096:8",
+      "tf32": false,
+      "cudnn_benchmark": false
+    },
+    "amp_skips": 11.0,
+    "optimizer_steps": 7689.0,
+    "empty_skips": 0.0,
+    "test": {
+      "in_distribution": {
+        "mae": 16.890588960345678,
+        "rmse": 29.34197528767263
+      },
+      "unseen_combinations": {
+        "mae": 26.951271905275107,
+        "rmse": 47.120244958387445
+      },
+      "unseen_geometry": {
+        "mae": 33.709352755686844,
+        "rmse": 57.85455217889142
+      },
+      "unseen_triple": {
+        "mae": 28.12031177830761,
+        "rmse": 46.74031444134813
+      },
+      "unseen_combinations_repeat": {
+        "mae": 26.861702361287573,
+        "rmse": 46.377779433008676
+      },
+      "unseen_geometry_repeat": {
+        "mae": 33.21379483755671,
+        "rmse": 57.29577692217046
+      }
+    },
+    "issues": []
+  },
+  "taxibj_K02_seed17": {
+    "name": "taxibj_K02_seed17",
+    "dataset": "taxibj",
+    "method": "K02",
+    "seed": 17,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261009_235350_cmff_plain_seed17/random/rate0.4/20261009_235350_seed17_bs32",
+    "best_epoch": 90,
+    "best_val_mae": 14.409547021589239,
+    "minutes": 51.62936017253669,
+    "peak_gib": 7.494946479797363,
+    "parameters": 330807,
+    "trainable": 250043,
+    "samples": {
+      "train": 2452,
+      "val": 342,
+      "test": 707
+    },
+    "steps": {
+      "train": 77,
+      "val": 11,
+      "test": 23
+    },
+    "runtime": {
+      "torch": "2.6.0+cu124",
+      "python": "3.9.25 (main, Nov  3 2025, 22:33:05) \n[GCC 11.2.0]",
+      "cuda": "12.4",
+      "cudnn": 90100,
+      "device": "cuda",
+      "gpu_name": "NVIDIA GeForce RTX 3090",
+      "deterministic": true,
+      "cublas_workspace": ":4096:8",
+      "tf32": false,
+      "cudnn_benchmark": false
+    },
+    "amp_skips": 11.0,
+    "optimizer_steps": 7689.0,
+    "empty_skips": 0.0,
+    "test": {
+      "in_distribution": {
+        "mae": 13.568009341262567,
+        "rmse": 23.77116471564592
+      },
+      "unseen_combinations": {
+        "mae": 24.558179265872017,
+        "rmse": 44.15695690725738
+      },
+      "unseen_geometry": {
+        "mae": 23.71341590633413,
+        "rmse": 40.586085111936654
+      },
+      "unseen_triple": {
+        "mae": 23.394039090637012,
+        "rmse": 40.9465215032437
+      },
+      "unseen_combinations_repeat": {
+        "mae": 24.28208109286441,
+        "rmse": 43.40111073524523
+      },
+      "unseen_geometry_repeat": {
+        "mae": 24.021919182862554,
+        "rmse": 41.48984276729284
+      }
+    },
+    "issues": []
+  },
+  "taxibj_K03_seed17": {
+    "name": "taxibj_K03_seed17",
+    "dataset": "taxibj",
+    "method": "K03",
+    "seed": 17,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261010_004609_fine_delta_seed17/random/rate0.4/20261010_004609_seed17_bs32",
+    "best_epoch": 100,
+    "best_val_mae": 16.64919813734064,
+    "minutes": 94.10760560394071,
+    "peak_gib": 11.528730392456055,
+    "parameters": 330807,
+    "trainable": 271163,
+    "samples": {
+      "train": 2452,
+      "val": 342,
+      "test": 707
+    },
+    "steps": {
+      "train": 77,
+      "val": 11,
+      "test": 23
+    },
+    "runtime": {
+      "torch": "2.6.0+cu124",
+      "python": "3.9.25 (main, Nov  3 2025, 22:33:05) \n[GCC 11.2.0]",
+      "cuda": "12.4",
+      "cudnn": 90100,
+      "device": "cuda",
+      "gpu_name": "NVIDIA GeForce RTX 3090",
+      "deterministic": true,
+      "cublas_workspace": ":4096:8",
+      "tf32": false,
+      "cudnn_benchmark": false
+    },
+    "amp_skips": 12.0,
+    "optimizer_steps": 7688.0,
+    "empty_skips": 0.0,
+    "test": {
+      "in_distribution": {
+        "mae": 15.741758052558271,
+        "rmse": 28.01367061314355
+      },
+      "unseen_combinations": {
+        "mae": 37.62726429751317,
+        "rmse": 65.06257401167551
+      },
+      "unseen_geometry": {
+        "mae": 36.35506945513618,
+        "rmse": 63.494975755770376
+      },
+      "unseen_triple": {
+        "mae": 41.655556914505574,
+        "rmse": 68.30784653071262
+      },
+      "unseen_combinations_repeat": {
+        "mae": 37.6105712242493,
+        "rmse": 64.85406546994847
+      },
+      "unseen_geometry_repeat": {
+        "mae": 36.18162974959028,
+        "rmse": 62.781452101071864
+      }
+    },
+    "issues": []
+  },
+  "taxibj_K04_seed17": {
+    "name": "taxibj_K04_seed17",
+    "dataset": "taxibj",
+    "method": "K04",
+    "seed": 17,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261010_022111_cmff_delta_seed17/random/rate0.4/20261010_022111_seed17_bs32",
+    "best_epoch": 100,
+    "best_val_mae": 13.864177270915505,
+    "minutes": 74.09250925996652,
+    "peak_gib": 7.880284786224365,
+    "parameters": 330807,
+    "trainable": 271163,
+    "samples": {
+      "train": 2452,
+      "val": 342,
+      "test": 707
+    },
+    "steps": {
+      "train": 77,
+      "val": 11,
+      "test": 23
+    },
+    "runtime": {
+      "torch": "2.6.0+cu124",
+      "python": "3.9.25 (main, Nov  3 2025, 22:33:05) \n[GCC 11.2.0]",
+      "cuda": "12.4",
+      "cudnn": 90100,
+      "device": "cuda",
+      "gpu_name": "NVIDIA GeForce RTX 3090",
+      "deterministic": true,
+      "cublas_workspace": ":4096:8",
+      "tf32": false,
+      "cudnn_benchmark": false
+    },
+    "amp_skips": 11.0,
+    "optimizer_steps": 7689.0,
+    "empty_skips": 0.0,
+    "test": {
+      "in_distribution": {
+        "mae": 12.991209094205454,
+        "rmse": 23.340684454632893
+      },
+      "unseen_combinations": {
+        "mae": 31.74161343079883,
+        "rmse": 55.724653964205125
+      },
+      "unseen_geometry": {
+        "mae": 31.784569955869298,
+        "rmse": 55.12101288858507
+      },
+      "unseen_triple": {
+        "mae": 29.0669478733951,
+        "rmse": 48.82772773997187
+      },
+      "unseen_combinations_repeat": {
+        "mae": 32.11800333390409,
+        "rmse": 56.41538572756726
+      },
+      "unseen_geometry_repeat": {
+        "mae": 31.349116873338982,
+        "rmse": 53.732728471053704
+      }
+    },
+    "issues": []
+  },
+  "taxibj_K01_seed27": {
+    "name": "taxibj_K01_seed27",
+    "dataset": "taxibj",
+    "method": "K01",
+    "seed": 27,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261010_033602_fine_plain_seed27/random/rate0.4/20261010_033602_seed27_bs32",
+    "best_epoch": 90,
+    "best_val_mae": 16.476847191733146,
+    "minutes": 90.33993597933635,
+    "peak_gib": 11.074283599853516,
+    "parameters": 330807,
+    "trainable": 250043,
+    "samples": {
+      "train": 2452,
+      "val": 342,
+      "test": 707
+    },
+    "steps": {
+      "train": 77,
+      "val": 11,
+      "test": 23
+    },
+    "runtime": {
+      "torch": "2.6.0+cu124",
+      "python": "3.9.25 (main, Nov  3 2025, 22:33:05) \n[GCC 11.2.0]",
+      "cuda": "12.4",
+      "cudnn": 90100,
+      "device": "cuda",
+      "gpu_name": "NVIDIA GeForce RTX 3090",
+      "deterministic": true,
+      "cublas_workspace": ":4096:8",
+      "tf32": false,
+      "cudnn_benchmark": false
+    },
+    "amp_skips": 10.0,
+    "optimizer_steps": 7690.0,
+    "empty_skips": 0.0,
+    "test": {
+      "in_distribution": {
+        "mae": 15.516176287553185,
+        "rmse": 27.43093502519459
+      },
+      "unseen_combinations": {
+        "mae": 26.99566735457516,
+        "rmse": 48.360035467904154
+      },
+      "unseen_geometry": {
+        "mae": 33.56400478933956,
+        "rmse": 58.38582513480374
+      },
+      "unseen_triple": {
+        "mae": 27.40725541417679,
+        "rmse": 46.35543005905291
+      },
+      "unseen_combinations_repeat": {
+        "mae": 27.054369004332493,
+        "rmse": 48.203844030139585
+      },
+      "unseen_geometry_repeat": {
+        "mae": 33.58168437338575,
+        "rmse": 58.77479995241292
+      }
+    },
+    "issues": []
+  },
+  "taxibj_K02_seed27": {
+    "name": "taxibj_K02_seed27",
+    "dataset": "taxibj",
+    "method": "K02",
+    "seed": 27,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261010_050716_cmff_plain_seed27/random/rate0.4/20261010_050716_seed27_bs32",
+    "best_epoch": 100,
+    "best_val_mae": 14.671804001356392,
+    "minutes": 61.054084213477715,
+    "peak_gib": 7.527649879455566,
+    "parameters": 330807,
+    "trainable": 250043,
+    "samples": {
+      "train": 2452,
+      "val": 342,
+      "test": 707
+    },
+    "steps": {
+      "train": 77,
+      "val": 11,
+      "test": 23
+    },
+    "runtime": {
+      "torch": "2.6.0+cu124",
+      "python": "3.9.25 (main, Nov  3 2025, 22:33:05) \n[GCC 11.2.0]",
+      "cuda": "12.4",
+      "cudnn": 90100,
+      "device": "cuda",
+      "gpu_name": "NVIDIA GeForce RTX 3090",
+      "deterministic": true,
+      "cublas_workspace": ":4096:8",
+      "tf32": false,
+      "cudnn_benchmark": false
+    },
+    "amp_skips": 12.0,
+    "optimizer_steps": 7688.0,
+    "empty_skips": 0.0,
+    "test": {
+      "in_distribution": {
+        "mae": 13.819412904813225,
+        "rmse": 24.37156262834001
+      },
+      "unseen_combinations": {
+        "mae": 22.084799386601937,
+        "rmse": 40.3519245951205
+      },
+      "unseen_geometry": {
+        "mae": 23.582942541774525,
+        "rmse": 40.89555833979959
+      },
+      "unseen_triple": {
+        "mae": 21.018107774708948,
+        "rmse": 35.8801419658886
+      },
+      "unseen_combinations_repeat": {
+        "mae": 22.1461785376147,
+        "rmse": 40.427405661613925
+      },
+      "unseen_geometry_repeat": {
+        "mae": 23.56829460535612,
+        "rmse": 41.03066914696933
+      }
+    },
+    "issues": []
+  },
+  "taxibj_K03_seed27": {
+    "name": "taxibj_K03_seed27",
+    "dataset": "taxibj",
+    "method": "K03",
+    "seed": 27,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261010_060902_fine_delta_seed27/random/rate0.4/20261010_060902_seed27_bs32",
+    "best_epoch": 100,
+    "best_val_mae": 17.383444953091445,
+    "minutes": 109.42428068385537,
+    "peak_gib": 11.452917098999023,
+    "parameters": 330807,
+    "trainable": 271163,
+    "samples": {
+      "train": 2452,
+      "val": 342,
+      "test": 707
+    },
+    "steps": {
+      "train": 77,
+      "val": 11,
+      "test": 23
+    },
+    "runtime": {
+      "torch": "2.6.0+cu124",
+      "python": "3.9.25 (main, Nov  3 2025, 22:33:05) \n[GCC 11.2.0]",
+      "cuda": "12.4",
+      "cudnn": 90100,
+      "device": "cuda",
+      "gpu_name": "NVIDIA GeForce RTX 3090",
+      "deterministic": true,
+      "cublas_workspace": ":4096:8",
+      "tf32": false,
+      "cudnn_benchmark": false
+    },
+    "amp_skips": 12.0,
+    "optimizer_steps": 7688.0,
+    "empty_skips": 0.0,
+    "test": {
+      "in_distribution": {
+        "mae": 16.676984959840627,
+        "rmse": 29.774652729044394
+      },
+      "unseen_combinations": {
+        "mae": 27.53018521369649,
+        "rmse": 44.215989803184286
+      },
+      "unseen_geometry": {
+        "mae": 34.08050935025562,
+        "rmse": 57.82898967874678
+      },
+      "unseen_triple": {
+        "mae": 26.618790702551582,
+        "rmse": 41.962216905953746
+      },
+      "unseen_combinations_repeat": {
+        "mae": 27.53699270195876,
+        "rmse": 44.428032591262046
+      },
+      "unseen_geometry_repeat": {
+        "mae": 33.51055300432674,
+        "rmse": 56.916568080316665
+      }
+    },
+    "issues": []
+  },
+  "taxibj_K04_seed27": {
+    "name": "taxibj_K04_seed27",
+    "dataset": "taxibj",
+    "method": "K04",
+    "seed": 27,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261010_075923_cmff_delta_seed27/random/rate0.4/20261010_075923_seed27_bs32",
+    "best_epoch": 100,
+    "best_val_mae": 16.59594502745504,
+    "minutes": 61.082956052980926,
+    "peak_gib": 7.931514739990234,
+    "parameters": 330807,
+    "trainable": 271163,
+    "samples": {
+      "train": 2452,
+      "val": 342,
+      "test": 707
+    },
+    "steps": {
+      "train": 77,
+      "val": 11,
+      "test": 23
+    },
+    "runtime": {
+      "torch": "2.6.0+cu124",
+      "python": "3.9.25 (main, Nov  3 2025, 22:33:05) \n[GCC 11.2.0]",
+      "cuda": "12.4",
+      "cudnn": 90100,
+      "device": "cuda",
+      "gpu_name": "NVIDIA GeForce RTX 3090",
+      "deterministic": true,
+      "cublas_workspace": ":4096:8",
+      "tf32": false,
+      "cudnn_benchmark": false
+    },
+    "amp_skips": 12.0,
+    "optimizer_steps": 7688.0,
+    "empty_skips": 0.0,
+    "test": {
+      "in_distribution": {
+        "mae": 15.424405586267826,
+        "rmse": 26.507047452950903
+      },
+      "unseen_combinations": {
+        "mae": 28.962710131643888,
+        "rmse": 51.68742622951004
+      },
+      "unseen_geometry": {
+        "mae": 29.748906552841014,
+        "rmse": 52.432253488427264
+      },
+      "unseen_triple": {
+        "mae": 29.468652398410892,
+        "rmse": 52.18623529011536
+      },
+      "unseen_combinations_repeat": {
+        "mae": 29.151267606596438,
+        "rmse": 52.06969443242003
+      },
+      "unseen_geometry_repeat": {
+        "mae": 29.64989925983588,
+        "rmse": 51.70034181568166
+      }
+    },
+    "issues": []
+  },
+  "bikenyc_K01_seed7": {
+    "name": "bikenyc_K01_seed7",
+    "dataset": "bikenyc",
+    "method": "K01",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/BikeNYC/custom/20261010_090113_fine_plain_seed7/random/rate0.4/20261010_090113_seed7_bs32",
+    "best_epoch": 95,
+    "best_val_mae": 3.7124038054090756,
+    "minutes": 4.700890920712846,
+    "peak_gib": 3.196016788482666,
+    "parameters": 330807,
+    "trainable": 250043,
+    "samples": {
+      "train": 511,
+      "val": 73,
+      "test": 147
+    },
+    "steps": {
+      "train": 16,
+      "val": 3,
+      "test": 5
+    },
+    "runtime": {
+      "torch": "2.6.0+cu124",
+      "python": "3.9.25 (main, Nov  3 2025, 22:33:05) \n[GCC 11.2.0]",
+      "cuda": "12.4",
+      "cudnn": 90100,
+      "device": "cuda",
+      "gpu_name": "NVIDIA GeForce RTX 3090",
+      "deterministic": true,
+      "cublas_workspace": ":4096:8",
+      "tf32": false,
+      "cudnn_benchmark": false
+    },
+    "amp_skips": 5.0,
+    "optimizer_steps": 1595.0,
+    "empty_skips": 0.0,
+    "test": {
+      "in_distribution": {
+        "mae": 3.613841285428788,
+        "rmse": 14.089423272604238
+      },
+      "unseen_combinations": {
+        "mae": 4.768916683894976,
+        "rmse": 16.802826104568457
+      },
+      "unseen_geometry": {
+        "mae": 5.659005914232552,
+        "rmse": 17.71126730738035
+      },
+      "unseen_triple": {
+        "mae": 4.090295493197279,
+        "rmse": 14.829937308370788
+      },
+      "unseen_combinations_repeat": {
+        "mae": 4.296624728038828,
+        "rmse": 15.230867540246356
+      },
+      "unseen_geometry_repeat": {
+        "mae": 5.568483222702974,
+        "rmse": 17.877535871177162
+      }
+    },
+    "issues": []
+  },
+  "bikenyc_K02_seed7": {
+    "name": "bikenyc_K02_seed7",
+    "dataset": "bikenyc",
+    "method": "K02",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/BikeNYC/custom/20261010_090605_cmff_plain_seed7/random/rate0.4/20261010_090605_seed7_bs32",
+    "best_epoch": 100,
+    "best_val_mae": 3.7079070064230915,
+    "minutes": 3.537347157722494,
+    "peak_gib": 2.1897616386413574,
+    "parameters": 330807,
+    "trainable": 250043,
+    "samples": {
+      "train": 511,
+      "val": 73,
+      "test": 147
+    },
+    "steps": {
+      "train": 16,
+      "val": 3,
+      "test": 5
+    },
+    "runtime": {
+      "torch": "2.6.0+cu124",
+      "python": "3.9.25 (main, Nov  3 2025, 22:33:05) \n[GCC 11.2.0]",
+      "cuda": "12.4",
+      "cudnn": 90100,
+      "device": "cuda",
+      "gpu_name": "NVIDIA GeForce RTX 3090",
+      "deterministic": true,
+      "cublas_workspace": ":4096:8",
+      "tf32": false,
+      "cudnn_benchmark": false
+    },
+    "amp_skips": 5.0,
+    "optimizer_steps": 1595.0,
+    "empty_skips": 0.0,
+    "test": {
+      "in_distribution": {
+        "mae": 3.623294820370261,
+        "rmse": 14.193850196607096
+      },
+      "unseen_combinations": {
+        "mae": 4.754690291909093,
+        "rmse": 16.520893437166045
+      },
+      "unseen_geometry": {
+        "mae": 5.386492820717288,
+        "rmse": 17.37395797916694
+      },
+      "unseen_triple": {
+        "mae": 4.106855667375489,
+        "rmse": 14.612776207372907
+      },
+      "unseen_combinations_repeat": {
+        "mae": 4.428073153555923,
+        "rmse": 15.15206953584477
+      },
+      "unseen_geometry_repeat": {
+        "mae": 5.243539460827747,
+        "rmse": 17.50078376505438
+      }
+    },
+    "issues": []
+  },
+  "bikenyc_K03_seed7": {
+    "name": "bikenyc_K03_seed7",
+    "dataset": "bikenyc",
+    "method": "K03",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/BikeNYC/custom/20261010_090946_fine_delta_seed7/random/rate0.4/20261010_090946_seed7_bs32",
+    "best_epoch": 100,
+    "best_val_mae": 3.7640001771801836,
+    "minutes": 4.838958919415018,
+    "peak_gib": 3.3071231842041016,
+    "parameters": 330807,
+    "trainable": 271163,
+    "samples": {
+      "train": 511,
+      "val": 73,
+      "test": 147
+    },
+    "steps": {
+      "train": 16,
+      "val": 3,
+      "test": 5
+    },
+    "runtime": {
+      "torch": "2.6.0+cu124",
+      "python": "3.9.25 (main, Nov  3 2025, 22:33:05) \n[GCC 11.2.0]",
+      "cuda": "12.4",
+      "cudnn": 90100,
+      "device": "cuda",
+      "gpu_name": "NVIDIA GeForce RTX 3090",
+      "deterministic": true,
+      "cublas_workspace": ":4096:8",
+      "tf32": false,
+      "cudnn_benchmark": false
+    },
+    "amp_skips": 4.0,
+    "optimizer_steps": 1596.0,
+    "empty_skips": 0.0,
+    "test": {
+      "in_distribution": {
+        "mae": 3.745064858432519,
+        "rmse": 14.16315462408556
+      },
+      "unseen_combinations": {
+        "mae": 4.540934617334633,
+        "rmse": 15.827303287113455
+      },
+      "unseen_geometry": {
+        "mae": 5.570453249136123,
+        "rmse": 17.507592380915877
+      },
+      "unseen_triple": {
+        "mae": 3.848778551308367,
+        "rmse": 13.909758750722563
+      },
+      "unseen_combinations_repeat": {
+        "mae": 4.008613539482363,
+        "rmse": 14.155409444002794
+      },
+      "unseen_geometry_repeat": {
+        "mae": 5.300258824586274,
+        "rmse": 17.32017556621372
+      }
+    },
+    "issues": []
+  },
+  "bikenyc_K04_seed7": {
+    "name": "bikenyc_K04_seed7",
+    "dataset": "bikenyc",
+    "method": "K04",
+    "seed": 7,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/BikeNYC/custom/20261010_091447_cmff_delta_seed7/random/rate0.4/20261010_091447_seed7_bs32",
+    "best_epoch": 95,
+    "best_val_mae": 3.6592353467032095,
+    "minutes": 3.7634579193933555,
+    "peak_gib": 2.292900562286377,
+    "parameters": 330807,
+    "trainable": 271163,
+    "samples": {
+      "train": 511,
+      "val": 73,
+      "test": 147
+    },
+    "steps": {
+      "train": 16,
+      "val": 3,
+      "test": 5
+    },
+    "runtime": {
+      "torch": "2.6.0+cu124",
+      "python": "3.9.25 (main, Nov  3 2025, 22:33:05) \n[GCC 11.2.0]",
+      "cuda": "12.4",
+      "cudnn": 90100,
+      "device": "cuda",
+      "gpu_name": "NVIDIA GeForce RTX 3090",
+      "deterministic": true,
+      "cublas_workspace": ":4096:8",
+      "tf32": false,
+      "cudnn_benchmark": false
+    },
+    "amp_skips": 4.0,
+    "optimizer_steps": 1596.0,
+    "empty_skips": 0.0,
+    "test": {
+      "in_distribution": {
+        "mae": 3.6594132406942514,
+        "rmse": 14.256161372482973
+      },
+      "unseen_combinations": {
+        "mae": 4.597979626908651,
+        "rmse": 16.130163196995493
+      },
+      "unseen_geometry": {
+        "mae": 5.6642307067544815,
+        "rmse": 18.561078629723973
+      },
+      "unseen_triple": {
+        "mae": 4.014852033432765,
+        "rmse": 14.449902219005866
+      },
+      "unseen_combinations_repeat": {
+        "mae": 4.191713898384969,
+        "rmse": 14.706984117369664
+      },
+      "unseen_geometry_repeat": {
+        "mae": 5.727331697874519,
+        "rmse": 19.013935959557884
+      }
+    },
+    "issues": []
+  },
+  "bikenyc_K01_seed17": {
+    "name": "bikenyc_K01_seed17",
+    "dataset": "bikenyc",
+    "method": "K01",
+    "seed": 17,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/BikeNYC/custom/20261010_091844_fine_plain_seed17/random/rate0.4/20261010_091844_seed17_bs32",
+    "best_epoch": 95,
+    "best_val_mae": 3.849007558655314,
+    "minutes": 4.624376107517552,
+    "peak_gib": 3.1980013847351074,
+    "parameters": 330807,
+    "trainable": 250043,
+    "samples": {
+      "train": 511,
+      "val": 73,
+      "test": 147
+    },
+    "steps": {
+      "train": 16,
+      "val": 3,
+      "test": 5
+    },
+    "runtime": {
+      "torch": "2.6.0+cu124",
+      "python": "3.9.25 (main, Nov  3 2025, 22:33:05) \n[GCC 11.2.0]",
+      "cuda": "12.4",
+      "cudnn": 90100,
+      "device": "cuda",
+      "gpu_name": "NVIDIA GeForce RTX 3090",
+      "deterministic": true,
+      "cublas_workspace": ":4096:8",
+      "tf32": false,
+      "cudnn_benchmark": false
+    },
+    "amp_skips": 5.0,
+    "optimizer_steps": 1595.0,
+    "empty_skips": 0.0,
+    "test": {
+      "in_distribution": {
+        "mae": 3.8395750191357294,
+        "rmse": 14.606821602502981
+      },
+      "unseen_combinations": {
+        "mae": 5.816985744189138,
+        "rmse": 20.91933072222098
+      },
+      "unseen_geometry": {
+        "mae": 7.6505270478307095,
+        "rmse": 23.189672601498682
+      },
+      "unseen_triple": {
+        "mae": 5.394946844512045,
+        "rmse": 20.248873155162745
+      },
+      "unseen_combinations_repeat": {
+        "mae": 5.206475367824409,
+        "rmse": 19.415635248721664
+      },
+      "unseen_geometry_repeat": {
+        "mae": 7.475121628788997,
+        "rmse": 23.053398207343466
+      }
+    },
+    "issues": []
+  },
+  "bikenyc_K02_seed17": {
+    "name": "bikenyc_K02_seed17",
+    "dataset": "bikenyc",
+    "method": "K02",
+    "seed": 17,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/BikeNYC/custom/20261010_092332_cmff_plain_seed17/random/rate0.4/20261010_092332_seed17_bs32",
+    "best_epoch": 100,
+    "best_val_mae": 3.6308847362369407,
+    "minutes": 3.548182581652266,
+    "peak_gib": 2.1845364570617676,
+    "parameters": 330807,
+    "trainable": 250043,
+    "samples": {
+      "train": 511,
+      "val": 73,
+      "test": 147
+    },
+    "steps": {
+      "train": 16,
+      "val": 3,
+      "test": 5
+    },
+    "runtime": {
+      "torch": "2.6.0+cu124",
+      "python": "3.9.25 (main, Nov  3 2025, 22:33:05) \n[GCC 11.2.0]",
+      "cuda": "12.4",
+      "cudnn": 90100,
+      "device": "cuda",
+      "gpu_name": "NVIDIA GeForce RTX 3090",
+      "deterministic": true,
+      "cublas_workspace": ":4096:8",
+      "tf32": false,
+      "cudnn_benchmark": false
+    },
+    "amp_skips": 4.0,
+    "optimizer_steps": 1596.0,
+    "empty_skips": 0.0,
+    "test": {
+      "in_distribution": {
+        "mae": 3.6419040481605087,
+        "rmse": 13.946918538372154
+      },
+      "unseen_combinations": {
+        "mae": 5.753674475397974,
+        "rmse": 20.88070519155406
+      },
+      "unseen_geometry": {
+        "mae": 7.2615871149472815,
+        "rmse": 22.01165108313532
+      },
+      "unseen_triple": {
+        "mae": 5.12362292737283,
+        "rmse": 19.648003347903597
+      },
+      "unseen_combinations_repeat": {
+        "mae": 5.228534333867411,
+        "rmse": 19.52813158626145
+      },
+      "unseen_geometry_repeat": {
+        "mae": 7.080178091497091,
+        "rmse": 22.239375187188603
+      }
+    },
+    "issues": []
+  },
+  "bikenyc_K03_seed17": {
+    "name": "bikenyc_K03_seed17",
+    "dataset": "bikenyc",
+    "method": "K03",
+    "seed": 17,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/BikeNYC/custom/20261010_092714_fine_delta_seed17/random/rate0.4/20261010_092714_seed17_bs32",
+    "best_epoch": 95,
+    "best_val_mae": 3.8538261549546022,
+    "minutes": 4.8230628897843415,
+    "peak_gib": 3.297635078430176,
+    "parameters": 330807,
+    "trainable": 271163,
+    "samples": {
+      "train": 511,
+      "val": 73,
+      "test": 147
+    },
+    "steps": {
+      "train": 16,
+      "val": 3,
+      "test": 5
+    },
+    "runtime": {
+      "torch": "2.6.0+cu124",
+      "python": "3.9.25 (main, Nov  3 2025, 22:33:05) \n[GCC 11.2.0]",
+      "cuda": "12.4",
+      "cudnn": 90100,
+      "device": "cuda",
+      "gpu_name": "NVIDIA GeForce RTX 3090",
+      "deterministic": true,
+      "cublas_workspace": ":4096:8",
+      "tf32": false,
+      "cudnn_benchmark": false
+    },
+    "amp_skips": 4.0,
+    "optimizer_steps": 1596.0,
+    "empty_skips": 0.0,
+    "test": {
+      "in_distribution": {
+        "mae": 3.889227122650797,
+        "rmse": 14.680980197129886
+      },
+      "unseen_combinations": {
+        "mae": 5.949803935684259,
+        "rmse": 21.815864147169332
+      },
+      "unseen_geometry": {
+        "mae": 7.931706211790071,
+        "rmse": 24.411108980322712
+      },
+      "unseen_triple": {
+        "mae": 5.388634130388769,
+        "rmse": 20.57718824184732
+      },
+      "unseen_combinations_repeat": {
+        "mae": 5.314486639445938,
+        "rmse": 20.096824506811714
+      },
+      "unseen_geometry_repeat": {
+        "mae": 7.9723980945489625,
+        "rmse": 24.656189296687764
+      }
+    },
+    "issues": []
+  },
+  "bikenyc_K04_seed17": {
+    "name": "bikenyc_K04_seed17",
+    "dataset": "bikenyc",
+    "method": "K04",
+    "seed": 17,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/BikeNYC/custom/20261010_093214_cmff_delta_seed17/random/rate0.4/20261010_093214_seed17_bs32",
+    "best_epoch": 100,
+    "best_val_mae": 3.663210284999901,
+    "minutes": 3.673067056859145,
+    "peak_gib": 2.297628402709961,
+    "parameters": 330807,
+    "trainable": 271163,
+    "samples": {
+      "train": 511,
+      "val": 73,
+      "test": 147
+    },
+    "steps": {
+      "train": 16,
+      "val": 3,
+      "test": 5
+    },
+    "runtime": {
+      "torch": "2.6.0+cu124",
+      "python": "3.9.25 (main, Nov  3 2025, 22:33:05) \n[GCC 11.2.0]",
+      "cuda": "12.4",
+      "cudnn": 90100,
+      "device": "cuda",
+      "gpu_name": "NVIDIA GeForce RTX 3090",
+      "deterministic": true,
+      "cublas_workspace": ":4096:8",
+      "tf32": false,
+      "cudnn_benchmark": false
+    },
+    "amp_skips": 4.0,
+    "optimizer_steps": 1596.0,
+    "empty_skips": 0.0,
+    "test": {
+      "in_distribution": {
+        "mae": 3.69514221661892,
+        "rmse": 14.229061828449328
+      },
+      "unseen_combinations": {
+        "mae": 5.375800731833978,
+        "rmse": 19.89956953001353
+      },
+      "unseen_geometry": {
+        "mae": 7.3585357352058045,
+        "rmse": 23.620629930703426
+      },
+      "unseen_triple": {
+        "mae": 4.399150321307974,
+        "rmse": 16.89962136033017
+      },
+      "unseen_combinations_repeat": {
+        "mae": 4.805967317281471,
+        "rmse": 18.256089360104497
+      },
+      "unseen_geometry_repeat": {
+        "mae": 7.317922225872983,
+        "rmse": 23.972550475691936
+      }
+    },
+    "issues": []
+  },
+  "bikenyc_K01_seed27": {
+    "name": "bikenyc_K01_seed27",
+    "dataset": "bikenyc",
+    "method": "K01",
+    "seed": 27,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/BikeNYC/custom/20261010_093606_fine_plain_seed27/random/rate0.4/20261010_093606_seed27_bs32",
+    "best_epoch": 95,
+    "best_val_mae": 3.7906945246367187,
+    "minutes": 4.583968042749135,
+    "peak_gib": 3.1918258666992188,
+    "parameters": 330807,
+    "trainable": 250043,
+    "samples": {
+      "train": 511,
+      "val": 73,
+      "test": 147
+    },
+    "steps": {
+      "train": 16,
+      "val": 3,
+      "test": 5
+    },
+    "runtime": {
+      "torch": "2.6.0+cu124",
+      "python": "3.9.25 (main, Nov  3 2025, 22:33:05) \n[GCC 11.2.0]",
+      "cuda": "12.4",
+      "cudnn": 90100,
+      "device": "cuda",
+      "gpu_name": "NVIDIA GeForce RTX 3090",
+      "deterministic": true,
+      "cublas_workspace": ":4096:8",
+      "tf32": false,
+      "cudnn_benchmark": false
+    },
+    "amp_skips": 4.0,
+    "optimizer_steps": 1596.0,
+    "empty_skips": 0.0,
+    "test": {
+      "in_distribution": {
+        "mae": 3.7844011654951415,
+        "rmse": 14.64808416146583
+      },
+      "unseen_combinations": {
+        "mae": 5.713401686651506,
+        "rmse": 21.37567403439025
+      },
+      "unseen_geometry": {
+        "mae": 6.915468145470924,
+        "rmse": 21.344308173850514
+      },
+      "unseen_triple": {
+        "mae": 5.107318062898097,
+        "rmse": 19.584319715617642
+      },
+      "unseen_combinations_repeat": {
+        "mae": 4.992776877393505,
+        "rmse": 19.336134852370872
+      },
+      "unseen_geometry_repeat": {
+        "mae": 6.795993818113352,
+        "rmse": 21.41844970332971
+      }
+    },
+    "issues": []
+  },
+  "bikenyc_K02_seed27": {
+    "name": "bikenyc_K02_seed27",
+    "dataset": "bikenyc",
+    "method": "K02",
+    "seed": 27,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/BikeNYC/custom/20261010_094051_cmff_plain_seed27/random/rate0.4/20261010_094051_seed27_bs32",
+    "best_epoch": 95,
+    "best_val_mae": 3.674002168908471,
+    "minutes": 3.536313783953665,
+    "peak_gib": 2.181218147277832,
+    "parameters": 330807,
+    "trainable": 250043,
+    "samples": {
+      "train": 511,
+      "val": 73,
+      "test": 147
+    },
+    "steps": {
+      "train": 16,
+      "val": 3,
+      "test": 5
+    },
+    "runtime": {
+      "torch": "2.6.0+cu124",
+      "python": "3.9.25 (main, Nov  3 2025, 22:33:05) \n[GCC 11.2.0]",
+      "cuda": "12.4",
+      "cudnn": 90100,
+      "device": "cuda",
+      "gpu_name": "NVIDIA GeForce RTX 3090",
+      "deterministic": true,
+      "cublas_workspace": ":4096:8",
+      "tf32": false,
+      "cudnn_benchmark": false
+    },
+    "amp_skips": 4.0,
+    "optimizer_steps": 1596.0,
+    "empty_skips": 0.0,
+    "test": {
+      "in_distribution": {
+        "mae": 3.6804289710638236,
+        "rmse": 14.248301614935949
+      },
+      "unseen_combinations": {
+        "mae": 5.426344131176349,
+        "rmse": 20.118934441988035
+      },
+      "unseen_geometry": {
+        "mae": 6.4097231964421075,
+        "rmse": 19.83308226997989
+      },
+      "unseen_triple": {
+        "mae": 4.932096617590596,
+        "rmse": 19.097325592545623
+      },
+      "unseen_combinations_repeat": {
+        "mae": 4.944788420976205,
+        "rmse": 18.703121990789896
+      },
+      "unseen_geometry_repeat": {
+        "mae": 6.257092910427557,
+        "rmse": 19.980047294450006
+      }
+    },
+    "issues": []
+  },
+  "bikenyc_K03_seed27": {
+    "name": "bikenyc_K03_seed27",
+    "dataset": "bikenyc",
+    "method": "K03",
+    "seed": 27,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/BikeNYC/custom/20261010_094433_fine_delta_seed27/random/rate0.4/20261010_094433_seed27_bs32",
+    "best_epoch": 95,
+    "best_val_mae": 3.7766397917575283,
+    "minutes": 4.770841249002842,
+    "peak_gib": 3.301342010498047,
+    "parameters": 330807,
+    "trainable": 271163,
+    "samples": {
+      "train": 511,
+      "val": 73,
+      "test": 147
+    },
+    "steps": {
+      "train": 16,
+      "val": 3,
+      "test": 5
+    },
+    "runtime": {
+      "torch": "2.6.0+cu124",
+      "python": "3.9.25 (main, Nov  3 2025, 22:33:05) \n[GCC 11.2.0]",
+      "cuda": "12.4",
+      "cudnn": 90100,
+      "device": "cuda",
+      "gpu_name": "NVIDIA GeForce RTX 3090",
+      "deterministic": true,
+      "cublas_workspace": ":4096:8",
+      "tf32": false,
+      "cudnn_benchmark": false
+    },
+    "amp_skips": 5.0,
+    "optimizer_steps": 1595.0,
+    "empty_skips": 0.0,
+    "test": {
+      "in_distribution": {
+        "mae": 3.8367609209023694,
+        "rmse": 14.749455421019235
+      },
+      "unseen_combinations": {
+        "mae": 6.472289110108588,
+        "rmse": 21.4085241487771
+      },
+      "unseen_geometry": {
+        "mae": 8.429961537798912,
+        "rmse": 23.775404710820272
+      },
+      "unseen_triple": {
+        "mae": 5.871519496908749,
+        "rmse": 20.33455114064863
+      },
+      "unseen_combinations_repeat": {
+        "mae": 5.733963251092767,
+        "rmse": 19.38828064644396
+      },
+      "unseen_geometry_repeat": {
+        "mae": 7.894138036907961,
+        "rmse": 22.99849306209183
+      }
+    },
+    "issues": []
+  },
+  "bikenyc_K04_seed27": {
+    "name": "bikenyc_K04_seed27",
+    "dataset": "bikenyc",
+    "method": "K04",
+    "seed": 27,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/BikeNYC/custom/20261010_094930_cmff_delta_seed27/random/rate0.4/20261010_094930_seed27_bs32",
+    "best_epoch": 90,
+    "best_val_mae": 3.831185462427889,
+    "minutes": 3.7613641797700743,
+    "peak_gib": 2.297801971435547,
+    "parameters": 330807,
+    "trainable": 271163,
+    "samples": {
+      "train": 511,
+      "val": 73,
+      "test": 147
+    },
+    "steps": {
+      "train": 16,
+      "val": 3,
+      "test": 5
+    },
+    "runtime": {
+      "torch": "2.6.0+cu124",
+      "python": "3.9.25 (main, Nov  3 2025, 22:33:05) \n[GCC 11.2.0]",
+      "cuda": "12.4",
+      "cudnn": 90100,
+      "device": "cuda",
+      "gpu_name": "NVIDIA GeForce RTX 3090",
+      "deterministic": true,
+      "cublas_workspace": ":4096:8",
+      "tf32": false,
+      "cudnn_benchmark": false
+    },
+    "amp_skips": 4.0,
+    "optimizer_steps": 1596.0,
+    "empty_skips": 0.0,
+    "test": {
+      "in_distribution": {
+        "mae": 3.7506855559698553,
+        "rmse": 14.848648487414366
+      },
+      "unseen_combinations": {
+        "mae": 5.392010879062189,
+        "rmse": 18.706276124160738
+      },
+      "unseen_geometry": {
+        "mae": 6.73310333540073,
+        "rmse": 21.455038211532926
+      },
+      "unseen_triple": {
+        "mae": 4.71482921361381,
+        "rmse": 16.798856686958022
+      },
+      "unseen_combinations_repeat": {
+        "mae": 4.746318871705701,
+        "rmse": 16.722249407006252
+      },
+      "unseen_geometry_repeat": {
+        "mae": 6.66039940759227,
+        "rmse": 21.869858605346774
+      }
+    },
+    "issues": []
+  }
+}

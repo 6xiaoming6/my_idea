@@ -1,0 +1,7170 @@
+[
+  {
+    "name": "taxibj_K01_seed7",
+    "round": 1,
+    "expert": "T",
+    "selection_rate": 0.17114568599717114,
+    "weighted_usage": 0.020168867420610647,
+    "router_entropy": 1.6673438313942412
+  },
+  {
+    "name": "taxibj_K01_seed7",
+    "round": 1,
+    "expert": "S",
+    "selection_rate": 0.019801980198019802,
+    "weighted_usage": 0.003564960590683588,
+    "router_entropy": 1.6673438313942412
+  },
+  {
+    "name": "taxibj_K01_seed7",
+    "round": 1,
+    "expert": "TD",
+    "selection_rate": 0.2376237623762376,
+    "weighted_usage": 0.11011568352558994,
+    "router_entropy": 1.6673438313942412
+  },
+  {
+    "name": "taxibj_K01_seed7",
+    "round": 1,
+    "expert": "SD",
+    "selection_rate": 0.9929278642149929,
+    "weighted_usage": 0.7830785014040905,
+    "router_entropy": 1.6673438313942412
+  },
+  {
+    "name": "taxibj_K01_seed7",
+    "round": 1,
+    "expert": "TA",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.6673438313942412
+  },
+  {
+    "name": "taxibj_K01_seed7",
+    "round": 1,
+    "expert": "ST",
+    "selection_rate": 0.018387553041018388,
+    "weighted_usage": 0.003886560486600625,
+    "router_entropy": 1.6673438313942412
+  },
+  {
+    "name": "taxibj_K01_seed7",
+    "round": 1,
+    "expert": "TL",
+    "selection_rate": 0.004243281471004243,
+    "weighted_usage": 0.0007104693030704029,
+    "router_entropy": 1.6673438313942412
+  },
+  {
+    "name": "taxibj_K01_seed7",
+    "round": 1,
+    "expert": "SL",
+    "selection_rate": 0.5558698727015559,
+    "weighted_usage": 0.07847495807026535,
+    "router_entropy": 1.6673438313942412
+  },
+  {
+    "name": "taxibj_K01_seed7",
+    "round": 2,
+    "expert": "T",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 2.019371925944854
+  },
+  {
+    "name": "taxibj_K01_seed7",
+    "round": 2,
+    "expert": "S",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 2.019371925944854
+  },
+  {
+    "name": "taxibj_K01_seed7",
+    "round": 2,
+    "expert": "TD",
+    "selection_rate": 1.0,
+    "weighted_usage": 0.4510156494977619,
+    "router_entropy": 2.019371925944854
+  },
+  {
+    "name": "taxibj_K01_seed7",
+    "round": 2,
+    "expert": "SD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 2.019371925944854
+  },
+  {
+    "name": "taxibj_K01_seed7",
+    "round": 2,
+    "expert": "TA",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 2.019371925944854
+  },
+  {
+    "name": "taxibj_K01_seed7",
+    "round": 2,
+    "expert": "ST",
+    "selection_rate": 1.0,
+    "weighted_usage": 0.5489843509237702,
+    "router_entropy": 2.019371925944854
+  },
+  {
+    "name": "taxibj_K01_seed7",
+    "round": 2,
+    "expert": "TL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 2.019371925944854
+  },
+  {
+    "name": "taxibj_K01_seed7",
+    "round": 2,
+    "expert": "SL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 2.019371925944854
+  },
+  {
+    "name": "taxibj_K01_seed7",
+    "round": 3,
+    "expert": "T",
+    "selection_rate": 0.13861386138613863,
+    "weighted_usage": 0.03445399485138552,
+    "router_entropy": 1.8834543282602951
+  },
+  {
+    "name": "taxibj_K01_seed7",
+    "round": 3,
+    "expert": "S",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.8834543282602951
+  },
+  {
+    "name": "taxibj_K01_seed7",
+    "round": 3,
+    "expert": "TD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.8834543282602951
+  },
+  {
+    "name": "taxibj_K01_seed7",
+    "round": 3,
+    "expert": "SD",
+    "selection_rate": 0.002828854314002829,
+    "weighted_usage": 0.0004797242529152812,
+    "router_entropy": 1.8834543282602951
+  },
+  {
+    "name": "taxibj_K01_seed7",
+    "round": 3,
+    "expert": "TA",
+    "selection_rate": 0.8359264497878359,
+    "weighted_usage": 0.478871883437185,
+    "router_entropy": 1.8834543282602951
+  },
+  {
+    "name": "taxibj_K01_seed7",
+    "round": 3,
+    "expert": "ST",
+    "selection_rate": 0.0014144271570014145,
+    "weighted_usage": 0.0002539007169691137,
+    "router_entropy": 1.8834543282602951
+  },
+  {
+    "name": "taxibj_K01_seed7",
+    "round": 3,
+    "expert": "TL",
+    "selection_rate": 1.0,
+    "weighted_usage": 0.48259311653094045,
+    "router_entropy": 1.8834543282602951
+  },
+  {
+    "name": "taxibj_K01_seed7",
+    "round": 3,
+    "expert": "SL",
+    "selection_rate": 0.021216407355021217,
+    "weighted_usage": 0.0033473782188652933,
+    "router_entropy": 1.8834543282602951
+  },
+  {
+    "name": "taxibj_K01_seed7",
+    "round": 4,
+    "expert": "T",
+    "selection_rate": 0.0014144271570014145,
+    "weighted_usage": 0.00014706103518457697,
+    "router_entropy": 1.8390035616707991
+  },
+  {
+    "name": "taxibj_K01_seed7",
+    "round": 4,
+    "expert": "S",
+    "selection_rate": 0.983026874115983,
+    "weighted_usage": 0.509238038733707,
+    "router_entropy": 1.8390035616707991
+  },
+  {
+    "name": "taxibj_K01_seed7",
+    "round": 4,
+    "expert": "TD",
+    "selection_rate": 0.014144271570014143,
+    "weighted_usage": 0.0026545563799657106,
+    "router_entropy": 1.8390035616707991
+  },
+  {
+    "name": "taxibj_K01_seed7",
+    "round": 4,
+    "expert": "SD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.8390035616707991
+  },
+  {
+    "name": "taxibj_K01_seed7",
+    "round": 4,
+    "expert": "TA",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.8390035616707991
+  },
+  {
+    "name": "taxibj_K01_seed7",
+    "round": 4,
+    "expert": "ST",
+    "selection_rate": 0.0014144271570014145,
+    "weighted_usage": 8.148018697532265e-05,
+    "router_entropy": 1.8390035616707991
+  },
+  {
+    "name": "taxibj_K01_seed7",
+    "round": 4,
+    "expert": "TL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.8390035616707991
+  },
+  {
+    "name": "taxibj_K01_seed7",
+    "round": 4,
+    "expert": "SL",
+    "selection_rate": 1.0,
+    "weighted_usage": 0.48787886410150705,
+    "router_entropy": 1.8390035616707991
+  },
+  {
+    "name": "taxibj_K02_seed7",
+    "round": 1,
+    "expert": "T",
+    "selection_rate": 0.3338048090523338,
+    "weighted_usage": 0.06571258016489183,
+    "router_entropy": 1.3827659987970442
+  },
+  {
+    "name": "taxibj_K02_seed7",
+    "round": 1,
+    "expert": "S",
+    "selection_rate": 1.0,
+    "weighted_usage": 0.8882939318113313,
+    "router_entropy": 1.3827659987970442
+  },
+  {
+    "name": "taxibj_K02_seed7",
+    "round": 1,
+    "expert": "TD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.3827659987970442
+  },
+  {
+    "name": "taxibj_K02_seed7",
+    "round": 1,
+    "expert": "SD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.3827659987970442
+  },
+  {
+    "name": "taxibj_K02_seed7",
+    "round": 1,
+    "expert": "TA",
+    "selection_rate": 0.3422913719943423,
+    "weighted_usage": 0.01607850275912666,
+    "router_entropy": 1.3827659987970442
+  },
+  {
+    "name": "taxibj_K02_seed7",
+    "round": 1,
+    "expert": "ST",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.3827659987970442
+  },
+  {
+    "name": "taxibj_K02_seed7",
+    "round": 1,
+    "expert": "TL",
+    "selection_rate": 0.25742574257425743,
+    "weighted_usage": 0.022268174292553938,
+    "router_entropy": 1.3827659987970442
+  },
+  {
+    "name": "taxibj_K02_seed7",
+    "round": 1,
+    "expert": "SL",
+    "selection_rate": 0.06647807637906648,
+    "weighted_usage": 0.007646811975869633,
+    "router_entropy": 1.3827659987970442
+  },
+  {
+    "name": "taxibj_K02_seed7",
+    "round": 2,
+    "expert": "T",
+    "selection_rate": 0.015558698727015558,
+    "weighted_usage": 0.0006846372601925231,
+    "router_entropy": 1.3917937087401522
+  },
+  {
+    "name": "taxibj_K02_seed7",
+    "round": 2,
+    "expert": "S",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.3917937087401522
+  },
+  {
+    "name": "taxibj_K02_seed7",
+    "round": 2,
+    "expert": "TD",
+    "selection_rate": 0.9363507779349364,
+    "weighted_usage": 0.11629605198429194,
+    "router_entropy": 1.3917937087401522
+  },
+  {
+    "name": "taxibj_K02_seed7",
+    "round": 2,
+    "expert": "SD",
+    "selection_rate": 1.0,
+    "weighted_usage": 0.8756265458156904,
+    "router_entropy": 1.3917937087401522
+  },
+  {
+    "name": "taxibj_K02_seed7",
+    "round": 2,
+    "expert": "TA",
+    "selection_rate": 0.0297029702970297,
+    "weighted_usage": 0.005950103870881497,
+    "router_entropy": 1.3917937087401522
+  },
+  {
+    "name": "taxibj_K02_seed7",
+    "round": 2,
+    "expert": "ST",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.3917937087401522
+  },
+  {
+    "name": "taxibj_K02_seed7",
+    "round": 2,
+    "expert": "TL",
+    "selection_rate": 0.004243281471004243,
+    "weighted_usage": 0.000724860578986172,
+    "router_entropy": 1.3917937087401522
+  },
+  {
+    "name": "taxibj_K02_seed7",
+    "round": 2,
+    "expert": "SL",
+    "selection_rate": 0.014144271570014143,
+    "weighted_usage": 0.0007178009378353643,
+    "router_entropy": 1.3917937087401522
+  },
+  {
+    "name": "taxibj_K02_seed7",
+    "round": 3,
+    "expert": "T",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.8461524979929713
+  },
+  {
+    "name": "taxibj_K02_seed7",
+    "round": 3,
+    "expert": "S",
+    "selection_rate": 0.014144271570014143,
+    "weighted_usage": 0.002290981767707026,
+    "router_entropy": 1.8461524979929713
+  },
+  {
+    "name": "taxibj_K02_seed7",
+    "round": 3,
+    "expert": "TD",
+    "selection_rate": 0.9575671852899575,
+    "weighted_usage": 0.20239451746792234,
+    "router_entropy": 1.8461524979929713
+  },
+  {
+    "name": "taxibj_K02_seed7",
+    "round": 3,
+    "expert": "SD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.8461524979929713
+  },
+  {
+    "name": "taxibj_K02_seed7",
+    "round": 3,
+    "expert": "TA",
+    "selection_rate": 0.009900990099009901,
+    "weighted_usage": 0.001336123873354522,
+    "router_entropy": 1.8461524979929713
+  },
+  {
+    "name": "taxibj_K02_seed7",
+    "round": 3,
+    "expert": "ST",
+    "selection_rate": 1.0,
+    "weighted_usage": 0.7920544966106874,
+    "router_entropy": 1.8461524979929713
+  },
+  {
+    "name": "taxibj_K02_seed7",
+    "round": 3,
+    "expert": "TL",
+    "selection_rate": 0.01272984441301273,
+    "weighted_usage": 0.0014402144805882573,
+    "router_entropy": 1.8461524979929713
+  },
+  {
+    "name": "taxibj_K02_seed7",
+    "round": 3,
+    "expert": "SL",
+    "selection_rate": 0.005657708628005658,
+    "weighted_usage": 0.0004836660105065881,
+    "router_entropy": 1.8461524979929713
+  },
+  {
+    "name": "taxibj_K02_seed7",
+    "round": 4,
+    "expert": "T",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.9870591535625755
+  },
+  {
+    "name": "taxibj_K02_seed7",
+    "round": 4,
+    "expert": "S",
+    "selection_rate": 0.9872701555869873,
+    "weighted_usage": 0.27966512023053713,
+    "router_entropy": 1.9870591535625755
+  },
+  {
+    "name": "taxibj_K02_seed7",
+    "round": 4,
+    "expert": "TD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.9870591535625755
+  },
+  {
+    "name": "taxibj_K02_seed7",
+    "round": 4,
+    "expert": "SD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.9870591535625755
+  },
+  {
+    "name": "taxibj_K02_seed7",
+    "round": 4,
+    "expert": "TA",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.9870591535625755
+  },
+  {
+    "name": "taxibj_K02_seed7",
+    "round": 4,
+    "expert": "ST",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.9870591535625755
+  },
+  {
+    "name": "taxibj_K02_seed7",
+    "round": 4,
+    "expert": "TL",
+    "selection_rate": 0.01272984441301273,
+    "weighted_usage": 0.003154829123401237,
+    "router_entropy": 1.9870591535625755
+  },
+  {
+    "name": "taxibj_K02_seed7",
+    "round": 4,
+    "expert": "SL",
+    "selection_rate": 1.0,
+    "weighted_usage": 0.7171800508357511,
+    "router_entropy": 1.9870591535625755
+  },
+  {
+    "name": "taxibj_K03_seed7",
+    "round": 1,
+    "expert": "T",
+    "selection_rate": 0.6195190947666195,
+    "weighted_usage": 0.001038391287985246,
+    "router_entropy": 0.13584090369182925
+  },
+  {
+    "name": "taxibj_K03_seed7",
+    "round": 1,
+    "expert": "S",
+    "selection_rate": 0.30834512022630833,
+    "weighted_usage": 0.010188069730362152,
+    "router_entropy": 0.13584090369182925
+  },
+  {
+    "name": "taxibj_K03_seed7",
+    "round": 1,
+    "expert": "TD",
+    "selection_rate": 0.9985855728429985,
+    "weighted_usage": 0.9884356051430506,
+    "router_entropy": 0.13584090369182925
+  },
+  {
+    "name": "taxibj_K03_seed7",
+    "round": 1,
+    "expert": "SD",
+    "selection_rate": 0.0014144271570014145,
+    "weighted_usage": 0.00023731290029501477,
+    "router_entropy": 0.13584090369182925
+  },
+  {
+    "name": "taxibj_K03_seed7",
+    "round": 1,
+    "expert": "TA",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 0.13584090369182925
+  },
+  {
+    "name": "taxibj_K03_seed7",
+    "round": 1,
+    "expert": "ST",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 0.13584090369182925
+  },
+  {
+    "name": "taxibj_K03_seed7",
+    "round": 1,
+    "expert": "TL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 0.13584090369182925
+  },
+  {
+    "name": "taxibj_K03_seed7",
+    "round": 1,
+    "expert": "SL",
+    "selection_rate": 0.07213578500707214,
+    "weighted_usage": 0.0001006192831346262,
+    "router_entropy": 0.13584090369182925
+  },
+  {
+    "name": "taxibj_K03_seed7",
+    "round": 2,
+    "expert": "T",
+    "selection_rate": 0.24752475247524752,
+    "weighted_usage": 0.06422639811013679,
+    "router_entropy": 1.4976545467055187
+  },
+  {
+    "name": "taxibj_K03_seed7",
+    "round": 2,
+    "expert": "S",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.4976545467055187
+  },
+  {
+    "name": "taxibj_K03_seed7",
+    "round": 2,
+    "expert": "TD",
+    "selection_rate": 0.002828854314002829,
+    "weighted_usage": 0.0001326891392090027,
+    "router_entropy": 1.4976545467055187
+  },
+  {
+    "name": "taxibj_K03_seed7",
+    "round": 2,
+    "expert": "SD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.4976545467055187
+  },
+  {
+    "name": "taxibj_K03_seed7",
+    "round": 2,
+    "expert": "TA",
+    "selection_rate": 0.7496463932107497,
+    "weighted_usage": 0.25744259291587995,
+    "router_entropy": 1.4976545467055187
+  },
+  {
+    "name": "taxibj_K03_seed7",
+    "round": 2,
+    "expert": "ST",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.4976545467055187
+  },
+  {
+    "name": "taxibj_K03_seed7",
+    "round": 2,
+    "expert": "TL",
+    "selection_rate": 1.0,
+    "weighted_usage": 0.678198321494557,
+    "router_entropy": 1.4976545467055187
+  },
+  {
+    "name": "taxibj_K03_seed7",
+    "round": 2,
+    "expert": "SL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.4976545467055187
+  },
+  {
+    "name": "taxibj_K03_seed7",
+    "round": 3,
+    "expert": "T",
+    "selection_rate": 0.0014144271570014145,
+    "weighted_usage": 0.00025036756102064204,
+    "router_entropy": 1.9844866760024162
+  },
+  {
+    "name": "taxibj_K03_seed7",
+    "round": 3,
+    "expert": "S",
+    "selection_rate": 0.0014144271570014145,
+    "weighted_usage": 0.0003069713606355551,
+    "router_entropy": 1.9844866760024162
+  },
+  {
+    "name": "taxibj_K03_seed7",
+    "round": 3,
+    "expert": "TD",
+    "selection_rate": 0.002828854314002829,
+    "weighted_usage": 0.0008340217647323176,
+    "router_entropy": 1.9844866760024162
+  },
+  {
+    "name": "taxibj_K03_seed7",
+    "round": 3,
+    "expert": "SD",
+    "selection_rate": 0.49363507779349364,
+    "weighted_usage": 0.23960040260996812,
+    "router_entropy": 1.9844866760024162
+  },
+  {
+    "name": "taxibj_K03_seed7",
+    "round": 3,
+    "expert": "TA",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.9844866760024162
+  },
+  {
+    "name": "taxibj_K03_seed7",
+    "round": 3,
+    "expert": "ST",
+    "selection_rate": 0.9971711456859972,
+    "weighted_usage": 0.42526831651762487,
+    "router_entropy": 1.9844866760024162
+  },
+  {
+    "name": "taxibj_K03_seed7",
+    "round": 3,
+    "expert": "TL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.9844866760024162
+  },
+  {
+    "name": "taxibj_K03_seed7",
+    "round": 3,
+    "expert": "SL",
+    "selection_rate": 0.5035360678925035,
+    "weighted_usage": 0.333739920375708,
+    "router_entropy": 1.9844866760024162
+  },
+  {
+    "name": "taxibj_K03_seed7",
+    "round": 4,
+    "expert": "T",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.9701658848675605
+  },
+  {
+    "name": "taxibj_K03_seed7",
+    "round": 4,
+    "expert": "S",
+    "selection_rate": 1.0,
+    "weighted_usage": 0.6751961689521433,
+    "router_entropy": 1.9701658848675605
+  },
+  {
+    "name": "taxibj_K03_seed7",
+    "round": 4,
+    "expert": "TD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.9701658848675605
+  },
+  {
+    "name": "taxibj_K03_seed7",
+    "round": 4,
+    "expert": "SD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.9701658848675605
+  },
+  {
+    "name": "taxibj_K03_seed7",
+    "round": 4,
+    "expert": "TA",
+    "selection_rate": 0.0014144271570014145,
+    "weighted_usage": 0.0003808745653322428,
+    "router_entropy": 1.9701658848675605
+  },
+  {
+    "name": "taxibj_K03_seed7",
+    "round": 4,
+    "expert": "ST",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.9701658848675605
+  },
+  {
+    "name": "taxibj_K03_seed7",
+    "round": 4,
+    "expert": "TL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.9701658848675605
+  },
+  {
+    "name": "taxibj_K03_seed7",
+    "round": 4,
+    "expert": "SL",
+    "selection_rate": 0.9985855728429985,
+    "weighted_usage": 0.32442295808434657,
+    "router_entropy": 1.9701658848675605
+  },
+  {
+    "name": "taxibj_K04_seed7",
+    "round": 1,
+    "expert": "T",
+    "selection_rate": 0.4243281471004243,
+    "weighted_usage": 0.00014167584233016272,
+    "router_entropy": 0.015827722708813125
+  },
+  {
+    "name": "taxibj_K04_seed7",
+    "round": 1,
+    "expert": "S",
+    "selection_rate": 0.0891089108910891,
+    "weighted_usage": 5.0828122272705485e-05,
+    "router_entropy": 0.015827722708813125
+  },
+  {
+    "name": "taxibj_K04_seed7",
+    "round": 1,
+    "expert": "TD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 0.015827722708813125
+  },
+  {
+    "name": "taxibj_K04_seed7",
+    "round": 1,
+    "expert": "SD",
+    "selection_rate": 1.0,
+    "weighted_usage": 0.9997304409025751,
+    "router_entropy": 0.015827722708813125
+  },
+  {
+    "name": "taxibj_K04_seed7",
+    "round": 1,
+    "expert": "TA",
+    "selection_rate": 0.48656294200848654,
+    "weighted_usage": 7.705477649567299e-05,
+    "router_entropy": 0.015827722708813125
+  },
+  {
+    "name": "taxibj_K04_seed7",
+    "round": 1,
+    "expert": "ST",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 0.015827722708813125
+  },
+  {
+    "name": "taxibj_K04_seed7",
+    "round": 1,
+    "expert": "TL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 0.015827722708813125
+  },
+  {
+    "name": "taxibj_K04_seed7",
+    "round": 1,
+    "expert": "SL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 0.015827722708813125
+  },
+  {
+    "name": "taxibj_K04_seed7",
+    "round": 2,
+    "expert": "T",
+    "selection_rate": 1.0,
+    "weighted_usage": 0.4107553633470009,
+    "router_entropy": 2.0021815929416404
+  },
+  {
+    "name": "taxibj_K04_seed7",
+    "round": 2,
+    "expert": "S",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 2.0021815929416404
+  },
+  {
+    "name": "taxibj_K04_seed7",
+    "round": 2,
+    "expert": "TD",
+    "selection_rate": 0.9915134370579916,
+    "weighted_usage": 0.5866968418449121,
+    "router_entropy": 2.0021815929416404
+  },
+  {
+    "name": "taxibj_K04_seed7",
+    "round": 2,
+    "expert": "SD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 2.0021815929416404
+  },
+  {
+    "name": "taxibj_K04_seed7",
+    "round": 2,
+    "expert": "TA",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 2.0021815929416404
+  },
+  {
+    "name": "taxibj_K04_seed7",
+    "round": 2,
+    "expert": "ST",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 2.0021815929416404
+  },
+  {
+    "name": "taxibj_K04_seed7",
+    "round": 2,
+    "expert": "TL",
+    "selection_rate": 0.007072135785007072,
+    "weighted_usage": 0.00211307385348869,
+    "router_entropy": 2.0021815929416404
+  },
+  {
+    "name": "taxibj_K04_seed7",
+    "round": 2,
+    "expert": "SL",
+    "selection_rate": 0.0014144271570014145,
+    "weighted_usage": 0.0004347201536871925,
+    "router_entropy": 2.0021815929416404
+  },
+  {
+    "name": "taxibj_K04_seed7",
+    "round": 3,
+    "expert": "T",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.9406291931348112
+  },
+  {
+    "name": "taxibj_K04_seed7",
+    "round": 3,
+    "expert": "S",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.9406291931348112
+  },
+  {
+    "name": "taxibj_K04_seed7",
+    "round": 3,
+    "expert": "TD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.9406291931348112
+  },
+  {
+    "name": "taxibj_K04_seed7",
+    "round": 3,
+    "expert": "SD",
+    "selection_rate": 0.004243281471004243,
+    "weighted_usage": 0.001055009800102957,
+    "router_entropy": 1.9406291931348112
+  },
+  {
+    "name": "taxibj_K04_seed7",
+    "round": 3,
+    "expert": "TA",
+    "selection_rate": 1.0,
+    "weighted_usage": 0.4744407029182267,
+    "router_entropy": 1.9406291931348112
+  },
+  {
+    "name": "taxibj_K04_seed7",
+    "round": 3,
+    "expert": "ST",
+    "selection_rate": 0.9957567185289957,
+    "weighted_usage": 0.5245042848789372,
+    "router_entropy": 1.9406291931348112
+  },
+  {
+    "name": "taxibj_K04_seed7",
+    "round": 3,
+    "expert": "TL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.9406291931348112
+  },
+  {
+    "name": "taxibj_K04_seed7",
+    "round": 3,
+    "expert": "SL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.9406291931348112
+  },
+  {
+    "name": "taxibj_K04_seed7",
+    "round": 4,
+    "expert": "T",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 2.0147731813482834
+  },
+  {
+    "name": "taxibj_K04_seed7",
+    "round": 4,
+    "expert": "S",
+    "selection_rate": 0.9985855728429985,
+    "weighted_usage": 0.5614814894877195,
+    "router_entropy": 2.0147731813482834
+  },
+  {
+    "name": "taxibj_K04_seed7",
+    "round": 4,
+    "expert": "TD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 2.0147731813482834
+  },
+  {
+    "name": "taxibj_K04_seed7",
+    "round": 4,
+    "expert": "SD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 2.0147731813482834
+  },
+  {
+    "name": "taxibj_K04_seed7",
+    "round": 4,
+    "expert": "TA",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 2.0147731813482834
+  },
+  {
+    "name": "taxibj_K04_seed7",
+    "round": 4,
+    "expert": "ST",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 2.0147731813482834
+  },
+  {
+    "name": "taxibj_K04_seed7",
+    "round": 4,
+    "expert": "TL",
+    "selection_rate": 0.0014144271570014145,
+    "weighted_usage": 0.0004717512043058619,
+    "router_entropy": 2.0147731813482834
+  },
+  {
+    "name": "taxibj_K04_seed7",
+    "round": 4,
+    "expert": "SL",
+    "selection_rate": 1.0,
+    "weighted_usage": 0.4380467604039582,
+    "router_entropy": 2.0147731813482834
+  },
+  {
+    "name": "taxibj_K05_seed7",
+    "round": 1,
+    "expert": "T",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.6585909849224008
+  },
+  {
+    "name": "taxibj_K05_seed7",
+    "round": 1,
+    "expert": "S",
+    "selection_rate": 0.05233380480905234,
+    "weighted_usage": 0.007111392946863781,
+    "router_entropy": 1.6585909849224008
+  },
+  {
+    "name": "taxibj_K05_seed7",
+    "round": 1,
+    "expert": "TD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.6585909849224008
+  },
+  {
+    "name": "taxibj_K05_seed7",
+    "round": 1,
+    "expert": "SD",
+    "selection_rate": 0.0594059405940594,
+    "weighted_usage": 0.0063286055158692,
+    "router_entropy": 1.6585909849224008
+  },
+  {
+    "name": "taxibj_K05_seed7",
+    "round": 1,
+    "expert": "TA",
+    "selection_rate": 0.0014144271570014145,
+    "weighted_usage": 0.00016148092259443464,
+    "router_entropy": 1.6585909849224008
+  },
+  {
+    "name": "taxibj_K05_seed7",
+    "round": 1,
+    "expert": "ST",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.6585909849224008
+  },
+  {
+    "name": "taxibj_K05_seed7",
+    "round": 1,
+    "expert": "TL",
+    "selection_rate": 0.8868458274398868,
+    "weighted_usage": 0.16370058175613722,
+    "router_entropy": 1.6585909849224008
+  },
+  {
+    "name": "taxibj_K05_seed7",
+    "round": 1,
+    "expert": "SL",
+    "selection_rate": 1.0,
+    "weighted_usage": 0.822697939090378,
+    "router_entropy": 1.6585909849224008
+  },
+  {
+    "name": "taxibj_K05_seed7",
+    "round": 2,
+    "expert": "T",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 2.044600846627269
+  },
+  {
+    "name": "taxibj_K05_seed7",
+    "round": 2,
+    "expert": "S",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 2.044600846627269
+  },
+  {
+    "name": "taxibj_K05_seed7",
+    "round": 2,
+    "expert": "TD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 2.044600846627269
+  },
+  {
+    "name": "taxibj_K05_seed7",
+    "round": 2,
+    "expert": "SD",
+    "selection_rate": 1.0,
+    "weighted_usage": 0.3795629327924451,
+    "router_entropy": 2.044600846627269
+  },
+  {
+    "name": "taxibj_K05_seed7",
+    "round": 2,
+    "expert": "TA",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 2.044600846627269
+  },
+  {
+    "name": "taxibj_K05_seed7",
+    "round": 2,
+    "expert": "ST",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 2.044600846627269
+  },
+  {
+    "name": "taxibj_K05_seed7",
+    "round": 2,
+    "expert": "TL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 2.044600846627269
+  },
+  {
+    "name": "taxibj_K05_seed7",
+    "round": 2,
+    "expert": "SL",
+    "selection_rate": 1.0,
+    "weighted_usage": 0.6204370687672238,
+    "router_entropy": 2.044600846627269
+  },
+  {
+    "name": "taxibj_K05_seed7",
+    "round": 3,
+    "expert": "T",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.9606224118963962
+  },
+  {
+    "name": "taxibj_K05_seed7",
+    "round": 3,
+    "expert": "S",
+    "selection_rate": 0.028288543140028287,
+    "weighted_usage": 0.0046591224646804355,
+    "router_entropy": 1.9606224118963962
+  },
+  {
+    "name": "taxibj_K05_seed7",
+    "round": 3,
+    "expert": "TD",
+    "selection_rate": 0.008486562942008486,
+    "weighted_usage": 0.0011638171939229358,
+    "router_entropy": 1.9606224118963962
+  },
+  {
+    "name": "taxibj_K05_seed7",
+    "round": 3,
+    "expert": "SD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.9606224118963962
+  },
+  {
+    "name": "taxibj_K05_seed7",
+    "round": 3,
+    "expert": "TA",
+    "selection_rate": 0.04101838755304102,
+    "weighted_usage": 0.00523945122240625,
+    "router_entropy": 1.9606224118963962
+  },
+  {
+    "name": "taxibj_K05_seed7",
+    "round": 3,
+    "expert": "ST",
+    "selection_rate": 1.0,
+    "weighted_usage": 0.6409803472533084,
+    "router_entropy": 1.9606224118963962
+  },
+  {
+    "name": "taxibj_K05_seed7",
+    "round": 3,
+    "expert": "TL",
+    "selection_rate": 0.9222065063649222,
+    "weighted_usage": 0.3479572622661375,
+    "router_entropy": 1.9606224118963962
+  },
+  {
+    "name": "taxibj_K05_seed7",
+    "round": 3,
+    "expert": "SL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.9606224118963962
+  },
+  {
+    "name": "taxibj_K05_seed7",
+    "round": 4,
+    "expert": "T",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 2.023144066422131
+  },
+  {
+    "name": "taxibj_K05_seed7",
+    "round": 4,
+    "expert": "S",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 2.023144066422131
+  },
+  {
+    "name": "taxibj_K05_seed7",
+    "round": 4,
+    "expert": "TD",
+    "selection_rate": 0.45403111739745405,
+    "weighted_usage": 0.24509803952894252,
+    "router_entropy": 2.023144066422131
+  },
+  {
+    "name": "taxibj_K05_seed7",
+    "round": 4,
+    "expert": "SD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 2.023144066422131
+  },
+  {
+    "name": "taxibj_K05_seed7",
+    "round": 4,
+    "expert": "TA",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 2.023144066422131
+  },
+  {
+    "name": "taxibj_K05_seed7",
+    "round": 4,
+    "expert": "ST",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 2.023144066422131
+  },
+  {
+    "name": "taxibj_K05_seed7",
+    "round": 4,
+    "expert": "TL",
+    "selection_rate": 0.545968882602546,
+    "weighted_usage": 0.20027108640110983,
+    "router_entropy": 2.023144066422131
+  },
+  {
+    "name": "taxibj_K05_seed7",
+    "round": 4,
+    "expert": "SL",
+    "selection_rate": 1.0,
+    "weighted_usage": 0.554630871582908,
+    "router_entropy": 2.023144066422131
+  },
+  {
+    "name": "taxibj_K06_seed7",
+    "round": 1,
+    "expert": "T",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 0.9139731683270371
+  },
+  {
+    "name": "taxibj_K06_seed7",
+    "round": 1,
+    "expert": "S",
+    "selection_rate": 0.173974540311174,
+    "weighted_usage": 0.03556741215025182,
+    "router_entropy": 0.9139731683270371
+  },
+  {
+    "name": "taxibj_K06_seed7",
+    "round": 1,
+    "expert": "TD",
+    "selection_rate": 0.38330975954738333,
+    "weighted_usage": 0.007640024919795265,
+    "router_entropy": 0.9139731683270371
+  },
+  {
+    "name": "taxibj_K06_seed7",
+    "round": 1,
+    "expert": "SD",
+    "selection_rate": 1.0,
+    "weighted_usage": 0.9247107212411969,
+    "router_entropy": 0.9139731683270371
+  },
+  {
+    "name": "taxibj_K06_seed7",
+    "round": 1,
+    "expert": "TA",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 0.9139731683270371
+  },
+  {
+    "name": "taxibj_K06_seed7",
+    "round": 1,
+    "expert": "ST",
+    "selection_rate": 0.014144271570014143,
+    "weighted_usage": 0.00412846943613832,
+    "router_entropy": 0.9139731683270371
+  },
+  {
+    "name": "taxibj_K06_seed7",
+    "round": 1,
+    "expert": "TL",
+    "selection_rate": 0.42857142857142855,
+    "weighted_usage": 0.02795337350074797,
+    "router_entropy": 0.9139731683270371
+  },
+  {
+    "name": "taxibj_K06_seed7",
+    "round": 1,
+    "expert": "SL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 0.9139731683270371
+  },
+  {
+    "name": "taxibj_K06_seed7",
+    "round": 2,
+    "expert": "T",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.3477830499310266
+  },
+  {
+    "name": "taxibj_K06_seed7",
+    "round": 2,
+    "expert": "S",
+    "selection_rate": 0.5007072135785007,
+    "weighted_usage": 0.05485281343486218,
+    "router_entropy": 1.3477830499310266
+  },
+  {
+    "name": "taxibj_K06_seed7",
+    "round": 2,
+    "expert": "TD",
+    "selection_rate": 0.4229137199434229,
+    "weighted_usage": 0.234194981116048,
+    "router_entropy": 1.3477830499310266
+  },
+  {
+    "name": "taxibj_K06_seed7",
+    "round": 2,
+    "expert": "SD",
+    "selection_rate": 0.5021216407355021,
+    "weighted_usage": 0.44719536014459765,
+    "router_entropy": 1.3477830499310266
+  },
+  {
+    "name": "taxibj_K06_seed7",
+    "round": 2,
+    "expert": "TA",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.3477830499310266
+  },
+  {
+    "name": "taxibj_K06_seed7",
+    "round": 2,
+    "expert": "ST",
+    "selection_rate": 0.49646393210749645,
+    "weighted_usage": 0.2262169585959746,
+    "router_entropy": 1.3477830499310266
+  },
+  {
+    "name": "taxibj_K06_seed7",
+    "round": 2,
+    "expert": "TL",
+    "selection_rate": 0.0014144271570014145,
+    "weighted_usage": 0.0006464702067988933,
+    "router_entropy": 1.3477830499310266
+  },
+  {
+    "name": "taxibj_K06_seed7",
+    "round": 2,
+    "expert": "SL",
+    "selection_rate": 0.07637906647807638,
+    "weighted_usage": 0.036893416443757994,
+    "router_entropy": 1.3477830499310266
+  },
+  {
+    "name": "taxibj_K06_seed7",
+    "round": 3,
+    "expert": "T",
+    "selection_rate": 0.07496463932107496,
+    "weighted_usage": 0.0167056046626524,
+    "router_entropy": 1.936310444459704
+  },
+  {
+    "name": "taxibj_K06_seed7",
+    "round": 3,
+    "expert": "S",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.936310444459704
+  },
+  {
+    "name": "taxibj_K06_seed7",
+    "round": 3,
+    "expert": "TD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.936310444459704
+  },
+  {
+    "name": "taxibj_K06_seed7",
+    "round": 3,
+    "expert": "SD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.936310444459704
+  },
+  {
+    "name": "taxibj_K06_seed7",
+    "round": 3,
+    "expert": "TA",
+    "selection_rate": 1.0,
+    "weighted_usage": 0.5208494304303907,
+    "router_entropy": 1.936310444459704
+  },
+  {
+    "name": "taxibj_K06_seed7",
+    "round": 3,
+    "expert": "ST",
+    "selection_rate": 0.5148514851485149,
+    "weighted_usage": 0.366753417708749,
+    "router_entropy": 1.936310444459704
+  },
+  {
+    "name": "taxibj_K06_seed7",
+    "round": 3,
+    "expert": "TL",
+    "selection_rate": 0.0014144271570014145,
+    "weighted_usage": 0.00035497183678342395,
+    "router_entropy": 1.936310444459704
+  },
+  {
+    "name": "taxibj_K06_seed7",
+    "round": 3,
+    "expert": "SL",
+    "selection_rate": 0.4087694483734088,
+    "weighted_usage": 0.09533657595156948,
+    "router_entropy": 1.936310444459704
+  },
+  {
+    "name": "taxibj_K06_seed7",
+    "round": 4,
+    "expert": "T",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 2.0099708755496937
+  },
+  {
+    "name": "taxibj_K06_seed7",
+    "round": 4,
+    "expert": "S",
+    "selection_rate": 0.9971711456859972,
+    "weighted_usage": 0.5751477217320169,
+    "router_entropy": 2.0099708755496937
+  },
+  {
+    "name": "taxibj_K06_seed7",
+    "round": 4,
+    "expert": "TD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 2.0099708755496937
+  },
+  {
+    "name": "taxibj_K06_seed7",
+    "round": 4,
+    "expert": "SD",
+    "selection_rate": 0.002828854314002829,
+    "weighted_usage": 0.001087476500695969,
+    "router_entropy": 2.0099708755496937
+  },
+  {
+    "name": "taxibj_K06_seed7",
+    "round": 4,
+    "expert": "TA",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 2.0099708755496937
+  },
+  {
+    "name": "taxibj_K06_seed7",
+    "round": 4,
+    "expert": "ST",
+    "selection_rate": 0.49787835926449786,
+    "weighted_usage": 0.14759738939317651,
+    "router_entropy": 2.0099708755496937
+  },
+  {
+    "name": "taxibj_K06_seed7",
+    "round": 4,
+    "expert": "TL",
+    "selection_rate": 0.002828854314002829,
+    "weighted_usage": 0.0009240355063361528,
+    "router_entropy": 2.0099708755496937
+  },
+  {
+    "name": "taxibj_K06_seed7",
+    "round": 4,
+    "expert": "SL",
+    "selection_rate": 0.49929278642149927,
+    "weighted_usage": 0.2752433780902177,
+    "router_entropy": 2.0099708755496937
+  },
+  {
+    "name": "taxibj_K07_seed7",
+    "round": 1,
+    "expert": "T",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 0.003410260967869949
+  },
+  {
+    "name": "taxibj_K07_seed7",
+    "round": 1,
+    "expert": "S",
+    "selection_rate": 0.9533239038189534,
+    "weighted_usage": 4.625175924867099e-05,
+    "router_entropy": 0.003410260967869949
+  },
+  {
+    "name": "taxibj_K07_seed7",
+    "round": 1,
+    "expert": "TD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 0.003410260967869949
+  },
+  {
+    "name": "taxibj_K07_seed7",
+    "round": 1,
+    "expert": "SD",
+    "selection_rate": 1.0,
+    "weighted_usage": 0.9999457408043081,
+    "router_entropy": 0.003410260967869949
+  },
+  {
+    "name": "taxibj_K07_seed7",
+    "round": 1,
+    "expert": "TA",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 0.003410260967869949
+  },
+  {
+    "name": "taxibj_K07_seed7",
+    "round": 1,
+    "expert": "ST",
+    "selection_rate": 0.02263083451202263,
+    "weighted_usage": 3.3173451384218593e-06,
+    "router_entropy": 0.003410260967869949
+  },
+  {
+    "name": "taxibj_K07_seed7",
+    "round": 1,
+    "expert": "TL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 0.003410260967869949
+  },
+  {
+    "name": "taxibj_K07_seed7",
+    "round": 1,
+    "expert": "SL",
+    "selection_rate": 0.024045261669024046,
+    "weighted_usage": 4.695960037480076e-06,
+    "router_entropy": 0.003410260967869949
+  },
+  {
+    "name": "taxibj_K07_seed7",
+    "round": 2,
+    "expert": "T",
+    "selection_rate": 0.9476661951909476,
+    "weighted_usage": 0.2654171756124901,
+    "router_entropy": 1.8216542395333013
+  },
+  {
+    "name": "taxibj_K07_seed7",
+    "round": 2,
+    "expert": "S",
+    "selection_rate": 0.5007072135785007,
+    "weighted_usage": 0.2920061951816672,
+    "router_entropy": 1.8216542395333013
+  },
+  {
+    "name": "taxibj_K07_seed7",
+    "round": 2,
+    "expert": "TD",
+    "selection_rate": 0.005657708628005658,
+    "weighted_usage": 0.0006641808691759932,
+    "router_entropy": 1.8216542395333013
+  },
+  {
+    "name": "taxibj_K07_seed7",
+    "round": 2,
+    "expert": "SD",
+    "selection_rate": 0.5417256011315418,
+    "weighted_usage": 0.4413202499399091,
+    "router_entropy": 1.8216542395333013
+  },
+  {
+    "name": "taxibj_K07_seed7",
+    "round": 2,
+    "expert": "TA",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.8216542395333013
+  },
+  {
+    "name": "taxibj_K07_seed7",
+    "round": 2,
+    "expert": "ST",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.8216542395333013
+  },
+  {
+    "name": "taxibj_K07_seed7",
+    "round": 2,
+    "expert": "TL",
+    "selection_rate": 0.002828854314002829,
+    "weighted_usage": 0.0003161373978962824,
+    "router_entropy": 1.8216542395333013
+  },
+  {
+    "name": "taxibj_K07_seed7",
+    "round": 2,
+    "expert": "SL",
+    "selection_rate": 0.0014144271570014145,
+    "weighted_usage": 0.0002760615679297117,
+    "router_entropy": 1.8216542395333013
+  },
+  {
+    "name": "taxibj_K07_seed7",
+    "round": 3,
+    "expert": "T",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.5073632951455296
+  },
+  {
+    "name": "taxibj_K07_seed7",
+    "round": 3,
+    "expert": "S",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.5073632951455296
+  },
+  {
+    "name": "taxibj_K07_seed7",
+    "round": 3,
+    "expert": "TD",
+    "selection_rate": 0.4724186704384724,
+    "weighted_usage": 0.0396416319686988,
+    "router_entropy": 1.5073632951455296
+  },
+  {
+    "name": "taxibj_K07_seed7",
+    "round": 3,
+    "expert": "SD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.5073632951455296
+  },
+  {
+    "name": "taxibj_K07_seed7",
+    "round": 3,
+    "expert": "TA",
+    "selection_rate": 0.5275813295615276,
+    "weighted_usage": 0.39378393594244077,
+    "router_entropy": 1.5073632951455296
+  },
+  {
+    "name": "taxibj_K07_seed7",
+    "round": 3,
+    "expert": "ST",
+    "selection_rate": 0.6718528995756718,
+    "weighted_usage": 0.4984861061588204,
+    "router_entropy": 1.5073632951455296
+  },
+  {
+    "name": "taxibj_K07_seed7",
+    "round": 3,
+    "expert": "TL",
+    "selection_rate": 0.32814710042432815,
+    "weighted_usage": 0.06808832534384694,
+    "router_entropy": 1.5073632951455296
+  },
+  {
+    "name": "taxibj_K07_seed7",
+    "round": 3,
+    "expert": "SL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.5073632951455296
+  },
+  {
+    "name": "taxibj_K07_seed7",
+    "round": 4,
+    "expert": "T",
+    "selection_rate": 0.004243281471004243,
+    "weighted_usage": 0.001039784607152116,
+    "router_entropy": 2.024367992710492
+  },
+  {
+    "name": "taxibj_K07_seed7",
+    "round": 4,
+    "expert": "S",
+    "selection_rate": 1.0,
+    "weighted_usage": 0.5597076522663257,
+    "router_entropy": 2.024367992710492
+  },
+  {
+    "name": "taxibj_K07_seed7",
+    "round": 4,
+    "expert": "TD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 2.024367992710492
+  },
+  {
+    "name": "taxibj_K07_seed7",
+    "round": 4,
+    "expert": "SD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 2.024367992710492
+  },
+  {
+    "name": "taxibj_K07_seed7",
+    "round": 4,
+    "expert": "TA",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 2.024367992710492
+  },
+  {
+    "name": "taxibj_K07_seed7",
+    "round": 4,
+    "expert": "ST",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 2.024367992710492
+  },
+  {
+    "name": "taxibj_K07_seed7",
+    "round": 4,
+    "expert": "TL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 2.024367992710492
+  },
+  {
+    "name": "taxibj_K07_seed7",
+    "round": 4,
+    "expert": "SL",
+    "selection_rate": 0.9957567185289957,
+    "weighted_usage": 0.43925256293683274,
+    "router_entropy": 2.024367992710492
+  },
+  {
+    "name": "taxibj_K08_seed7",
+    "round": 1,
+    "expert": "T",
+    "selection_rate": 0.07779349363507779,
+    "weighted_usage": 0.00017973240543963043,
+    "router_entropy": 0.39345052035819095
+  },
+  {
+    "name": "taxibj_K08_seed7",
+    "round": 1,
+    "expert": "S",
+    "selection_rate": 0.056577086280056574,
+    "weighted_usage": 0.0005832610979855398,
+    "router_entropy": 0.39345052035819095
+  },
+  {
+    "name": "taxibj_K08_seed7",
+    "round": 1,
+    "expert": "TD",
+    "selection_rate": 0.355021216407355,
+    "weighted_usage": 0.011137213768724674,
+    "router_entropy": 0.39345052035819095
+  },
+  {
+    "name": "taxibj_K08_seed7",
+    "round": 1,
+    "expert": "SD",
+    "selection_rate": 1.0,
+    "weighted_usage": 0.9842417971079556,
+    "router_entropy": 0.39345052035819095
+  },
+  {
+    "name": "taxibj_K08_seed7",
+    "round": 1,
+    "expert": "TA",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 0.39345052035819095
+  },
+  {
+    "name": "taxibj_K08_seed7",
+    "round": 1,
+    "expert": "ST",
+    "selection_rate": 0.0014144271570014145,
+    "weighted_usage": 1.5621239522306047e-05,
+    "router_entropy": 0.39345052035819095
+  },
+  {
+    "name": "taxibj_K08_seed7",
+    "round": 1,
+    "expert": "TL",
+    "selection_rate": 0.2984441301272984,
+    "weighted_usage": 0.0015622402364822814,
+    "router_entropy": 0.39345052035819095
+  },
+  {
+    "name": "taxibj_K08_seed7",
+    "round": 1,
+    "expert": "SL",
+    "selection_rate": 0.21074964639321075,
+    "weighted_usage": 0.0022801367567306784,
+    "router_entropy": 0.39345052035819095
+  },
+  {
+    "name": "taxibj_K08_seed7",
+    "round": 2,
+    "expert": "T",
+    "selection_rate": 1.0,
+    "weighted_usage": 0.2156947429121974,
+    "router_entropy": 1.6282000245960113
+  },
+  {
+    "name": "taxibj_K08_seed7",
+    "round": 2,
+    "expert": "S",
+    "selection_rate": 0.004243281471004243,
+    "weighted_usage": 0.0019952336160263214,
+    "router_entropy": 1.6282000245960113
+  },
+  {
+    "name": "taxibj_K08_seed7",
+    "round": 2,
+    "expert": "TD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.6282000245960113
+  },
+  {
+    "name": "taxibj_K08_seed7",
+    "round": 2,
+    "expert": "SD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.6282000245960113
+  },
+  {
+    "name": "taxibj_K08_seed7",
+    "round": 2,
+    "expert": "TA",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.6282000245960113
+  },
+  {
+    "name": "taxibj_K08_seed7",
+    "round": 2,
+    "expert": "ST",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.6282000245960113
+  },
+  {
+    "name": "taxibj_K08_seed7",
+    "round": 2,
+    "expert": "TL",
+    "selection_rate": 0.9957567185289957,
+    "weighted_usage": 0.7823100243464555,
+    "router_entropy": 1.6282000245960113
+  },
+  {
+    "name": "taxibj_K08_seed7",
+    "round": 2,
+    "expert": "SL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.6282000245960113
+  },
+  {
+    "name": "taxibj_K08_seed7",
+    "round": 3,
+    "expert": "T",
+    "selection_rate": 0.002828854314002829,
+    "weighted_usage": 0.0009139367343681368,
+    "router_entropy": 2.013656245604972
+  },
+  {
+    "name": "taxibj_K08_seed7",
+    "round": 3,
+    "expert": "S",
+    "selection_rate": 0.0014144271570014145,
+    "weighted_usage": 0.00039501958217108264,
+    "router_entropy": 2.013656245604972
+  },
+  {
+    "name": "taxibj_K08_seed7",
+    "round": 3,
+    "expert": "TD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 2.013656245604972
+  },
+  {
+    "name": "taxibj_K08_seed7",
+    "round": 3,
+    "expert": "SD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 2.013656245604972
+  },
+  {
+    "name": "taxibj_K08_seed7",
+    "round": 3,
+    "expert": "TA",
+    "selection_rate": 0.9985855728429985,
+    "weighted_usage": 0.4997955522324779,
+    "router_entropy": 2.013656245604972
+  },
+  {
+    "name": "taxibj_K08_seed7",
+    "round": 3,
+    "expert": "ST",
+    "selection_rate": 0.9971711456859972,
+    "weighted_usage": 0.49889549288419216,
+    "router_entropy": 2.013656245604972
+  },
+  {
+    "name": "taxibj_K08_seed7",
+    "round": 3,
+    "expert": "TL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 2.013656245604972
+  },
+  {
+    "name": "taxibj_K08_seed7",
+    "round": 3,
+    "expert": "SL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 2.013656245604972
+  },
+  {
+    "name": "taxibj_K08_seed7",
+    "round": 4,
+    "expert": "T",
+    "selection_rate": 0.002828854314002829,
+    "weighted_usage": 0.0002677773653702149,
+    "router_entropy": 1.7972158875179425
+  },
+  {
+    "name": "taxibj_K08_seed7",
+    "round": 4,
+    "expert": "S",
+    "selection_rate": 0.9971711456859972,
+    "weighted_usage": 0.5944469737829549,
+    "router_entropy": 1.7972158875179425
+  },
+  {
+    "name": "taxibj_K08_seed7",
+    "round": 4,
+    "expert": "TD",
+    "selection_rate": 0.002828854314002829,
+    "weighted_usage": 0.0005647335227847606,
+    "router_entropy": 1.7972158875179425
+  },
+  {
+    "name": "taxibj_K08_seed7",
+    "round": 4,
+    "expert": "SD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.7972158875179425
+  },
+  {
+    "name": "taxibj_K08_seed7",
+    "round": 4,
+    "expert": "TA",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.7972158875179425
+  },
+  {
+    "name": "taxibj_K08_seed7",
+    "round": 4,
+    "expert": "ST",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.7972158875179425
+  },
+  {
+    "name": "taxibj_K08_seed7",
+    "round": 4,
+    "expert": "TL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.7972158875179425
+  },
+  {
+    "name": "taxibj_K08_seed7",
+    "round": 4,
+    "expert": "SL",
+    "selection_rate": 0.9971711456859972,
+    "weighted_usage": 0.40472051453851743,
+    "router_entropy": 1.7972158875179425
+  },
+  {
+    "name": "taxibj_K01_seed17",
+    "round": 1,
+    "expert": "T",
+    "selection_rate": 0.43705799151343705,
+    "weighted_usage": 0.2720948620587377,
+    "router_entropy": 1.2212543081817913
+  },
+  {
+    "name": "taxibj_K01_seed17",
+    "round": 1,
+    "expert": "S",
+    "selection_rate": 0.0014144271570014145,
+    "weighted_usage": 0.0003495421655781704,
+    "router_entropy": 1.2212543081817913
+  },
+  {
+    "name": "taxibj_K01_seed17",
+    "round": 1,
+    "expert": "TD",
+    "selection_rate": 0.2871287128712871,
+    "weighted_usage": 0.010257780446527365,
+    "router_entropy": 1.2212543081817913
+  },
+  {
+    "name": "taxibj_K01_seed17",
+    "round": 1,
+    "expert": "SD",
+    "selection_rate": 0.9688826025459689,
+    "weighted_usage": 0.6414146939084419,
+    "router_entropy": 1.2212543081817913
+  },
+  {
+    "name": "taxibj_K01_seed17",
+    "round": 1,
+    "expert": "TA",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.2212543081817913
+  },
+  {
+    "name": "taxibj_K01_seed17",
+    "round": 1,
+    "expert": "ST",
+    "selection_rate": 0.004243281471004243,
+    "weighted_usage": 0.0009432794391855998,
+    "router_entropy": 1.2212543081817913
+  },
+  {
+    "name": "taxibj_K01_seed17",
+    "round": 1,
+    "expert": "TL",
+    "selection_rate": 0.3012729844413013,
+    "weighted_usage": 0.07493984414715073,
+    "router_entropy": 1.2212543081817913
+  },
+  {
+    "name": "taxibj_K01_seed17",
+    "round": 1,
+    "expert": "SL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.2212543081817913
+  },
+  {
+    "name": "taxibj_K01_seed17",
+    "round": 2,
+    "expert": "T",
+    "selection_rate": 0.13578500707213578,
+    "weighted_usage": 0.00020479052279821612,
+    "router_entropy": 0.1027171183239286
+  },
+  {
+    "name": "taxibj_K01_seed17",
+    "round": 2,
+    "expert": "S",
+    "selection_rate": 1.0,
+    "weighted_usage": 0.9976179458970228,
+    "router_entropy": 0.1027171183239286
+  },
+  {
+    "name": "taxibj_K01_seed17",
+    "round": 2,
+    "expert": "TD",
+    "selection_rate": 0.04526166902404526,
+    "weighted_usage": 0.00010325026076321281,
+    "router_entropy": 0.1027171183239286
+  },
+  {
+    "name": "taxibj_K01_seed17",
+    "round": 2,
+    "expert": "SD",
+    "selection_rate": 0.024045261669024046,
+    "weighted_usage": 8.607566410338419e-06,
+    "router_entropy": 0.1027171183239286
+  },
+  {
+    "name": "taxibj_K01_seed17",
+    "round": 2,
+    "expert": "TA",
+    "selection_rate": 0.7086280056577087,
+    "weighted_usage": 0.0019953550755729983,
+    "router_entropy": 0.1027171183239286
+  },
+  {
+    "name": "taxibj_K01_seed17",
+    "round": 2,
+    "expert": "ST",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 0.1027171183239286
+  },
+  {
+    "name": "taxibj_K01_seed17",
+    "round": 2,
+    "expert": "TL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 0.1027171183239286
+  },
+  {
+    "name": "taxibj_K01_seed17",
+    "round": 2,
+    "expert": "SL",
+    "selection_rate": 0.08628005657708628,
+    "weighted_usage": 7.005176682959151e-05,
+    "router_entropy": 0.1027171183239286
+  },
+  {
+    "name": "taxibj_K01_seed17",
+    "round": 3,
+    "expert": "T",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.5361310987230723
+  },
+  {
+    "name": "taxibj_K01_seed17",
+    "round": 3,
+    "expert": "S",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.5361310987230723
+  },
+  {
+    "name": "taxibj_K01_seed17",
+    "round": 3,
+    "expert": "TD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.5361310987230723
+  },
+  {
+    "name": "taxibj_K01_seed17",
+    "round": 3,
+    "expert": "SD",
+    "selection_rate": 0.4823196605374823,
+    "weighted_usage": 0.16762747861118263,
+    "router_entropy": 1.5361310987230723
+  },
+  {
+    "name": "taxibj_K01_seed17",
+    "round": 3,
+    "expert": "TA",
+    "selection_rate": 0.9801980198019802,
+    "weighted_usage": 0.5681228071156115,
+    "router_entropy": 1.5361310987230723
+  },
+  {
+    "name": "taxibj_K01_seed17",
+    "round": 3,
+    "expert": "ST",
+    "selection_rate": 0.019801980198019802,
+    "weighted_usage": 0.005722192633775876,
+    "router_entropy": 1.5361310987230723
+  },
+  {
+    "name": "taxibj_K01_seed17",
+    "round": 3,
+    "expert": "TL",
+    "selection_rate": 0.5176803394625177,
+    "weighted_usage": 0.25852752376816734,
+    "router_entropy": 1.5361310987230723
+  },
+  {
+    "name": "taxibj_K01_seed17",
+    "round": 3,
+    "expert": "SL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.5361310987230723
+  },
+  {
+    "name": "taxibj_K01_seed17",
+    "round": 4,
+    "expert": "T",
+    "selection_rate": 0.8571428571428571,
+    "weighted_usage": 0.3826298298685689,
+    "router_entropy": 1.7039796790501096
+  },
+  {
+    "name": "taxibj_K01_seed17",
+    "round": 4,
+    "expert": "S",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.7039796790501096
+  },
+  {
+    "name": "taxibj_K01_seed17",
+    "round": 4,
+    "expert": "TD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.7039796790501096
+  },
+  {
+    "name": "taxibj_K01_seed17",
+    "round": 4,
+    "expert": "SD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.7039796790501096
+  },
+  {
+    "name": "taxibj_K01_seed17",
+    "round": 4,
+    "expert": "TA",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.7039796790501096
+  },
+  {
+    "name": "taxibj_K01_seed17",
+    "round": 4,
+    "expert": "ST",
+    "selection_rate": 0.14427157001414428,
+    "weighted_usage": 0.05079587733391488,
+    "router_entropy": 1.7039796790501096
+  },
+  {
+    "name": "taxibj_K01_seed17",
+    "round": 4,
+    "expert": "TL",
+    "selection_rate": 0.4823196605374823,
+    "weighted_usage": 0.1841628332707973,
+    "router_entropy": 1.7039796790501096
+  },
+  {
+    "name": "taxibj_K01_seed17",
+    "round": 4,
+    "expert": "SL",
+    "selection_rate": 0.5162659123055162,
+    "weighted_usage": 0.3824114603697832,
+    "router_entropy": 1.7039796790501096
+  },
+  {
+    "name": "taxibj_K02_seed17",
+    "round": 1,
+    "expert": "T",
+    "selection_rate": 0.014144271570014143,
+    "weighted_usage": 5.414920116088431e-05,
+    "router_entropy": 0.29504574793044225
+  },
+  {
+    "name": "taxibj_K02_seed17",
+    "round": 1,
+    "expert": "S",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 0.29504574793044225
+  },
+  {
+    "name": "taxibj_K02_seed17",
+    "round": 1,
+    "expert": "TD",
+    "selection_rate": 0.6760961810466761,
+    "weighted_usage": 0.005751522785662561,
+    "router_entropy": 0.29504574793044225
+  },
+  {
+    "name": "taxibj_K02_seed17",
+    "round": 1,
+    "expert": "SD",
+    "selection_rate": 0.26591230551626593,
+    "weighted_usage": 0.004763763035348547,
+    "router_entropy": 0.29504574793044225
+  },
+  {
+    "name": "taxibj_K02_seed17",
+    "round": 1,
+    "expert": "TA",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 0.29504574793044225
+  },
+  {
+    "name": "taxibj_K02_seed17",
+    "round": 1,
+    "expert": "ST",
+    "selection_rate": 0.04384724186704385,
+    "weighted_usage": 9.135863298479114e-05,
+    "router_entropy": 0.29504574793044225
+  },
+  {
+    "name": "taxibj_K02_seed17",
+    "round": 1,
+    "expert": "TL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 0.29504574793044225
+  },
+  {
+    "name": "taxibj_K02_seed17",
+    "round": 1,
+    "expert": "SL",
+    "selection_rate": 1.0,
+    "weighted_usage": 0.9893392066469961,
+    "router_entropy": 0.29504574793044225
+  },
+  {
+    "name": "taxibj_K02_seed17",
+    "round": 2,
+    "expert": "T",
+    "selection_rate": 0.011315417256011316,
+    "weighted_usage": 7.356188219759213e-07,
+    "router_entropy": 0.9632561489874151
+  },
+  {
+    "name": "taxibj_K02_seed17",
+    "round": 2,
+    "expert": "S",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 0.9632561489874151
+  },
+  {
+    "name": "taxibj_K02_seed17",
+    "round": 2,
+    "expert": "TD",
+    "selection_rate": 0.9886845827439887,
+    "weighted_usage": 0.38687286246860236,
+    "router_entropy": 0.9632561489874151
+  },
+  {
+    "name": "taxibj_K02_seed17",
+    "round": 2,
+    "expert": "SD",
+    "selection_rate": 0.5261669024045261,
+    "weighted_usage": 0.5135026114243261,
+    "router_entropy": 0.9632561489874151
+  },
+  {
+    "name": "taxibj_K02_seed17",
+    "round": 2,
+    "expert": "TA",
+    "selection_rate": 0.4738330975954738,
+    "weighted_usage": 0.09962379061939693,
+    "router_entropy": 0.9632561489874151
+  },
+  {
+    "name": "taxibj_K02_seed17",
+    "round": 2,
+    "expert": "ST",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 0.9632561489874151
+  },
+  {
+    "name": "taxibj_K02_seed17",
+    "round": 2,
+    "expert": "TL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 0.9632561489874151
+  },
+  {
+    "name": "taxibj_K02_seed17",
+    "round": 2,
+    "expert": "SL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 0.9632561489874151
+  },
+  {
+    "name": "taxibj_K02_seed17",
+    "round": 3,
+    "expert": "T",
+    "selection_rate": 0.43847241867043846,
+    "weighted_usage": 0.12408610674667224,
+    "router_entropy": 1.9603082679449886
+  },
+  {
+    "name": "taxibj_K02_seed17",
+    "round": 3,
+    "expert": "S",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.9603082679449886
+  },
+  {
+    "name": "taxibj_K02_seed17",
+    "round": 3,
+    "expert": "TD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.9603082679449886
+  },
+  {
+    "name": "taxibj_K02_seed17",
+    "round": 3,
+    "expert": "SD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.9603082679449886
+  },
+  {
+    "name": "taxibj_K02_seed17",
+    "round": 3,
+    "expert": "TA",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.9603082679449886
+  },
+  {
+    "name": "taxibj_K02_seed17",
+    "round": 3,
+    "expert": "ST",
+    "selection_rate": 0.5615275813295615,
+    "weighted_usage": 0.3520344793164241,
+    "router_entropy": 1.9603082679449886
+  },
+  {
+    "name": "taxibj_K02_seed17",
+    "round": 3,
+    "expert": "TL",
+    "selection_rate": 1.0,
+    "weighted_usage": 0.5238794115763237,
+    "router_entropy": 1.9603082679449886
+  },
+  {
+    "name": "taxibj_K02_seed17",
+    "round": 3,
+    "expert": "SL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.9603082679449886
+  },
+  {
+    "name": "taxibj_K02_seed17",
+    "round": 4,
+    "expert": "T",
+    "selection_rate": 0.9222065063649222,
+    "weighted_usage": 0.2836492297014345,
+    "router_entropy": 1.3746791990748775
+  },
+  {
+    "name": "taxibj_K02_seed17",
+    "round": 4,
+    "expert": "S",
+    "selection_rate": 0.5106082036775106,
+    "weighted_usage": 0.48807024036809443,
+    "router_entropy": 1.3746791990748775
+  },
+  {
+    "name": "taxibj_K02_seed17",
+    "round": 4,
+    "expert": "TD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.3746791990748775
+  },
+  {
+    "name": "taxibj_K02_seed17",
+    "round": 4,
+    "expert": "SD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.3746791990748775
+  },
+  {
+    "name": "taxibj_K02_seed17",
+    "round": 4,
+    "expert": "TA",
+    "selection_rate": 0.5671852899575672,
+    "weighted_usage": 0.22828052994100934,
+    "router_entropy": 1.3746791990748775
+  },
+  {
+    "name": "taxibj_K02_seed17",
+    "round": 4,
+    "expert": "ST",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.3746791990748775
+  },
+  {
+    "name": "taxibj_K02_seed17",
+    "round": 4,
+    "expert": "TL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.3746791990748775
+  },
+  {
+    "name": "taxibj_K02_seed17",
+    "round": 4,
+    "expert": "SL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.3746791990748775
+  },
+  {
+    "name": "taxibj_K03_seed17",
+    "round": 1,
+    "expert": "T",
+    "selection_rate": 1.0,
+    "weighted_usage": 0.4839174768227499,
+    "router_entropy": 1.6272771632086842
+  },
+  {
+    "name": "taxibj_K03_seed17",
+    "round": 1,
+    "expert": "S",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.6272771632086842
+  },
+  {
+    "name": "taxibj_K03_seed17",
+    "round": 1,
+    "expert": "TD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.6272771632086842
+  },
+  {
+    "name": "taxibj_K03_seed17",
+    "round": 1,
+    "expert": "SD",
+    "selection_rate": 0.49929278642149927,
+    "weighted_usage": 0.425150338291616,
+    "router_entropy": 1.6272771632086842
+  },
+  {
+    "name": "taxibj_K03_seed17",
+    "round": 1,
+    "expert": "TA",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.6272771632086842
+  },
+  {
+    "name": "taxibj_K03_seed17",
+    "round": 1,
+    "expert": "ST",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.6272771632086842
+  },
+  {
+    "name": "taxibj_K03_seed17",
+    "round": 1,
+    "expert": "TL",
+    "selection_rate": 0.5007072135785007,
+    "weighted_usage": 0.09093218547709633,
+    "router_entropy": 1.6272771632086842
+  },
+  {
+    "name": "taxibj_K03_seed17",
+    "round": 1,
+    "expert": "SL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.6272771632086842
+  },
+  {
+    "name": "taxibj_K03_seed17",
+    "round": 2,
+    "expert": "T",
+    "selection_rate": 0.09335219236209336,
+    "weighted_usage": 3.934119385940894e-05,
+    "router_entropy": 1.0962974993129646
+  },
+  {
+    "name": "taxibj_K03_seed17",
+    "round": 2,
+    "expert": "S",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.0962974993129646
+  },
+  {
+    "name": "taxibj_K03_seed17",
+    "round": 2,
+    "expert": "TD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.0962974993129646
+  },
+  {
+    "name": "taxibj_K03_seed17",
+    "round": 2,
+    "expert": "SD",
+    "selection_rate": 0.49929278642149927,
+    "weighted_usage": 0.37459057991035927,
+    "router_entropy": 1.0962974993129646
+  },
+  {
+    "name": "taxibj_K03_seed17",
+    "round": 2,
+    "expert": "TA",
+    "selection_rate": 0.5007072135785007,
+    "weighted_usage": 0.4955255494596597,
+    "router_entropy": 1.0962974993129646
+  },
+  {
+    "name": "taxibj_K03_seed17",
+    "round": 2,
+    "expert": "ST",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.0962974993129646
+  },
+  {
+    "name": "taxibj_K03_seed17",
+    "round": 2,
+    "expert": "TL",
+    "selection_rate": 0.7496463932107497,
+    "weighted_usage": 0.12794566652283093,
+    "router_entropy": 1.0962974993129646
+  },
+  {
+    "name": "taxibj_K03_seed17",
+    "round": 2,
+    "expert": "SL",
+    "selection_rate": 0.157001414427157,
+    "weighted_usage": 0.0018988634965018945,
+    "router_entropy": 1.0962974993129646
+  },
+  {
+    "name": "taxibj_K03_seed17",
+    "round": 3,
+    "expert": "T",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.6589974350489252
+  },
+  {
+    "name": "taxibj_K03_seed17",
+    "round": 3,
+    "expert": "S",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.6589974350489252
+  },
+  {
+    "name": "taxibj_K03_seed17",
+    "round": 3,
+    "expert": "TD",
+    "selection_rate": 0.3734087694483734,
+    "weighted_usage": 0.20817992637063018,
+    "router_entropy": 1.6589974350489252
+  },
+  {
+    "name": "taxibj_K03_seed17",
+    "round": 3,
+    "expert": "SD",
+    "selection_rate": 0.49929278642149927,
+    "weighted_usage": 0.1314137855167942,
+    "router_entropy": 1.6589974350489252
+  },
+  {
+    "name": "taxibj_K03_seed17",
+    "round": 3,
+    "expert": "TA",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.6589974350489252
+  },
+  {
+    "name": "taxibj_K03_seed17",
+    "round": 3,
+    "expert": "ST",
+    "selection_rate": 0.9844413012729845,
+    "weighted_usage": 0.6151009559251969,
+    "router_entropy": 1.6589974350489252
+  },
+  {
+    "name": "taxibj_K03_seed17",
+    "round": 3,
+    "expert": "TL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.6589974350489252
+  },
+  {
+    "name": "taxibj_K03_seed17",
+    "round": 3,
+    "expert": "SL",
+    "selection_rate": 0.14285714285714285,
+    "weighted_usage": 0.04530533075416948,
+    "router_entropy": 1.6589974350489252
+  },
+  {
+    "name": "taxibj_K03_seed17",
+    "round": 4,
+    "expert": "T",
+    "selection_rate": 0.5007072135785007,
+    "weighted_usage": 0.4760742644440841,
+    "router_entropy": 1.449605292794965
+  },
+  {
+    "name": "taxibj_K03_seed17",
+    "round": 4,
+    "expert": "S",
+    "selection_rate": 0.49929278642149927,
+    "weighted_usage": 0.29487054958370484,
+    "router_entropy": 1.449605292794965
+  },
+  {
+    "name": "taxibj_K03_seed17",
+    "round": 4,
+    "expert": "TD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.449605292794965
+  },
+  {
+    "name": "taxibj_K03_seed17",
+    "round": 4,
+    "expert": "SD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.449605292794965
+  },
+  {
+    "name": "taxibj_K03_seed17",
+    "round": 4,
+    "expert": "TA",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.449605292794965
+  },
+  {
+    "name": "taxibj_K03_seed17",
+    "round": 4,
+    "expert": "ST",
+    "selection_rate": 0.05091937765205092,
+    "weighted_usage": 0.00028126670147754685,
+    "router_entropy": 1.449605292794965
+  },
+  {
+    "name": "taxibj_K03_seed17",
+    "round": 4,
+    "expert": "TL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.449605292794965
+  },
+  {
+    "name": "taxibj_K03_seed17",
+    "round": 4,
+    "expert": "SL",
+    "selection_rate": 0.9490806223479491,
+    "weighted_usage": 0.22877392045365808,
+    "router_entropy": 1.449605292794965
+  },
+  {
+    "name": "taxibj_K04_seed17",
+    "round": 1,
+    "expert": "T",
+    "selection_rate": 0.002828854314002829,
+    "weighted_usage": 0.00044290727739455506,
+    "router_entropy": 0.9052369519335307
+  },
+  {
+    "name": "taxibj_K04_seed17",
+    "round": 1,
+    "expert": "S",
+    "selection_rate": 0.9971711456859972,
+    "weighted_usage": 0.1005548795185215,
+    "router_entropy": 0.9052369519335307
+  },
+  {
+    "name": "taxibj_K04_seed17",
+    "round": 1,
+    "expert": "TD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 0.9052369519335307
+  },
+  {
+    "name": "taxibj_K04_seed17",
+    "round": 1,
+    "expert": "SD",
+    "selection_rate": 0.49929278642149927,
+    "weighted_usage": 0.4978066617899602,
+    "router_entropy": 0.9052369519335307
+  },
+  {
+    "name": "taxibj_K04_seed17",
+    "round": 1,
+    "expert": "TA",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 0.9052369519335307
+  },
+  {
+    "name": "taxibj_K04_seed17",
+    "round": 1,
+    "expert": "ST",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 0.9052369519335307
+  },
+  {
+    "name": "taxibj_K04_seed17",
+    "round": 1,
+    "expert": "TL",
+    "selection_rate": 0.5007072135785007,
+    "weighted_usage": 0.40119555208942675,
+    "router_entropy": 0.9052369519335307
+  },
+  {
+    "name": "taxibj_K04_seed17",
+    "round": 1,
+    "expert": "SL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 0.9052369519335307
+  },
+  {
+    "name": "taxibj_K04_seed17",
+    "round": 2,
+    "expert": "T",
+    "selection_rate": 0.009900990099009901,
+    "weighted_usage": 0.0007356964315181068,
+    "router_entropy": 1.5863809486230733
+  },
+  {
+    "name": "taxibj_K04_seed17",
+    "round": 2,
+    "expert": "S",
+    "selection_rate": 0.25742574257425743,
+    "weighted_usage": 0.014248012052651342,
+    "router_entropy": 1.5863809486230733
+  },
+  {
+    "name": "taxibj_K04_seed17",
+    "round": 2,
+    "expert": "TD",
+    "selection_rate": 0.011315417256011316,
+    "weighted_usage": 0.0019408742642975933,
+    "router_entropy": 1.5863809486230733
+  },
+  {
+    "name": "taxibj_K04_seed17",
+    "round": 2,
+    "expert": "SD",
+    "selection_rate": 0.9801980198019802,
+    "weighted_usage": 0.5953748595427927,
+    "router_entropy": 1.5863809486230733
+  },
+  {
+    "name": "taxibj_K04_seed17",
+    "round": 2,
+    "expert": "TA",
+    "selection_rate": 0.7411598302687411,
+    "weighted_usage": 0.38770055623337774,
+    "router_entropy": 1.5863809486230733
+  },
+  {
+    "name": "taxibj_K04_seed17",
+    "round": 2,
+    "expert": "ST",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.5863809486230733
+  },
+  {
+    "name": "taxibj_K04_seed17",
+    "round": 2,
+    "expert": "TL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.5863809486230733
+  },
+  {
+    "name": "taxibj_K04_seed17",
+    "round": 2,
+    "expert": "SL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.5863809486230733
+  },
+  {
+    "name": "taxibj_K04_seed17",
+    "round": 3,
+    "expert": "T",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 0.759934915394078
+  },
+  {
+    "name": "taxibj_K04_seed17",
+    "round": 3,
+    "expert": "S",
+    "selection_rate": 0.471004243281471,
+    "weighted_usage": 0.019423697952607902,
+    "router_entropy": 0.759934915394078
+  },
+  {
+    "name": "taxibj_K04_seed17",
+    "round": 3,
+    "expert": "TD",
+    "selection_rate": 0.0014144271570014145,
+    "weighted_usage": 1.3162769229695348e-06,
+    "router_entropy": 0.759934915394078
+  },
+  {
+    "name": "taxibj_K04_seed17",
+    "round": 3,
+    "expert": "SD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 0.759934915394078
+  },
+  {
+    "name": "taxibj_K04_seed17",
+    "round": 3,
+    "expert": "TA",
+    "selection_rate": 0.5007072135785007,
+    "weighted_usage": 0.47954924195962717,
+    "router_entropy": 0.759934915394078
+  },
+  {
+    "name": "taxibj_K04_seed17",
+    "round": 3,
+    "expert": "ST",
+    "selection_rate": 0.5106082036775106,
+    "weighted_usage": 0.485600857361835,
+    "router_entropy": 0.759934915394078
+  },
+  {
+    "name": "taxibj_K04_seed17",
+    "round": 3,
+    "expert": "TL",
+    "selection_rate": 0.018387553041018388,
+    "weighted_usage": 0.0008771532232302756,
+    "router_entropy": 0.759934915394078
+  },
+  {
+    "name": "taxibj_K04_seed17",
+    "round": 3,
+    "expert": "SL",
+    "selection_rate": 0.49787835926449786,
+    "weighted_usage": 0.014547733653895294,
+    "router_entropy": 0.759934915394078
+  },
+  {
+    "name": "taxibj_K04_seed17",
+    "round": 4,
+    "expert": "T",
+    "selection_rate": 0.5007072135785007,
+    "weighted_usage": 0.349041063090868,
+    "router_entropy": 1.880897243245262
+  },
+  {
+    "name": "taxibj_K04_seed17",
+    "round": 4,
+    "expert": "S",
+    "selection_rate": 0.49929278642149927,
+    "weighted_usage": 0.11297513999814192,
+    "router_entropy": 1.880897243245262
+  },
+  {
+    "name": "taxibj_K04_seed17",
+    "round": 4,
+    "expert": "TD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.880897243245262
+  },
+  {
+    "name": "taxibj_K04_seed17",
+    "round": 4,
+    "expert": "SD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.880897243245262
+  },
+  {
+    "name": "taxibj_K04_seed17",
+    "round": 4,
+    "expert": "TA",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.880897243245262
+  },
+  {
+    "name": "taxibj_K04_seed17",
+    "round": 4,
+    "expert": "ST",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.880897243245262
+  },
+  {
+    "name": "taxibj_K04_seed17",
+    "round": 4,
+    "expert": "TL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.880897243245262
+  },
+  {
+    "name": "taxibj_K04_seed17",
+    "round": 4,
+    "expert": "SL",
+    "selection_rate": 1.0,
+    "weighted_usage": 0.5379837960890024,
+    "router_entropy": 1.880897243245262
+  },
+  {
+    "name": "taxibj_K01_seed27",
+    "round": 1,
+    "expert": "T",
+    "selection_rate": 0.7920792079207921,
+    "weighted_usage": 0.4574092522031684,
+    "router_entropy": 1.9078222126488884
+  },
+  {
+    "name": "taxibj_K01_seed27",
+    "round": 1,
+    "expert": "S",
+    "selection_rate": 0.5346534653465347,
+    "weighted_usage": 0.20225084308519053,
+    "router_entropy": 1.9078222126488884
+  },
+  {
+    "name": "taxibj_K01_seed27",
+    "round": 1,
+    "expert": "TD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.9078222126488884
+  },
+  {
+    "name": "taxibj_K01_seed27",
+    "round": 1,
+    "expert": "SD",
+    "selection_rate": 0.008486562942008486,
+    "weighted_usage": 0.0008226633071899414,
+    "router_entropy": 1.9078222126488884
+  },
+  {
+    "name": "taxibj_K01_seed27",
+    "round": 1,
+    "expert": "TA",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.9078222126488884
+  },
+  {
+    "name": "taxibj_K01_seed27",
+    "round": 1,
+    "expert": "ST",
+    "selection_rate": 0.6647807637906648,
+    "weighted_usage": 0.339517239908012,
+    "router_entropy": 1.9078222126488884
+  },
+  {
+    "name": "taxibj_K01_seed27",
+    "round": 1,
+    "expert": "TL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.9078222126488884
+  },
+  {
+    "name": "taxibj_K01_seed27",
+    "round": 1,
+    "expert": "SL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.9078222126488884
+  },
+  {
+    "name": "taxibj_K01_seed27",
+    "round": 2,
+    "expert": "T",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.164979152745785
+  },
+  {
+    "name": "taxibj_K01_seed27",
+    "round": 2,
+    "expert": "S",
+    "selection_rate": 0.49787835926449786,
+    "weighted_usage": 0.1743671027824936,
+    "router_entropy": 1.164979152745785
+  },
+  {
+    "name": "taxibj_K01_seed27",
+    "round": 2,
+    "expert": "TD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.164979152745785
+  },
+  {
+    "name": "taxibj_K01_seed27",
+    "round": 2,
+    "expert": "SD",
+    "selection_rate": 0.49929278642149927,
+    "weighted_usage": 0.32451385790758797,
+    "router_entropy": 1.164979152745785
+  },
+  {
+    "name": "taxibj_K01_seed27",
+    "round": 2,
+    "expert": "TA",
+    "selection_rate": 0.49929278642149927,
+    "weighted_usage": 0.017345753892738493,
+    "router_entropy": 1.164979152745785
+  },
+  {
+    "name": "taxibj_K01_seed27",
+    "round": 2,
+    "expert": "ST",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.164979152745785
+  },
+  {
+    "name": "taxibj_K01_seed27",
+    "round": 2,
+    "expert": "TL",
+    "selection_rate": 0.5007072135785007,
+    "weighted_usage": 0.483258170740945,
+    "router_entropy": 1.164979152745785
+  },
+  {
+    "name": "taxibj_K01_seed27",
+    "round": 2,
+    "expert": "SL",
+    "selection_rate": 0.002828854314002829,
+    "weighted_usage": 0.0005151149112062036,
+    "router_entropy": 1.164979152745785
+  },
+  {
+    "name": "taxibj_K01_seed27",
+    "round": 3,
+    "expert": "T",
+    "selection_rate": 0.005657708628005658,
+    "weighted_usage": 0.0002860387120675164,
+    "router_entropy": 1.4339177081725152
+  },
+  {
+    "name": "taxibj_K01_seed27",
+    "round": 3,
+    "expert": "S",
+    "selection_rate": 0.009900990099009901,
+    "weighted_usage": 0.0005456012854144461,
+    "router_entropy": 1.4339177081725152
+  },
+  {
+    "name": "taxibj_K01_seed27",
+    "round": 3,
+    "expert": "TD",
+    "selection_rate": 0.2376237623762376,
+    "weighted_usage": 0.05053329338152304,
+    "router_entropy": 1.4339177081725152
+  },
+  {
+    "name": "taxibj_K01_seed27",
+    "round": 3,
+    "expert": "SD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.4339177081725152
+  },
+  {
+    "name": "taxibj_K01_seed27",
+    "round": 3,
+    "expert": "TA",
+    "selection_rate": 1.0,
+    "weighted_usage": 0.6922982061094746,
+    "router_entropy": 1.4339177081725152
+  },
+  {
+    "name": "taxibj_K01_seed27",
+    "round": 3,
+    "expert": "ST",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.4339177081725152
+  },
+  {
+    "name": "taxibj_K01_seed27",
+    "round": 3,
+    "expert": "TL",
+    "selection_rate": 0.7468175388967468,
+    "weighted_usage": 0.2563368599529904,
+    "router_entropy": 1.4339177081725152
+  },
+  {
+    "name": "taxibj_K01_seed27",
+    "round": 3,
+    "expert": "SL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.4339177081725152
+  },
+  {
+    "name": "taxibj_K01_seed27",
+    "round": 4,
+    "expert": "T",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 0.9970285572290175
+  },
+  {
+    "name": "taxibj_K01_seed27",
+    "round": 4,
+    "expert": "S",
+    "selection_rate": 0.024045261669024046,
+    "weighted_usage": 0.0005875915378500751,
+    "router_entropy": 0.9970285572290175
+  },
+  {
+    "name": "taxibj_K01_seed27",
+    "round": 4,
+    "expert": "TD",
+    "selection_rate": 0.413012729844413,
+    "weighted_usage": 0.01847427264585382,
+    "router_entropy": 0.9970285572290175
+  },
+  {
+    "name": "taxibj_K01_seed27",
+    "round": 4,
+    "expert": "SD",
+    "selection_rate": 0.48514851485148514,
+    "weighted_usage": 0.3075437087992462,
+    "router_entropy": 0.9970285572290175
+  },
+  {
+    "name": "taxibj_K01_seed27",
+    "round": 4,
+    "expert": "TA",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 0.9970285572290175
+  },
+  {
+    "name": "taxibj_K01_seed27",
+    "round": 4,
+    "expert": "ST",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 0.9970285572290175
+  },
+  {
+    "name": "taxibj_K01_seed27",
+    "round": 4,
+    "expert": "TL",
+    "selection_rate": 0.214992927864215,
+    "weighted_usage": 0.0019765696848722575,
+    "router_entropy": 0.9970285572290175
+  },
+  {
+    "name": "taxibj_K01_seed27",
+    "round": 4,
+    "expert": "SL",
+    "selection_rate": 0.8628005657708628,
+    "weighted_usage": 0.6714178572871223,
+    "router_entropy": 0.9970285572290175
+  },
+  {
+    "name": "taxibj_K02_seed27",
+    "round": 1,
+    "expert": "T",
+    "selection_rate": 0.02263083451202263,
+    "weighted_usage": 0.006850673209828399,
+    "router_entropy": 0.9923533815559163
+  },
+  {
+    "name": "taxibj_K02_seed27",
+    "round": 1,
+    "expert": "S",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 0.9923533815559163
+  },
+  {
+    "name": "taxibj_K02_seed27",
+    "round": 1,
+    "expert": "TD",
+    "selection_rate": 0.8415841584158416,
+    "weighted_usage": 0.0783759605803407,
+    "router_entropy": 0.9923533815559163
+  },
+  {
+    "name": "taxibj_K02_seed27",
+    "round": 1,
+    "expert": "SD",
+    "selection_rate": 1.0,
+    "weighted_usage": 0.9136242579874257,
+    "router_entropy": 0.9923533815559163
+  },
+  {
+    "name": "taxibj_K02_seed27",
+    "round": 1,
+    "expert": "TA",
+    "selection_rate": 0.13578500707213578,
+    "weighted_usage": 0.0011491071237870287,
+    "router_entropy": 0.9923533815559163
+  },
+  {
+    "name": "taxibj_K02_seed27",
+    "round": 1,
+    "expert": "ST",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 0.9923533815559163
+  },
+  {
+    "name": "taxibj_K02_seed27",
+    "round": 1,
+    "expert": "TL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 0.9923533815559163
+  },
+  {
+    "name": "taxibj_K02_seed27",
+    "round": 1,
+    "expert": "SL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 0.9923533815559163
+  },
+  {
+    "name": "taxibj_K02_seed27",
+    "round": 2,
+    "expert": "T",
+    "selection_rate": 0.03253182461103253,
+    "weighted_usage": 0.0004696754246022779,
+    "router_entropy": 1.200380737779119
+  },
+  {
+    "name": "taxibj_K02_seed27",
+    "round": 2,
+    "expert": "S",
+    "selection_rate": 0.7043847241867044,
+    "weighted_usage": 0.20265954298585062,
+    "router_entropy": 1.200380737779119
+  },
+  {
+    "name": "taxibj_K02_seed27",
+    "round": 2,
+    "expert": "TD",
+    "selection_rate": 0.039603960396039604,
+    "weighted_usage": 0.000351149667201951,
+    "router_entropy": 1.200380737779119
+  },
+  {
+    "name": "taxibj_K02_seed27",
+    "round": 2,
+    "expert": "SD",
+    "selection_rate": 0.01272984441301273,
+    "weighted_usage": 0.00012213855526045154,
+    "router_entropy": 1.200380737779119
+  },
+  {
+    "name": "taxibj_K02_seed27",
+    "round": 2,
+    "expert": "TA",
+    "selection_rate": 0.05374823196605375,
+    "weighted_usage": 0.00020527179981367808,
+    "router_entropy": 1.200380737779119
+  },
+  {
+    "name": "taxibj_K02_seed27",
+    "round": 2,
+    "expert": "ST",
+    "selection_rate": 1.0,
+    "weighted_usage": 0.795721328030887,
+    "router_entropy": 1.200380737779119
+  },
+  {
+    "name": "taxibj_K02_seed27",
+    "round": 2,
+    "expert": "TL",
+    "selection_rate": 0.157001414427157,
+    "weighted_usage": 0.00047089354957742394,
+    "router_entropy": 1.200380737779119
+  },
+  {
+    "name": "taxibj_K02_seed27",
+    "round": 2,
+    "expert": "SL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.200380737779119
+  },
+  {
+    "name": "taxibj_K02_seed27",
+    "round": 3,
+    "expert": "T",
+    "selection_rate": 0.0014144271570014145,
+    "weighted_usage": 0.000462949950421885,
+    "router_entropy": 2.0580865707895146
+  },
+  {
+    "name": "taxibj_K02_seed27",
+    "round": 3,
+    "expert": "S",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 2.0580865707895146
+  },
+  {
+    "name": "taxibj_K02_seed27",
+    "round": 3,
+    "expert": "TD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 2.0580865707895146
+  },
+  {
+    "name": "taxibj_K02_seed27",
+    "round": 3,
+    "expert": "SD",
+    "selection_rate": 0.9985855728429985,
+    "weighted_usage": 0.5511139095082479,
+    "router_entropy": 2.0580865707895146
+  },
+  {
+    "name": "taxibj_K02_seed27",
+    "round": 3,
+    "expert": "TA",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 2.0580865707895146
+  },
+  {
+    "name": "taxibj_K02_seed27",
+    "round": 3,
+    "expert": "ST",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 2.0580865707895146
+  },
+  {
+    "name": "taxibj_K02_seed27",
+    "round": 3,
+    "expert": "TL",
+    "selection_rate": 0.9985855728429985,
+    "weighted_usage": 0.4478885092188985,
+    "router_entropy": 2.0580865707895146
+  },
+  {
+    "name": "taxibj_K02_seed27",
+    "round": 3,
+    "expert": "SL",
+    "selection_rate": 0.0014144271570014145,
+    "weighted_usage": 0.0005346310695124819,
+    "router_entropy": 2.0580865707895146
+  },
+  {
+    "name": "taxibj_K02_seed27",
+    "round": 4,
+    "expert": "T",
+    "selection_rate": 0.38613861386138615,
+    "weighted_usage": 0.052301874697798546,
+    "router_entropy": 1.7778094484190434
+  },
+  {
+    "name": "taxibj_K02_seed27",
+    "round": 4,
+    "expert": "S",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.7778094484190434
+  },
+  {
+    "name": "taxibj_K02_seed27",
+    "round": 4,
+    "expert": "TD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.7778094484190434
+  },
+  {
+    "name": "taxibj_K02_seed27",
+    "round": 4,
+    "expert": "SD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.7778094484190434
+  },
+  {
+    "name": "taxibj_K02_seed27",
+    "round": 4,
+    "expert": "TA",
+    "selection_rate": 0.6138613861386139,
+    "weighted_usage": 0.3534739159964436,
+    "router_entropy": 1.7778094484190434
+  },
+  {
+    "name": "taxibj_K02_seed27",
+    "round": 4,
+    "expert": "ST",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.7778094484190434
+  },
+  {
+    "name": "taxibj_K02_seed27",
+    "round": 4,
+    "expert": "TL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.7778094484190434
+  },
+  {
+    "name": "taxibj_K02_seed27",
+    "round": 4,
+    "expert": "SL",
+    "selection_rate": 1.0,
+    "weighted_usage": 0.5942242080200848,
+    "router_entropy": 1.7778094484190434
+  },
+  {
+    "name": "taxibj_K03_seed27",
+    "round": 1,
+    "expert": "T",
+    "selection_rate": 1.0,
+    "weighted_usage": 0.5151194735750282,
+    "router_entropy": 1.7357149272096652
+  },
+  {
+    "name": "taxibj_K03_seed27",
+    "round": 1,
+    "expert": "S",
+    "selection_rate": 0.6421499292786421,
+    "weighted_usage": 0.43172441735926914,
+    "router_entropy": 1.7357149272096652
+  },
+  {
+    "name": "taxibj_K03_seed27",
+    "round": 1,
+    "expert": "TD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.7357149272096652
+  },
+  {
+    "name": "taxibj_K03_seed27",
+    "round": 1,
+    "expert": "SD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.7357149272096652
+  },
+  {
+    "name": "taxibj_K03_seed27",
+    "round": 1,
+    "expert": "TA",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.7357149272096652
+  },
+  {
+    "name": "taxibj_K03_seed27",
+    "round": 1,
+    "expert": "ST",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.7357149272096652
+  },
+  {
+    "name": "taxibj_K03_seed27",
+    "round": 1,
+    "expert": "TL",
+    "selection_rate": 0.3578500707213578,
+    "weighted_usage": 0.053156107147731405,
+    "router_entropy": 1.7357149272096652
+  },
+  {
+    "name": "taxibj_K03_seed27",
+    "round": 1,
+    "expert": "SL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.7357149272096652
+  },
+  {
+    "name": "taxibj_K03_seed27",
+    "round": 2,
+    "expert": "T",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.6165800760725246
+  },
+  {
+    "name": "taxibj_K03_seed27",
+    "round": 2,
+    "expert": "S",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.6165800760725246
+  },
+  {
+    "name": "taxibj_K03_seed27",
+    "round": 2,
+    "expert": "TD",
+    "selection_rate": 0.24186704384724186,
+    "weighted_usage": 0.07885811790887166,
+    "router_entropy": 1.6165800760725246
+  },
+  {
+    "name": "taxibj_K03_seed27",
+    "round": 2,
+    "expert": "SD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.6165800760725246
+  },
+  {
+    "name": "taxibj_K03_seed27",
+    "round": 2,
+    "expert": "TA",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.6165800760725246
+  },
+  {
+    "name": "taxibj_K03_seed27",
+    "round": 2,
+    "expert": "ST",
+    "selection_rate": 0.7581329561527581,
+    "weighted_usage": 0.21569333879917313,
+    "router_entropy": 1.6165800760725246
+  },
+  {
+    "name": "taxibj_K03_seed27",
+    "round": 2,
+    "expert": "TL",
+    "selection_rate": 1.0,
+    "weighted_usage": 0.705448542870423,
+    "router_entropy": 1.6165800760725246
+  },
+  {
+    "name": "taxibj_K03_seed27",
+    "round": 2,
+    "expert": "SL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.6165800760725246
+  },
+  {
+    "name": "taxibj_K03_seed27",
+    "round": 3,
+    "expert": "T",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 2.0411270630769303
+  },
+  {
+    "name": "taxibj_K03_seed27",
+    "round": 3,
+    "expert": "S",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 2.0411270630769303
+  },
+  {
+    "name": "taxibj_K03_seed27",
+    "round": 3,
+    "expert": "TD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 2.0411270630769303
+  },
+  {
+    "name": "taxibj_K03_seed27",
+    "round": 3,
+    "expert": "SD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 2.0411270630769303
+  },
+  {
+    "name": "taxibj_K03_seed27",
+    "round": 3,
+    "expert": "TA",
+    "selection_rate": 1.0,
+    "weighted_usage": 0.6360308592019358,
+    "router_entropy": 2.0411270630769303
+  },
+  {
+    "name": "taxibj_K03_seed27",
+    "round": 3,
+    "expert": "ST",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 2.0411270630769303
+  },
+  {
+    "name": "taxibj_K03_seed27",
+    "round": 3,
+    "expert": "TL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 2.0411270630769303
+  },
+  {
+    "name": "taxibj_K03_seed27",
+    "round": 3,
+    "expert": "SL",
+    "selection_rate": 1.0,
+    "weighted_usage": 0.36396914088237065,
+    "router_entropy": 2.0411270630769303
+  },
+  {
+    "name": "taxibj_K03_seed27",
+    "round": 4,
+    "expert": "T",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.5544843118553342
+  },
+  {
+    "name": "taxibj_K03_seed27",
+    "round": 4,
+    "expert": "S",
+    "selection_rate": 0.08203677510608204,
+    "weighted_usage": 0.0036402830993690787,
+    "router_entropy": 1.5544843118553342
+  },
+  {
+    "name": "taxibj_K03_seed27",
+    "round": 4,
+    "expert": "TD",
+    "selection_rate": 0.005657708628005658,
+    "weighted_usage": 0.00023826013570796314,
+    "router_entropy": 1.5544843118553342
+  },
+  {
+    "name": "taxibj_K03_seed27",
+    "round": 4,
+    "expert": "SD",
+    "selection_rate": 0.9123055162659123,
+    "weighted_usage": 0.3359086397966789,
+    "router_entropy": 1.5544843118553342
+  },
+  {
+    "name": "taxibj_K03_seed27",
+    "round": 4,
+    "expert": "TA",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.5544843118553342
+  },
+  {
+    "name": "taxibj_K03_seed27",
+    "round": 4,
+    "expert": "ST",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.5544843118553342
+  },
+  {
+    "name": "taxibj_K03_seed27",
+    "round": 4,
+    "expert": "TL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.5544843118553342
+  },
+  {
+    "name": "taxibj_K03_seed27",
+    "round": 4,
+    "expert": "SL",
+    "selection_rate": 1.0,
+    "weighted_usage": 0.6602128157984923,
+    "router_entropy": 1.5544843118553342
+  },
+  {
+    "name": "taxibj_K04_seed27",
+    "round": 1,
+    "expert": "T",
+    "selection_rate": 0.9646393210749646,
+    "weighted_usage": 0.5216316805870563,
+    "router_entropy": 2.0597367179973034
+  },
+  {
+    "name": "taxibj_K04_seed27",
+    "round": 1,
+    "expert": "S",
+    "selection_rate": 0.9547383309759547,
+    "weighted_usage": 0.441925960686453,
+    "router_entropy": 2.0597367179973034
+  },
+  {
+    "name": "taxibj_K04_seed27",
+    "round": 1,
+    "expert": "TD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 2.0597367179973034
+  },
+  {
+    "name": "taxibj_K04_seed27",
+    "round": 1,
+    "expert": "SD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 2.0597367179973034
+  },
+  {
+    "name": "taxibj_K04_seed27",
+    "round": 1,
+    "expert": "TA",
+    "selection_rate": 0.04526166902404526,
+    "weighted_usage": 0.019440753667324232,
+    "router_entropy": 2.0597367179973034
+  },
+  {
+    "name": "taxibj_K04_seed27",
+    "round": 1,
+    "expert": "ST",
+    "selection_rate": 0.03536067892503536,
+    "weighted_usage": 0.017001605522851796,
+    "router_entropy": 2.0597367179973034
+  },
+  {
+    "name": "taxibj_K04_seed27",
+    "round": 1,
+    "expert": "TL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 2.0597367179973034
+  },
+  {
+    "name": "taxibj_K04_seed27",
+    "round": 1,
+    "expert": "SL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 2.0597367179973034
+  },
+  {
+    "name": "taxibj_K04_seed27",
+    "round": 2,
+    "expert": "T",
+    "selection_rate": 0.5007072135785007,
+    "weighted_usage": 0.41259196539748,
+    "router_entropy": 0.9618228561010632
+  },
+  {
+    "name": "taxibj_K04_seed27",
+    "round": 2,
+    "expert": "S",
+    "selection_rate": 0.11315417256011315,
+    "weighted_usage": 0.005200722098055452,
+    "router_entropy": 0.9618228561010632
+  },
+  {
+    "name": "taxibj_K04_seed27",
+    "round": 2,
+    "expert": "TD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 0.9618228561010632
+  },
+  {
+    "name": "taxibj_K04_seed27",
+    "round": 2,
+    "expert": "SD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 0.9618228561010632
+  },
+  {
+    "name": "taxibj_K04_seed27",
+    "round": 2,
+    "expert": "TA",
+    "selection_rate": 0.18811881188118812,
+    "weighted_usage": 0.03703288341407392,
+    "router_entropy": 0.9618228561010632
+  },
+  {
+    "name": "taxibj_K04_seed27",
+    "round": 2,
+    "expert": "ST",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 0.9618228561010632
+  },
+  {
+    "name": "taxibj_K04_seed27",
+    "round": 2,
+    "expert": "TL",
+    "selection_rate": 0.4752475247524752,
+    "weighted_usage": 0.024628355593290154,
+    "router_entropy": 0.9618228561010632
+  },
+  {
+    "name": "taxibj_K04_seed27",
+    "round": 2,
+    "expert": "SL",
+    "selection_rate": 0.7227722772277227,
+    "weighted_usage": 0.5205460724854233,
+    "router_entropy": 0.9618228561010632
+  },
+  {
+    "name": "taxibj_K04_seed27",
+    "round": 3,
+    "expert": "T",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.7611378412469336
+  },
+  {
+    "name": "taxibj_K04_seed27",
+    "round": 3,
+    "expert": "S",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.7611378412469336
+  },
+  {
+    "name": "taxibj_K04_seed27",
+    "round": 3,
+    "expert": "TD",
+    "selection_rate": 1.0,
+    "weighted_usage": 0.3956011296309204,
+    "router_entropy": 1.7611378412469336
+  },
+  {
+    "name": "taxibj_K04_seed27",
+    "round": 3,
+    "expert": "SD",
+    "selection_rate": 1.0,
+    "weighted_usage": 0.6043988677871952,
+    "router_entropy": 1.7611378412469336
+  },
+  {
+    "name": "taxibj_K04_seed27",
+    "round": 3,
+    "expert": "TA",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.7611378412469336
+  },
+  {
+    "name": "taxibj_K04_seed27",
+    "round": 3,
+    "expert": "ST",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.7611378412469336
+  },
+  {
+    "name": "taxibj_K04_seed27",
+    "round": 3,
+    "expert": "TL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.7611378412469336
+  },
+  {
+    "name": "taxibj_K04_seed27",
+    "round": 3,
+    "expert": "SL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.7611378412469336
+  },
+  {
+    "name": "taxibj_K04_seed27",
+    "round": 4,
+    "expert": "T",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.662247794991792
+  },
+  {
+    "name": "taxibj_K04_seed27",
+    "round": 4,
+    "expert": "S",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.662247794991792
+  },
+  {
+    "name": "taxibj_K04_seed27",
+    "round": 4,
+    "expert": "TD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.662247794991792
+  },
+  {
+    "name": "taxibj_K04_seed27",
+    "round": 4,
+    "expert": "SD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.662247794991792
+  },
+  {
+    "name": "taxibj_K04_seed27",
+    "round": 4,
+    "expert": "TA",
+    "selection_rate": 0.5035360678925035,
+    "weighted_usage": 0.4410673825879077,
+    "router_entropy": 1.662247794991792
+  },
+  {
+    "name": "taxibj_K04_seed27",
+    "round": 4,
+    "expert": "ST",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.662247794991792
+  },
+  {
+    "name": "taxibj_K04_seed27",
+    "round": 4,
+    "expert": "TL",
+    "selection_rate": 0.9773691654879774,
+    "weighted_usage": 0.15646062118476822,
+    "router_entropy": 1.662247794991792
+  },
+  {
+    "name": "taxibj_K04_seed27",
+    "round": 4,
+    "expert": "SL",
+    "selection_rate": 0.5190947666195191,
+    "weighted_usage": 0.40247199660143385,
+    "router_entropy": 1.662247794991792
+  },
+  {
+    "name": "bikenyc_K01_seed7",
+    "round": 1,
+    "expert": "T",
+    "selection_rate": 0.6802721088435374,
+    "weighted_usage": 0.12224140498457717,
+    "router_entropy": 1.465359414253214
+  },
+  {
+    "name": "bikenyc_K01_seed7",
+    "round": 1,
+    "expert": "S",
+    "selection_rate": 0.16326530612244897,
+    "weighted_usage": 0.019175035650936926,
+    "router_entropy": 1.465359414253214
+  },
+  {
+    "name": "bikenyc_K01_seed7",
+    "round": 1,
+    "expert": "TD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.465359414253214
+  },
+  {
+    "name": "bikenyc_K01_seed7",
+    "round": 1,
+    "expert": "SD",
+    "selection_rate": 0.08843537414965986,
+    "weighted_usage": 0.007268669653911979,
+    "router_entropy": 1.465359414253214
+  },
+  {
+    "name": "bikenyc_K01_seed7",
+    "round": 1,
+    "expert": "TA",
+    "selection_rate": 0.02040816326530612,
+    "weighted_usage": 0.004540995168848103,
+    "router_entropy": 1.465359414253214
+  },
+  {
+    "name": "bikenyc_K01_seed7",
+    "round": 1,
+    "expert": "ST",
+    "selection_rate": 0.25170068027210885,
+    "weighted_usage": 0.1714965319957863,
+    "router_entropy": 1.465359414253214
+  },
+  {
+    "name": "bikenyc_K01_seed7",
+    "round": 1,
+    "expert": "TL",
+    "selection_rate": 0.24489795918367346,
+    "weighted_usage": 0.19087526506307173,
+    "router_entropy": 1.465359414253214
+  },
+  {
+    "name": "bikenyc_K01_seed7",
+    "round": 1,
+    "expert": "SL",
+    "selection_rate": 0.5510204081632653,
+    "weighted_usage": 0.484402098217789,
+    "router_entropy": 1.465359414253214
+  },
+  {
+    "name": "bikenyc_K01_seed7",
+    "round": 2,
+    "expert": "T",
+    "selection_rate": 0.25170068027210885,
+    "weighted_usage": 0.057951608685409134,
+    "router_entropy": 1.7135820012757048
+  },
+  {
+    "name": "bikenyc_K01_seed7",
+    "round": 2,
+    "expert": "S",
+    "selection_rate": 0.10204081632653061,
+    "weighted_usage": 0.00830400278981851,
+    "router_entropy": 1.7135820012757048
+  },
+  {
+    "name": "bikenyc_K01_seed7",
+    "round": 2,
+    "expert": "TD",
+    "selection_rate": 0.02040816326530612,
+    "weighted_usage": 0.0018460588897166608,
+    "router_entropy": 1.7135820012757048
+  },
+  {
+    "name": "bikenyc_K01_seed7",
+    "round": 2,
+    "expert": "SD",
+    "selection_rate": 0.1564625850340136,
+    "weighted_usage": 0.020963843430386108,
+    "router_entropy": 1.7135820012757048
+  },
+  {
+    "name": "bikenyc_K01_seed7",
+    "round": 2,
+    "expert": "TA",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.7135820012757048
+  },
+  {
+    "name": "bikenyc_K01_seed7",
+    "round": 2,
+    "expert": "ST",
+    "selection_rate": 0.17006802721088435,
+    "weighted_usage": 0.04649773295842061,
+    "router_entropy": 1.7135820012757048
+  },
+  {
+    "name": "bikenyc_K01_seed7",
+    "round": 2,
+    "expert": "TL",
+    "selection_rate": 0.29931972789115646,
+    "weighted_usage": 0.06086975751685447,
+    "router_entropy": 1.7135820012757048
+  },
+  {
+    "name": "bikenyc_K01_seed7",
+    "round": 2,
+    "expert": "SL",
+    "selection_rate": 1.0,
+    "weighted_usage": 0.8035669898500248,
+    "router_entropy": 1.7135820012757048
+  },
+  {
+    "name": "bikenyc_K01_seed7",
+    "round": 3,
+    "expert": "T",
+    "selection_rate": 0.08163265306122448,
+    "weighted_usage": 0.0022437669539532696,
+    "router_entropy": 1.3522041351041745
+  },
+  {
+    "name": "bikenyc_K01_seed7",
+    "round": 3,
+    "expert": "S",
+    "selection_rate": 0.4965986394557823,
+    "weighted_usage": 0.1587934096147414,
+    "router_entropy": 1.3522041351041745
+  },
+  {
+    "name": "bikenyc_K01_seed7",
+    "round": 3,
+    "expert": "TD",
+    "selection_rate": 0.24489795918367346,
+    "weighted_usage": 0.14844725645926535,
+    "router_entropy": 1.3522041351041745
+  },
+  {
+    "name": "bikenyc_K01_seed7",
+    "round": 3,
+    "expert": "SD",
+    "selection_rate": 0.7891156462585034,
+    "weighted_usage": 0.6044276241137057,
+    "router_entropy": 1.3522041351041745
+  },
+  {
+    "name": "bikenyc_K01_seed7",
+    "round": 3,
+    "expert": "TA",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.3522041351041745
+  },
+  {
+    "name": "bikenyc_K01_seed7",
+    "round": 3,
+    "expert": "ST",
+    "selection_rate": 0.272108843537415,
+    "weighted_usage": 0.08318849601054272,
+    "router_entropy": 1.3522041351041745
+  },
+  {
+    "name": "bikenyc_K01_seed7",
+    "round": 3,
+    "expert": "TL",
+    "selection_rate": 0.08163265306122448,
+    "weighted_usage": 0.00215815326997212,
+    "router_entropy": 1.3522041351041745
+  },
+  {
+    "name": "bikenyc_K01_seed7",
+    "round": 3,
+    "expert": "SL",
+    "selection_rate": 0.034013605442176874,
+    "weighted_usage": 0.0007412929062535163,
+    "router_entropy": 1.3522041351041745
+  },
+  {
+    "name": "bikenyc_K01_seed7",
+    "round": 4,
+    "expert": "T",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.6967790290142553
+  },
+  {
+    "name": "bikenyc_K01_seed7",
+    "round": 4,
+    "expert": "S",
+    "selection_rate": 0.013605442176870748,
+    "weighted_usage": 0.0007682725229636342,
+    "router_entropy": 1.6967790290142553
+  },
+  {
+    "name": "bikenyc_K01_seed7",
+    "round": 4,
+    "expert": "TD",
+    "selection_rate": 0.034013605442176874,
+    "weighted_usage": 0.009298565106935242,
+    "router_entropy": 1.6967790290142553
+  },
+  {
+    "name": "bikenyc_K01_seed7",
+    "round": 4,
+    "expert": "SD",
+    "selection_rate": 0.006802721088435374,
+    "weighted_usage": 0.0020116170247395835,
+    "router_entropy": 1.6967790290142553
+  },
+  {
+    "name": "bikenyc_K01_seed7",
+    "round": 4,
+    "expert": "TA",
+    "selection_rate": 0.46938775510204084,
+    "weighted_usage": 0.151751213637339,
+    "router_entropy": 1.6967790290142553
+  },
+  {
+    "name": "bikenyc_K01_seed7",
+    "round": 4,
+    "expert": "ST",
+    "selection_rate": 1.0,
+    "weighted_usage": 0.793263167345605,
+    "router_entropy": 1.6967790290142553
+  },
+  {
+    "name": "bikenyc_K01_seed7",
+    "round": 4,
+    "expert": "TL",
+    "selection_rate": 0.47619047619047616,
+    "weighted_usage": 0.042907167200734016,
+    "router_entropy": 1.6967790290142553
+  },
+  {
+    "name": "bikenyc_K01_seed7",
+    "round": 4,
+    "expert": "SL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.6967790290142553
+  },
+  {
+    "name": "bikenyc_K02_seed7",
+    "round": 1,
+    "expert": "T",
+    "selection_rate": 0.3741496598639456,
+    "weighted_usage": 0.0752570263179792,
+    "router_entropy": 1.4931292922265502
+  },
+  {
+    "name": "bikenyc_K02_seed7",
+    "round": 1,
+    "expert": "S",
+    "selection_rate": 0.2585034013605442,
+    "weighted_usage": 0.15966197392162013,
+    "router_entropy": 1.4931292922265502
+  },
+  {
+    "name": "bikenyc_K02_seed7",
+    "round": 1,
+    "expert": "TD",
+    "selection_rate": 0.25170068027210885,
+    "weighted_usage": 0.1933988363158946,
+    "router_entropy": 1.4931292922265502
+  },
+  {
+    "name": "bikenyc_K02_seed7",
+    "round": 1,
+    "expert": "SD",
+    "selection_rate": 0.027210884353741496,
+    "weighted_usage": 0.008036326794397263,
+    "router_entropy": 1.4931292922265502
+  },
+  {
+    "name": "bikenyc_K02_seed7",
+    "round": 1,
+    "expert": "TA",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.4931292922265502
+  },
+  {
+    "name": "bikenyc_K02_seed7",
+    "round": 1,
+    "expert": "ST",
+    "selection_rate": 0.02040816326530612,
+    "weighted_usage": 0.004251027150320358,
+    "router_entropy": 1.4931292922265502
+  },
+  {
+    "name": "bikenyc_K02_seed7",
+    "round": 1,
+    "expert": "TL",
+    "selection_rate": 0.5714285714285714,
+    "weighted_usage": 0.10931680846934011,
+    "router_entropy": 1.4931292922265502
+  },
+  {
+    "name": "bikenyc_K02_seed7",
+    "round": 1,
+    "expert": "SL",
+    "selection_rate": 0.4965986394557823,
+    "weighted_usage": 0.45007800528792297,
+    "router_entropy": 1.4931292922265502
+  },
+  {
+    "name": "bikenyc_K02_seed7",
+    "round": 2,
+    "expert": "T",
+    "selection_rate": 0.14965986394557823,
+    "weighted_usage": 0.018649709518669413,
+    "router_entropy": 1.614741538032803
+  },
+  {
+    "name": "bikenyc_K02_seed7",
+    "round": 2,
+    "expert": "S",
+    "selection_rate": 0.02040816326530612,
+    "weighted_usage": 0.004213574792252106,
+    "router_entropy": 1.614741538032803
+  },
+  {
+    "name": "bikenyc_K02_seed7",
+    "round": 2,
+    "expert": "TD",
+    "selection_rate": 0.4557823129251701,
+    "weighted_usage": 0.06367249503022149,
+    "router_entropy": 1.614741538032803
+  },
+  {
+    "name": "bikenyc_K02_seed7",
+    "round": 2,
+    "expert": "SD",
+    "selection_rate": 0.034013605442176874,
+    "weighted_usage": 0.002703541420957669,
+    "router_entropy": 1.614741538032803
+  },
+  {
+    "name": "bikenyc_K02_seed7",
+    "round": 2,
+    "expert": "TA",
+    "selection_rate": 0.047619047619047616,
+    "weighted_usage": 0.002432877463953836,
+    "router_entropy": 1.614741538032803
+  },
+  {
+    "name": "bikenyc_K02_seed7",
+    "round": 2,
+    "expert": "ST",
+    "selection_rate": 0.013605442176870748,
+    "weighted_usage": 0.005946873402108951,
+    "router_entropy": 1.614741538032803
+  },
+  {
+    "name": "bikenyc_K02_seed7",
+    "round": 2,
+    "expert": "TL",
+    "selection_rate": 0.2789115646258503,
+    "weighted_usage": 0.05383320416317505,
+    "router_entropy": 1.614741538032803
+  },
+  {
+    "name": "bikenyc_K02_seed7",
+    "round": 2,
+    "expert": "SL",
+    "selection_rate": 1.0,
+    "weighted_usage": 0.8485477250449511,
+    "router_entropy": 1.614741538032803
+  },
+  {
+    "name": "bikenyc_K02_seed7",
+    "round": 3,
+    "expert": "T",
+    "selection_rate": 0.02040816326530612,
+    "weighted_usage": 0.004076355016555916,
+    "router_entropy": 1.3681262518392134
+  },
+  {
+    "name": "bikenyc_K02_seed7",
+    "round": 3,
+    "expert": "S",
+    "selection_rate": 0.4013605442176871,
+    "weighted_usage": 0.08067712673068451,
+    "router_entropy": 1.3681262518392134
+  },
+  {
+    "name": "bikenyc_K02_seed7",
+    "round": 3,
+    "expert": "TD",
+    "selection_rate": 0.1836734693877551,
+    "weighted_usage": 0.10054862093763287,
+    "router_entropy": 1.3681262518392134
+  },
+  {
+    "name": "bikenyc_K02_seed7",
+    "round": 3,
+    "expert": "SD",
+    "selection_rate": 0.5510204081632653,
+    "weighted_usage": 0.5144464162742199,
+    "router_entropy": 1.3681262518392134
+  },
+  {
+    "name": "bikenyc_K02_seed7",
+    "round": 3,
+    "expert": "TA",
+    "selection_rate": 0.5102040816326531,
+    "weighted_usage": 0.2890278159254262,
+    "router_entropy": 1.3681262518392134
+  },
+  {
+    "name": "bikenyc_K02_seed7",
+    "round": 3,
+    "expert": "ST",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.3681262518392134
+  },
+  {
+    "name": "bikenyc_K02_seed7",
+    "round": 3,
+    "expert": "TL",
+    "selection_rate": 0.2857142857142857,
+    "weighted_usage": 0.009940710875402096,
+    "router_entropy": 1.3681262518392134
+  },
+  {
+    "name": "bikenyc_K02_seed7",
+    "round": 3,
+    "expert": "SL",
+    "selection_rate": 0.047619047619047616,
+    "weighted_usage": 0.0012829580350595267,
+    "router_entropy": 1.3681262518392134
+  },
+  {
+    "name": "bikenyc_K02_seed7",
+    "round": 4,
+    "expert": "T",
+    "selection_rate": 0.43537414965986393,
+    "weighted_usage": 0.08989223853057744,
+    "router_entropy": 1.6728113257307768
+  },
+  {
+    "name": "bikenyc_K02_seed7",
+    "round": 4,
+    "expert": "S",
+    "selection_rate": 0.30612244897959184,
+    "weighted_usage": 0.0379948991091073,
+    "router_entropy": 1.6728113257307768
+  },
+  {
+    "name": "bikenyc_K02_seed7",
+    "round": 4,
+    "expert": "TD",
+    "selection_rate": 0.027210884353741496,
+    "weighted_usage": 0.007779803811287393,
+    "router_entropy": 1.6728113257307768
+  },
+  {
+    "name": "bikenyc_K02_seed7",
+    "round": 4,
+    "expert": "SD",
+    "selection_rate": 0.06802721088435375,
+    "weighted_usage": 0.0058995989106950305,
+    "router_entropy": 1.6728113257307768
+  },
+  {
+    "name": "bikenyc_K02_seed7",
+    "round": 4,
+    "expert": "TA",
+    "selection_rate": 0.05442176870748299,
+    "weighted_usage": 0.005791068786666507,
+    "router_entropy": 1.6728113257307768
+  },
+  {
+    "name": "bikenyc_K02_seed7",
+    "round": 4,
+    "expert": "ST",
+    "selection_rate": 1.0,
+    "weighted_usage": 0.8271365157600974,
+    "router_entropy": 1.6728113257307768
+  },
+  {
+    "name": "bikenyc_K02_seed7",
+    "round": 4,
+    "expert": "TL",
+    "selection_rate": 0.10204081632653061,
+    "weighted_usage": 0.02505632469645974,
+    "router_entropy": 1.6728113257307768
+  },
+  {
+    "name": "bikenyc_K02_seed7",
+    "round": 4,
+    "expert": "SL",
+    "selection_rate": 0.006802721088435374,
+    "weighted_usage": 0.0004495497868985546,
+    "router_entropy": 1.6728113257307768
+  },
+  {
+    "name": "bikenyc_K03_seed7",
+    "round": 1,
+    "expert": "T",
+    "selection_rate": 0.4421768707482993,
+    "weighted_usage": 0.12464385205993847,
+    "router_entropy": 1.7612467770684315
+  },
+  {
+    "name": "bikenyc_K03_seed7",
+    "round": 1,
+    "expert": "S",
+    "selection_rate": 0.10884353741496598,
+    "weighted_usage": 0.0453573493223612,
+    "router_entropy": 1.7612467770684315
+  },
+  {
+    "name": "bikenyc_K03_seed7",
+    "round": 1,
+    "expert": "TD",
+    "selection_rate": 0.23809523809523808,
+    "weighted_usage": 0.16165007458252162,
+    "router_entropy": 1.7612467770684315
+  },
+  {
+    "name": "bikenyc_K03_seed7",
+    "round": 1,
+    "expert": "SD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.7612467770684315
+  },
+  {
+    "name": "bikenyc_K03_seed7",
+    "round": 1,
+    "expert": "TA",
+    "selection_rate": 0.23809523809523808,
+    "weighted_usage": 0.10443553556593096,
+    "router_entropy": 1.7612467770684315
+  },
+  {
+    "name": "bikenyc_K03_seed7",
+    "round": 1,
+    "expert": "ST",
+    "selection_rate": 0.17006802721088435,
+    "weighted_usage": 0.09505912702099807,
+    "router_entropy": 1.7612467770684315
+  },
+  {
+    "name": "bikenyc_K03_seed7",
+    "round": 1,
+    "expert": "TL",
+    "selection_rate": 0.23129251700680273,
+    "weighted_usage": 0.08713937201062028,
+    "router_entropy": 1.7612467770684315
+  },
+  {
+    "name": "bikenyc_K03_seed7",
+    "round": 1,
+    "expert": "SL",
+    "selection_rate": 0.5714285714285714,
+    "weighted_usage": 0.3817146887280503,
+    "router_entropy": 1.7612467770684315
+  },
+  {
+    "name": "bikenyc_K03_seed7",
+    "round": 2,
+    "expert": "T",
+    "selection_rate": 0.19047619047619047,
+    "weighted_usage": 0.017813648344302664,
+    "router_entropy": 1.5630195729389933
+  },
+  {
+    "name": "bikenyc_K03_seed7",
+    "round": 2,
+    "expert": "S",
+    "selection_rate": 0.8979591836734694,
+    "weighted_usage": 0.7053860891230253,
+    "router_entropy": 1.5630195729389933
+  },
+  {
+    "name": "bikenyc_K03_seed7",
+    "round": 2,
+    "expert": "TD",
+    "selection_rate": 0.04081632653061224,
+    "weighted_usage": 0.002895637409013956,
+    "router_entropy": 1.5630195729389933
+  },
+  {
+    "name": "bikenyc_K03_seed7",
+    "round": 2,
+    "expert": "SD",
+    "selection_rate": 0.08843537414965986,
+    "weighted_usage": 0.009704976006835496,
+    "router_entropy": 1.5630195729389933
+  },
+  {
+    "name": "bikenyc_K03_seed7",
+    "round": 2,
+    "expert": "TA",
+    "selection_rate": 0.14965986394557823,
+    "weighted_usage": 0.05045200559963174,
+    "router_entropy": 1.5630195729389933
+  },
+  {
+    "name": "bikenyc_K03_seed7",
+    "round": 2,
+    "expert": "ST",
+    "selection_rate": 0.24489795918367346,
+    "weighted_usage": 0.15925693846478753,
+    "router_entropy": 1.5630195729389933
+  },
+  {
+    "name": "bikenyc_K03_seed7",
+    "round": 2,
+    "expert": "TL",
+    "selection_rate": 0.272108843537415,
+    "weighted_usage": 0.04406464870284204,
+    "router_entropy": 1.5630195729389933
+  },
+  {
+    "name": "bikenyc_K03_seed7",
+    "round": 2,
+    "expert": "SL",
+    "selection_rate": 0.11564625850340136,
+    "weighted_usage": 0.010426053232481691,
+    "router_entropy": 1.5630195729389933
+  },
+  {
+    "name": "bikenyc_K03_seed7",
+    "round": 3,
+    "expert": "T",
+    "selection_rate": 0.3129251700680272,
+    "weighted_usage": 0.045713886796008976,
+    "router_entropy": 1.572987099665043
+  },
+  {
+    "name": "bikenyc_K03_seed7",
+    "round": 3,
+    "expert": "S",
+    "selection_rate": 0.034013605442176874,
+    "weighted_usage": 0.002779907717996714,
+    "router_entropy": 1.572987099665043
+  },
+  {
+    "name": "bikenyc_K03_seed7",
+    "round": 3,
+    "expert": "TD",
+    "selection_rate": 0.2108843537414966,
+    "weighted_usage": 0.09805953137728633,
+    "router_entropy": 1.572987099665043
+  },
+  {
+    "name": "bikenyc_K03_seed7",
+    "round": 3,
+    "expert": "SD",
+    "selection_rate": 1.0,
+    "weighted_usage": 0.8164587227665648,
+    "router_entropy": 1.572987099665043
+  },
+  {
+    "name": "bikenyc_K03_seed7",
+    "round": 3,
+    "expert": "TA",
+    "selection_rate": 0.12244897959183673,
+    "weighted_usage": 0.007301226055541006,
+    "router_entropy": 1.572987099665043
+  },
+  {
+    "name": "bikenyc_K03_seed7",
+    "round": 3,
+    "expert": "ST",
+    "selection_rate": 0.04081632653061224,
+    "weighted_usage": 0.0034334755876437337,
+    "router_entropy": 1.572987099665043
+  },
+  {
+    "name": "bikenyc_K03_seed7",
+    "round": 3,
+    "expert": "TL",
+    "selection_rate": 0.21768707482993196,
+    "weighted_usage": 0.0210727368082319,
+    "router_entropy": 1.572987099665043
+  },
+  {
+    "name": "bikenyc_K03_seed7",
+    "round": 3,
+    "expert": "SL",
+    "selection_rate": 0.061224489795918366,
+    "weighted_usage": 0.005180512206489537,
+    "router_entropy": 1.572987099665043
+  },
+  {
+    "name": "bikenyc_K03_seed7",
+    "round": 4,
+    "expert": "T",
+    "selection_rate": 0.11564625850340136,
+    "weighted_usage": 0.02354434902976159,
+    "router_entropy": 1.8631783539419924
+  },
+  {
+    "name": "bikenyc_K03_seed7",
+    "round": 4,
+    "expert": "S",
+    "selection_rate": 0.034013605442176874,
+    "weighted_usage": 0.007281987034544653,
+    "router_entropy": 1.8631783539419924
+  },
+  {
+    "name": "bikenyc_K03_seed7",
+    "round": 4,
+    "expert": "TD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.8631783539419924
+  },
+  {
+    "name": "bikenyc_K03_seed7",
+    "round": 4,
+    "expert": "SD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.8631783539419924
+  },
+  {
+    "name": "bikenyc_K03_seed7",
+    "round": 4,
+    "expert": "TA",
+    "selection_rate": 0.2789115646258503,
+    "weighted_usage": 0.09015701731451514,
+    "router_entropy": 1.8631783539419924
+  },
+  {
+    "name": "bikenyc_K03_seed7",
+    "round": 4,
+    "expert": "ST",
+    "selection_rate": 1.0,
+    "weighted_usage": 0.7564749012188036,
+    "router_entropy": 1.8631783539419924
+  },
+  {
+    "name": "bikenyc_K03_seed7",
+    "round": 4,
+    "expert": "TL",
+    "selection_rate": 0.5714285714285714,
+    "weighted_usage": 0.12254174631469104,
+    "router_entropy": 1.8631783539419924
+  },
+  {
+    "name": "bikenyc_K03_seed7",
+    "round": 4,
+    "expert": "SL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.8631783539419924
+  },
+  {
+    "name": "bikenyc_K04_seed7",
+    "round": 1,
+    "expert": "T",
+    "selection_rate": 0.04081632653061224,
+    "weighted_usage": 0.005391244276040265,
+    "router_entropy": 1.2949251599487759
+  },
+  {
+    "name": "bikenyc_K04_seed7",
+    "round": 1,
+    "expert": "S",
+    "selection_rate": 0.5238095238095238,
+    "weighted_usage": 0.27522810905867695,
+    "router_entropy": 1.2949251599487759
+  },
+  {
+    "name": "bikenyc_K04_seed7",
+    "round": 1,
+    "expert": "TD",
+    "selection_rate": 0.07482993197278912,
+    "weighted_usage": 0.008806006121290785,
+    "router_entropy": 1.2949251599487759
+  },
+  {
+    "name": "bikenyc_K04_seed7",
+    "round": 1,
+    "expert": "SD",
+    "selection_rate": 0.034013605442176874,
+    "weighted_usage": 0.002800225552652969,
+    "router_entropy": 1.2949251599487759
+  },
+  {
+    "name": "bikenyc_K04_seed7",
+    "round": 1,
+    "expert": "TA",
+    "selection_rate": 0.14285714285714285,
+    "weighted_usage": 0.009066457701783602,
+    "router_entropy": 1.2949251599487759
+  },
+  {
+    "name": "bikenyc_K04_seed7",
+    "round": 1,
+    "expert": "ST",
+    "selection_rate": 0.06802721088435375,
+    "weighted_usage": 0.008028872817957482,
+    "router_entropy": 1.2949251599487759
+  },
+  {
+    "name": "bikenyc_K04_seed7",
+    "round": 1,
+    "expert": "TL",
+    "selection_rate": 0.6190476190476191,
+    "weighted_usage": 0.22258321104609236,
+    "router_entropy": 1.2949251599487759
+  },
+  {
+    "name": "bikenyc_K04_seed7",
+    "round": 1,
+    "expert": "SL",
+    "selection_rate": 0.4965986394557823,
+    "weighted_usage": 0.4680958670012805,
+    "router_entropy": 1.2949251599487759
+  },
+  {
+    "name": "bikenyc_K04_seed7",
+    "round": 2,
+    "expert": "T",
+    "selection_rate": 0.3401360544217687,
+    "weighted_usage": 0.025280650451678,
+    "router_entropy": 1.2918799048481273
+  },
+  {
+    "name": "bikenyc_K04_seed7",
+    "round": 2,
+    "expert": "S",
+    "selection_rate": 0.3333333333333333,
+    "weighted_usage": 0.245911973877018,
+    "router_entropy": 1.2918799048481273
+  },
+  {
+    "name": "bikenyc_K04_seed7",
+    "round": 2,
+    "expert": "TD",
+    "selection_rate": 0.1292517006802721,
+    "weighted_usage": 0.009809010034921219,
+    "router_entropy": 1.2918799048481273
+  },
+  {
+    "name": "bikenyc_K04_seed7",
+    "round": 2,
+    "expert": "SD",
+    "selection_rate": 0.7482993197278912,
+    "weighted_usage": 0.658447299684797,
+    "router_entropy": 1.2918799048481273
+  },
+  {
+    "name": "bikenyc_K04_seed7",
+    "round": 2,
+    "expert": "TA",
+    "selection_rate": 0.013605442176870748,
+    "weighted_usage": 0.0014961138367652893,
+    "router_entropy": 1.2918799048481273
+  },
+  {
+    "name": "bikenyc_K04_seed7",
+    "round": 2,
+    "expert": "ST",
+    "selection_rate": 0.034013605442176874,
+    "weighted_usage": 0.004651921275420254,
+    "router_entropy": 1.2918799048481273
+  },
+  {
+    "name": "bikenyc_K04_seed7",
+    "round": 2,
+    "expert": "TL",
+    "selection_rate": 0.3877551020408163,
+    "weighted_usage": 0.050316957566811114,
+    "router_entropy": 1.2918799048481273
+  },
+  {
+    "name": "bikenyc_K04_seed7",
+    "round": 2,
+    "expert": "SL",
+    "selection_rate": 0.013605442176870748,
+    "weighted_usage": 0.004086075794129144,
+    "router_entropy": 1.2918799048481273
+  },
+  {
+    "name": "bikenyc_K04_seed7",
+    "round": 3,
+    "expert": "T",
+    "selection_rate": 0.06802721088435375,
+    "weighted_usage": 0.006575518218027491,
+    "router_entropy": 1.6287636645034769
+  },
+  {
+    "name": "bikenyc_K04_seed7",
+    "round": 3,
+    "expert": "S",
+    "selection_rate": 0.3333333333333333,
+    "weighted_usage": 0.030870531996091206,
+    "router_entropy": 1.6287636645034769
+  },
+  {
+    "name": "bikenyc_K04_seed7",
+    "round": 3,
+    "expert": "TD",
+    "selection_rate": 0.48299319727891155,
+    "weighted_usage": 0.2245085501954669,
+    "router_entropy": 1.6287636645034769
+  },
+  {
+    "name": "bikenyc_K04_seed7",
+    "round": 3,
+    "expert": "SD",
+    "selection_rate": 0.5986394557823129,
+    "weighted_usage": 0.4868806300520086,
+    "router_entropy": 1.6287636645034769
+  },
+  {
+    "name": "bikenyc_K04_seed7",
+    "round": 3,
+    "expert": "TA",
+    "selection_rate": 0.25170068027210885,
+    "weighted_usage": 0.180219520516947,
+    "router_entropy": 1.6287636645034769
+  },
+  {
+    "name": "bikenyc_K04_seed7",
+    "round": 3,
+    "expert": "ST",
+    "selection_rate": 0.06802721088435375,
+    "weighted_usage": 0.006868853556866549,
+    "router_entropy": 1.6287636645034769
+  },
+  {
+    "name": "bikenyc_K04_seed7",
+    "round": 3,
+    "expert": "TL",
+    "selection_rate": 0.19047619047619047,
+    "weighted_usage": 0.06354349699555611,
+    "router_entropy": 1.6287636645034769
+  },
+  {
+    "name": "bikenyc_K04_seed7",
+    "round": 3,
+    "expert": "SL",
+    "selection_rate": 0.006802721088435374,
+    "weighted_usage": 0.0005328960361934843,
+    "router_entropy": 1.6287636645034769
+  },
+  {
+    "name": "bikenyc_K04_seed7",
+    "round": 4,
+    "expert": "T",
+    "selection_rate": 0.6598639455782312,
+    "weighted_usage": 0.10742958391807517,
+    "router_entropy": 1.7012967974444995
+  },
+  {
+    "name": "bikenyc_K04_seed7",
+    "round": 4,
+    "expert": "S",
+    "selection_rate": 0.061224489795918366,
+    "weighted_usage": 0.006567020450725036,
+    "router_entropy": 1.7012967974444995
+  },
+  {
+    "name": "bikenyc_K04_seed7",
+    "round": 4,
+    "expert": "TD",
+    "selection_rate": 0.14965986394557823,
+    "weighted_usage": 0.049862050989858145,
+    "router_entropy": 1.7012967974444995
+  },
+  {
+    "name": "bikenyc_K04_seed7",
+    "round": 4,
+    "expert": "SD",
+    "selection_rate": 0.027210884353741496,
+    "weighted_usage": 0.0024210698142343636,
+    "router_entropy": 1.7012967974444995
+  },
+  {
+    "name": "bikenyc_K04_seed7",
+    "round": 4,
+    "expert": "TA",
+    "selection_rate": 0.02040816326530612,
+    "weighted_usage": 0.0017343550717749563,
+    "router_entropy": 1.7012967974444995
+  },
+  {
+    "name": "bikenyc_K04_seed7",
+    "round": 4,
+    "expert": "ST",
+    "selection_rate": 1.0,
+    "weighted_usage": 0.8152806921070125,
+    "router_entropy": 1.7012967974444995
+  },
+  {
+    "name": "bikenyc_K04_seed7",
+    "round": 4,
+    "expert": "TL",
+    "selection_rate": 0.06802721088435375,
+    "weighted_usage": 0.015199466221997526,
+    "router_entropy": 1.7012967974444995
+  },
+  {
+    "name": "bikenyc_K04_seed7",
+    "round": 4,
+    "expert": "SL",
+    "selection_rate": 0.013605442176870748,
+    "weighted_usage": 0.0015057645687440626,
+    "router_entropy": 1.7012967974444995
+  },
+  {
+    "name": "bikenyc_K01_seed17",
+    "round": 1,
+    "expert": "T",
+    "selection_rate": 0.04081632653061224,
+    "weighted_usage": 0.009052181831833457,
+    "router_entropy": 1.4995861314959051
+  },
+  {
+    "name": "bikenyc_K01_seed17",
+    "round": 1,
+    "expert": "S",
+    "selection_rate": 0.08163265306122448,
+    "weighted_usage": 0.04255474233353625,
+    "router_entropy": 1.4995861314959051
+  },
+  {
+    "name": "bikenyc_K01_seed17",
+    "round": 1,
+    "expert": "TD",
+    "selection_rate": 0.38095238095238093,
+    "weighted_usage": 0.23232384573440162,
+    "router_entropy": 1.4995861314959051
+  },
+  {
+    "name": "bikenyc_K01_seed17",
+    "round": 1,
+    "expert": "SD",
+    "selection_rate": 0.47619047619047616,
+    "weighted_usage": 0.07208152022846297,
+    "router_entropy": 1.4995861314959051
+  },
+  {
+    "name": "bikenyc_K01_seed17",
+    "round": 1,
+    "expert": "TA",
+    "selection_rate": 0.07482993197278912,
+    "weighted_usage": 0.01767100332951059,
+    "router_entropy": 1.4995861314959051
+  },
+  {
+    "name": "bikenyc_K01_seed17",
+    "round": 1,
+    "expert": "ST",
+    "selection_rate": 0.061224489795918366,
+    "weighted_usage": 0.009384730235249007,
+    "router_entropy": 1.4995861314959051
+  },
+  {
+    "name": "bikenyc_K01_seed17",
+    "round": 1,
+    "expert": "TL",
+    "selection_rate": 0.3877551020408163,
+    "weighted_usage": 0.1710874940059623,
+    "router_entropy": 1.4995861314959051
+  },
+  {
+    "name": "bikenyc_K01_seed17",
+    "round": 1,
+    "expert": "SL",
+    "selection_rate": 0.4965986394557823,
+    "weighted_usage": 0.4458444799695696,
+    "router_entropy": 1.4995861314959051
+  },
+  {
+    "name": "bikenyc_K01_seed17",
+    "round": 2,
+    "expert": "T",
+    "selection_rate": 0.16326530612244897,
+    "weighted_usage": 0.03798530478866733,
+    "router_entropy": 1.3703649911872773
+  },
+  {
+    "name": "bikenyc_K01_seed17",
+    "round": 2,
+    "expert": "S",
+    "selection_rate": 0.08843537414965986,
+    "weighted_usage": 0.005389214170222379,
+    "router_entropy": 1.3703649911872773
+  },
+  {
+    "name": "bikenyc_K01_seed17",
+    "round": 2,
+    "expert": "TD",
+    "selection_rate": 0.48299319727891155,
+    "weighted_usage": 0.34377167824985216,
+    "router_entropy": 1.3703649911872773
+  },
+  {
+    "name": "bikenyc_K01_seed17",
+    "round": 2,
+    "expert": "SD",
+    "selection_rate": 0.4965986394557823,
+    "weighted_usage": 0.101340223635946,
+    "router_entropy": 1.3703649911872773
+  },
+  {
+    "name": "bikenyc_K01_seed17",
+    "round": 2,
+    "expert": "TA",
+    "selection_rate": 0.14285714285714285,
+    "weighted_usage": 0.023480013038228158,
+    "router_entropy": 1.3703649911872773
+  },
+  {
+    "name": "bikenyc_K01_seed17",
+    "round": 2,
+    "expert": "ST",
+    "selection_rate": 0.013605442176870748,
+    "weighted_usage": 0.000450557287858457,
+    "router_entropy": 1.3703649911872773
+  },
+  {
+    "name": "bikenyc_K01_seed17",
+    "round": 2,
+    "expert": "TL",
+    "selection_rate": 0.11564625850340136,
+    "weighted_usage": 0.024135489574297755,
+    "router_entropy": 1.3703649911872773
+  },
+  {
+    "name": "bikenyc_K01_seed17",
+    "round": 2,
+    "expert": "SL",
+    "selection_rate": 0.4965986394557823,
+    "weighted_usage": 0.4634475209275071,
+    "router_entropy": 1.3703649911872773
+  },
+  {
+    "name": "bikenyc_K01_seed17",
+    "round": 3,
+    "expert": "T",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.9713607239478732
+  },
+  {
+    "name": "bikenyc_K01_seed17",
+    "round": 3,
+    "expert": "S",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.9713607239478732
+  },
+  {
+    "name": "bikenyc_K01_seed17",
+    "round": 3,
+    "expert": "TD",
+    "selection_rate": 0.4421768707482993,
+    "weighted_usage": 0.19514963922857428,
+    "router_entropy": 1.9713607239478732
+  },
+  {
+    "name": "bikenyc_K01_seed17",
+    "round": 3,
+    "expert": "SD",
+    "selection_rate": 0.4965986394557823,
+    "weighted_usage": 0.15598290672107618,
+    "router_entropy": 1.9713607239478732
+  },
+  {
+    "name": "bikenyc_K01_seed17",
+    "round": 3,
+    "expert": "TA",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.9713607239478732
+  },
+  {
+    "name": "bikenyc_K01_seed17",
+    "round": 3,
+    "expert": "ST",
+    "selection_rate": 0.5034013605442177,
+    "weighted_usage": 0.2910752245763532,
+    "router_entropy": 1.9713607239478732
+  },
+  {
+    "name": "bikenyc_K01_seed17",
+    "round": 3,
+    "expert": "TL",
+    "selection_rate": 0.061224489795918366,
+    "weighted_usage": 0.017176495522868877,
+    "router_entropy": 1.9713607239478732
+  },
+  {
+    "name": "bikenyc_K01_seed17",
+    "round": 3,
+    "expert": "SL",
+    "selection_rate": 0.4965986394557823,
+    "weighted_usage": 0.3406157319237586,
+    "router_entropy": 1.9713607239478732
+  },
+  {
+    "name": "bikenyc_K01_seed17",
+    "round": 4,
+    "expert": "T",
+    "selection_rate": 0.5034013605442177,
+    "weighted_usage": 0.3989480397328228,
+    "router_entropy": 1.7742130655864132
+  },
+  {
+    "name": "bikenyc_K01_seed17",
+    "round": 4,
+    "expert": "S",
+    "selection_rate": 0.48299319727891155,
+    "weighted_usage": 0.10232036241463252,
+    "router_entropy": 1.7742130655864132
+  },
+  {
+    "name": "bikenyc_K01_seed17",
+    "round": 4,
+    "expert": "TD",
+    "selection_rate": 0.02040816326530612,
+    "weighted_usage": 0.0021329576364990804,
+    "router_entropy": 1.7742130655864132
+  },
+  {
+    "name": "bikenyc_K01_seed17",
+    "round": 4,
+    "expert": "SD",
+    "selection_rate": 0.4421768707482993,
+    "weighted_usage": 0.08056568602720897,
+    "router_entropy": 1.7742130655864132
+  },
+  {
+    "name": "bikenyc_K01_seed17",
+    "round": 4,
+    "expert": "TA",
+    "selection_rate": 0.05442176870748299,
+    "weighted_usage": 0.009177424976614867,
+    "router_entropy": 1.7742130655864132
+  },
+  {
+    "name": "bikenyc_K01_seed17",
+    "round": 4,
+    "expert": "ST",
+    "selection_rate": 0.4965986394557823,
+    "weighted_usage": 0.4068555316957487,
+    "router_entropy": 1.7742130655864132
+  },
+  {
+    "name": "bikenyc_K01_seed17",
+    "round": 4,
+    "expert": "TL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.7742130655864132
+  },
+  {
+    "name": "bikenyc_K01_seed17",
+    "round": 4,
+    "expert": "SL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.7742130655864132
+  },
+  {
+    "name": "bikenyc_K02_seed17",
+    "round": 1,
+    "expert": "T",
+    "selection_rate": 0.08843537414965986,
+    "weighted_usage": 0.010857413491221513,
+    "router_entropy": 1.2325778618879841
+  },
+  {
+    "name": "bikenyc_K02_seed17",
+    "round": 1,
+    "expert": "S",
+    "selection_rate": 0.2925170068027211,
+    "weighted_usage": 0.02054878127868889,
+    "router_entropy": 1.2325778618879841
+  },
+  {
+    "name": "bikenyc_K02_seed17",
+    "round": 1,
+    "expert": "TD",
+    "selection_rate": 0.3877551020408163,
+    "weighted_usage": 0.23068360051735728,
+    "router_entropy": 1.2325778618879841
+  },
+  {
+    "name": "bikenyc_K02_seed17",
+    "round": 1,
+    "expert": "SD",
+    "selection_rate": 0.2585034013605442,
+    "weighted_usage": 0.027551914128113766,
+    "router_entropy": 1.2325778618879841
+  },
+  {
+    "name": "bikenyc_K02_seed17",
+    "round": 1,
+    "expert": "TA",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.2325778618879841
+  },
+  {
+    "name": "bikenyc_K02_seed17",
+    "round": 1,
+    "expert": "ST",
+    "selection_rate": 0.6394557823129252,
+    "weighted_usage": 0.5058422063787779,
+    "router_entropy": 1.2325778618879841
+  },
+  {
+    "name": "bikenyc_K02_seed17",
+    "round": 1,
+    "expert": "TL",
+    "selection_rate": 0.061224489795918366,
+    "weighted_usage": 0.010423507262654856,
+    "router_entropy": 1.2325778618879841
+  },
+  {
+    "name": "bikenyc_K02_seed17",
+    "round": 1,
+    "expert": "SL",
+    "selection_rate": 0.272108843537415,
+    "weighted_usage": 0.19409257708256747,
+    "router_entropy": 1.2325778618879841
+  },
+  {
+    "name": "bikenyc_K02_seed17",
+    "round": 2,
+    "expert": "T",
+    "selection_rate": 0.19047619047619047,
+    "weighted_usage": 0.10136709596682973,
+    "router_entropy": 0.9206909113949736
+  },
+  {
+    "name": "bikenyc_K02_seed17",
+    "round": 2,
+    "expert": "S",
+    "selection_rate": 0.17687074829931973,
+    "weighted_usage": 0.010102097670465302,
+    "router_entropy": 0.9206909113949736
+  },
+  {
+    "name": "bikenyc_K02_seed17",
+    "round": 2,
+    "expert": "TD",
+    "selection_rate": 0.06802721088435375,
+    "weighted_usage": 0.011907190794036501,
+    "router_entropy": 0.9206909113949736
+  },
+  {
+    "name": "bikenyc_K02_seed17",
+    "round": 2,
+    "expert": "SD",
+    "selection_rate": 0.5714285714285714,
+    "weighted_usage": 0.06442479520907854,
+    "router_entropy": 0.9206909113949736
+  },
+  {
+    "name": "bikenyc_K02_seed17",
+    "round": 2,
+    "expert": "TA",
+    "selection_rate": 0.006802721088435374,
+    "weighted_usage": 8.443785438529489e-05,
+    "router_entropy": 0.9206909113949736
+  },
+  {
+    "name": "bikenyc_K02_seed17",
+    "round": 2,
+    "expert": "ST",
+    "selection_rate": 0.4897959183673469,
+    "weighted_usage": 0.31730425357818604,
+    "router_entropy": 0.9206909113949736
+  },
+  {
+    "name": "bikenyc_K02_seed17",
+    "round": 2,
+    "expert": "TL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 0.9206909113949736
+  },
+  {
+    "name": "bikenyc_K02_seed17",
+    "round": 2,
+    "expert": "SL",
+    "selection_rate": 0.4965986394557823,
+    "weighted_usage": 0.4948101319423338,
+    "router_entropy": 0.9206909113949736
+  },
+  {
+    "name": "bikenyc_K02_seed17",
+    "round": 3,
+    "expert": "T",
+    "selection_rate": 0.1564625850340136,
+    "weighted_usage": 0.003954690912751114,
+    "router_entropy": 1.1237288818235611
+  },
+  {
+    "name": "bikenyc_K02_seed17",
+    "round": 3,
+    "expert": "S",
+    "selection_rate": 0.3673469387755102,
+    "weighted_usage": 0.04443537700465139,
+    "router_entropy": 1.1237288818235611
+  },
+  {
+    "name": "bikenyc_K02_seed17",
+    "round": 3,
+    "expert": "TD",
+    "selection_rate": 0.006802721088435374,
+    "weighted_usage": 0.00021687466777911804,
+    "router_entropy": 1.1237288818235611
+  },
+  {
+    "name": "bikenyc_K02_seed17",
+    "round": 3,
+    "expert": "SD",
+    "selection_rate": 0.3333333333333333,
+    "weighted_usage": 0.03415054745566683,
+    "router_entropy": 1.1237288818235611
+  },
+  {
+    "name": "bikenyc_K02_seed17",
+    "round": 3,
+    "expert": "TA",
+    "selection_rate": 0.5034013605442177,
+    "weighted_usage": 0.40567128836703137,
+    "router_entropy": 1.1237288818235611
+  },
+  {
+    "name": "bikenyc_K02_seed17",
+    "round": 3,
+    "expert": "ST",
+    "selection_rate": 0.07482993197278912,
+    "weighted_usage": 0.010659204061035396,
+    "router_entropy": 1.1237288818235611
+  },
+  {
+    "name": "bikenyc_K02_seed17",
+    "round": 3,
+    "expert": "TL",
+    "selection_rate": 0.4965986394557823,
+    "weighted_usage": 0.48536564663153925,
+    "router_entropy": 1.1237288818235611
+  },
+  {
+    "name": "bikenyc_K02_seed17",
+    "round": 3,
+    "expert": "SL",
+    "selection_rate": 0.061224489795918366,
+    "weighted_usage": 0.015546372350381345,
+    "router_entropy": 1.1237288818235611
+  },
+  {
+    "name": "bikenyc_K02_seed17",
+    "round": 4,
+    "expert": "T",
+    "selection_rate": 0.5034013605442177,
+    "weighted_usage": 0.4010275995650259,
+    "router_entropy": 1.9106390176696915
+  },
+  {
+    "name": "bikenyc_K02_seed17",
+    "round": 4,
+    "expert": "S",
+    "selection_rate": 0.02040816326530612,
+    "weighted_usage": 0.00541394786769841,
+    "router_entropy": 1.9106390176696915
+  },
+  {
+    "name": "bikenyc_K02_seed17",
+    "round": 4,
+    "expert": "TD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.9106390176696915
+  },
+  {
+    "name": "bikenyc_K02_seed17",
+    "round": 4,
+    "expert": "SD",
+    "selection_rate": 0.4897959183673469,
+    "weighted_usage": 0.1606608248081337,
+    "router_entropy": 1.9106390176696915
+  },
+  {
+    "name": "bikenyc_K02_seed17",
+    "round": 4,
+    "expert": "TA",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.9106390176696915
+  },
+  {
+    "name": "bikenyc_K02_seed17",
+    "round": 4,
+    "expert": "ST",
+    "selection_rate": 0.4965986394557823,
+    "weighted_usage": 0.33350783748691587,
+    "router_entropy": 1.9106390176696915
+  },
+  {
+    "name": "bikenyc_K02_seed17",
+    "round": 4,
+    "expert": "TL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.9106390176696915
+  },
+  {
+    "name": "bikenyc_K02_seed17",
+    "round": 4,
+    "expert": "SL",
+    "selection_rate": 0.4897959183673469,
+    "weighted_usage": 0.09938979108317368,
+    "router_entropy": 1.9106390176696915
+  },
+  {
+    "name": "bikenyc_K03_seed17",
+    "round": 1,
+    "expert": "T",
+    "selection_rate": 0.1292517006802721,
+    "weighted_usage": 0.026466715751456565,
+    "router_entropy": 1.7624850050106535
+  },
+  {
+    "name": "bikenyc_K03_seed17",
+    "round": 1,
+    "expert": "S",
+    "selection_rate": 0.07482993197278912,
+    "weighted_usage": 0.039974596528779896,
+    "router_entropy": 1.7624850050106535
+  },
+  {
+    "name": "bikenyc_K03_seed17",
+    "round": 1,
+    "expert": "TD",
+    "selection_rate": 0.4489795918367347,
+    "weighted_usage": 0.3525032713299706,
+    "router_entropy": 1.7624850050106535
+  },
+  {
+    "name": "bikenyc_K03_seed17",
+    "round": 1,
+    "expert": "SD",
+    "selection_rate": 0.5034013605442177,
+    "weighted_usage": 0.3127774531338491,
+    "router_entropy": 1.7624850050106535
+  },
+  {
+    "name": "bikenyc_K03_seed17",
+    "round": 1,
+    "expert": "TA",
+    "selection_rate": 0.07482993197278912,
+    "weighted_usage": 0.015994833085407206,
+    "router_entropy": 1.7624850050106535
+  },
+  {
+    "name": "bikenyc_K03_seed17",
+    "round": 1,
+    "expert": "ST",
+    "selection_rate": 0.12244897959183673,
+    "weighted_usage": 0.013974328886489478,
+    "router_entropy": 1.7624850050106535
+  },
+  {
+    "name": "bikenyc_K03_seed17",
+    "round": 1,
+    "expert": "TL",
+    "selection_rate": 0.3945578231292517,
+    "weighted_usage": 0.13435999562545697,
+    "router_entropy": 1.7624850050106535
+  },
+  {
+    "name": "bikenyc_K03_seed17",
+    "round": 1,
+    "expert": "SL",
+    "selection_rate": 0.25170068027210885,
+    "weighted_usage": 0.103948806520222,
+    "router_entropy": 1.7624850050106535
+  },
+  {
+    "name": "bikenyc_K03_seed17",
+    "round": 2,
+    "expert": "T",
+    "selection_rate": 0.5034013605442177,
+    "weighted_usage": 0.3307818320332741,
+    "router_entropy": 1.4677626404666462
+  },
+  {
+    "name": "bikenyc_K03_seed17",
+    "round": 2,
+    "expert": "S",
+    "selection_rate": 0.17006802721088435,
+    "weighted_usage": 0.005294391150478603,
+    "router_entropy": 1.4677626404666462
+  },
+  {
+    "name": "bikenyc_K03_seed17",
+    "round": 2,
+    "expert": "TD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.4677626404666462
+  },
+  {
+    "name": "bikenyc_K03_seed17",
+    "round": 2,
+    "expert": "SD",
+    "selection_rate": 0.6054421768707483,
+    "weighted_usage": 0.17915294798357145,
+    "router_entropy": 1.4677626404666462
+  },
+  {
+    "name": "bikenyc_K03_seed17",
+    "round": 2,
+    "expert": "TA",
+    "selection_rate": 0.1836734693877551,
+    "weighted_usage": 0.012014480687829912,
+    "router_entropy": 1.4677626404666462
+  },
+  {
+    "name": "bikenyc_K03_seed17",
+    "round": 2,
+    "expert": "ST",
+    "selection_rate": 0.034013605442176874,
+    "weighted_usage": 0.002586199363478187,
+    "router_entropy": 1.4677626404666462
+  },
+  {
+    "name": "bikenyc_K03_seed17",
+    "round": 2,
+    "expert": "TL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.4677626404666462
+  },
+  {
+    "name": "bikenyc_K03_seed17",
+    "round": 2,
+    "expert": "SL",
+    "selection_rate": 0.5034013605442177,
+    "weighted_usage": 0.47017014513210376,
+    "router_entropy": 1.4677626404666462
+  },
+  {
+    "name": "bikenyc_K03_seed17",
+    "round": 3,
+    "expert": "T",
+    "selection_rate": 0.08163265306122448,
+    "weighted_usage": 0.014337600696654547,
+    "router_entropy": 1.799663007730479
+  },
+  {
+    "name": "bikenyc_K03_seed17",
+    "round": 3,
+    "expert": "S",
+    "selection_rate": 0.02040816326530612,
+    "weighted_usage": 0.0033739919767898766,
+    "router_entropy": 1.799663007730479
+  },
+  {
+    "name": "bikenyc_K03_seed17",
+    "round": 3,
+    "expert": "TD",
+    "selection_rate": 0.2789115646258503,
+    "weighted_usage": 0.14874606969810666,
+    "router_entropy": 1.799663007730479
+  },
+  {
+    "name": "bikenyc_K03_seed17",
+    "round": 3,
+    "expert": "SD",
+    "selection_rate": 0.48299319727891155,
+    "weighted_usage": 0.0939812578108846,
+    "router_entropy": 1.799663007730479
+  },
+  {
+    "name": "bikenyc_K03_seed17",
+    "round": 3,
+    "expert": "TA",
+    "selection_rate": 0.1360544217687075,
+    "weighted_usage": 0.041077026805910126,
+    "router_entropy": 1.799663007730479
+  },
+  {
+    "name": "bikenyc_K03_seed17",
+    "round": 3,
+    "expert": "ST",
+    "selection_rate": 0.46258503401360546,
+    "weighted_usage": 0.29530105156963377,
+    "router_entropy": 1.799663007730479
+  },
+  {
+    "name": "bikenyc_K03_seed17",
+    "round": 3,
+    "expert": "TL",
+    "selection_rate": 0.04081632653061224,
+    "weighted_usage": 0.0032547921651885623,
+    "router_entropy": 1.799663007730479
+  },
+  {
+    "name": "bikenyc_K03_seed17",
+    "round": 3,
+    "expert": "SL",
+    "selection_rate": 0.4965986394557823,
+    "weighted_usage": 0.3999282081110948,
+    "router_entropy": 1.799663007730479
+  },
+  {
+    "name": "bikenyc_K03_seed17",
+    "round": 4,
+    "expert": "T",
+    "selection_rate": 0.5034013605442177,
+    "weighted_usage": 0.3898698415885977,
+    "router_entropy": 1.5943788633748126
+  },
+  {
+    "name": "bikenyc_K03_seed17",
+    "round": 4,
+    "expert": "S",
+    "selection_rate": 0.3129251700680272,
+    "weighted_usage": 0.023887508327052706,
+    "router_entropy": 1.5943788633748126
+  },
+  {
+    "name": "bikenyc_K03_seed17",
+    "round": 4,
+    "expert": "TD",
+    "selection_rate": 0.02040816326530612,
+    "weighted_usage": 0.0021615044093456397,
+    "router_entropy": 1.5943788633748126
+  },
+  {
+    "name": "bikenyc_K03_seed17",
+    "round": 4,
+    "expert": "SD",
+    "selection_rate": 0.23129251700680273,
+    "weighted_usage": 0.033921794522376286,
+    "router_entropy": 1.5943788633748126
+  },
+  {
+    "name": "bikenyc_K03_seed17",
+    "round": 4,
+    "expert": "TA",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.5943788633748126
+  },
+  {
+    "name": "bikenyc_K03_seed17",
+    "round": 4,
+    "expert": "ST",
+    "selection_rate": 0.4965986394557823,
+    "weighted_usage": 0.44377351577590113,
+    "router_entropy": 1.5943788633748126
+  },
+  {
+    "name": "bikenyc_K03_seed17",
+    "round": 4,
+    "expert": "TL",
+    "selection_rate": 0.43537414965986393,
+    "weighted_usage": 0.10638583350141033,
+    "router_entropy": 1.5943788633748126
+  },
+  {
+    "name": "bikenyc_K03_seed17",
+    "round": 4,
+    "expert": "SL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.5943788633748126
+  },
+  {
+    "name": "bikenyc_K04_seed17",
+    "round": 1,
+    "expert": "T",
+    "selection_rate": 0.05442176870748299,
+    "weighted_usage": 0.0023277140140127973,
+    "router_entropy": 1.3743243936633915
+  },
+  {
+    "name": "bikenyc_K04_seed17",
+    "round": 1,
+    "expert": "S",
+    "selection_rate": 0.2925170068027211,
+    "weighted_usage": 0.21119241163033206,
+    "router_entropy": 1.3743243936633915
+  },
+  {
+    "name": "bikenyc_K04_seed17",
+    "round": 1,
+    "expert": "TD",
+    "selection_rate": 0.1360544217687075,
+    "weighted_usage": 0.00874354135321111,
+    "router_entropy": 1.3743243936633915
+  },
+  {
+    "name": "bikenyc_K04_seed17",
+    "round": 1,
+    "expert": "SD",
+    "selection_rate": 0.3469387755102041,
+    "weighted_usage": 0.05206755686830096,
+    "router_entropy": 1.3743243936633915
+  },
+  {
+    "name": "bikenyc_K04_seed17",
+    "round": 1,
+    "expert": "TA",
+    "selection_rate": 0.061224489795918366,
+    "weighted_usage": 0.007025553559770389,
+    "router_entropy": 1.3743243936633915
+  },
+  {
+    "name": "bikenyc_K04_seed17",
+    "round": 1,
+    "expert": "ST",
+    "selection_rate": 0.7482993197278912,
+    "weighted_usage": 0.6559204595024083,
+    "router_entropy": 1.3743243936633915
+  },
+  {
+    "name": "bikenyc_K04_seed17",
+    "round": 1,
+    "expert": "TL",
+    "selection_rate": 0.027210884353741496,
+    "weighted_usage": 0.0027785811091766877,
+    "router_entropy": 1.3743243936633915
+  },
+  {
+    "name": "bikenyc_K04_seed17",
+    "round": 1,
+    "expert": "SL",
+    "selection_rate": 0.3333333333333333,
+    "weighted_usage": 0.05994418458569618,
+    "router_entropy": 1.3743243936633915
+  },
+  {
+    "name": "bikenyc_K04_seed17",
+    "round": 2,
+    "expert": "T",
+    "selection_rate": 0.20408163265306123,
+    "weighted_usage": 0.060317518531667946,
+    "router_entropy": 0.9864431356909459
+  },
+  {
+    "name": "bikenyc_K04_seed17",
+    "round": 2,
+    "expert": "S",
+    "selection_rate": 0.061224489795918366,
+    "weighted_usage": 0.0006797100475919592,
+    "router_entropy": 0.9864431356909459
+  },
+  {
+    "name": "bikenyc_K04_seed17",
+    "round": 2,
+    "expert": "TD",
+    "selection_rate": 0.3333333333333333,
+    "weighted_usage": 0.16608458695312342,
+    "router_entropy": 0.9864431356909459
+  },
+  {
+    "name": "bikenyc_K04_seed17",
+    "round": 2,
+    "expert": "SD",
+    "selection_rate": 0.4421768707482993,
+    "weighted_usage": 0.26126100794494556,
+    "router_entropy": 0.9864431356909459
+  },
+  {
+    "name": "bikenyc_K04_seed17",
+    "round": 2,
+    "expert": "TA",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 0.9864431356909459
+  },
+  {
+    "name": "bikenyc_K04_seed17",
+    "round": 2,
+    "expert": "ST",
+    "selection_rate": 0.35374149659863946,
+    "weighted_usage": 0.004957668348627329,
+    "router_entropy": 0.9864431356909459
+  },
+  {
+    "name": "bikenyc_K04_seed17",
+    "round": 2,
+    "expert": "TL",
+    "selection_rate": 0.061224489795918366,
+    "weighted_usage": 0.006770049937728311,
+    "router_entropy": 0.9864431356909459
+  },
+  {
+    "name": "bikenyc_K04_seed17",
+    "round": 2,
+    "expert": "SL",
+    "selection_rate": 0.54421768707483,
+    "weighted_usage": 0.4999294582070137,
+    "router_entropy": 0.9864431356909459
+  },
+  {
+    "name": "bikenyc_K04_seed17",
+    "round": 3,
+    "expert": "T",
+    "selection_rate": 0.1292517006802721,
+    "weighted_usage": 0.00438119262000736,
+    "router_entropy": 1.3149736427531047
+  },
+  {
+    "name": "bikenyc_K04_seed17",
+    "round": 3,
+    "expert": "S",
+    "selection_rate": 0.2653061224489796,
+    "weighted_usage": 0.06598961799323154,
+    "router_entropy": 1.3149736427531047
+  },
+  {
+    "name": "bikenyc_K04_seed17",
+    "round": 3,
+    "expert": "TD",
+    "selection_rate": 0.5102040816326531,
+    "weighted_usage": 0.05551374116975839,
+    "router_entropy": 1.3149736427531047
+  },
+  {
+    "name": "bikenyc_K04_seed17",
+    "round": 3,
+    "expert": "SD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.3149736427531047
+  },
+  {
+    "name": "bikenyc_K04_seed17",
+    "round": 3,
+    "expert": "TA",
+    "selection_rate": 0.5034013605442177,
+    "weighted_usage": 0.3857730967657907,
+    "router_entropy": 1.3149736427531047
+  },
+  {
+    "name": "bikenyc_K04_seed17",
+    "round": 3,
+    "expert": "ST",
+    "selection_rate": 0.013605442176870748,
+    "weighted_usage": 0.0003523506401550202,
+    "router_entropy": 1.3149736427531047
+  },
+  {
+    "name": "bikenyc_K04_seed17",
+    "round": 3,
+    "expert": "TL",
+    "selection_rate": 0.4965986394557823,
+    "weighted_usage": 0.4774343294351279,
+    "router_entropy": 1.3149736427531047
+  },
+  {
+    "name": "bikenyc_K04_seed17",
+    "round": 3,
+    "expert": "SL",
+    "selection_rate": 0.08163265306122448,
+    "weighted_usage": 0.010555674201574456,
+    "router_entropy": 1.3149736427531047
+  },
+  {
+    "name": "bikenyc_K04_seed17",
+    "round": 4,
+    "expert": "T",
+    "selection_rate": 1.0,
+    "weighted_usage": 0.7975695129154491,
+    "router_entropy": 1.860320089767393
+  },
+  {
+    "name": "bikenyc_K04_seed17",
+    "round": 4,
+    "expert": "S",
+    "selection_rate": 0.9727891156462585,
+    "weighted_usage": 0.19670851741518294,
+    "router_entropy": 1.860320089767393
+  },
+  {
+    "name": "bikenyc_K04_seed17",
+    "round": 4,
+    "expert": "TD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.860320089767393
+  },
+  {
+    "name": "bikenyc_K04_seed17",
+    "round": 4,
+    "expert": "SD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.860320089767393
+  },
+  {
+    "name": "bikenyc_K04_seed17",
+    "round": 4,
+    "expert": "TA",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.860320089767393
+  },
+  {
+    "name": "bikenyc_K04_seed17",
+    "round": 4,
+    "expert": "ST",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.860320089767393
+  },
+  {
+    "name": "bikenyc_K04_seed17",
+    "round": 4,
+    "expert": "TL",
+    "selection_rate": 0.027210884353741496,
+    "weighted_usage": 0.005721968655683556,
+    "router_entropy": 1.860320089767393
+  },
+  {
+    "name": "bikenyc_K04_seed17",
+    "round": 4,
+    "expert": "SL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.860320089767393
+  },
+  {
+    "name": "bikenyc_K01_seed27",
+    "round": 1,
+    "expert": "T",
+    "selection_rate": 0.40816326530612246,
+    "weighted_usage": 0.25389959987531713,
+    "router_entropy": 1.2212750278689262
+  },
+  {
+    "name": "bikenyc_K01_seed27",
+    "round": 1,
+    "expert": "S",
+    "selection_rate": 0.2585034013605442,
+    "weighted_usage": 0.07103122195520369,
+    "router_entropy": 1.2212750278689262
+  },
+  {
+    "name": "bikenyc_K01_seed27",
+    "round": 1,
+    "expert": "TD",
+    "selection_rate": 0.034013605442176874,
+    "weighted_usage": 0.004866767665181233,
+    "router_entropy": 1.2212750278689262
+  },
+  {
+    "name": "bikenyc_K01_seed27",
+    "round": 1,
+    "expert": "SD",
+    "selection_rate": 0.4965986394557823,
+    "weighted_usage": 0.48367966153994707,
+    "router_entropy": 1.2212750278689262
+  },
+  {
+    "name": "bikenyc_K01_seed27",
+    "round": 1,
+    "expert": "TA",
+    "selection_rate": 0.38095238095238093,
+    "weighted_usage": 0.0874625254251367,
+    "router_entropy": 1.2212750278689262
+  },
+  {
+    "name": "bikenyc_K01_seed27",
+    "round": 1,
+    "expert": "ST",
+    "selection_rate": 0.14965986394557823,
+    "weighted_usage": 0.015563484154590945,
+    "router_entropy": 1.2212750278689262
+  },
+  {
+    "name": "bikenyc_K01_seed27",
+    "round": 1,
+    "expert": "TL",
+    "selection_rate": 0.1836734693877551,
+    "weighted_usage": 0.08285320230892726,
+    "router_entropy": 1.2212750278689262
+  },
+  {
+    "name": "bikenyc_K01_seed27",
+    "round": 1,
+    "expert": "SL",
+    "selection_rate": 0.08843537414965986,
+    "weighted_usage": 0.0006435384916863879,
+    "router_entropy": 1.2212750278689262
+  },
+  {
+    "name": "bikenyc_K01_seed27",
+    "round": 2,
+    "expert": "T",
+    "selection_rate": 0.5034013605442177,
+    "weighted_usage": 0.2631676590361563,
+    "router_entropy": 1.9551421560966091
+  },
+  {
+    "name": "bikenyc_K01_seed27",
+    "round": 2,
+    "expert": "S",
+    "selection_rate": 0.4489795918367347,
+    "weighted_usage": 0.15970822185480676,
+    "router_entropy": 1.9551421560966091
+  },
+  {
+    "name": "bikenyc_K01_seed27",
+    "round": 2,
+    "expert": "TD",
+    "selection_rate": 0.006802721088435374,
+    "weighted_usage": 0.0007774527279698119,
+    "router_entropy": 1.9551421560966091
+  },
+  {
+    "name": "bikenyc_K01_seed27",
+    "round": 2,
+    "expert": "SD",
+    "selection_rate": 0.4965986394557823,
+    "weighted_usage": 0.3297513849070283,
+    "router_entropy": 1.9551421560966091
+  },
+  {
+    "name": "bikenyc_K01_seed27",
+    "round": 2,
+    "expert": "TA",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.9551421560966091
+  },
+  {
+    "name": "bikenyc_K01_seed27",
+    "round": 2,
+    "expert": "ST",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.9551421560966091
+  },
+  {
+    "name": "bikenyc_K01_seed27",
+    "round": 2,
+    "expert": "TL",
+    "selection_rate": 0.04081632653061224,
+    "weighted_usage": 0.006361578293398124,
+    "router_entropy": 1.9551421560966091
+  },
+  {
+    "name": "bikenyc_K01_seed27",
+    "round": 2,
+    "expert": "SL",
+    "selection_rate": 0.5034013605442177,
+    "weighted_usage": 0.2402337033326934,
+    "router_entropy": 1.9551421560966091
+  },
+  {
+    "name": "bikenyc_K01_seed27",
+    "round": 3,
+    "expert": "T",
+    "selection_rate": 0.034013605442176874,
+    "weighted_usage": 0.009763077611014956,
+    "router_entropy": 1.8328954883384274
+  },
+  {
+    "name": "bikenyc_K01_seed27",
+    "round": 3,
+    "expert": "S",
+    "selection_rate": 0.40816326530612246,
+    "weighted_usage": 0.14654047371578865,
+    "router_entropy": 1.8328954883384274
+  },
+  {
+    "name": "bikenyc_K01_seed27",
+    "round": 3,
+    "expert": "TD",
+    "selection_rate": 0.04081632653061224,
+    "weighted_usage": 0.0037326664746213122,
+    "router_entropy": 1.8328954883384274
+  },
+  {
+    "name": "bikenyc_K01_seed27",
+    "round": 3,
+    "expert": "SD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.8328954883384274
+  },
+  {
+    "name": "bikenyc_K01_seed27",
+    "round": 3,
+    "expert": "TA",
+    "selection_rate": 0.04081632653061224,
+    "weighted_usage": 0.017530535759569026,
+    "router_entropy": 1.8328954883384274
+  },
+  {
+    "name": "bikenyc_K01_seed27",
+    "round": 3,
+    "expert": "ST",
+    "selection_rate": 0.47619047619047616,
+    "weighted_usage": 0.1509750580706564,
+    "router_entropy": 1.8328954883384274
+  },
+  {
+    "name": "bikenyc_K01_seed27",
+    "round": 3,
+    "expert": "TL",
+    "selection_rate": 0.4965986394557823,
+    "weighted_usage": 0.33112404236988147,
+    "router_entropy": 1.8328954883384274
+  },
+  {
+    "name": "bikenyc_K01_seed27",
+    "round": 3,
+    "expert": "SL",
+    "selection_rate": 0.5034013605442177,
+    "weighted_usage": 0.3403341435656256,
+    "router_entropy": 1.8328954883384274
+  },
+  {
+    "name": "bikenyc_K01_seed27",
+    "round": 4,
+    "expert": "T",
+    "selection_rate": 0.06802721088435375,
+    "weighted_usage": 0.008232400834965868,
+    "router_entropy": 1.5898885491574228
+  },
+  {
+    "name": "bikenyc_K01_seed27",
+    "round": 4,
+    "expert": "S",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.5898885491574228
+  },
+  {
+    "name": "bikenyc_K01_seed27",
+    "round": 4,
+    "expert": "TD",
+    "selection_rate": 1.0,
+    "weighted_usage": 0.8679147419475374,
+    "router_entropy": 1.5898885491574228
+  },
+  {
+    "name": "bikenyc_K01_seed27",
+    "round": 4,
+    "expert": "SD",
+    "selection_rate": 0.02040816326530612,
+    "weighted_usage": 0.0024125137600768992,
+    "router_entropy": 1.5898885491574228
+  },
+  {
+    "name": "bikenyc_K01_seed27",
+    "round": 4,
+    "expert": "TA",
+    "selection_rate": 0.1564625850340136,
+    "weighted_usage": 0.013325136585705945,
+    "router_entropy": 1.5898885491574228
+  },
+  {
+    "name": "bikenyc_K01_seed27",
+    "round": 4,
+    "expert": "ST",
+    "selection_rate": 0.04081632653061224,
+    "weighted_usage": 0.009453477604048592,
+    "router_entropy": 1.5898885491574228
+  },
+  {
+    "name": "bikenyc_K01_seed27",
+    "round": 4,
+    "expert": "TL",
+    "selection_rate": 0.14965986394557823,
+    "weighted_usage": 0.013535333581927681,
+    "router_entropy": 1.5898885491574228
+  },
+  {
+    "name": "bikenyc_K01_seed27",
+    "round": 4,
+    "expert": "SL",
+    "selection_rate": 0.564625850340136,
+    "weighted_usage": 0.08512639360768455,
+    "router_entropy": 1.5898885491574228
+  },
+  {
+    "name": "bikenyc_K02_seed27",
+    "round": 1,
+    "expert": "T",
+    "selection_rate": 0.35374149659863946,
+    "weighted_usage": 0.22979013738380807,
+    "router_entropy": 1.1650593389015875
+  },
+  {
+    "name": "bikenyc_K02_seed27",
+    "round": 1,
+    "expert": "S",
+    "selection_rate": 0.2653061224489796,
+    "weighted_usage": 0.14598960506089895,
+    "router_entropy": 1.1650593389015875
+  },
+  {
+    "name": "bikenyc_K02_seed27",
+    "round": 1,
+    "expert": "TD",
+    "selection_rate": 0.20408163265306123,
+    "weighted_usage": 0.015419241953261045,
+    "router_entropy": 1.1650593389015875
+  },
+  {
+    "name": "bikenyc_K02_seed27",
+    "round": 1,
+    "expert": "SD",
+    "selection_rate": 0.29931972789115646,
+    "weighted_usage": 0.09603782869926115,
+    "router_entropy": 1.1650593389015875
+  },
+  {
+    "name": "bikenyc_K02_seed27",
+    "round": 1,
+    "expert": "TA",
+    "selection_rate": 0.013605442176870748,
+    "weighted_usage": 0.0012938129101075283,
+    "router_entropy": 1.1650593389015875
+  },
+  {
+    "name": "bikenyc_K02_seed27",
+    "round": 1,
+    "expert": "ST",
+    "selection_rate": 0.17687074829931973,
+    "weighted_usage": 0.02379828481143024,
+    "router_entropy": 1.1650593389015875
+  },
+  {
+    "name": "bikenyc_K02_seed27",
+    "round": 1,
+    "expert": "TL",
+    "selection_rate": 0.19047619047619047,
+    "weighted_usage": 0.0021217887283486573,
+    "router_entropy": 1.1650593389015875
+  },
+  {
+    "name": "bikenyc_K02_seed27",
+    "round": 1,
+    "expert": "SL",
+    "selection_rate": 0.4965986394557823,
+    "weighted_usage": 0.4855492986789366,
+    "router_entropy": 1.1650593389015875
+  },
+  {
+    "name": "bikenyc_K02_seed27",
+    "round": 2,
+    "expert": "T",
+    "selection_rate": 0.25170068027210885,
+    "weighted_usage": 0.025880066158414698,
+    "router_entropy": 1.1718029519530098
+  },
+  {
+    "name": "bikenyc_K02_seed27",
+    "round": 2,
+    "expert": "S",
+    "selection_rate": 0.4965986394557823,
+    "weighted_usage": 0.4704655266943432,
+    "router_entropy": 1.1718029519530098
+  },
+  {
+    "name": "bikenyc_K02_seed27",
+    "round": 2,
+    "expert": "TD",
+    "selection_rate": 0.08843537414965986,
+    "weighted_usage": 0.00527820117188757,
+    "router_entropy": 1.1718029519530098
+  },
+  {
+    "name": "bikenyc_K02_seed27",
+    "round": 2,
+    "expert": "SD",
+    "selection_rate": 0.25170068027210885,
+    "weighted_usage": 0.057231735590161106,
+    "router_entropy": 1.1718029519530098
+  },
+  {
+    "name": "bikenyc_K02_seed27",
+    "round": 2,
+    "expert": "TA",
+    "selection_rate": 0.1360544217687075,
+    "weighted_usage": 0.019863685124179943,
+    "router_entropy": 1.1718029519530098
+  },
+  {
+    "name": "bikenyc_K02_seed27",
+    "round": 2,
+    "expert": "ST",
+    "selection_rate": 0.10884353741496598,
+    "weighted_usage": 0.004858670908273483,
+    "router_entropy": 1.1718029519530098
+  },
+  {
+    "name": "bikenyc_K02_seed27",
+    "round": 2,
+    "expert": "TL",
+    "selection_rate": 0.14965986394557823,
+    "weighted_usage": 0.0054980777330747264,
+    "router_entropy": 1.1718029519530098
+  },
+  {
+    "name": "bikenyc_K02_seed27",
+    "round": 2,
+    "expert": "SL",
+    "selection_rate": 0.5170068027210885,
+    "weighted_usage": 0.41092403846330383,
+    "router_entropy": 1.1718029519530098
+  },
+  {
+    "name": "bikenyc_K02_seed27",
+    "round": 3,
+    "expert": "T",
+    "selection_rate": 0.10204081632653061,
+    "weighted_usage": 0.002103270126544699,
+    "router_entropy": 1.18242757310062
+  },
+  {
+    "name": "bikenyc_K02_seed27",
+    "round": 3,
+    "expert": "S",
+    "selection_rate": 0.23129251700680273,
+    "weighted_usage": 0.0029618834291084283,
+    "router_entropy": 1.18242757310062
+  },
+  {
+    "name": "bikenyc_K02_seed27",
+    "round": 3,
+    "expert": "TD",
+    "selection_rate": 0.047619047619047616,
+    "weighted_usage": 0.0013460285556154187,
+    "router_entropy": 1.18242757310062
+  },
+  {
+    "name": "bikenyc_K02_seed27",
+    "round": 3,
+    "expert": "SD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.18242757310062
+  },
+  {
+    "name": "bikenyc_K02_seed27",
+    "round": 3,
+    "expert": "TA",
+    "selection_rate": 0.5918367346938775,
+    "weighted_usage": 0.13808849477367538,
+    "router_entropy": 1.18242757310062
+  },
+  {
+    "name": "bikenyc_K02_seed27",
+    "round": 3,
+    "expert": "ST",
+    "selection_rate": 0.4965986394557823,
+    "weighted_usage": 0.48853259062280463,
+    "router_entropy": 1.18242757310062
+  },
+  {
+    "name": "bikenyc_K02_seed27",
+    "round": 3,
+    "expert": "TL",
+    "selection_rate": 0.5034013605442177,
+    "weighted_usage": 0.3666225971818781,
+    "router_entropy": 1.18242757310062
+  },
+  {
+    "name": "bikenyc_K02_seed27",
+    "round": 3,
+    "expert": "SL",
+    "selection_rate": 0.027210884353741496,
+    "weighted_usage": 0.000345135956597166,
+    "router_entropy": 1.18242757310062
+  },
+  {
+    "name": "bikenyc_K02_seed27",
+    "round": 4,
+    "expert": "T",
+    "selection_rate": 0.02040816326530612,
+    "weighted_usage": 0.003348299485891044,
+    "router_entropy": 1.8976010315177885
+  },
+  {
+    "name": "bikenyc_K02_seed27",
+    "round": 4,
+    "expert": "S",
+    "selection_rate": 0.6666666666666666,
+    "weighted_usage": 0.22982972885678415,
+    "router_entropy": 1.8976010315177885
+  },
+  {
+    "name": "bikenyc_K02_seed27",
+    "round": 4,
+    "expert": "TD",
+    "selection_rate": 1.0,
+    "weighted_usage": 0.7083221527994895,
+    "router_entropy": 1.8976010315177885
+  },
+  {
+    "name": "bikenyc_K02_seed27",
+    "round": 4,
+    "expert": "SD",
+    "selection_rate": 0.04081632653061224,
+    "weighted_usage": 0.009855519067876193,
+    "router_entropy": 1.8976010315177885
+  },
+  {
+    "name": "bikenyc_K02_seed27",
+    "round": 4,
+    "expert": "TA",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.8976010315177885
+  },
+  {
+    "name": "bikenyc_K02_seed27",
+    "round": 4,
+    "expert": "ST",
+    "selection_rate": 0.2585034013605442,
+    "weighted_usage": 0.04717883021653104,
+    "router_entropy": 1.8976010315177885
+  },
+  {
+    "name": "bikenyc_K02_seed27",
+    "round": 4,
+    "expert": "TL",
+    "selection_rate": 0.006802721088435374,
+    "weighted_usage": 0.0005357126597644521,
+    "router_entropy": 1.8976010315177885
+  },
+  {
+    "name": "bikenyc_K02_seed27",
+    "round": 4,
+    "expert": "SL",
+    "selection_rate": 0.006802721088435374,
+    "weighted_usage": 0.0009297591691114465,
+    "router_entropy": 1.8976010315177885
+  },
+  {
+    "name": "bikenyc_K03_seed27",
+    "round": 1,
+    "expert": "T",
+    "selection_rate": 0.46938775510204084,
+    "weighted_usage": 0.3712355401240239,
+    "router_entropy": 1.4788189660782298
+  },
+  {
+    "name": "bikenyc_K03_seed27",
+    "round": 1,
+    "expert": "S",
+    "selection_rate": 0.2857142857142857,
+    "weighted_usage": 0.05244261097340357,
+    "router_entropy": 1.4788189660782298
+  },
+  {
+    "name": "bikenyc_K03_seed27",
+    "round": 1,
+    "expert": "TD",
+    "selection_rate": 0.09523809523809523,
+    "weighted_usage": 0.011798584516964802,
+    "router_entropy": 1.4788189660782298
+  },
+  {
+    "name": "bikenyc_K03_seed27",
+    "round": 1,
+    "expert": "SD",
+    "selection_rate": 0.54421768707483,
+    "weighted_usage": 0.4465190609093426,
+    "router_entropy": 1.4788189660782298
+  },
+  {
+    "name": "bikenyc_K03_seed27",
+    "round": 1,
+    "expert": "TA",
+    "selection_rate": 0.14965986394557823,
+    "weighted_usage": 0.05068679392135062,
+    "router_entropy": 1.4788189660782298
+  },
+  {
+    "name": "bikenyc_K03_seed27",
+    "round": 1,
+    "expert": "ST",
+    "selection_rate": 0.034013605442176874,
+    "weighted_usage": 0.003152684872450472,
+    "router_entropy": 1.4788189660782298
+  },
+  {
+    "name": "bikenyc_K03_seed27",
+    "round": 1,
+    "expert": "TL",
+    "selection_rate": 0.11564625850340136,
+    "weighted_usage": 0.00832055030124528,
+    "router_entropy": 1.4788189660782298
+  },
+  {
+    "name": "bikenyc_K03_seed27",
+    "round": 1,
+    "expert": "SL",
+    "selection_rate": 0.30612244897959184,
+    "weighted_usage": 0.055844174710666244,
+    "router_entropy": 1.4788189660782298
+  },
+  {
+    "name": "bikenyc_K03_seed27",
+    "round": 2,
+    "expert": "T",
+    "selection_rate": 0.10884353741496598,
+    "weighted_usage": 0.03554457070648062,
+    "router_entropy": 1.126642361571965
+  },
+  {
+    "name": "bikenyc_K03_seed27",
+    "round": 2,
+    "expert": "S",
+    "selection_rate": 0.30612244897959184,
+    "weighted_usage": 0.17268530594907244,
+    "router_entropy": 1.126642361571965
+  },
+  {
+    "name": "bikenyc_K03_seed27",
+    "round": 2,
+    "expert": "TD",
+    "selection_rate": 0.42857142857142855,
+    "weighted_usage": 0.23003513208862875,
+    "router_entropy": 1.126642361571965
+  },
+  {
+    "name": "bikenyc_K03_seed27",
+    "round": 2,
+    "expert": "SD",
+    "selection_rate": 0.10204081632653061,
+    "weighted_usage": 0.0025091986425322334,
+    "router_entropy": 1.126642361571965
+  },
+  {
+    "name": "bikenyc_K03_seed27",
+    "round": 2,
+    "expert": "TA",
+    "selection_rate": 0.29931972789115646,
+    "weighted_usage": 0.054044031132595476,
+    "router_entropy": 1.126642361571965
+  },
+  {
+    "name": "bikenyc_K03_seed27",
+    "round": 2,
+    "expert": "ST",
+    "selection_rate": 0.09523809523809523,
+    "weighted_usage": 0.0010373796190635688,
+    "router_entropy": 1.126642361571965
+  },
+  {
+    "name": "bikenyc_K03_seed27",
+    "round": 2,
+    "expert": "TL",
+    "selection_rate": 0.16326530612244897,
+    "weighted_usage": 0.022831178067543475,
+    "router_entropy": 1.126642361571965
+  },
+  {
+    "name": "bikenyc_K03_seed27",
+    "round": 2,
+    "expert": "SL",
+    "selection_rate": 0.4965986394557823,
+    "weighted_usage": 0.4813132026568562,
+    "router_entropy": 1.126642361571965
+  },
+  {
+    "name": "bikenyc_K03_seed27",
+    "round": 3,
+    "expert": "T",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 2.023802365981316
+  },
+  {
+    "name": "bikenyc_K03_seed27",
+    "round": 3,
+    "expert": "S",
+    "selection_rate": 0.47619047619047616,
+    "weighted_usage": 0.16588279969838202,
+    "router_entropy": 2.023802365981316
+  },
+  {
+    "name": "bikenyc_K03_seed27",
+    "round": 3,
+    "expert": "TD",
+    "selection_rate": 0.027210884353741496,
+    "weighted_usage": 0.008558437937781924,
+    "router_entropy": 2.023802365981316
+  },
+  {
+    "name": "bikenyc_K03_seed27",
+    "round": 3,
+    "expert": "SD",
+    "selection_rate": 0.006802721088435374,
+    "weighted_usage": 0.0030732006848263904,
+    "router_entropy": 2.023802365981316
+  },
+  {
+    "name": "bikenyc_K03_seed27",
+    "round": 3,
+    "expert": "TA",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 2.023802365981316
+  },
+  {
+    "name": "bikenyc_K03_seed27",
+    "round": 3,
+    "expert": "ST",
+    "selection_rate": 0.4965986394557823,
+    "weighted_usage": 0.25630232326838437,
+    "router_entropy": 2.023802365981316
+  },
+  {
+    "name": "bikenyc_K03_seed27",
+    "round": 3,
+    "expert": "TL",
+    "selection_rate": 0.5034013605442177,
+    "weighted_usage": 0.3289601247326857,
+    "router_entropy": 2.023802365981316
+  },
+  {
+    "name": "bikenyc_K03_seed27",
+    "round": 3,
+    "expert": "SL",
+    "selection_rate": 0.4897959183673469,
+    "weighted_usage": 0.23722312199015197,
+    "router_entropy": 2.023802365981316
+  },
+  {
+    "name": "bikenyc_K03_seed27",
+    "round": 4,
+    "expert": "T",
+    "selection_rate": 0.40816326530612246,
+    "weighted_usage": 0.12411047609484925,
+    "router_entropy": 1.8959906754824525
+  },
+  {
+    "name": "bikenyc_K03_seed27",
+    "round": 4,
+    "expert": "S",
+    "selection_rate": 0.013605442176870748,
+    "weighted_usage": 0.002532528979437692,
+    "router_entropy": 1.8959906754824525
+  },
+  {
+    "name": "bikenyc_K03_seed27",
+    "round": 4,
+    "expert": "TD",
+    "selection_rate": 1.0,
+    "weighted_usage": 0.7672385812616672,
+    "router_entropy": 1.8959906754824525
+  },
+  {
+    "name": "bikenyc_K03_seed27",
+    "round": 4,
+    "expert": "SD",
+    "selection_rate": 0.027210884353741496,
+    "weighted_usage": 0.006002781241118502,
+    "router_entropy": 1.8959906754824525
+  },
+  {
+    "name": "bikenyc_K03_seed27",
+    "round": 4,
+    "expert": "TA",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.8959906754824525
+  },
+  {
+    "name": "bikenyc_K03_seed27",
+    "round": 4,
+    "expert": "ST",
+    "selection_rate": 0.42857142857142855,
+    "weighted_usage": 0.07937645172180773,
+    "router_entropy": 1.8959906754824525
+  },
+  {
+    "name": "bikenyc_K03_seed27",
+    "round": 4,
+    "expert": "TL",
+    "selection_rate": 0.12244897959183673,
+    "weighted_usage": 0.020739177862803142,
+    "router_entropy": 1.8959906754824525
+  },
+  {
+    "name": "bikenyc_K03_seed27",
+    "round": 4,
+    "expert": "SL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.8959906754824525
+  },
+  {
+    "name": "bikenyc_K04_seed27",
+    "round": 1,
+    "expert": "T",
+    "selection_rate": 0.2585034013605442,
+    "weighted_usage": 0.05643139061118875,
+    "router_entropy": 1.6394774644109207
+  },
+  {
+    "name": "bikenyc_K04_seed27",
+    "round": 1,
+    "expert": "S",
+    "selection_rate": 0.25170068027210885,
+    "weighted_usage": 0.1911076055903013,
+    "router_entropy": 1.6394774644109207
+  },
+  {
+    "name": "bikenyc_K04_seed27",
+    "round": 1,
+    "expert": "TD",
+    "selection_rate": 0.027210884353741496,
+    "weighted_usage": 0.0028141235970720953,
+    "router_entropy": 1.6394774644109207
+  },
+  {
+    "name": "bikenyc_K04_seed27",
+    "round": 1,
+    "expert": "SD",
+    "selection_rate": 0.6802721088435374,
+    "weighted_usage": 0.5458522915434675,
+    "router_entropy": 1.6394774644109207
+  },
+  {
+    "name": "bikenyc_K04_seed27",
+    "round": 1,
+    "expert": "TA",
+    "selection_rate": 0.061224489795918366,
+    "weighted_usage": 0.008350728979321565,
+    "router_entropy": 1.6394774644109207
+  },
+  {
+    "name": "bikenyc_K04_seed27",
+    "round": 1,
+    "expert": "ST",
+    "selection_rate": 0.35374149659863946,
+    "weighted_usage": 0.13718391924488302,
+    "router_entropy": 1.6394774644109207
+  },
+  {
+    "name": "bikenyc_K04_seed27",
+    "round": 1,
+    "expert": "TL",
+    "selection_rate": 0.08843537414965986,
+    "weighted_usage": 0.007019047935803731,
+    "router_entropy": 1.6394774644109207
+  },
+  {
+    "name": "bikenyc_K04_seed27",
+    "round": 1,
+    "expert": "SL",
+    "selection_rate": 0.2789115646258503,
+    "weighted_usage": 0.05124089648934449,
+    "router_entropy": 1.6394774644109207
+  },
+  {
+    "name": "bikenyc_K04_seed27",
+    "round": 2,
+    "expert": "T",
+    "selection_rate": 0.46938775510204084,
+    "weighted_usage": 0.10950664451130393,
+    "router_entropy": 1.8646456336887116
+  },
+  {
+    "name": "bikenyc_K04_seed27",
+    "round": 2,
+    "expert": "S",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 1.8646456336887116
+  },
+  {
+    "name": "bikenyc_K04_seed27",
+    "round": 2,
+    "expert": "TD",
+    "selection_rate": 0.006802721088435374,
+    "weighted_usage": 0.0021518620909476765,
+    "router_entropy": 1.8646456336887116
+  },
+  {
+    "name": "bikenyc_K04_seed27",
+    "round": 2,
+    "expert": "SD",
+    "selection_rate": 0.4965986394557823,
+    "weighted_usage": 0.3129176144697228,
+    "router_entropy": 1.8646456336887116
+  },
+  {
+    "name": "bikenyc_K04_seed27",
+    "round": 2,
+    "expert": "TA",
+    "selection_rate": 0.04081632653061224,
+    "weighted_usage": 0.007076939656620934,
+    "router_entropy": 1.8646456336887116
+  },
+  {
+    "name": "bikenyc_K04_seed27",
+    "round": 2,
+    "expert": "ST",
+    "selection_rate": 0.5170068027210885,
+    "weighted_usage": 0.20351721133504594,
+    "router_entropy": 1.8646456336887116
+  },
+  {
+    "name": "bikenyc_K04_seed27",
+    "round": 2,
+    "expert": "TL",
+    "selection_rate": 0.006802721088435374,
+    "weighted_usage": 0.002180378047787413,
+    "router_entropy": 1.8646456336887116
+  },
+  {
+    "name": "bikenyc_K04_seed27",
+    "round": 2,
+    "expert": "SL",
+    "selection_rate": 0.46258503401360546,
+    "weighted_usage": 0.36264934770914975,
+    "router_entropy": 1.8646456336887116
+  },
+  {
+    "name": "bikenyc_K04_seed27",
+    "round": 3,
+    "expert": "T",
+    "selection_rate": 0.1360544217687075,
+    "weighted_usage": 0.005981544045363964,
+    "router_entropy": 1.2730533095047218
+  },
+  {
+    "name": "bikenyc_K04_seed27",
+    "round": 3,
+    "expert": "S",
+    "selection_rate": 0.4965986394557823,
+    "weighted_usage": 0.4630055431606007,
+    "router_entropy": 1.2730533095047218
+  },
+  {
+    "name": "bikenyc_K04_seed27",
+    "round": 3,
+    "expert": "TD",
+    "selection_rate": 0.013605442176870748,
+    "weighted_usage": 0.0012831081237111772,
+    "router_entropy": 1.2730533095047218
+  },
+  {
+    "name": "bikenyc_K04_seed27",
+    "round": 3,
+    "expert": "SD",
+    "selection_rate": 0.013605442176870748,
+    "weighted_usage": 0.0011010991574144687,
+    "router_entropy": 1.2730533095047218
+  },
+  {
+    "name": "bikenyc_K04_seed27",
+    "round": 3,
+    "expert": "TA",
+    "selection_rate": 0.6190476190476191,
+    "weighted_usage": 0.07872856345002344,
+    "router_entropy": 1.2730533095047218
+  },
+  {
+    "name": "bikenyc_K04_seed27",
+    "round": 3,
+    "expert": "ST",
+    "selection_rate": 0.07482993197278912,
+    "weighted_usage": 0.004541675731235621,
+    "router_entropy": 1.2730533095047218
+  },
+  {
+    "name": "bikenyc_K04_seed27",
+    "round": 3,
+    "expert": "TL",
+    "selection_rate": 0.5034013605442177,
+    "weighted_usage": 0.43320803617944525,
+    "router_entropy": 1.2730533095047218
+  },
+  {
+    "name": "bikenyc_K04_seed27",
+    "round": 3,
+    "expert": "SL",
+    "selection_rate": 0.14285714285714285,
+    "weighted_usage": 0.012150430430968603,
+    "router_entropy": 1.2730533095047218
+  },
+  {
+    "name": "bikenyc_K04_seed27",
+    "round": 4,
+    "expert": "T",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 2.016668779097686
+  },
+  {
+    "name": "bikenyc_K04_seed27",
+    "round": 4,
+    "expert": "S",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 2.016668779097686
+  },
+  {
+    "name": "bikenyc_K04_seed27",
+    "round": 4,
+    "expert": "TD",
+    "selection_rate": 1.0,
+    "weighted_usage": 0.4486835975022543,
+    "router_entropy": 2.016668779097686
+  },
+  {
+    "name": "bikenyc_K04_seed27",
+    "round": 4,
+    "expert": "SD",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 2.016668779097686
+  },
+  {
+    "name": "bikenyc_K04_seed27",
+    "round": 4,
+    "expert": "TA",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 2.016668779097686
+  },
+  {
+    "name": "bikenyc_K04_seed27",
+    "round": 4,
+    "expert": "ST",
+    "selection_rate": 1.0,
+    "weighted_usage": 0.5513163997607977,
+    "router_entropy": 2.016668779097686
+  },
+  {
+    "name": "bikenyc_K04_seed27",
+    "round": 4,
+    "expert": "TL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 2.016668779097686
+  },
+  {
+    "name": "bikenyc_K04_seed27",
+    "round": 4,
+    "expert": "SL",
+    "selection_rate": 0.0,
+    "weighted_usage": 0.0,
+    "router_entropy": 2.016668779097686
+  }
+]

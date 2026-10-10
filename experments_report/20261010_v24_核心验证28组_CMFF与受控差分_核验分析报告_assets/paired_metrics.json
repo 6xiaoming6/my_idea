@@ -1,0 +1,2162 @@
+[
+  {
+    "dataset": "taxibj",
+    "a": "K02",
+    "b": "K01",
+    "seed": 7,
+    "set": "in_distribution",
+    "delta": {
+      "mae": -1.1724026717996612,
+      "rmse": -2.6807758481090005
+    },
+    "relative_percent": {
+      "mae": -7.3563762017604954,
+      "rmse": -9.414319470149158
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K02",
+    "b": "K01",
+    "seed": 7,
+    "set": "unseen_combinations",
+    "delta": {
+      "mae": -7.925867015609057,
+      "rmse": -17.15692372088798
+    },
+    "relative_percent": {
+      "mae": -31.287030566365846,
+      "rmse": -36.523336496987966
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K02",
+    "b": "K01",
+    "seed": 7,
+    "set": "unseen_geometry",
+    "delta": {
+      "mae": -10.672110626945198,
+      "rmse": -22.230110061783833
+    },
+    "relative_percent": {
+      "mae": -33.71455575229262,
+      "rmse": -38.83656620763851
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K02",
+    "b": "K01",
+    "seed": 7,
+    "set": "unseen_triple",
+    "delta": {
+      "mae": -7.798795902334021,
+      "rmse": -14.979010503915521
+    },
+    "relative_percent": {
+      "mae": -32.19756659201543,
+      "rmse": -35.260446703879325
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K02",
+    "b": "K01",
+    "seed": 7,
+    "set": "unseen_combinations_repeat",
+    "delta": {
+      "mae": -7.6322341321201606,
+      "rmse": -16.260564854412664
+    },
+    "relative_percent": {
+      "mae": -30.254577288922658,
+      "rmse": -35.00233642294867
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K02",
+    "b": "K01",
+    "seed": 7,
+    "set": "unseen_geometry_repeat",
+    "delta": {
+      "mae": -10.557169656436653,
+      "rmse": -22.1772572301185
+    },
+    "relative_percent": {
+      "mae": -33.53756580641966,
+      "rmse": -38.91857771751482
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K02",
+    "b": "K01",
+    "seed": 17,
+    "set": "in_distribution",
+    "delta": {
+      "mae": -3.322579619083111,
+      "rmse": -5.5708105720267085
+    },
+    "relative_percent": {
+      "mae": -19.671188653537108,
+      "rmse": -18.9858062295048
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K02",
+    "b": "K01",
+    "seed": 17,
+    "set": "unseen_combinations",
+    "delta": {
+      "mae": -2.39309263940309,
+      "rmse": -2.963288051130064
+    },
+    "relative_percent": {
+      "mae": -8.87933099340924,
+      "rmse": -6.288778960608088
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K02",
+    "b": "K01",
+    "seed": 17,
+    "set": "unseen_geometry",
+    "delta": {
+      "mae": -9.995936849352713,
+      "rmse": -17.268467066954763
+    },
+    "relative_percent": {
+      "mae": -29.65330400082029,
+      "rmse": -29.848069713786963
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K02",
+    "b": "K01",
+    "seed": 17,
+    "set": "unseen_triple",
+    "delta": {
+      "mae": -4.726272687670598,
+      "rmse": -5.793792938104431
+    },
+    "relative_percent": {
+      "mae": -16.807326764123964,
+      "rmse": -12.395708089158763
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K02",
+    "b": "K01",
+    "seed": 17,
+    "set": "unseen_combinations_repeat",
+    "delta": {
+      "mae": -2.579621268423164,
+      "rmse": -2.9766686977634436
+    },
+    "relative_percent": {
+      "mae": -9.603342460308294,
+      "rmse": -6.418307935728473
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K02",
+    "b": "K01",
+    "seed": 17,
+    "set": "unseen_geometry_repeat",
+    "delta": {
+      "mae": -9.191875654694158,
+      "rmse": -15.805934154877619
+    },
+    "relative_percent": {
+      "mae": -27.67487334600015,
+      "rmse": -27.586560483066858
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K02",
+    "b": "K01",
+    "seed": 27,
+    "set": "in_distribution",
+    "delta": {
+      "mae": -1.6967633827399595,
+      "rmse": -3.059372396854581
+    },
+    "relative_percent": {
+      "mae": -10.935447956343946,
+      "rmse": -11.153000778298761
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K02",
+    "b": "K01",
+    "seed": 27,
+    "set": "unseen_combinations",
+    "delta": {
+      "mae": -4.910867967973225,
+      "rmse": -8.008110872783654
+    },
+    "relative_percent": {
+      "mae": -18.19131901231159,
+      "rmse": -16.559356905555866
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K02",
+    "b": "K01",
+    "seed": 27,
+    "set": "unseen_geometry",
+    "delta": {
+      "mae": -9.981062247565038,
+      "rmse": -17.490266795004146
+    },
+    "relative_percent": {
+      "mae": -29.737399664342725,
+      "rmse": -29.956357993779925
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K02",
+    "b": "K01",
+    "seed": 27,
+    "set": "unseen_triple",
+    "delta": {
+      "mae": -6.3891476394678435,
+      "rmse": -10.475288093164309
+    },
+    "relative_percent": {
+      "mae": -23.31188418145279,
+      "rmse": -22.59775840677063
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K02",
+    "b": "K01",
+    "seed": 27,
+    "set": "unseen_combinations_repeat",
+    "delta": {
+      "mae": -4.9081904667177945,
+      "rmse": -7.77643836852566
+    },
+    "relative_percent": {
+      "mae": -18.14195136442397,
+      "rmse": -16.132402975296788
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K02",
+    "b": "K01",
+    "seed": 27,
+    "set": "unseen_geometry_repeat",
+    "delta": {
+      "mae": -10.01338976802963,
+      "rmse": -17.74413080544359
+    },
+    "relative_percent": {
+      "mae": -29.818009295464254,
+      "rmse": -30.190031816033645
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K04",
+    "b": "K03",
+    "seed": 7,
+    "set": "in_distribution",
+    "delta": {
+      "mae": -2.121947740297937,
+      "rmse": -4.019775458312768
+    },
+    "relative_percent": {
+      "mae": -13.571974311516477,
+      "rmse": -14.270337379780784
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K04",
+    "b": "K03",
+    "seed": 7,
+    "set": "unseen_combinations",
+    "delta": {
+      "mae": -6.354741303179512,
+      "rmse": -15.014765843565911
+    },
+    "relative_percent": {
+      "mae": -22.310467223640718,
+      "rmse": -28.173554355633513
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K04",
+    "b": "K03",
+    "seed": 7,
+    "set": "unseen_geometry",
+    "delta": {
+      "mae": -6.083576808214904,
+      "rmse": -11.102707659316593
+    },
+    "relative_percent": {
+      "mae": -18.974993579590738,
+      "rmse": -20.042825939868216
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K04",
+    "b": "K03",
+    "seed": 7,
+    "set": "unseen_triple",
+    "delta": {
+      "mae": -5.628588677244412,
+      "rmse": -12.024926490471522
+    },
+    "relative_percent": {
+      "mae": -20.125590729249275,
+      "rmse": -24.472629153729486
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K04",
+    "b": "K03",
+    "seed": 7,
+    "set": "unseen_combinations_repeat",
+    "delta": {
+      "mae": -5.864131366540956,
+      "rmse": -13.507545537380935
+    },
+    "relative_percent": {
+      "mae": -20.811715142119947,
+      "rmse": -25.972379319066107
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K04",
+    "b": "K03",
+    "seed": 7,
+    "set": "unseen_geometry_repeat",
+    "delta": {
+      "mae": -5.659884739654753,
+      "rmse": -10.635786871029865
+    },
+    "relative_percent": {
+      "mae": -17.941226245163854,
+      "rmse": -19.48199745278123
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K04",
+    "b": "K03",
+    "seed": 17,
+    "set": "in_distribution",
+    "delta": {
+      "mae": -2.7505489583528178,
+      "rmse": -4.672986158510657
+    },
+    "relative_percent": {
+      "mae": -17.472946472492712,
+      "rmse": -16.68109196771297
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K04",
+    "b": "K03",
+    "seed": 17,
+    "set": "unseen_combinations",
+    "delta": {
+      "mae": -5.885650866714343,
+      "rmse": -9.337920047470384
+    },
+    "relative_percent": {
+      "mae": -15.641984546570754,
+      "rmse": -14.35221429418807
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K04",
+    "b": "K03",
+    "seed": 17,
+    "set": "unseen_geometry",
+    "delta": {
+      "mae": -4.570499499266884,
+      "rmse": -8.373962867185305
+    },
+    "relative_percent": {
+      "mae": -12.571835421486643,
+      "rmse": -13.18838658887792
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K04",
+    "b": "K03",
+    "seed": 17,
+    "set": "unseen_triple",
+    "delta": {
+      "mae": -12.588609041110473,
+      "rmse": -19.480118790740754
+    },
+    "relative_percent": {
+      "mae": -30.22071957157482,
+      "rmse": -28.51812753602485
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K04",
+    "b": "K03",
+    "seed": 17,
+    "set": "unseen_combinations_repeat",
+    "delta": {
+      "mae": -5.492567890345207,
+      "rmse": -8.438679742381204
+    },
+    "relative_percent": {
+      "mae": -14.603787476654674,
+      "rmse": -13.011797612427934
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K04",
+    "b": "K03",
+    "seed": 17,
+    "set": "unseen_geometry_repeat",
+    "delta": {
+      "mae": -4.832512876251297,
+      "rmse": -9.04872363001816
+    },
+    "relative_percent": {
+      "mae": -13.356260924940845,
+      "rmse": -14.413052465640042
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K04",
+    "b": "K03",
+    "seed": 27,
+    "set": "in_distribution",
+    "delta": {
+      "mae": -1.252579373572802,
+      "rmse": -3.267605276093491
+    },
+    "relative_percent": {
+      "mae": -7.510826306967977,
+      "rmse": -10.974453021599906
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K04",
+    "b": "K03",
+    "seed": 27,
+    "set": "unseen_combinations",
+    "delta": {
+      "mae": 1.4325249179473971,
+      "rmse": 7.471436426325752
+    },
+    "relative_percent": {
+      "mae": 5.20346996152683,
+      "rmse": 16.897589445770333
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K04",
+    "b": "K03",
+    "seed": 27,
+    "set": "unseen_geometry",
+    "delta": {
+      "mae": -4.331602797414604,
+      "rmse": -5.3967361903195155
+    },
+    "relative_percent": {
+      "mae": -12.709912146257619,
+      "rmse": -9.332233228177799
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K04",
+    "b": "K03",
+    "seed": 27,
+    "set": "unseen_triple",
+    "delta": {
+      "mae": 2.8498616958593104,
+      "rmse": 10.224018384161617
+    },
+    "relative_percent": {
+      "mae": 10.70620272612961,
+      "rmse": 24.36481944477771
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K04",
+    "b": "K03",
+    "seed": 27,
+    "set": "unseen_combinations_repeat",
+    "delta": {
+      "mae": 1.6142749046376785,
+      "rmse": 7.641661841157983
+    },
+    "relative_percent": {
+      "mae": 5.862204787971836,
+      "rmse": 17.200090563229043
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K04",
+    "b": "K03",
+    "seed": 27,
+    "set": "unseen_geometry_repeat",
+    "delta": {
+      "mae": -3.8606537444908575,
+      "rmse": -5.216226264635004
+    },
+    "relative_percent": {
+      "mae": -11.520710338598072,
+      "rmse": -9.164688667233467
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K03",
+    "b": "K01",
+    "seed": 7,
+    "set": "in_distribution",
+    "delta": {
+      "mae": -0.30245535489459385,
+      "rmse": -0.3067653052197876
+    },
+    "relative_percent": {
+      "mae": -1.897791115936498,
+      "rmse": -1.0772950628207378
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K03",
+    "b": "K01",
+    "seed": 7,
+    "set": "unseen_combinations",
+    "delta": {
+      "mae": 3.150472562379406,
+      "rmse": 6.318592300316702
+    },
+    "relative_percent": {
+      "mae": 12.436359475063297,
+      "rmse": 13.450900436817935
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K03",
+    "b": "K01",
+    "seed": 7,
+    "set": "unseen_geometry",
+    "delta": {
+      "mae": 0.40670981472874956,
+      "rmse": -1.8452320541772735
+    },
+    "relative_percent": {
+      "mae": 1.2848480682964958,
+      "rmse": -3.223667208184844
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K03",
+    "b": "K01",
+    "seed": 7,
+    "set": "unseen_triple",
+    "delta": {
+      "mae": 3.745628045946578,
+      "rmse": 6.655169379067921
+    },
+    "relative_percent": {
+      "mae": 15.463939555360383,
+      "rmse": 15.666204729249156
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K03",
+    "b": "K01",
+    "seed": 7,
+    "set": "unseen_combinations_repeat",
+    "delta": {
+      "mae": 2.950360279633543,
+      "rmse": 5.551691805615185
+    },
+    "relative_percent": {
+      "mae": 11.695383234469038,
+      "rmse": 11.950518695784208
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K03",
+    "b": "K01",
+    "seed": 7,
+    "set": "unseen_geometry_repeat",
+    "delta": {
+      "mae": 0.06817087445556069,
+      "rmse": -2.390832608689834
+    },
+    "relative_percent": {
+      "mae": 0.21656232328715053,
+      "rmse": -4.1956407740312285
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K03",
+    "b": "K01",
+    "seed": 17,
+    "set": "in_distribution",
+    "delta": {
+      "mae": -1.1488309077874064,
+      "rmse": -1.328304674529079
+    },
+    "relative_percent": {
+      "mae": -6.801603605916506,
+      "rmse": -4.526977688128364
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K03",
+    "b": "K01",
+    "seed": 17,
+    "set": "unseen_combinations",
+    "delta": {
+      "mae": 10.675992392238065,
+      "rmse": 17.942329053288063
+    },
+    "relative_percent": {
+      "mae": 39.61220245842454,
+      "rmse": 38.07774995468123
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K03",
+    "b": "K01",
+    "seed": 17,
+    "set": "unseen_geometry",
+    "delta": {
+      "mae": 2.6457166994493377,
+      "rmse": 5.640423576878959
+    },
+    "relative_percent": {
+      "mae": 7.848613168649465,
+      "rmse": 9.749316803003282
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K03",
+    "b": "K01",
+    "seed": 17,
+    "set": "unseen_triple",
+    "delta": {
+      "mae": 13.535245136197965,
+      "rmse": 21.56753208936449
+    },
+    "relative_percent": {
+      "mae": 48.133339498174536,
+      "rmse": 46.14331834765126
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K03",
+    "b": "K01",
+    "seed": 17,
+    "set": "unseen_combinations_repeat",
+    "delta": {
+      "mae": 10.748868862961725,
+      "rmse": 18.47628603693979
+    },
+    "relative_percent": {
+      "mae": 40.015590666557046,
+      "rmse": 39.83866037318202
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K03",
+    "b": "K01",
+    "seed": 17,
+    "set": "unseen_geometry_repeat",
+    "delta": {
+      "mae": 2.9678349120335668,
+      "rmse": 5.485675178901403
+    },
+    "relative_percent": {
+      "mae": 8.935548998687937,
+      "rmse": 9.574309789625591
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K03",
+    "b": "K01",
+    "seed": 27,
+    "set": "in_distribution",
+    "delta": {
+      "mae": 1.1608086722874429,
+      "rmse": 2.343717703849805
+    },
+    "relative_percent": {
+      "mae": 7.481280508643251,
+      "rmse": 8.544067862423077
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K03",
+    "b": "K01",
+    "seed": 27,
+    "set": "unseen_combinations",
+    "delta": {
+      "mae": 0.5345178591213298,
+      "rmse": -4.144045664719869
+    },
+    "relative_percent": {
+      "mae": 1.9800135040215716,
+      "rmse": -8.569153485154512
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K03",
+    "b": "K01",
+    "seed": 27,
+    "set": "unseen_geometry",
+    "delta": {
+      "mae": 0.5165045609160543,
+      "rmse": -0.5568354560569588
+    },
+    "relative_percent": {
+      "mae": 1.538864519171157,
+      "rmse": -0.953716856396758
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K03",
+    "b": "K01",
+    "seed": 27,
+    "set": "unseen_triple",
+    "delta": {
+      "mae": -0.7884647116252097,
+      "rmse": -4.393213153099161
+    },
+    "relative_percent": {
+      "mae": -2.87684665870398,
+      "rmse": -9.47723523976065
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K03",
+    "b": "K01",
+    "seed": 27,
+    "set": "unseen_combinations_repeat",
+    "delta": {
+      "mae": 0.48262369762626633,
+      "rmse": -3.7758114388775397
+    },
+    "relative_percent": {
+      "mae": 1.783902990119568,
+      "rmse": -7.833008995126411
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K03",
+    "b": "K01",
+    "seed": 27,
+    "set": "unseen_geometry_repeat",
+    "delta": {
+      "mae": -0.0711313690590103,
+      "rmse": -1.8582318720962547
+    },
+    "relative_percent": {
+      "mae": -0.21181596571547834,
+      "rmse": -3.1616132655505003
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K04",
+    "b": "K02",
+    "seed": 7,
+    "set": "in_distribution",
+    "delta": {
+      "mae": -1.2520004233928699,
+      "rmse": -1.6457649154235554
+    },
+    "relative_percent": {
+      "mae": -8.479613794101848,
+      "rmse": -6.380235042234483
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K04",
+    "b": "K02",
+    "seed": 7,
+    "set": "unseen_combinations",
+    "delta": {
+      "mae": 4.721598274808951,
+      "rmse": 8.460750177638772
+    },
+    "relative_percent": {
+      "mae": 27.1248835073151,
+      "rmse": 28.374342377697115
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K04",
+    "b": "K02",
+    "seed": 7,
+    "set": "unseen_geometry",
+    "delta": {
+      "mae": 4.995243633459044,
+      "rmse": 9.282170348289966
+    },
+    "relative_percent": {
+      "mae": 23.807052334988967,
+      "rmse": 26.51287879299502
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K04",
+    "b": "K02",
+    "seed": 7,
+    "set": "unseen_triple",
+    "delta": {
+      "mae": 5.915835271036187,
+      "rmse": 9.60925339251192
+    },
+    "relative_percent": {
+      "mae": 36.02187267473504,
+      "rmse": 34.94013928406461
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K04",
+    "b": "K02",
+    "seed": 7,
+    "set": "unseen_combinations_repeat",
+    "delta": {
+      "mae": 4.718463045212747,
+      "rmse": 8.304711122646914
+    },
+    "relative_percent": {
+      "mae": 26.817868199347927,
+      "rmse": 27.503514387420978
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K04",
+    "b": "K02",
+    "seed": 7,
+    "set": "unseen_geometry_repeat",
+    "delta": {
+      "mae": 4.96545579123746,
+      "rmse": 9.1506377503988
+    },
+    "relative_percent": {
+      "mae": 23.73378005117339,
+      "rmse": 26.290046170112923
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K04",
+    "b": "K02",
+    "seed": 17,
+    "set": "in_distribution",
+    "delta": {
+      "mae": -0.576800247057113,
+      "rmse": -0.4304802610130274
+    },
+    "relative_percent": {
+      "mae": -4.25117813932342,
+      "rmse": -1.8109346603857879
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K04",
+    "b": "K02",
+    "seed": 17,
+    "set": "unseen_combinations",
+    "delta": {
+      "mae": 7.183434164926812,
+      "rmse": 11.567697056947743
+    },
+    "relative_percent": {
+      "mae": 29.250678917021666,
+      "rmse": 26.19677139718508
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K04",
+    "b": "K02",
+    "seed": 17,
+    "set": "unseen_geometry",
+    "delta": {
+      "mae": 8.071154049535167,
+      "rmse": 14.534927776648416
+    },
+    "relative_percent": {
+      "mae": 34.036235358986254,
+      "rmse": 35.81258881353302
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K04",
+    "b": "K02",
+    "seed": 17,
+    "set": "unseen_triple",
+    "delta": {
+      "mae": 5.672908782758089,
+      "rmse": 7.881206236728168
+    },
+    "relative_percent": {
+      "mae": 24.249377205788104,
+      "rmse": 19.24755985952027
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K04",
+    "b": "K02",
+    "seed": 17,
+    "set": "unseen_combinations_repeat",
+    "delta": {
+      "mae": 7.8359222410396825,
+      "rmse": 13.01427499232203
+    },
+    "relative_percent": {
+      "mae": 32.27038988574322,
+      "rmse": 29.98604130597371
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K04",
+    "b": "K02",
+    "seed": 17,
+    "set": "unseen_geometry_repeat",
+    "delta": {
+      "mae": 7.327197690476428,
+      "rmse": 12.242885703760862
+    },
+    "relative_percent": {
+      "mae": 30.502132800878435,
+      "rmse": 29.50815160334168
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K04",
+    "b": "K02",
+    "seed": 27,
+    "set": "in_distribution",
+    "delta": {
+      "mae": 1.6049926814546005,
+      "rmse": 2.135484824610895
+    },
+    "relative_percent": {
+      "mae": 11.61404389976357,
+      "rmse": 8.762199031619279
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K04",
+    "b": "K02",
+    "seed": 27,
+    "set": "unseen_combinations",
+    "delta": {
+      "mae": 6.877910745041952,
+      "rmse": 11.335501634389537
+    },
+    "relative_percent": {
+      "mae": 31.143188691197878,
+      "rmse": 28.09160095367611
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K04",
+    "b": "K02",
+    "seed": 27,
+    "set": "unseen_geometry",
+    "delta": {
+      "mae": 6.165964011066489,
+      "rmse": 11.536695148627672
+    },
+    "relative_percent": {
+      "mae": 26.14586369001315,
+      "rmse": 28.210142169400697
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K04",
+    "b": "K02",
+    "seed": 27,
+    "set": "unseen_triple",
+    "delta": {
+      "mae": 8.450544623701944,
+      "rmse": 16.306093324226765
+    },
+    "relative_percent": {
+      "mae": 40.20602003892315,
+      "rmse": 45.44601116609024
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K04",
+    "b": "K02",
+    "seed": 27,
+    "set": "unseen_combinations_repeat",
+    "delta": {
+      "mae": 7.005089068981739,
+      "rmse": 11.642288770806104
+    },
+    "relative_percent": {
+      "mae": 31.63114149506101,
+      "rmse": 28.798011102306596
+    }
+  },
+  {
+    "dataset": "taxibj",
+    "a": "K04",
+    "b": "K02",
+    "seed": 27,
+    "set": "unseen_geometry_repeat",
+    "delta": {
+      "mae": 6.0816046544797615,
+      "rmse": 10.66967266871233
+    },
+    "relative_percent": {
+      "mae": 25.804177842794186,
+      "rmse": 26.004140050687987
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K02",
+    "b": "K01",
+    "seed": 7,
+    "set": "in_distribution",
+    "delta": {
+      "mae": 0.009453534941473052,
+      "rmse": 0.10442692400285836
+    },
+    "relative_percent": {
+      "mae": 0.2615924218805743,
+      "rmse": 0.7411724524303942
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K02",
+    "b": "K01",
+    "seed": 7,
+    "set": "unseen_combinations",
+    "delta": {
+      "mae": -0.014226391985882714,
+      "rmse": -0.28193266740241185
+    },
+    "relative_percent": {
+      "mae": -0.29831496184293815,
+      "rmse": -1.6778883840603331
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K02",
+    "b": "K01",
+    "seed": 7,
+    "set": "unseen_geometry",
+    "delta": {
+      "mae": -0.272513093515264,
+      "rmse": -0.3373093282134114
+    },
+    "relative_percent": {
+      "mae": -4.81556474132473,
+      "rmse": -1.9044900760593952
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K02",
+    "b": "K01",
+    "seed": 7,
+    "set": "unseen_triple",
+    "delta": {
+      "mae": 0.016560174178209763,
+      "rmse": -0.2171611009978811
+    },
+    "relative_percent": {
+      "mae": 0.4048649836118523,
+      "rmse": -1.4643426771285384
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K02",
+    "b": "K01",
+    "seed": 7,
+    "set": "unseen_combinations_repeat",
+    "delta": {
+      "mae": 0.13144842551709512,
+      "rmse": -0.07879800440158569
+    },
+    "relative_percent": {
+      "mae": 3.059341549176775,
+      "rmse": -0.5173572955931016
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K02",
+    "b": "K01",
+    "seed": 7,
+    "set": "unseen_geometry_repeat",
+    "delta": {
+      "mae": -0.3249437618752271,
+      "rmse": -0.3767521061227832
+    },
+    "relative_percent": {
+      "mae": -5.835408833601507,
+      "rmse": -2.107405119126049
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K02",
+    "b": "K01",
+    "seed": 17,
+    "set": "in_distribution",
+    "delta": {
+      "mae": -0.19767097097522068,
+      "rmse": -0.6599030641308268
+    },
+    "relative_percent": {
+      "mae": -5.148251303596496,
+      "rmse": -4.5177731479773
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K02",
+    "b": "K01",
+    "seed": 17,
+    "set": "unseen_combinations",
+    "delta": {
+      "mae": -0.06331126879116411,
+      "rmse": -0.03862553066691987
+    },
+    "relative_percent": {
+      "mae": -1.0883861775733084,
+      "rmse": -0.18464037487533336
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K02",
+    "b": "K01",
+    "seed": 17,
+    "set": "unseen_geometry",
+    "delta": {
+      "mae": -0.388939932883428,
+      "rmse": -1.1780215183633622
+    },
+    "relative_percent": {
+      "mae": -5.083831877879719,
+      "rmse": -5.079940276031447
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K02",
+    "b": "K01",
+    "seed": 17,
+    "set": "unseen_triple",
+    "delta": {
+      "mae": -0.271323917139215,
+      "rmse": -0.6008698072591478
+    },
+    "relative_percent": {
+      "mae": -5.029223177893149,
+      "rmse": -2.9674234346514616
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K02",
+    "b": "K01",
+    "seed": 17,
+    "set": "unseen_combinations_repeat",
+    "delta": {
+      "mae": 0.022058966043001504,
+      "rmse": 0.11249633753978472
+    },
+    "relative_percent": {
+      "mae": 0.4236832883014019,
+      "rmse": 0.5794110576278655
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K02",
+    "b": "K01",
+    "seed": 17,
+    "set": "unseen_geometry_repeat",
+    "delta": {
+      "mae": -0.39494353729190657,
+      "rmse": -0.8140230201548633
+    },
+    "relative_percent": {
+      "mae": -5.2834396134887935,
+      "rmse": -3.531032660927025
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K02",
+    "b": "K01",
+    "seed": 27,
+    "set": "in_distribution",
+    "delta": {
+      "mae": -0.10397219443131789,
+      "rmse": -0.399782546529881
+    },
+    "relative_percent": {
+      "mae": -2.7473882890455825,
+      "rmse": -2.729248017167829
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K02",
+    "b": "K01",
+    "seed": 27,
+    "set": "unseen_combinations",
+    "delta": {
+      "mae": -0.28705755547515643,
+      "rmse": -1.2567395924022158
+    },
+    "relative_percent": {
+      "mae": -5.024284501925058,
+      "rmse": -5.879298076777884
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K02",
+    "b": "K01",
+    "seed": 27,
+    "set": "unseen_geometry",
+    "delta": {
+      "mae": -0.5057449490288164,
+      "rmse": -1.5112259038706242
+    },
+    "relative_percent": {
+      "mae": -7.313242406590204,
+      "rmse": -7.0802290313727205
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K02",
+    "b": "K01",
+    "seed": 27,
+    "set": "unseen_triple",
+    "delta": {
+      "mae": -0.17522144530750072,
+      "rmse": -0.4869941230720194
+    },
+    "relative_percent": {
+      "mae": -3.4307917217921036,
+      "rmse": -2.486653251905724
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K02",
+    "b": "K01",
+    "seed": 27,
+    "set": "unseen_combinations_repeat",
+    "delta": {
+      "mae": -0.04798845641729965,
+      "rmse": -0.6330128615809762
+    },
+    "relative_percent": {
+      "mae": -0.9611576402419164,
+      "rmse": -3.2737300728090446
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K02",
+    "b": "K01",
+    "seed": 27,
+    "set": "unseen_geometry_repeat",
+    "delta": {
+      "mae": -0.5389009076857949,
+      "rmse": -1.4384024088797034
+    },
+    "relative_percent": {
+      "mae": -7.929685077838988,
+      "rmse": -6.7157167246147065
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K04",
+    "b": "K03",
+    "seed": 7,
+    "set": "in_distribution",
+    "delta": {
+      "mae": -0.08565161773826757,
+      "rmse": 0.09300674839741241
+    },
+    "relative_percent": {
+      "mae": -2.287052987758309,
+      "rmse": 0.6566810210434815
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K04",
+    "b": "K03",
+    "seed": 7,
+    "set": "unseen_combinations",
+    "delta": {
+      "mae": 0.05704500957401759,
+      "rmse": 0.3028599098820379
+    },
+    "relative_percent": {
+      "mae": 1.2562393952173068,
+      "rmse": 1.9135281885235944
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K04",
+    "b": "K03",
+    "seed": 7,
+    "set": "unseen_geometry",
+    "delta": {
+      "mae": 0.09377745761835854,
+      "rmse": 1.0534862488080954
+    },
+    "relative_percent": {
+      "mae": 1.6834798430971798,
+      "rmse": 6.017310809431731
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K04",
+    "b": "K03",
+    "seed": 7,
+    "set": "unseen_triple",
+    "delta": {
+      "mae": 0.1660734821243981,
+      "rmse": 0.5401434682833024
+    },
+    "relative_percent": {
+      "mae": 4.3149659017909014,
+      "rmse": 3.8831979616845924
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K04",
+    "b": "K03",
+    "seed": 7,
+    "set": "unseen_combinations_repeat",
+    "delta": {
+      "mae": 0.1831003589026059,
+      "rmse": 0.5515746733668703
+    },
+    "relative_percent": {
+      "mae": 4.567673014601703,
+      "rmse": 3.896564599906749
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K04",
+    "b": "K03",
+    "seed": 7,
+    "set": "unseen_geometry_repeat",
+    "delta": {
+      "mae": 0.4270728732882443,
+      "rmse": 1.6937603933441636
+    },
+    "relative_percent": {
+      "mae": 8.057585250501065,
+      "rmse": 9.779117924463554
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K04",
+    "b": "K03",
+    "seed": 17,
+    "set": "in_distribution",
+    "delta": {
+      "mae": -0.19408490603187722,
+      "rmse": -0.45191836868055724
+    },
+    "relative_percent": {
+      "mae": -4.99032069640597,
+      "rmse": -3.0782574638232085
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K04",
+    "b": "K03",
+    "seed": 17,
+    "set": "unseen_combinations",
+    "delta": {
+      "mae": -0.5740032038502809,
+      "rmse": -1.9162946171558026
+    },
+    "relative_percent": {
+      "mae": -9.647430571748206,
+      "rmse": -8.783950084344683
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K04",
+    "b": "K03",
+    "seed": 17,
+    "set": "unseen_geometry",
+    "delta": {
+      "mae": -0.5731704765842665,
+      "rmse": -0.790479049619286
+    },
+    "relative_percent": {
+      "mae": -7.226320053714019,
+      "rmse": -3.2381939315271335
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K04",
+    "b": "K03",
+    "seed": 17,
+    "set": "unseen_triple",
+    "delta": {
+      "mae": -0.9894838090807951,
+      "rmse": -3.6775668815171514
+    },
+    "relative_percent": {
+      "mae": -18.362423299453212,
+      "rmse": -17.87205733987588
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K04",
+    "b": "K03",
+    "seed": 17,
+    "set": "unseen_combinations_repeat",
+    "delta": {
+      "mae": -0.5085193221644664,
+      "rmse": -1.8407351467072175
+    },
+    "relative_percent": {
+      "mae": -9.568550203702875,
+      "rmse": -9.159333336882703
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K04",
+    "b": "K03",
+    "seed": 17,
+    "set": "unseen_geometry_repeat",
+    "delta": {
+      "mae": -0.6544758686759797,
+      "rmse": -0.683638820995828
+    },
+    "relative_percent": {
+      "mae": -8.209272303191561,
+      "rmse": -2.7726864551922747
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K04",
+    "b": "K03",
+    "seed": 27,
+    "set": "in_distribution",
+    "delta": {
+      "mae": -0.08607536493251411,
+      "rmse": 0.09919306639513081
+    },
+    "relative_percent": {
+      "mae": -2.2434383248531975,
+      "rmse": 0.672520195245796
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K04",
+    "b": "K03",
+    "seed": 27,
+    "set": "unseen_combinations",
+    "delta": {
+      "mae": -1.0802782310463988,
+      "rmse": -2.702248024616363
+    },
+    "relative_percent": {
+      "mae": -16.690821634639164,
+      "rmse": -12.622299444077845
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K04",
+    "b": "K03",
+    "seed": 27,
+    "set": "unseen_geometry",
+    "delta": {
+      "mae": -1.6968582023981815,
+      "rmse": -2.3203664992873456
+    },
+    "relative_percent": {
+      "mae": -20.128896137778064,
+      "rmse": -9.759524716865652
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K04",
+    "b": "K03",
+    "seed": 27,
+    "set": "unseen_triple",
+    "delta": {
+      "mae": -1.1566902832949388,
+      "rmse": -3.53569445369061
+    },
+    "relative_percent": {
+      "mae": -19.700016050426395,
+      "rmse": -17.38761986549474
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K04",
+    "b": "K03",
+    "seed": 27,
+    "set": "unseen_combinations_repeat",
+    "delta": {
+      "mae": -0.9876443793870662,
+      "rmse": -2.6660312394377073
+    },
+    "relative_percent": {
+      "mae": -17.22446301341124,
+      "rmse": -13.750735756585453
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K04",
+    "b": "K03",
+    "seed": 27,
+    "set": "unseen_geometry_repeat",
+    "delta": {
+      "mae": -1.233738629315691,
+      "rmse": -1.1286344567450541
+    },
+    "relative_percent": {
+      "mae": -15.628541375226968,
+      "rmse": -4.907427863634117
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K03",
+    "b": "K01",
+    "seed": 7,
+    "set": "in_distribution",
+    "delta": {
+      "mae": 0.131223573003731,
+      "rmse": 0.0737313514813227
+    },
+    "relative_percent": {
+      "mae": 3.631138244306187,
+      "rmse": 0.5233099329529534
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K03",
+    "b": "K01",
+    "seed": 7,
+    "set": "unseen_combinations",
+    "delta": {
+      "mae": -0.22798206656034292,
+      "rmse": -0.9755228174550012
+    },
+    "relative_percent": {
+      "mae": -4.780583970574637,
+      "rmse": -5.80570679827348
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K03",
+    "b": "K01",
+    "seed": 7,
+    "set": "unseen_geometry",
+    "delta": {
+      "mae": -0.08855266509642945,
+      "rmse": -0.2036749264644726
+    },
+    "relative_percent": {
+      "mae": -1.5648095520401806,
+      "rmse": -1.149973759244205
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K03",
+    "b": "K01",
+    "seed": 7,
+    "set": "unseen_triple",
+    "delta": {
+      "mae": -0.2415169418889116,
+      "rmse": -0.9201785576482244
+    },
+    "relative_percent": {
+      "mae": -5.904633107573454,
+      "rmse": -6.204871527871047
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K03",
+    "b": "K01",
+    "seed": 7,
+    "set": "unseen_combinations_repeat",
+    "delta": {
+      "mae": -0.2880111885564647,
+      "rmse": -1.0754580962435618
+    },
+    "relative_percent": {
+      "mae": -6.703196271179257,
+      "rmse": -7.06104293404003
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K03",
+    "b": "K01",
+    "seed": 7,
+    "set": "unseen_geometry_repeat",
+    "delta": {
+      "mae": -0.2682243981166996,
+      "rmse": -0.5573603049634421
+    },
+    "relative_percent": {
+      "mae": -4.8168304974528064,
+      "rmse": -3.1176573157492005
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K03",
+    "b": "K01",
+    "seed": 17,
+    "set": "in_distribution",
+    "delta": {
+      "mae": 0.04965210351506766,
+      "rmse": 0.07415859462690477
+    },
+    "relative_percent": {
+      "mae": 1.2931666465067382,
+      "rmse": 0.507698366181164
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K03",
+    "b": "K01",
+    "seed": 17,
+    "set": "unseen_combinations",
+    "delta": {
+      "mae": 0.13281819149512142,
+      "rmse": 0.8965334249483519
+    },
+    "relative_percent": {
+      "mae": 2.283282052526947,
+      "rmse": 4.285669732234942
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K03",
+    "b": "K01",
+    "seed": 17,
+    "set": "unseen_geometry",
+    "delta": {
+      "mae": 0.2811791639593615,
+      "rmse": 1.2214363788240306
+    },
+    "relative_percent": {
+      "mae": 3.6752914171983564,
+      "rmse": 5.267156633962533
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K03",
+    "b": "K01",
+    "seed": 17,
+    "set": "unseen_triple",
+    "delta": {
+      "mae": -0.006312714123276386,
+      "rmse": 0.3283150866845759
+    },
+    "relative_percent": {
+      "mae": -0.11701160929320498,
+      "rmse": 1.6213992955003809
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K03",
+    "b": "K01",
+    "seed": 17,
+    "set": "unseen_combinations_repeat",
+    "delta": {
+      "mae": 0.10801127162152824,
+      "rmse": 0.6811892580900505
+    },
+    "relative_percent": {
+      "mae": 2.0745564703720465,
+      "rmse": 3.508457227197348
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K03",
+    "b": "K01",
+    "seed": 17,
+    "set": "unseen_geometry_repeat",
+    "delta": {
+      "mae": 0.4972764657599651,
+      "rmse": 1.6027910893442971
+    },
+    "relative_percent": {
+      "mae": 6.652419725784786,
+      "rmse": 6.952515524733971
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K03",
+    "b": "K01",
+    "seed": 27,
+    "set": "in_distribution",
+    "delta": {
+      "mae": 0.052359755407227926,
+      "rmse": 0.10137125955340487
+    },
+    "relative_percent": {
+      "mae": 1.3835677856942397,
+      "rmse": 0.6920444915252455
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K03",
+    "b": "K01",
+    "seed": 27,
+    "set": "unseen_combinations",
+    "delta": {
+      "mae": 0.7588874234570824,
+      "rmse": 0.03285011438685004
+    },
+    "relative_percent": {
+      "mae": 13.282584790600449,
+      "rmse": 0.15367989956245331
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K03",
+    "b": "K01",
+    "seed": 27,
+    "set": "unseen_geometry",
+    "delta": {
+      "mae": 1.5144933923279877,
+      "rmse": 2.4310965369697577
+    },
+    "relative_percent": {
+      "mae": 21.900084860051862,
+      "rmse": 11.389905529700695
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K03",
+    "b": "K01",
+    "seed": 27,
+    "set": "unseen_triple",
+    "delta": {
+      "mae": 0.7642014340106522,
+      "rmse": 0.7502314250309894
+    },
+    "relative_percent": {
+      "mae": 14.9628714052912,
+      "rmse": 3.8307760286037107
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K03",
+    "b": "K01",
+    "seed": 27,
+    "set": "unseen_combinations_repeat",
+    "delta": {
+      "mae": 0.7411863736992625,
+      "rmse": 0.052145794073087615
+    },
+    "relative_percent": {
+      "mae": 14.84517317517704,
+      "rmse": 0.26968054614437964
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K03",
+    "b": "K01",
+    "seed": 27,
+    "set": "unseen_geometry_repeat",
+    "delta": {
+      "mae": 1.0981442187946087,
+      "rmse": 1.5800433587621185
+    },
+    "relative_percent": {
+      "mae": 16.158699495395744,
+      "rmse": 7.377020188891104
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K04",
+    "b": "K02",
+    "seed": 7,
+    "set": "in_distribution",
+    "delta": {
+      "mae": 0.036118420323990374,
+      "rmse": 0.062311175875876756
+    },
+    "relative_percent": {
+      "mae": 0.996839123356219,
+      "rmse": 0.43900122245035256
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K04",
+    "b": "K02",
+    "seed": 7,
+    "set": "unseen_combinations",
+    "delta": {
+      "mae": -0.15671066500044262,
+      "rmse": -0.39073024017055147
+    },
+    "relative_percent": {
+      "mae": -3.2959174074305597,
+      "rmse": -2.365067250488706
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K04",
+    "b": "K02",
+    "seed": 7,
+    "set": "unseen_geometry",
+    "delta": {
+      "mae": 0.27773788603719307,
+      "rmse": 1.1871206505570342
+    },
+    "relative_percent": {
+      "mae": 5.156191519813591,
+      "rmse": 6.8327588450513455
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K04",
+    "b": "K02",
+    "seed": 7,
+    "set": "unseen_triple",
+    "delta": {
+      "mae": -0.09200363394272326,
+      "rmse": -0.16287398836704092
+    },
+    "relative_percent": {
+      "mae": -2.240245126547602,
+      "rmse": -1.1145998957053926
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K04",
+    "b": "K02",
+    "seed": 7,
+    "set": "unseen_combinations_repeat",
+    "delta": {
+      "mae": -0.2363592551709539,
+      "rmse": -0.44508541847510585
+    },
+    "relative_percent": {
+      "mae": -5.33774504111676,
+      "rmse": -2.9374562822733985
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K04",
+    "b": "K02",
+    "seed": 7,
+    "set": "unseen_geometry_repeat",
+    "delta": {
+      "mae": 0.48379223704677177,
+      "rmse": 1.5131521945035047
+    },
+    "relative_percent": {
+      "mae": 9.22644409679716,
+      "rmse": 8.646196735056932
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K04",
+    "b": "K02",
+    "seed": 17,
+    "set": "in_distribution",
+    "delta": {
+      "mae": 0.05323816845841112,
+      "rmse": 0.2821432900771743
+    },
+    "relative_percent": {
+      "mae": 1.4618223806665442,
+      "rmse": 2.0229794079668073
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K04",
+    "b": "K02",
+    "seed": 17,
+    "set": "unseen_combinations",
+    "delta": {
+      "mae": -0.3778737435639954,
+      "rmse": -0.9811356615405309
+    },
+    "relative_percent": {
+      "mae": -6.56752037640882,
+      "rmse": -4.698766888090478
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K04",
+    "b": "K02",
+    "seed": 17,
+    "set": "unseen_geometry",
+    "delta": {
+      "mae": 0.09694862025852302,
+      "rmse": 1.6089788475681068
+    },
+    "relative_percent": {
+      "mae": 1.3350885794506828,
+      "rmse": 7.309669054316692
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K04",
+    "b": "K02",
+    "seed": 17,
+    "set": "unseen_triple",
+    "delta": {
+      "mae": -0.7244726060648565,
+      "rmse": -2.7483819875734277
+    },
+    "relative_percent": {
+      "mae": -14.139850186757098,
+      "rmse": -13.988098123296966
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K04",
+    "b": "K02",
+    "seed": 17,
+    "set": "unseen_combinations_repeat",
+    "delta": {
+      "mae": -0.42256701658593965,
+      "rmse": -1.2720422261569517
+    },
+    "relative_percent": {
+      "mae": -8.081940169136804,
+      "rmse": -6.513896224725702
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K04",
+    "b": "K02",
+    "seed": 17,
+    "set": "unseen_geometry_repeat",
+    "delta": {
+      "mae": 0.23774413437589192,
+      "rmse": 1.7331752885033325
+    },
+    "relative_percent": {
+      "mae": 3.3578835348987868,
+      "rmse": 7.793273299790182
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K04",
+    "b": "K02",
+    "seed": 27,
+    "set": "in_distribution",
+    "delta": {
+      "mae": 0.0702565849060317,
+      "rmse": 0.6003468724784167
+    },
+    "relative_percent": {
+      "mae": 1.908923809110341,
+      "rmse": 4.213462689820502
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K04",
+    "b": "K02",
+    "seed": 27,
+    "set": "unseen_combinations",
+    "delta": {
+      "mae": -0.03433325211415994,
+      "rmse": -1.4126583178272973
+    },
+    "relative_percent": {
+      "mae": -0.632714241562804,
+      "rmse": -7.021536463079736
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K04",
+    "b": "K02",
+    "seed": 27,
+    "set": "unseen_geometry",
+    "delta": {
+      "mae": 0.3233801389586226,
+      "rmse": 1.6219559415530362
+    },
+    "relative_percent": {
+      "mae": 5.045149830153717,
+      "rmse": 8.178032639979982
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K04",
+    "b": "K02",
+    "seed": 27,
+    "set": "unseen_triple",
+    "delta": {
+      "mae": -0.2172674039767859,
+      "rmse": -2.298468905587601
+    },
+    "relative_percent": {
+      "mae": -4.405173313148203,
+      "rmse": -12.035553849931624
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K04",
+    "b": "K02",
+    "seed": 27,
+    "set": "unseen_combinations_repeat",
+    "delta": {
+      "mae": -0.19846954927050398,
+      "rmse": -1.9808725837836434
+    },
+    "relative_percent": {
+      "mae": -4.013711657076769,
+      "rmse": -10.591133313246303
+    }
+  },
+  {
+    "dataset": "bikenyc",
+    "a": "K04",
+    "b": "K02",
+    "seed": 27,
+    "set": "unseen_geometry_repeat",
+    "delta": {
+      "mae": 0.4033064971647127,
+      "rmse": 1.8898113108967678
+    },
+    "relative_percent": {
+      "mae": 6.445589076879377,
+      "rmse": 9.458492680453823
+    }
+  }
+]

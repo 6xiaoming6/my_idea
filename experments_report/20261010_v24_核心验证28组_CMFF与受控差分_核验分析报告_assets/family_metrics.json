@@ -1,0 +1,3362 @@
+[
+  {
+    "name": "taxibj_K01_seed7",
+    "set": "in_distribution",
+    "family": "random_point",
+    "count": 1739910.0,
+    "mae": 9.040805846279405,
+    "rmse": 14.784663190918957
+  },
+  {
+    "name": "taxibj_K01_seed7",
+    "set": "in_distribution",
+    "family": "node_outage",
+    "count": 1739910.0,
+    "mae": 14.932265955925882,
+    "rmse": 23.491630676507263
+  },
+  {
+    "name": "taxibj_K01_seed7",
+    "set": "in_distribution",
+    "family": "temporal_gap",
+    "count": 1739910.0,
+    "mae": 15.004902265059687,
+    "rmse": 28.86729630400527
+  },
+  {
+    "name": "taxibj_K01_seed7",
+    "set": "in_distribution",
+    "family": "spatial_region",
+    "count": 1730080.0,
+    "mae": 24.821140848616828,
+    "rmse": 40.550768827389334
+  },
+  {
+    "name": "taxibj_K01_seed7",
+    "set": "unseen_combinations",
+    "family": "node_plus_space",
+    "count": 2319880.0,
+    "mae": 19.269895533389658,
+    "rmse": 32.230195651758116
+  },
+  {
+    "name": "taxibj_K01_seed7",
+    "set": "unseen_combinations",
+    "family": "time_plus_space",
+    "count": 2319880.0,
+    "mae": 37.00798371036433,
+    "rmse": 67.51794734832929
+  },
+  {
+    "name": "taxibj_K01_seed7",
+    "set": "unseen_combinations",
+    "family": "node_plus_time",
+    "count": 2310050.0,
+    "mae": 19.696504134109652,
+    "rmse": 31.89860564980356
+  },
+  {
+    "name": "taxibj_K01_seed7",
+    "set": "unseen_geometry",
+    "family": "moving_region",
+    "count": 3479820.0,
+    "mae": 34.89596783202867,
+    "rmse": 61.290553205880094
+  },
+  {
+    "name": "taxibj_K01_seed7",
+    "set": "unseen_geometry",
+    "family": "multi_block",
+    "count": 3469990.0,
+    "mae": 28.403472470381757,
+    "rmse": 52.8675546403949
+  },
+  {
+    "name": "taxibj_K01_seed7",
+    "set": "unseen_triple",
+    "family": "node_plus_time_plus_space",
+    "count": 6949810.0,
+    "mae": 24.221693524715064,
+    "rmse": 42.48105711680489
+  },
+  {
+    "name": "taxibj_K01_seed7",
+    "set": "unseen_combinations_repeat",
+    "family": "node_plus_space",
+    "count": 2319880.0,
+    "mae": 19.327066957665913,
+    "rmse": 32.25920202340709
+  },
+  {
+    "name": "taxibj_K01_seed7",
+    "set": "unseen_combinations_repeat",
+    "family": "time_plus_space",
+    "count": 2319880.0,
+    "mae": 36.187976425504765,
+    "rmse": 65.76200593470703
+  },
+  {
+    "name": "taxibj_K01_seed7",
+    "set": "unseen_combinations_repeat",
+    "family": "node_plus_time",
+    "count": 2310050.0,
+    "mae": 20.14354432263371,
+    "rmse": 33.23585480387845
+  },
+  {
+    "name": "taxibj_K01_seed7",
+    "set": "unseen_geometry_repeat",
+    "family": "moving_region",
+    "count": 3479820.0,
+    "mae": 35.033522010477554,
+    "rmse": 61.67890001275707
+  },
+  {
+    "name": "taxibj_K01_seed7",
+    "set": "unseen_geometry_repeat",
+    "family": "multi_block",
+    "count": 3469990.0,
+    "mae": 27.91368774657852,
+    "rmse": 51.85003375191696
+  },
+  {
+    "name": "taxibj_K02_seed7",
+    "set": "in_distribution",
+    "family": "random_point",
+    "count": 1739910.0,
+    "mae": 9.903260764924623,
+    "rmse": 15.98232415560274
+  },
+  {
+    "name": "taxibj_K02_seed7",
+    "set": "in_distribution",
+    "family": "node_outage",
+    "count": 1739910.0,
+    "mae": 12.503170027472686,
+    "rmse": 20.20738115461861
+  },
+  {
+    "name": "taxibj_K02_seed7",
+    "set": "in_distribution",
+    "family": "temporal_gap",
+    "count": 1739910.0,
+    "mae": 16.52832082550247,
+    "rmse": 30.317794907209002
+  },
+  {
+    "name": "taxibj_K02_seed7",
+    "set": "in_distribution",
+    "family": "spatial_region",
+    "count": 1730080.0,
+    "mae": 20.15501583561165,
+    "rmse": 32.8767387557849
+  },
+  {
+    "name": "taxibj_K02_seed7",
+    "set": "unseen_combinations",
+    "family": "node_plus_space",
+    "count": 2319880.0,
+    "mae": 15.726653796478697,
+    "rmse": 26.585916228893534
+  },
+  {
+    "name": "taxibj_K02_seed7",
+    "set": "unseen_combinations",
+    "family": "time_plus_space",
+    "count": 2319880.0,
+    "mae": 20.24172333267238,
+    "rmse": 34.31513554304603
+  },
+  {
+    "name": "taxibj_K02_seed7",
+    "set": "unseen_combinations",
+    "family": "node_plus_time",
+    "count": 2310050.0,
+    "mae": 16.2473752191511,
+    "rmse": 27.975069774824526
+  },
+  {
+    "name": "taxibj_K02_seed7",
+    "set": "unseen_geometry",
+    "family": "moving_region",
+    "count": 3479820.0,
+    "mae": 20.60823957399377,
+    "rmse": 34.055434187814605
+  },
+  {
+    "name": "taxibj_K02_seed7",
+    "set": "unseen_geometry",
+    "family": "multi_block",
+    "count": 3469990.0,
+    "mae": 21.357221319441845,
+    "rmse": 35.94190386004725
+  },
+  {
+    "name": "taxibj_K02_seed7",
+    "set": "unseen_triple",
+    "family": "node_plus_time_plus_space",
+    "count": 6949810.0,
+    "mae": 16.422897622381043,
+    "rmse": 27.50204661288937
+  },
+  {
+    "name": "taxibj_K02_seed7",
+    "set": "unseen_combinations_repeat",
+    "family": "node_plus_space",
+    "count": 2319880.0,
+    "mae": 16.009647468295775,
+    "rmse": 27.02643296919834
+  },
+  {
+    "name": "taxibj_K02_seed7",
+    "set": "unseen_combinations_repeat",
+    "family": "time_plus_space",
+    "count": 2319880.0,
+    "mae": 20.143775863406727,
+    "rmse": 34.0388569622885
+  },
+  {
+    "name": "taxibj_K02_seed7",
+    "set": "unseen_combinations_repeat",
+    "family": "node_plus_time",
+    "count": 2310050.0,
+    "mae": 16.625896571502782,
+    "rmse": 29.084008667697102
+  },
+  {
+    "name": "taxibj_K02_seed7",
+    "set": "unseen_geometry_repeat",
+    "family": "moving_region",
+    "count": 3479820.0,
+    "mae": 20.996786615399646,
+    "rmse": 34.8910257500605
+  },
+  {
+    "name": "taxibj_K02_seed7",
+    "set": "unseen_geometry_repeat",
+    "family": "multi_block",
+    "count": 3469990.0,
+    "mae": 20.845941014059118,
+    "rmse": 34.721473821324345
+  },
+  {
+    "name": "taxibj_K03_seed7",
+    "set": "in_distribution",
+    "family": "random_point",
+    "count": 1739910.0,
+    "mae": 8.929592101746643,
+    "rmse": 14.611654595673862
+  },
+  {
+    "name": "taxibj_K03_seed7",
+    "set": "in_distribution",
+    "family": "node_outage",
+    "count": 1739910.0,
+    "mae": 14.491392774985489,
+    "rmse": 22.889691525090733
+  },
+  {
+    "name": "taxibj_K03_seed7",
+    "set": "in_distribution",
+    "family": "temporal_gap",
+    "count": 1739910.0,
+    "mae": 14.300974978590846,
+    "rmse": 27.70496939614205
+  },
+  {
+    "name": "taxibj_K03_seed7",
+    "set": "in_distribution",
+    "family": "spatial_region",
+    "count": 1730080.0,
+    "mae": 24.86931553562552,
+    "rmse": 40.913125872573374
+  },
+  {
+    "name": "taxibj_K03_seed7",
+    "set": "unseen_combinations",
+    "family": "node_plus_space",
+    "count": 2319880.0,
+    "mae": 19.40626068886106,
+    "rmse": 32.463211899269986
+  },
+  {
+    "name": "taxibj_K03_seed7",
+    "set": "unseen_combinations",
+    "family": "time_plus_space",
+    "count": 2319880.0,
+    "mae": 43.63554871372657,
+    "rmse": 77.39809916997487
+  },
+  {
+    "name": "taxibj_K03_seed7",
+    "set": "unseen_combinations",
+    "family": "node_plus_time",
+    "count": 2310050.0,
+    "mae": 22.38202041081362,
+    "rmse": 38.34797277951402
+  },
+  {
+    "name": "taxibj_K03_seed7",
+    "set": "unseen_geometry",
+    "family": "moving_region",
+    "count": 3479820.0,
+    "mae": 32.86944960515199,
+    "rmse": 55.03577472507368
+  },
+  {
+    "name": "taxibj_K03_seed7",
+    "set": "unseen_geometry",
+    "family": "multi_block",
+    "count": 3469990.0,
+    "mae": 31.25030318891409,
+    "rmse": 55.752762947535444
+  },
+  {
+    "name": "taxibj_K03_seed7",
+    "set": "unseen_triple",
+    "family": "node_plus_time_plus_space",
+    "count": 6949810.0,
+    "mae": 27.967321570661642,
+    "rmse": 49.13622649587281
+  },
+  {
+    "name": "taxibj_K03_seed7",
+    "set": "unseen_combinations_repeat",
+    "family": "node_plus_space",
+    "count": 2319880.0,
+    "mae": 19.314648952747557,
+    "rmse": 32.26073985926847
+  },
+  {
+    "name": "taxibj_K03_seed7",
+    "set": "unseen_combinations_repeat",
+    "family": "time_plus_space",
+    "count": 2319880.0,
+    "mae": 42.28482286799317,
+    "rmse": 74.64131482580389
+  },
+  {
+    "name": "taxibj_K03_seed7",
+    "set": "unseen_combinations_repeat",
+    "family": "node_plus_time",
+    "count": 2310050.0,
+    "mae": 22.909415664704227,
+    "rmse": 38.692300291650625
+  },
+  {
+    "name": "taxibj_K03_seed7",
+    "set": "unseen_geometry_repeat",
+    "family": "moving_region",
+    "count": 3479820.0,
+    "mae": 32.89975517771034,
+    "rmse": 55.20332855653201
+  },
+  {
+    "name": "taxibj_K03_seed7",
+    "set": "unseen_geometry_repeat",
+    "family": "multi_block",
+    "count": 3469990.0,
+    "mae": 30.190034400315273,
+    "rmse": 53.97380317895582
+  },
+  {
+    "name": "taxibj_K04_seed7",
+    "set": "in_distribution",
+    "family": "random_point",
+    "count": 1739910.0,
+    "mae": 8.69943659082941,
+    "rmse": 14.185279300978864
+  },
+  {
+    "name": "taxibj_K04_seed7",
+    "set": "in_distribution",
+    "family": "node_outage",
+    "count": 1739910.0,
+    "mae": 12.013431926795064,
+    "rmse": 19.424668839887246
+  },
+  {
+    "name": "taxibj_K04_seed7",
+    "set": "in_distribution",
+    "family": "temporal_gap",
+    "count": 1739910.0,
+    "mae": 14.943457168761602,
+    "rmse": 28.65976519496074
+  },
+  {
+    "name": "taxibj_K04_seed7",
+    "set": "in_distribution",
+    "family": "spatial_region",
+    "count": 1730080.0,
+    "mae": 18.42272560643872,
+    "rmse": 30.573777283615083
+  },
+  {
+    "name": "taxibj_K04_seed7",
+    "set": "unseen_combinations",
+    "family": "node_plus_space",
+    "count": 2319880.0,
+    "mae": 15.046926356374037,
+    "rmse": 25.51081905777564
+  },
+  {
+    "name": "taxibj_K04_seed7",
+    "set": "unseen_combinations",
+    "family": "time_plus_space",
+    "count": 2319880.0,
+    "mae": 28.767423638291636,
+    "rmse": 48.119359717545414
+  },
+  {
+    "name": "taxibj_K04_seed7",
+    "set": "unseen_combinations",
+    "family": "node_plus_time",
+    "count": 2310050.0,
+    "mae": 22.572994699790048,
+    "rmse": 37.80784902892205
+  },
+  {
+    "name": "taxibj_K04_seed7",
+    "set": "unseen_geometry",
+    "family": "moving_region",
+    "count": 3479820.0,
+    "mae": 27.828589593894225,
+    "rmse": 46.741968383445865
+  },
+  {
+    "name": "taxibj_K04_seed7",
+    "set": "unseen_geometry",
+    "family": "multi_block",
+    "count": 3469990.0,
+    "mae": 24.12105557220626,
+    "rmse": 41.69120925997319
+  },
+  {
+    "name": "taxibj_K04_seed7",
+    "set": "unseen_triple",
+    "family": "node_plus_time_plus_space",
+    "count": 6949810.0,
+    "mae": 22.33873289341723,
+    "rmse": 37.11130000540129
+  },
+  {
+    "name": "taxibj_K04_seed7",
+    "set": "unseen_combinations_repeat",
+    "family": "node_plus_space",
+    "count": 2319880.0,
+    "mae": 15.152817087387064,
+    "rmse": 25.79055910702368
+  },
+  {
+    "name": "taxibj_K04_seed7",
+    "set": "unseen_combinations_repeat",
+    "family": "time_plus_space",
+    "count": 2319880.0,
+    "mae": 28.68400720080349,
+    "rmse": 48.03514229450354
+  },
+  {
+    "name": "taxibj_K04_seed7",
+    "set": "unseen_combinations_repeat",
+    "family": "node_plus_time",
+    "count": 2310050.0,
+    "mae": 23.105346867492045,
+    "rmse": 38.394558822047586
+  },
+  {
+    "name": "taxibj_K04_seed7",
+    "set": "unseen_geometry_repeat",
+    "family": "moving_region",
+    "count": 3479820.0,
+    "mae": 27.676384105356025,
+    "rmse": 46.46074519120202
+  },
+  {
+    "name": "taxibj_K04_seed7",
+    "set": "unseen_geometry_repeat",
+    "family": "multi_block",
+    "count": 3469990.0,
+    "mae": 24.092399113542115,
+    "rmse": 41.294224558426954
+  },
+  {
+    "name": "taxibj_K05_seed7",
+    "set": "in_distribution",
+    "family": "random_point",
+    "count": 1739910.0,
+    "mae": 9.512357823105793,
+    "rmse": 15.635716441035541
+  },
+  {
+    "name": "taxibj_K05_seed7",
+    "set": "in_distribution",
+    "family": "node_outage",
+    "count": 1739910.0,
+    "mae": 11.451155465656269,
+    "rmse": 19.037667395362
+  },
+  {
+    "name": "taxibj_K05_seed7",
+    "set": "in_distribution",
+    "family": "temporal_gap",
+    "count": 1739910.0,
+    "mae": 15.442230955911512,
+    "rmse": 28.854671888980786
+  },
+  {
+    "name": "taxibj_K05_seed7",
+    "set": "in_distribution",
+    "family": "spatial_region",
+    "count": 1730080.0,
+    "mae": 17.680067332507747,
+    "rmse": 28.765148849292043
+  },
+  {
+    "name": "taxibj_K05_seed7",
+    "set": "unseen_combinations",
+    "family": "node_plus_space",
+    "count": 2319880.0,
+    "mae": 14.521130258488586,
+    "rmse": 24.550023298124984
+  },
+  {
+    "name": "taxibj_K05_seed7",
+    "set": "unseen_combinations",
+    "family": "time_plus_space",
+    "count": 2319880.0,
+    "mae": 20.481831064537822,
+    "rmse": 35.52189325266126
+  },
+  {
+    "name": "taxibj_K05_seed7",
+    "set": "unseen_combinations",
+    "family": "node_plus_time",
+    "count": 2310050.0,
+    "mae": 18.006741141966625,
+    "rmse": 32.578968241228125
+  },
+  {
+    "name": "taxibj_K05_seed7",
+    "set": "unseen_geometry",
+    "family": "moving_region",
+    "count": 3479820.0,
+    "mae": 20.86845580374847,
+    "rmse": 34.806785002991646
+  },
+  {
+    "name": "taxibj_K05_seed7",
+    "set": "unseen_geometry",
+    "family": "multi_block",
+    "count": 3469990.0,
+    "mae": 23.653242588595358,
+    "rmse": 39.86824129080074
+  },
+  {
+    "name": "taxibj_K05_seed7",
+    "set": "unseen_triple",
+    "family": "node_plus_time_plus_space",
+    "count": 6949810.0,
+    "mae": 17.46488456159233,
+    "rmse": 30.288974174961336
+  },
+  {
+    "name": "taxibj_K05_seed7",
+    "set": "unseen_combinations_repeat",
+    "family": "node_plus_space",
+    "count": 2319880.0,
+    "mae": 14.560010162163561,
+    "rmse": 24.95469522038047
+  },
+  {
+    "name": "taxibj_K05_seed7",
+    "set": "unseen_combinations_repeat",
+    "family": "time_plus_space",
+    "count": 2319880.0,
+    "mae": 20.662402150111213,
+    "rmse": 36.01443640591944
+  },
+  {
+    "name": "taxibj_K05_seed7",
+    "set": "unseen_combinations_repeat",
+    "family": "node_plus_time",
+    "count": 2310050.0,
+    "mae": 18.52190336789247,
+    "rmse": 34.24241492052198
+  },
+  {
+    "name": "taxibj_K05_seed7",
+    "set": "unseen_geometry_repeat",
+    "family": "moving_region",
+    "count": 3479820.0,
+    "mae": 20.778982497657925,
+    "rmse": 34.58734420387143
+  },
+  {
+    "name": "taxibj_K05_seed7",
+    "set": "unseen_geometry_repeat",
+    "family": "multi_block",
+    "count": 3469990.0,
+    "mae": 22.987911222366634,
+    "rmse": 37.94911083370995
+  },
+  {
+    "name": "taxibj_K06_seed7",
+    "set": "in_distribution",
+    "family": "random_point",
+    "count": 1739910.0,
+    "mae": 8.349553981958836,
+    "rmse": 13.559929261660299
+  },
+  {
+    "name": "taxibj_K06_seed7",
+    "set": "in_distribution",
+    "family": "node_outage",
+    "count": 1739910.0,
+    "mae": 11.073813615000201,
+    "rmse": 18.072313639052688
+  },
+  {
+    "name": "taxibj_K06_seed7",
+    "set": "in_distribution",
+    "family": "temporal_gap",
+    "count": 1739910.0,
+    "mae": 13.90365300863263,
+    "rmse": 26.902282868501135
+  },
+  {
+    "name": "taxibj_K06_seed7",
+    "set": "in_distribution",
+    "family": "spatial_region",
+    "count": 1730080.0,
+    "mae": 17.466739995404836,
+    "rmse": 28.76209971402137
+  },
+  {
+    "name": "taxibj_K06_seed7",
+    "set": "unseen_combinations",
+    "family": "node_plus_space",
+    "count": 2319880.0,
+    "mae": 14.039429969168664,
+    "rmse": 23.655558322487284
+  },
+  {
+    "name": "taxibj_K06_seed7",
+    "set": "unseen_combinations",
+    "family": "time_plus_space",
+    "count": 2319880.0,
+    "mae": 31.74296763194648,
+    "rmse": 54.952719772708065
+  },
+  {
+    "name": "taxibj_K06_seed7",
+    "set": "unseen_combinations",
+    "family": "node_plus_time",
+    "count": 2310050.0,
+    "mae": 27.93380825090366,
+    "rmse": 51.58166920185311
+  },
+  {
+    "name": "taxibj_K06_seed7",
+    "set": "unseen_geometry",
+    "family": "moving_region",
+    "count": 3479820.0,
+    "mae": 26.576807093290746,
+    "rmse": 45.335975527681256
+  },
+  {
+    "name": "taxibj_K06_seed7",
+    "set": "unseen_geometry",
+    "family": "multi_block",
+    "count": 3469990.0,
+    "mae": 23.28637461851475,
+    "rmse": 41.414374864174064
+  },
+  {
+    "name": "taxibj_K06_seed7",
+    "set": "unseen_triple",
+    "family": "node_plus_time_plus_space",
+    "count": 6949810.0,
+    "mae": 22.75051661484271,
+    "rmse": 41.96370913276813
+  },
+  {
+    "name": "taxibj_K06_seed7",
+    "set": "unseen_combinations_repeat",
+    "family": "node_plus_space",
+    "count": 2319880.0,
+    "mae": 14.052609395475198,
+    "rmse": 23.838358381283285
+  },
+  {
+    "name": "taxibj_K06_seed7",
+    "set": "unseen_combinations_repeat",
+    "family": "time_plus_space",
+    "count": 2319880.0,
+    "mae": 31.47710452695829,
+    "rmse": 54.97921556220156
+  },
+  {
+    "name": "taxibj_K06_seed7",
+    "set": "unseen_combinations_repeat",
+    "family": "node_plus_time",
+    "count": 2310050.0,
+    "mae": 28.182415396852882,
+    "rmse": 51.12061944574432
+  },
+  {
+    "name": "taxibj_K06_seed7",
+    "set": "unseen_geometry_repeat",
+    "family": "moving_region",
+    "count": 3479820.0,
+    "mae": 25.72485480570834,
+    "rmse": 43.94338340138946
+  },
+  {
+    "name": "taxibj_K06_seed7",
+    "set": "unseen_geometry_repeat",
+    "family": "multi_block",
+    "count": 3469990.0,
+    "mae": 23.619342211721072,
+    "rmse": 41.398568770298034
+  },
+  {
+    "name": "taxibj_K07_seed7",
+    "set": "in_distribution",
+    "family": "random_point",
+    "count": 1739910.0,
+    "mae": 8.792848193297354,
+    "rmse": 14.678593364505616
+  },
+  {
+    "name": "taxibj_K07_seed7",
+    "set": "in_distribution",
+    "family": "node_outage",
+    "count": 1739910.0,
+    "mae": 11.491774053686685,
+    "rmse": 19.053864391845586
+  },
+  {
+    "name": "taxibj_K07_seed7",
+    "set": "in_distribution",
+    "family": "temporal_gap",
+    "count": 1739910.0,
+    "mae": 14.864121509876947,
+    "rmse": 28.437378567177685
+  },
+  {
+    "name": "taxibj_K07_seed7",
+    "set": "in_distribution",
+    "family": "spatial_region",
+    "count": 1730080.0,
+    "mae": 18.57548684526149,
+    "rmse": 30.760139755015434
+  },
+  {
+    "name": "taxibj_K07_seed7",
+    "set": "unseen_combinations",
+    "family": "node_plus_space",
+    "count": 2319880.0,
+    "mae": 14.8729328705849,
+    "rmse": 25.42091822099015
+  },
+  {
+    "name": "taxibj_K07_seed7",
+    "set": "unseen_combinations",
+    "family": "time_plus_space",
+    "count": 2319880.0,
+    "mae": 26.90696851776816,
+    "rmse": 44.489269276759764
+  },
+  {
+    "name": "taxibj_K07_seed7",
+    "set": "unseen_combinations",
+    "family": "node_plus_time",
+    "count": 2310050.0,
+    "mae": 22.22185193502305,
+    "rmse": 36.67795871596763
+  },
+  {
+    "name": "taxibj_K07_seed7",
+    "set": "unseen_geometry",
+    "family": "moving_region",
+    "count": 3479820.0,
+    "mae": 24.22220562952969,
+    "rmse": 40.840618181151775
+  },
+  {
+    "name": "taxibj_K07_seed7",
+    "set": "unseen_geometry",
+    "family": "multi_block",
+    "count": 3469990.0,
+    "mae": 22.690843525485665,
+    "rmse": 39.62192538811072
+  },
+  {
+    "name": "taxibj_K07_seed7",
+    "set": "unseen_triple",
+    "family": "node_plus_time_plus_space",
+    "count": 6949810.0,
+    "mae": 21.490545236128757,
+    "rmse": 36.328160988696176
+  },
+  {
+    "name": "taxibj_K07_seed7",
+    "set": "unseen_combinations_repeat",
+    "family": "node_plus_space",
+    "count": 2319880.0,
+    "mae": 14.905380814417125,
+    "rmse": 25.661160242816386
+  },
+  {
+    "name": "taxibj_K07_seed7",
+    "set": "unseen_combinations_repeat",
+    "family": "time_plus_space",
+    "count": 2319880.0,
+    "mae": 27.529445704088143,
+    "rmse": 46.144012016641796
+  },
+  {
+    "name": "taxibj_K07_seed7",
+    "set": "unseen_combinations_repeat",
+    "family": "node_plus_time",
+    "count": 2310050.0,
+    "mae": 22.730774712668556,
+    "rmse": 37.75969482615883
+  },
+  {
+    "name": "taxibj_K07_seed7",
+    "set": "unseen_geometry_repeat",
+    "family": "moving_region",
+    "count": 3479820.0,
+    "mae": 24.33331407048353,
+    "rmse": 41.30019766010846
+  },
+  {
+    "name": "taxibj_K07_seed7",
+    "set": "unseen_geometry_repeat",
+    "family": "multi_block",
+    "count": 3469990.0,
+    "mae": 22.85819075667365,
+    "rmse": 40.01107276446767
+  },
+  {
+    "name": "taxibj_K08_seed7",
+    "set": "in_distribution",
+    "family": "random_point",
+    "count": 1739910.0,
+    "mae": 9.108766778885114,
+    "rmse": 14.802658752398933
+  },
+  {
+    "name": "taxibj_K08_seed7",
+    "set": "in_distribution",
+    "family": "node_outage",
+    "count": 1739910.0,
+    "mae": 13.048685474392354,
+    "rmse": 20.91325345291363
+  },
+  {
+    "name": "taxibj_K08_seed7",
+    "set": "in_distribution",
+    "family": "temporal_gap",
+    "count": 1739910.0,
+    "mae": 14.537937414866287,
+    "rmse": 28.089240838026463
+  },
+  {
+    "name": "taxibj_K08_seed7",
+    "set": "in_distribution",
+    "family": "spatial_region",
+    "count": 1730080.0,
+    "mae": 18.631713426908004,
+    "rmse": 30.07067961883856
+  },
+  {
+    "name": "taxibj_K08_seed7",
+    "set": "unseen_combinations",
+    "family": "node_plus_space",
+    "count": 2319880.0,
+    "mae": 15.857311598552512,
+    "rmse": 25.978631692589286
+  },
+  {
+    "name": "taxibj_K08_seed7",
+    "set": "unseen_combinations",
+    "family": "time_plus_space",
+    "count": 2319880.0,
+    "mae": 34.03011308774592,
+    "rmse": 56.58764549045021
+  },
+  {
+    "name": "taxibj_K08_seed7",
+    "set": "unseen_combinations",
+    "family": "node_plus_time",
+    "count": 2310050.0,
+    "mae": 22.904076372805783,
+    "rmse": 38.285667790624544
+  },
+  {
+    "name": "taxibj_K08_seed7",
+    "set": "unseen_geometry",
+    "family": "moving_region",
+    "count": 3479820.0,
+    "mae": 28.876838699631016,
+    "rmse": 47.71859023656158
+  },
+  {
+    "name": "taxibj_K08_seed7",
+    "set": "unseen_geometry",
+    "family": "multi_block",
+    "count": 3469990.0,
+    "mae": 24.371160399597695,
+    "rmse": 42.425585244903516
+  },
+  {
+    "name": "taxibj_K08_seed7",
+    "set": "unseen_triple",
+    "family": "node_plus_time_plus_space",
+    "count": 6949810.0,
+    "mae": 24.43640586936909,
+    "rmse": 40.38523645016149
+  },
+  {
+    "name": "taxibj_K08_seed7",
+    "set": "unseen_combinations_repeat",
+    "family": "node_plus_space",
+    "count": 2319880.0,
+    "mae": 16.138882109473336,
+    "rmse": 26.804087335411616
+  },
+  {
+    "name": "taxibj_K08_seed7",
+    "set": "unseen_combinations_repeat",
+    "family": "time_plus_space",
+    "count": 2319880.0,
+    "mae": 33.43610800989706,
+    "rmse": 55.93409713127394
+  },
+  {
+    "name": "taxibj_K08_seed7",
+    "set": "unseen_combinations_repeat",
+    "family": "node_plus_time",
+    "count": 2310050.0,
+    "mae": 23.21634527661739,
+    "rmse": 38.63703810901352
+  },
+  {
+    "name": "taxibj_K08_seed7",
+    "set": "unseen_geometry_repeat",
+    "family": "moving_region",
+    "count": 3479820.0,
+    "mae": 28.880143279681132,
+    "rmse": 47.98219445068958
+  },
+  {
+    "name": "taxibj_K08_seed7",
+    "set": "unseen_geometry_repeat",
+    "family": "multi_block",
+    "count": 3469990.0,
+    "mae": 23.996608194476064,
+    "rmse": 41.29696322819406
+  },
+  {
+    "name": "taxibj_K01_seed17",
+    "set": "in_distribution",
+    "family": "random_point",
+    "count": 1739910.0,
+    "mae": 9.979777905179004,
+    "rmse": 16.70448789570386
+  },
+  {
+    "name": "taxibj_K01_seed17",
+    "set": "in_distribution",
+    "family": "node_outage",
+    "count": 1739910.0,
+    "mae": 16.75785336957084,
+    "rmse": 25.959552411578635
+  },
+  {
+    "name": "taxibj_K01_seed17",
+    "set": "in_distribution",
+    "family": "temporal_gap",
+    "count": 1739910.0,
+    "mae": 15.659519421981598,
+    "rmse": 29.4005753075754
+  },
+  {
+    "name": "taxibj_K01_seed17",
+    "set": "in_distribution",
+    "family": "spatial_region",
+    "count": 1730080.0,
+    "mae": 25.212220027397578,
+    "rmse": 40.383456151050055
+  },
+  {
+    "name": "taxibj_K01_seed17",
+    "set": "unseen_combinations",
+    "family": "node_plus_space",
+    "count": 2319880.0,
+    "mae": 20.502384754276083,
+    "rmse": 32.982867210999416
+  },
+  {
+    "name": "taxibj_K01_seed17",
+    "set": "unseen_combinations",
+    "family": "time_plus_space",
+    "count": 2319880.0,
+    "mae": 35.61949551269893,
+    "rmse": 61.8919045209741
+  },
+  {
+    "name": "taxibj_K01_seed17",
+    "set": "unseen_combinations",
+    "family": "node_plus_time",
+    "count": 2310050.0,
+    "mae": 24.72249096339906,
+    "rmse": 41.718601724323015
+  },
+  {
+    "name": "taxibj_K01_seed17",
+    "set": "unseen_geometry",
+    "family": "moving_region",
+    "count": 3479820.0,
+    "mae": 35.45997193730567,
+    "rmse": 60.01009722059117
+  },
+  {
+    "name": "taxibj_K01_seed17",
+    "set": "unseen_geometry",
+    "family": "multi_block",
+    "count": 3469990.0,
+    "mae": 31.95377432643898,
+    "rmse": 55.60905412064474
+  },
+  {
+    "name": "taxibj_K01_seed17",
+    "set": "unseen_triple",
+    "family": "node_plus_time_plus_space",
+    "count": 6949810.0,
+    "mae": 28.12031177830761,
+    "rmse": 46.74031444134813
+  },
+  {
+    "name": "taxibj_K01_seed17",
+    "set": "unseen_combinations_repeat",
+    "family": "node_plus_space",
+    "count": 2319880.0,
+    "mae": 20.769115105091643,
+    "rmse": 33.36562256722347
+  },
+  {
+    "name": "taxibj_K01_seed17",
+    "set": "unseen_combinations_repeat",
+    "family": "time_plus_space",
+    "count": 2319880.0,
+    "mae": 34.761559218580274,
+    "rmse": 59.91576174175783
+  },
+  {
+    "name": "taxibj_K01_seed17",
+    "set": "unseen_combinations_repeat",
+    "family": "node_plus_time",
+    "count": 2310050.0,
+    "mae": 25.046741277245083,
+    "rmse": 41.80698570842922
+  },
+  {
+    "name": "taxibj_K01_seed17",
+    "set": "unseen_geometry_repeat",
+    "family": "moving_region",
+    "count": 3479820.0,
+    "mae": 35.305779393761746,
+    "rmse": 59.99766365071878
+  },
+  {
+    "name": "taxibj_K01_seed17",
+    "set": "unseen_geometry_repeat",
+    "family": "multi_block",
+    "count": 3469990.0,
+    "mae": 31.11588442077643,
+    "rmse": 54.45176578498774
+  },
+  {
+    "name": "taxibj_K02_seed17",
+    "set": "in_distribution",
+    "family": "random_point",
+    "count": 1739910.0,
+    "mae": 10.435115609428074,
+    "rmse": 17.71636105396614
+  },
+  {
+    "name": "taxibj_K02_seed17",
+    "set": "in_distribution",
+    "family": "node_outage",
+    "count": 1739910.0,
+    "mae": 11.277099785333725,
+    "rmse": 18.45509877853564
+  },
+  {
+    "name": "taxibj_K02_seed17",
+    "set": "in_distribution",
+    "family": "temporal_gap",
+    "count": 1739910.0,
+    "mae": 15.029015042444724,
+    "rmse": 28.284773314789735
+  },
+  {
+    "name": "taxibj_K02_seed17",
+    "set": "in_distribution",
+    "family": "spatial_region",
+    "count": 1730080.0,
+    "mae": 17.553322493576886,
+    "rmse": 28.410424700956302
+  },
+  {
+    "name": "taxibj_K02_seed17",
+    "set": "unseen_combinations",
+    "family": "node_plus_space",
+    "count": 2319880.0,
+    "mae": 14.16680581942816,
+    "rmse": 23.677533417055834
+  },
+  {
+    "name": "taxibj_K02_seed17",
+    "set": "unseen_combinations",
+    "family": "time_plus_space",
+    "count": 2319880.0,
+    "mae": 33.23204831715434,
+    "rmse": 55.58498139234553
+  },
+  {
+    "name": "taxibj_K02_seed17",
+    "set": "unseen_combinations",
+    "family": "node_plus_time",
+    "count": 2310050.0,
+    "mae": 26.282992657085344,
+    "rmse": 46.90688620746663
+  },
+  {
+    "name": "taxibj_K02_seed17",
+    "set": "unseen_geometry",
+    "family": "moving_region",
+    "count": 3479820.0,
+    "mae": 22.669025759593886,
+    "rmse": 37.90311647038396
+  },
+  {
+    "name": "taxibj_K02_seed17",
+    "set": "unseen_geometry",
+    "family": "multi_block",
+    "count": 3469990.0,
+    "mae": 24.76076502561967,
+    "rmse": 43.10929092444623
+  },
+  {
+    "name": "taxibj_K02_seed17",
+    "set": "unseen_triple",
+    "family": "node_plus_time_plus_space",
+    "count": 6949810.0,
+    "mae": 23.394039090637012,
+    "rmse": 40.9465215032437
+  },
+  {
+    "name": "taxibj_K02_seed17",
+    "set": "unseen_combinations_repeat",
+    "family": "node_plus_space",
+    "count": 2319880.0,
+    "mae": 14.410416992204338,
+    "rmse": 24.3057673590747
+  },
+  {
+    "name": "taxibj_K02_seed17",
+    "set": "unseen_combinations_repeat",
+    "family": "time_plus_space",
+    "count": 2319880.0,
+    "mae": 32.471254116592235,
+    "rmse": 54.43805712826145
+  },
+  {
+    "name": "taxibj_K02_seed17",
+    "set": "unseen_combinations_repeat",
+    "family": "node_plus_time",
+    "count": 2310050.0,
+    "mae": 25.97173133427848,
+    "rmse": 45.79960104850529
+  },
+  {
+    "name": "taxibj_K02_seed17",
+    "set": "unseen_geometry_repeat",
+    "family": "moving_region",
+    "count": 3479820.0,
+    "mae": 23.119843968222494,
+    "rmse": 38.63859234985124
+  },
+  {
+    "name": "taxibj_K02_seed17",
+    "set": "unseen_geometry_repeat",
+    "family": "multi_block",
+    "count": 3469990.0,
+    "mae": 24.926549270495016,
+    "rmse": 44.16469785866074
+  },
+  {
+    "name": "taxibj_K03_seed17",
+    "set": "in_distribution",
+    "family": "random_point",
+    "count": 1739910.0,
+    "mae": 9.227044286773454,
+    "rmse": 15.76493490924845
+  },
+  {
+    "name": "taxibj_K03_seed17",
+    "set": "in_distribution",
+    "family": "node_outage",
+    "count": 1739910.0,
+    "mae": 14.532944376433264,
+    "rmse": 23.047827075003987
+  },
+  {
+    "name": "taxibj_K03_seed17",
+    "set": "in_distribution",
+    "family": "temporal_gap",
+    "count": 1739910.0,
+    "mae": 14.640399341776298,
+    "rmse": 28.104278026907927
+  },
+  {
+    "name": "taxibj_K03_seed17",
+    "set": "in_distribution",
+    "family": "spatial_region",
+    "count": 1730080.0,
+    "mae": 24.616785341935056,
+    "rmse": 39.67285685689222
+  },
+  {
+    "name": "taxibj_K03_seed17",
+    "set": "unseen_combinations",
+    "family": "node_plus_space",
+    "count": 2319880.0,
+    "mae": 19.449469921396798,
+    "rmse": 32.044981085977604
+  },
+  {
+    "name": "taxibj_K03_seed17",
+    "set": "unseen_combinations",
+    "family": "time_plus_space",
+    "count": 2319880.0,
+    "mae": 52.88300925047847,
+    "rmse": 84.57820600697627
+  },
+  {
+    "name": "taxibj_K03_seed17",
+    "set": "unseen_combinations",
+    "family": "node_plus_time",
+    "count": 2310050.0,
+    "mae": 40.56174904222852,
+    "rmse": 67.23301793360929
+  },
+  {
+    "name": "taxibj_K03_seed17",
+    "set": "unseen_geometry",
+    "family": "moving_region",
+    "count": 3479820.0,
+    "mae": 42.69205982637033,
+    "rmse": 71.66153362178687
+  },
+  {
+    "name": "taxibj_K03_seed17",
+    "set": "unseen_geometry",
+    "family": "multi_block",
+    "count": 3469990.0,
+    "mae": 30.000126684442893,
+    "rmse": 54.08069658125675
+  },
+  {
+    "name": "taxibj_K03_seed17",
+    "set": "unseen_triple",
+    "family": "node_plus_time_plus_space",
+    "count": 6949810.0,
+    "mae": 41.655556914505574,
+    "rmse": 68.30784653071262
+  },
+  {
+    "name": "taxibj_K03_seed17",
+    "set": "unseen_combinations_repeat",
+    "family": "node_plus_space",
+    "count": 2319880.0,
+    "mae": 19.743622683339225,
+    "rmse": 32.4761701509029
+  },
+  {
+    "name": "taxibj_K03_seed17",
+    "set": "unseen_combinations_repeat",
+    "family": "time_plus_space",
+    "count": 2319880.0,
+    "mae": 52.63449165474076,
+    "rmse": 84.6800310013861
+  },
+  {
+    "name": "taxibj_K03_seed17",
+    "set": "unseen_combinations_repeat",
+    "family": "node_plus_time",
+    "count": 2310050.0,
+    "mae": 40.465698496785784,
+    "rmse": 66.28374437606482
+  },
+  {
+    "name": "taxibj_K03_seed17",
+    "set": "unseen_geometry_repeat",
+    "family": "moving_region",
+    "count": 3479820.0,
+    "mae": 42.85784844833928,
+    "rmse": 71.44182168894838
+  },
+  {
+    "name": "taxibj_K03_seed17",
+    "set": "unseen_geometry_repeat",
+    "family": "multi_block",
+    "count": 3469990.0,
+    "mae": 29.486496520883346,
+    "rmse": 52.68580999852337
+  },
+  {
+    "name": "taxibj_K04_seed17",
+    "set": "in_distribution",
+    "family": "random_point",
+    "count": 1739910.0,
+    "mae": 8.60307765559713,
+    "rmse": 14.416182605032992
+  },
+  {
+    "name": "taxibj_K04_seed17",
+    "set": "in_distribution",
+    "family": "node_outage",
+    "count": 1739910.0,
+    "mae": 11.24138967676489,
+    "rmse": 18.45980839658698
+  },
+  {
+    "name": "taxibj_K04_seed17",
+    "set": "in_distribution",
+    "family": "temporal_gap",
+    "count": 1739910.0,
+    "mae": 14.462363193354829,
+    "rmse": 27.866071412834543
+  },
+  {
+    "name": "taxibj_K04_seed17",
+    "set": "in_distribution",
+    "family": "spatial_region",
+    "count": 1730080.0,
+    "mae": 17.684521475343626,
+    "rmse": 29.25403459024768
+  },
+  {
+    "name": "taxibj_K04_seed17",
+    "set": "unseen_combinations",
+    "family": "node_plus_space",
+    "count": 2319880.0,
+    "mae": 14.216659660871468,
+    "rmse": 24.302934279999967
+  },
+  {
+    "name": "taxibj_K04_seed17",
+    "set": "unseen_combinations",
+    "family": "time_plus_space",
+    "count": 2319880.0,
+    "mae": 44.2330473990034,
+    "rmse": 71.57100655834607
+  },
+  {
+    "name": "taxibj_K04_seed17",
+    "set": "unseen_combinations",
+    "family": "node_plus_time",
+    "count": 2310050.0,
+    "mae": 36.79655196857211,
+    "rmse": 60.039871631944706
+  },
+  {
+    "name": "taxibj_K04_seed17",
+    "set": "unseen_geometry",
+    "family": "moving_region",
+    "count": 3479820.0,
+    "mae": 35.25805621770666,
+    "rmse": 59.39743805675389
+  },
+  {
+    "name": "taxibj_K04_seed17",
+    "set": "unseen_geometry",
+    "family": "multi_block",
+    "count": 3469990.0,
+    "mae": 28.30124386165378,
+    "rmse": 50.46988426955411
+  },
+  {
+    "name": "taxibj_K04_seed17",
+    "set": "unseen_triple",
+    "family": "node_plus_time_plus_space",
+    "count": 6949810.0,
+    "mae": 29.0669478733951,
+    "rmse": 48.82772773997187
+  },
+  {
+    "name": "taxibj_K04_seed17",
+    "set": "unseen_combinations_repeat",
+    "family": "node_plus_space",
+    "count": 2319880.0,
+    "mae": 14.349638316421538,
+    "rmse": 24.593891611260794
+  },
+  {
+    "name": "taxibj_K04_seed17",
+    "set": "unseen_combinations_repeat",
+    "family": "time_plus_space",
+    "count": 2319880.0,
+    "mae": 44.161662672207186,
+    "rmse": 71.02927869782086
+  },
+  {
+    "name": "taxibj_K04_seed17",
+    "set": "unseen_combinations_repeat",
+    "family": "node_plus_time",
+    "count": 2310050.0,
+    "mae": 37.86706986861756,
+    "rmse": 62.458894674415255
+  },
+  {
+    "name": "taxibj_K04_seed17",
+    "set": "unseen_geometry_repeat",
+    "family": "moving_region",
+    "count": 3479820.0,
+    "mae": 34.20086784302062,
+    "rmse": 56.86175986789068
+  },
+  {
+    "name": "taxibj_K04_seed17",
+    "set": "unseen_geometry_repeat",
+    "family": "multi_block",
+    "count": 3469990.0,
+    "mae": 28.489287284509466,
+    "rmse": 50.400121608318656
+  },
+  {
+    "name": "taxibj_K01_seed27",
+    "set": "in_distribution",
+    "family": "random_point",
+    "count": 1739910.0,
+    "mae": 9.738997311642557,
+    "rmse": 16.265280743593863
+  },
+  {
+    "name": "taxibj_K01_seed27",
+    "set": "in_distribution",
+    "family": "node_outage",
+    "count": 1739910.0,
+    "mae": 14.077775808087775,
+    "rmse": 22.098699345745423
+  },
+  {
+    "name": "taxibj_K01_seed27",
+    "set": "in_distribution",
+    "family": "temporal_gap",
+    "count": 1739910.0,
+    "mae": 15.25762481967458,
+    "rmse": 29.27652437543196
+  },
+  {
+    "name": "taxibj_K01_seed27",
+    "set": "in_distribution",
+    "family": "spatial_region",
+    "count": 1730080.0,
+    "mae": 23.0327734302749,
+    "rmse": 37.462996115965325
+  },
+  {
+    "name": "taxibj_K01_seed27",
+    "set": "unseen_combinations",
+    "family": "node_plus_space",
+    "count": 2319880.0,
+    "mae": 17.854000520096946,
+    "rmse": 29.34722302178641
+  },
+  {
+    "name": "taxibj_K01_seed27",
+    "set": "unseen_combinations",
+    "family": "time_plus_space",
+    "count": 2319880.0,
+    "mae": 35.85729035553563,
+    "rmse": 63.84063208340648
+  },
+  {
+    "name": "taxibj_K01_seed27",
+    "set": "unseen_combinations",
+    "family": "node_plus_time",
+    "count": 2310050.0,
+    "mae": 27.276901392826996,
+    "rmse": 45.5860629549536
+  },
+  {
+    "name": "taxibj_K01_seed27",
+    "set": "unseen_geometry",
+    "family": "moving_region",
+    "count": 3479820.0,
+    "mae": 36.611079281758826,
+    "rmse": 62.90816802029094
+  },
+  {
+    "name": "taxibj_K01_seed27",
+    "set": "unseen_geometry",
+    "family": "multi_block",
+    "count": 3469990.0,
+    "mae": 30.50829741224038,
+    "rmse": 53.46791186214382
+  },
+  {
+    "name": "taxibj_K01_seed27",
+    "set": "unseen_triple",
+    "family": "node_plus_time_plus_space",
+    "count": 6949810.0,
+    "mae": 27.40725541417679,
+    "rmse": 46.35543005905291
+  },
+  {
+    "name": "taxibj_K01_seed27",
+    "set": "unseen_combinations_repeat",
+    "family": "node_plus_space",
+    "count": 2319880.0,
+    "mae": 18.079245505155438,
+    "rmse": 29.84316135428536
+  },
+  {
+    "name": "taxibj_K01_seed27",
+    "set": "unseen_combinations_repeat",
+    "family": "time_plus_space",
+    "count": 2319880.0,
+    "mae": 35.36986977774713,
+    "rmse": 62.600302466164536
+  },
+  {
+    "name": "taxibj_K01_seed27",
+    "set": "unseen_combinations_repeat",
+    "family": "node_plus_time",
+    "count": 2310050.0,
+    "mae": 27.716799230536136,
+    "rmse": 46.48364751581737
+  },
+  {
+    "name": "taxibj_K01_seed27",
+    "set": "unseen_geometry_repeat",
+    "family": "moving_region",
+    "count": 3479820.0,
+    "mae": 36.59657370927232,
+    "rmse": 62.948431336533595
+  },
+  {
+    "name": "taxibj_K01_seed27",
+    "set": "unseen_geometry_repeat",
+    "family": "multi_block",
+    "count": 3469990.0,
+    "mae": 30.558255067017484,
+    "rmse": 54.26794558521733
+  },
+  {
+    "name": "taxibj_K02_seed27",
+    "set": "in_distribution",
+    "family": "random_point",
+    "count": 1739910.0,
+    "mae": 9.799324264617136,
+    "rmse": 16.186504751533175
+  },
+  {
+    "name": "taxibj_K02_seed27",
+    "set": "in_distribution",
+    "family": "node_outage",
+    "count": 1739910.0,
+    "mae": 12.120860687478087,
+    "rmse": 19.593332006732464
+  },
+  {
+    "name": "taxibj_K02_seed27",
+    "set": "in_distribution",
+    "family": "temporal_gap",
+    "count": 1739910.0,
+    "mae": 15.243384212401791,
+    "rmse": 29.415777843874938
+  },
+  {
+    "name": "taxibj_K02_seed27",
+    "set": "in_distribution",
+    "family": "spatial_region",
+    "count": 1730080.0,
+    "mae": 18.1384840404779,
+    "rmse": 29.43197081256818
+  },
+  {
+    "name": "taxibj_K02_seed27",
+    "set": "unseen_combinations",
+    "family": "node_plus_space",
+    "count": 2319880.0,
+    "mae": 14.759252243111712,
+    "rmse": 24.51933208273428
+  },
+  {
+    "name": "taxibj_K02_seed27",
+    "set": "unseen_combinations",
+    "family": "time_plus_space",
+    "count": 2319880.0,
+    "mae": 29.01633026277221,
+    "rmse": 52.10853677807496
+  },
+  {
+    "name": "taxibj_K02_seed27",
+    "set": "unseen_combinations",
+    "family": "node_plus_time",
+    "count": 2310050.0,
+    "mae": 22.480492088915824,
+    "rmse": 39.59900422871956
+  },
+  {
+    "name": "taxibj_K02_seed27",
+    "set": "unseen_geometry",
+    "family": "moving_region",
+    "count": 3479820.0,
+    "mae": 24.49558773873361,
+    "rmse": 42.0738676091475
+  },
+  {
+    "name": "taxibj_K02_seed27",
+    "set": "unseen_geometry",
+    "family": "multi_block",
+    "count": 3469990.0,
+    "mae": 22.667711983680068,
+    "rmse": 39.678786977939964
+  },
+  {
+    "name": "taxibj_K02_seed27",
+    "set": "unseen_triple",
+    "family": "node_plus_time_plus_space",
+    "count": 6949810.0,
+    "mae": 21.018107774708948,
+    "rmse": 35.8801419658886
+  },
+  {
+    "name": "taxibj_K02_seed27",
+    "set": "unseen_combinations_repeat",
+    "family": "node_plus_space",
+    "count": 2319880.0,
+    "mae": 14.965075624870684,
+    "rmse": 25.09611998473444
+  },
+  {
+    "name": "taxibj_K02_seed27",
+    "set": "unseen_combinations_repeat",
+    "family": "time_plus_space",
+    "count": 2319880.0,
+    "mae": 28.724561130317085,
+    "rmse": 51.5620223992864
+  },
+  {
+    "name": "taxibj_K02_seed27",
+    "set": "unseen_combinations_repeat",
+    "family": "node_plus_time",
+    "count": 2310050.0,
+    "mae": 22.751463807601567,
+    "rmse": 40.1818880543994
+  },
+  {
+    "name": "taxibj_K02_seed27",
+    "set": "unseen_geometry_repeat",
+    "family": "moving_region",
+    "count": 3479820.0,
+    "mae": 24.684356509460258,
+    "rmse": 42.543557509527744
+  },
+  {
+    "name": "taxibj_K02_seed27",
+    "set": "unseen_geometry_repeat",
+    "family": "multi_block",
+    "count": 3469990.0,
+    "mae": 22.449070773618946,
+    "rmse": 39.4552796958323
+  },
+  {
+    "name": "taxibj_K03_seed27",
+    "set": "in_distribution",
+    "family": "random_point",
+    "count": 1739910.0,
+    "mae": 9.183926611146553,
+    "rmse": 15.465986051436342
+  },
+  {
+    "name": "taxibj_K03_seed27",
+    "set": "in_distribution",
+    "family": "node_outage",
+    "count": 1739910.0,
+    "mae": 16.272575575029744,
+    "rmse": 25.506613508620212
+  },
+  {
+    "name": "taxibj_K03_seed27",
+    "set": "in_distribution",
+    "family": "temporal_gap",
+    "count": 1739910.0,
+    "mae": 14.794231741871705,
+    "rmse": 28.566120739021603
+  },
+  {
+    "name": "taxibj_K03_seed27",
+    "set": "in_distribution",
+    "family": "spatial_region",
+    "count": 1730080.0,
+    "mae": 26.512775429821165,
+    "rmse": 42.9619794235771
+  },
+  {
+    "name": "taxibj_K03_seed27",
+    "set": "unseen_combinations",
+    "family": "node_plus_space",
+    "count": 2319880.0,
+    "mae": 21.06213313700493,
+    "rmse": 35.03911827968491
+  },
+  {
+    "name": "taxibj_K03_seed27",
+    "set": "unseen_combinations",
+    "family": "time_plus_space",
+    "count": 2319880.0,
+    "mae": 33.263347349862926,
+    "rmse": 51.336325287750114
+  },
+  {
+    "name": "taxibj_K03_seed27",
+    "set": "unseen_combinations",
+    "family": "node_plus_time",
+    "count": 2310050.0,
+    "mae": 28.26820205460921,
+    "rmse": 44.74598296246541
+  },
+  {
+    "name": "taxibj_K03_seed27",
+    "set": "unseen_geometry",
+    "family": "moving_region",
+    "count": 3479820.0,
+    "mae": 36.414919755188485,
+    "rmse": 59.346035326774675
+  },
+  {
+    "name": "taxibj_K03_seed27",
+    "set": "unseen_geometry",
+    "family": "multi_block",
+    "count": 3469990.0,
+    "mae": 31.739486163865024,
+    "rmse": 56.266584888460244
+  },
+  {
+    "name": "taxibj_K03_seed27",
+    "set": "unseen_triple",
+    "family": "node_plus_time_plus_space",
+    "count": 6949810.0,
+    "mae": 26.618790702551582,
+    "rmse": 41.962216905953746
+  },
+  {
+    "name": "taxibj_K03_seed27",
+    "set": "unseen_combinations_repeat",
+    "family": "node_plus_space",
+    "count": 2319880.0,
+    "mae": 21.051985467728933,
+    "rmse": 34.8584293484794
+  },
+  {
+    "name": "taxibj_K03_seed27",
+    "set": "unseen_combinations_repeat",
+    "family": "time_plus_space",
+    "count": 2319880.0,
+    "mae": 32.69825389675328,
+    "rmse": 50.75434494914826
+  },
+  {
+    "name": "taxibj_K03_seed27",
+    "set": "unseen_combinations_repeat",
+    "family": "node_plus_time",
+    "count": 2310050.0,
+    "mae": 28.8663735092314,
+    "rmse": 46.16387112130902
+  },
+  {
+    "name": "taxibj_K03_seed27",
+    "set": "unseen_geometry_repeat",
+    "family": "moving_region",
+    "count": 3479820.0,
+    "mae": 36.40668967791437,
+    "rmse": 59.928290836056185
+  },
+  {
+    "name": "taxibj_K03_seed27",
+    "set": "unseen_geometry_repeat",
+    "family": "multi_block",
+    "count": 3469990.0,
+    "mae": 30.606211756914284,
+    "rmse": 53.72703717778906
+  },
+  {
+    "name": "taxibj_K04_seed27",
+    "set": "in_distribution",
+    "family": "random_point",
+    "count": 1739910.0,
+    "mae": 10.186893664758522,
+    "rmse": 17.272555821345676
+  },
+  {
+    "name": "taxibj_K04_seed27",
+    "set": "in_distribution",
+    "family": "node_outage",
+    "count": 1739910.0,
+    "mae": 15.41157796955015,
+    "rmse": 24.591203238113827
+  },
+  {
+    "name": "taxibj_K04_seed27",
+    "set": "in_distribution",
+    "family": "temporal_gap",
+    "count": 1739910.0,
+    "mae": 14.671733272123271,
+    "rmse": 27.889576582174453
+  },
+  {
+    "name": "taxibj_K04_seed27",
+    "set": "in_distribution",
+    "family": "spatial_region",
+    "count": 1730080.0,
+    "mae": 21.461525460527838,
+    "rmse": 33.645553615809426
+  },
+  {
+    "name": "taxibj_K04_seed27",
+    "set": "unseen_combinations",
+    "family": "node_plus_space",
+    "count": 2319880.0,
+    "mae": 18.361308141477146,
+    "rmse": 29.638024523054632
+  },
+  {
+    "name": "taxibj_K04_seed27",
+    "set": "unseen_combinations",
+    "family": "time_plus_space",
+    "count": 2319880.0,
+    "mae": 35.707280333465526,
+    "rmse": 61.32950208722451
+  },
+  {
+    "name": "taxibj_K04_seed27",
+    "set": "unseen_combinations",
+    "family": "node_plus_time",
+    "count": 2310050.0,
+    "mae": 32.835953604900325,
+    "rmse": 58.12093578526261
+  },
+  {
+    "name": "taxibj_K04_seed27",
+    "set": "unseen_geometry",
+    "family": "moving_region",
+    "count": 3479820.0,
+    "mae": 32.942318801690895,
+    "rmse": 56.874256000133634
+  },
+  {
+    "name": "taxibj_K04_seed27",
+    "set": "unseen_geometry",
+    "family": "multi_block",
+    "count": 3469990.0,
+    "mae": 26.546447017858842,
+    "rmse": 47.56286302942687
+  },
+  {
+    "name": "taxibj_K04_seed27",
+    "set": "unseen_triple",
+    "family": "node_plus_time_plus_space",
+    "count": 6949810.0,
+    "mae": 29.468652398410892,
+    "rmse": 52.18623529011536
+  },
+  {
+    "name": "taxibj_K04_seed27",
+    "set": "unseen_combinations_repeat",
+    "family": "node_plus_space",
+    "count": 2319880.0,
+    "mae": 18.53556578761617,
+    "rmse": 29.995141880526567
+  },
+  {
+    "name": "taxibj_K04_seed27",
+    "set": "unseen_combinations_repeat",
+    "family": "time_plus_space",
+    "count": 2319880.0,
+    "mae": 35.48552403572599,
+    "rmse": 61.290276200967384
+  },
+  {
+    "name": "taxibj_K04_seed27",
+    "set": "unseen_combinations_repeat",
+    "family": "node_plus_time",
+    "count": 2310050.0,
+    "mae": 33.45093232559901,
+    "rmse": 58.99842078493025
+  },
+  {
+    "name": "taxibj_K04_seed27",
+    "set": "unseen_geometry_repeat",
+    "family": "moving_region",
+    "count": 3479820.0,
+    "mae": 32.87116075687823,
+    "rmse": 56.273844821372194
+  },
+  {
+    "name": "taxibj_K04_seed27",
+    "set": "unseen_geometry_repeat",
+    "family": "multi_block",
+    "count": 3469990.0,
+    "mae": 26.41951311459111,
+    "rmse": 46.665900330116074
+  },
+  {
+    "name": "bikenyc_K01_seed7",
+    "set": "in_distribution",
+    "family": "random_point",
+    "count": 102268.0,
+    "mae": 2.9293232800399442,
+    "rmse": 12.311974799830558
+  },
+  {
+    "name": "bikenyc_K01_seed7",
+    "set": "in_distribution",
+    "family": "node_outage",
+    "count": 102268.0,
+    "mae": 3.3377770294715843,
+    "rmse": 13.2160745873477
+  },
+  {
+    "name": "bikenyc_K01_seed7",
+    "set": "in_distribution",
+    "family": "temporal_gap",
+    "count": 102268.0,
+    "mae": 3.5881473799233388,
+    "rmse": 14.89972008570031
+  },
+  {
+    "name": "bikenyc_K01_seed7",
+    "set": "in_distribution",
+    "family": "spatial_region",
+    "count": 99504.0,
+    "mae": 4.627513875070349,
+    "rmse": 15.719728486008343
+  },
+  {
+    "name": "bikenyc_K01_seed7",
+    "set": "unseen_combinations",
+    "family": "node_plus_space",
+    "count": 135436.0,
+    "mae": 4.119665953845359,
+    "rmse": 14.66778310813143
+  },
+  {
+    "name": "bikenyc_K01_seed7",
+    "set": "unseen_combinations",
+    "family": "time_plus_space",
+    "count": 135436.0,
+    "mae": 5.451218368362179,
+    "rmse": 18.727899741113333
+  },
+  {
+    "name": "bikenyc_K01_seed7",
+    "set": "unseen_combinations",
+    "family": "node_plus_time",
+    "count": 135436.0,
+    "mae": 4.735865902529608,
+    "rmse": 16.766837187653998
+  },
+  {
+    "name": "bikenyc_K01_seed7",
+    "set": "unseen_geometry",
+    "family": "moving_region",
+    "count": 204536.0,
+    "mae": 5.464486271671002,
+    "rmse": 17.290268780804347
+  },
+  {
+    "name": "bikenyc_K01_seed7",
+    "set": "unseen_geometry",
+    "family": "multi_block",
+    "count": 201772.0,
+    "mae": 5.856189860956921,
+    "rmse": 18.12805670070207
+  },
+  {
+    "name": "bikenyc_K01_seed7",
+    "set": "unseen_triple",
+    "family": "node_plus_time_plus_space",
+    "count": 406308.0,
+    "mae": 4.090295493197279,
+    "rmse": 14.829937308370788
+  },
+  {
+    "name": "bikenyc_K01_seed7",
+    "set": "unseen_combinations_repeat",
+    "family": "node_plus_space",
+    "count": 135436.0,
+    "mae": 3.3909820644068045,
+    "rmse": 12.624094073982233
+  },
+  {
+    "name": "bikenyc_K01_seed7",
+    "set": "unseen_combinations_repeat",
+    "family": "time_plus_space",
+    "count": 135436.0,
+    "mae": 4.756266884127927,
+    "rmse": 16.883760167507067
+  },
+  {
+    "name": "bikenyc_K01_seed7",
+    "set": "unseen_combinations_repeat",
+    "family": "node_plus_time",
+    "count": 135436.0,
+    "mae": 4.742624860635281,
+    "rmse": 15.859031514511866
+  },
+  {
+    "name": "bikenyc_K01_seed7",
+    "set": "unseen_geometry_repeat",
+    "family": "moving_region",
+    "count": 204536.0,
+    "mae": 5.38190885406481,
+    "rmse": 17.87711240017828
+  },
+  {
+    "name": "bikenyc_K01_seed7",
+    "set": "unseen_geometry_repeat",
+    "family": "multi_block",
+    "count": 201772.0,
+    "mae": 5.75761317229348,
+    "rmse": 17.877965202215364
+  },
+  {
+    "name": "bikenyc_K02_seed7",
+    "set": "in_distribution",
+    "family": "random_point",
+    "count": 102268.0,
+    "mae": 3.0012042119113507,
+    "rmse": 12.56880713231369
+  },
+  {
+    "name": "bikenyc_K02_seed7",
+    "set": "in_distribution",
+    "family": "node_outage",
+    "count": 102268.0,
+    "mae": 3.301552546067685,
+    "rmse": 13.357374985369875
+  },
+  {
+    "name": "bikenyc_K02_seed7",
+    "set": "in_distribution",
+    "family": "temporal_gap",
+    "count": 102268.0,
+    "mae": 3.8668195177132634,
+    "rmse": 15.617714048138163
+  },
+  {
+    "name": "bikenyc_K02_seed7",
+    "set": "in_distribution",
+    "family": "spatial_region",
+    "count": 99504.0,
+    "mae": 4.343055618367101,
+    "rmse": 15.040722062721372
+  },
+  {
+    "name": "bikenyc_K02_seed7",
+    "set": "unseen_combinations",
+    "family": "node_plus_space",
+    "count": 135436.0,
+    "mae": 3.914627919275525,
+    "rmse": 14.420957918586488
+  },
+  {
+    "name": "bikenyc_K02_seed7",
+    "set": "unseen_combinations",
+    "family": "time_plus_space",
+    "count": 135436.0,
+    "mae": 5.682548803032429,
+    "rmse": 18.420622555489736
+  },
+  {
+    "name": "bikenyc_K02_seed7",
+    "set": "unseen_combinations",
+    "family": "node_plus_time",
+    "count": 135436.0,
+    "mae": 4.666893980367111,
+    "rmse": 16.478362606246264
+  },
+  {
+    "name": "bikenyc_K02_seed7",
+    "set": "unseen_geometry",
+    "family": "moving_region",
+    "count": 204536.0,
+    "mae": 5.034867715829976,
+    "rmse": 16.579502666586055
+  },
+  {
+    "name": "bikenyc_K02_seed7",
+    "set": "unseen_geometry",
+    "family": "multi_block",
+    "count": 201772.0,
+    "mae": 5.742934475546656,
+    "rmse": 18.143826411468815
+  },
+  {
+    "name": "bikenyc_K02_seed7",
+    "set": "unseen_triple",
+    "family": "node_plus_time_plus_space",
+    "count": 406308.0,
+    "mae": 4.106855667375489,
+    "rmse": 14.612776207372907
+  },
+  {
+    "name": "bikenyc_K02_seed7",
+    "set": "unseen_combinations_repeat",
+    "family": "node_plus_space",
+    "count": 135436.0,
+    "mae": 3.283557160993015,
+    "rmse": 12.561485274951634
+  },
+  {
+    "name": "bikenyc_K02_seed7",
+    "set": "unseen_combinations_repeat",
+    "family": "time_plus_space",
+    "count": 135436.0,
+    "mae": 5.3225273376354885,
+    "rmse": 17.155184734394815
+  },
+  {
+    "name": "bikenyc_K02_seed7",
+    "set": "unseen_combinations_repeat",
+    "family": "node_plus_time",
+    "count": 135436.0,
+    "mae": 4.678134875513157,
+    "rmse": 15.383899133038897
+  },
+  {
+    "name": "bikenyc_K02_seed7",
+    "set": "unseen_geometry_repeat",
+    "family": "moving_region",
+    "count": 204536.0,
+    "mae": 4.796516986924062,
+    "rmse": 16.665426488388924
+  },
+  {
+    "name": "bikenyc_K02_seed7",
+    "set": "unseen_geometry_repeat",
+    "family": "multi_block",
+    "count": 201772.0,
+    "mae": 5.696685878739369,
+    "rmse": 18.30872516219537
+  },
+  {
+    "name": "bikenyc_K03_seed7",
+    "set": "in_distribution",
+    "family": "random_point",
+    "count": 102268.0,
+    "mae": 3.014787089742148,
+    "rmse": 12.32158732897471
+  },
+  {
+    "name": "bikenyc_K03_seed7",
+    "set": "in_distribution",
+    "family": "node_outage",
+    "count": 102268.0,
+    "mae": 3.313856805770133,
+    "rmse": 13.016876659238413
+  },
+  {
+    "name": "bikenyc_K03_seed7",
+    "set": "in_distribution",
+    "family": "temporal_gap",
+    "count": 102268.0,
+    "mae": 3.9302942085989754,
+    "rmse": 15.413876610373375
+  },
+  {
+    "name": "bikenyc_K03_seed7",
+    "set": "in_distribution",
+    "family": "spatial_region",
+    "count": 99504.0,
+    "mae": 4.748439604186767,
+    "rmse": 15.643667494872906
+  },
+  {
+    "name": "bikenyc_K03_seed7",
+    "set": "unseen_combinations",
+    "family": "node_plus_space",
+    "count": 135436.0,
+    "mae": 4.10462846612053,
+    "rmse": 14.535668569243565
+  },
+  {
+    "name": "bikenyc_K03_seed7",
+    "set": "unseen_combinations",
+    "family": "time_plus_space",
+    "count": 135436.0,
+    "mae": 5.106629007427863,
+    "rmse": 17.143390673766334
+  },
+  {
+    "name": "bikenyc_K03_seed7",
+    "set": "unseen_combinations",
+    "family": "node_plus_time",
+    "count": 135436.0,
+    "mae": 4.411546594770777,
+    "rmse": 15.694875080208087
+  },
+  {
+    "name": "bikenyc_K03_seed7",
+    "set": "unseen_geometry",
+    "family": "moving_region",
+    "count": 204536.0,
+    "mae": 5.355303627784351,
+    "rmse": 16.99634729497191
+  },
+  {
+    "name": "bikenyc_K03_seed7",
+    "set": "unseen_geometry",
+    "family": "multi_block",
+    "count": 201772.0,
+    "mae": 5.7885500868554605,
+    "rmse": 18.01103575468785
+  },
+  {
+    "name": "bikenyc_K03_seed7",
+    "set": "unseen_triple",
+    "family": "node_plus_time_plus_space",
+    "count": 406308.0,
+    "mae": 3.848778551308367,
+    "rmse": 13.909758750722563
+  },
+  {
+    "name": "bikenyc_K03_seed7",
+    "set": "unseen_combinations_repeat",
+    "family": "node_plus_space",
+    "count": 135436.0,
+    "mae": 3.4312610926470803,
+    "rmse": 12.606341056378534
+  },
+  {
+    "name": "bikenyc_K03_seed7",
+    "set": "unseen_combinations_repeat",
+    "family": "time_plus_space",
+    "count": 135436.0,
+    "mae": 4.2964876514553,
+    "rmse": 15.194458677065715
+  },
+  {
+    "name": "bikenyc_K03_seed7",
+    "set": "unseen_combinations_repeat",
+    "family": "node_plus_time",
+    "count": 135436.0,
+    "mae": 4.298091960870817,
+    "rmse": 14.537381378287604
+  },
+  {
+    "name": "bikenyc_K03_seed7",
+    "set": "unseen_geometry_repeat",
+    "family": "moving_region",
+    "count": 204536.0,
+    "mae": 5.202518367793445,
+    "rmse": 17.27525717048097
+  },
+  {
+    "name": "bikenyc_K03_seed7",
+    "set": "unseen_geometry_repeat",
+    "family": "multi_block",
+    "count": 201772.0,
+    "mae": 5.399337959429455,
+    "rmse": 17.365591553351106
+  },
+  {
+    "name": "bikenyc_K04_seed7",
+    "set": "in_distribution",
+    "family": "random_point",
+    "count": 102268.0,
+    "mae": 2.9548750166535473,
+    "rmse": 12.482417622274737
+  },
+  {
+    "name": "bikenyc_K04_seed7",
+    "set": "in_distribution",
+    "family": "node_outage",
+    "count": 102268.0,
+    "mae": 3.418247123978175,
+    "rmse": 13.650610837359432
+  },
+  {
+    "name": "bikenyc_K04_seed7",
+    "set": "in_distribution",
+    "family": "temporal_gap",
+    "count": 102268.0,
+    "mae": 3.7866573228551452,
+    "rmse": 15.147702335486743
+  },
+  {
+    "name": "bikenyc_K04_seed7",
+    "set": "in_distribution",
+    "family": "spatial_region",
+    "count": 99504.0,
+    "mae": 4.500608447587534,
+    "rmse": 15.569470147288566
+  },
+  {
+    "name": "bikenyc_K04_seed7",
+    "set": "unseen_combinations",
+    "family": "node_plus_space",
+    "count": 135436.0,
+    "mae": 4.005091369262973,
+    "rmse": 14.706398136030591
+  },
+  {
+    "name": "bikenyc_K04_seed7",
+    "set": "unseen_combinations",
+    "family": "time_plus_space",
+    "count": 135436.0,
+    "mae": 5.250396347259961,
+    "rmse": 17.422351075301265
+  },
+  {
+    "name": "bikenyc_K04_seed7",
+    "set": "unseen_combinations",
+    "family": "node_plus_time",
+    "count": 135436.0,
+    "mae": 4.538451106518946,
+    "rmse": 16.14713744821791
+  },
+  {
+    "name": "bikenyc_K04_seed7",
+    "set": "unseen_geometry",
+    "family": "moving_region",
+    "count": 204536.0,
+    "mae": 5.520995883670845,
+    "rmse": 18.503786826523434
+  },
+  {
+    "name": "bikenyc_K04_seed7",
+    "set": "unseen_geometry",
+    "family": "multi_block",
+    "count": 201772.0,
+    "mae": 5.809427534543941,
+    "rmse": 18.618975190352153
+  },
+  {
+    "name": "bikenyc_K04_seed7",
+    "set": "unseen_triple",
+    "family": "node_plus_time_plus_space",
+    "count": 406308.0,
+    "mae": 4.014852033432765,
+    "rmse": 14.449902219005866
+  },
+  {
+    "name": "bikenyc_K04_seed7",
+    "set": "unseen_combinations_repeat",
+    "family": "node_plus_space",
+    "count": 135436.0,
+    "mae": 3.4039400990135564,
+    "rmse": 12.92567496340886
+  },
+  {
+    "name": "bikenyc_K04_seed7",
+    "set": "unseen_combinations_repeat",
+    "family": "time_plus_space",
+    "count": 135436.0,
+    "mae": 4.595751666146741,
+    "rmse": 15.78594078568852
+  },
+  {
+    "name": "bikenyc_K04_seed7",
+    "set": "unseen_combinations_repeat",
+    "family": "node_plus_time",
+    "count": 135436.0,
+    "mae": 4.575450189572935,
+    "rmse": 15.25179143723619
+  },
+  {
+    "name": "bikenyc_K04_seed7",
+    "set": "unseen_geometry_repeat",
+    "family": "moving_region",
+    "count": 204536.0,
+    "mae": 5.4021255732487194,
+    "rmse": 18.502094140438487
+  },
+  {
+    "name": "bikenyc_K04_seed7",
+    "set": "unseen_geometry_repeat",
+    "family": "multi_block",
+    "count": 201772.0,
+    "mae": 6.056992778358741,
+    "rmse": 19.519094722328088
+  },
+  {
+    "name": "bikenyc_K01_seed17",
+    "set": "in_distribution",
+    "family": "random_point",
+    "count": 102268.0,
+    "mae": 3.155639548172449,
+    "rmse": 13.072404124311426
+  },
+  {
+    "name": "bikenyc_K01_seed17",
+    "set": "in_distribution",
+    "family": "node_outage",
+    "count": 102268.0,
+    "mae": 3.4960994030390737,
+    "rmse": 13.613696858600155
+  },
+  {
+    "name": "bikenyc_K01_seed17",
+    "set": "in_distribution",
+    "family": "temporal_gap",
+    "count": 102268.0,
+    "mae": 3.970306151789905,
+    "rmse": 15.620238000048506
+  },
+  {
+    "name": "bikenyc_K01_seed17",
+    "set": "in_distribution",
+    "family": "spatial_region",
+    "count": 99504.0,
+    "mae": 4.761163064110488,
+    "rmse": 15.94778983032893
+  },
+  {
+    "name": "bikenyc_K01_seed17",
+    "set": "unseen_combinations",
+    "family": "node_plus_space",
+    "count": 135436.0,
+    "mae": 4.25022473714522,
+    "rmse": 15.017852794808114
+  },
+  {
+    "name": "bikenyc_K01_seed17",
+    "set": "unseen_combinations",
+    "family": "time_plus_space",
+    "count": 135436.0,
+    "mae": 7.260574874848637,
+    "rmse": 24.668340815735018
+  },
+  {
+    "name": "bikenyc_K01_seed17",
+    "set": "unseen_combinations",
+    "family": "node_plus_time",
+    "count": 135436.0,
+    "mae": 5.94015736099523,
+    "rmse": 21.881323433226385
+  },
+  {
+    "name": "bikenyc_K01_seed17",
+    "set": "unseen_geometry",
+    "family": "moving_region",
+    "count": 204536.0,
+    "mae": 7.860323029931161,
+    "rmse": 23.500528746624145
+  },
+  {
+    "name": "bikenyc_K01_seed17",
+    "set": "unseen_geometry",
+    "family": "multi_block",
+    "count": 201772.0,
+    "mae": 7.437857303045021,
+    "rmse": 22.870245594152752
+  },
+  {
+    "name": "bikenyc_K01_seed17",
+    "set": "unseen_triple",
+    "family": "node_plus_time_plus_space",
+    "count": 406308.0,
+    "mae": 5.394946844512045,
+    "rmse": 20.248873155162745
+  },
+  {
+    "name": "bikenyc_K01_seed17",
+    "set": "unseen_combinations_repeat",
+    "family": "node_plus_space",
+    "count": 135436.0,
+    "mae": 3.5569307758830737,
+    "rmse": 13.080108686811764
+  },
+  {
+    "name": "bikenyc_K01_seed17",
+    "set": "unseen_combinations_repeat",
+    "family": "time_plus_space",
+    "count": 135436.0,
+    "mae": 5.876608145406317,
+    "rmse": 22.273673331350114
+  },
+  {
+    "name": "bikenyc_K01_seed17",
+    "set": "unseen_combinations_repeat",
+    "family": "node_plus_time",
+    "count": 135436.0,
+    "mae": 6.185886691869222,
+    "rmse": 21.533576883562045
+  },
+  {
+    "name": "bikenyc_K01_seed17",
+    "set": "unseen_geometry_repeat",
+    "family": "moving_region",
+    "count": 204536.0,
+    "mae": 7.832948646570775,
+    "rmse": 24.02299674945538
+  },
+  {
+    "name": "bikenyc_K01_seed17",
+    "set": "unseen_geometry_repeat",
+    "family": "multi_block",
+    "count": 201772.0,
+    "mae": 7.112392948476498,
+    "rmse": 22.026999524372496
+  },
+  {
+    "name": "bikenyc_K02_seed17",
+    "set": "in_distribution",
+    "family": "random_point",
+    "count": 102268.0,
+    "mae": 2.989771971682247,
+    "rmse": 12.239194331314813
+  },
+  {
+    "name": "bikenyc_K02_seed17",
+    "set": "in_distribution",
+    "family": "node_outage",
+    "count": 102268.0,
+    "mae": 3.2646515695892164,
+    "rmse": 12.964590594442065
+  },
+  {
+    "name": "bikenyc_K02_seed17",
+    "set": "in_distribution",
+    "family": "temporal_gap",
+    "count": 102268.0,
+    "mae": 4.051074940658368,
+    "rmse": 15.687487577552805
+  },
+  {
+    "name": "bikenyc_K02_seed17",
+    "set": "in_distribution",
+    "family": "spatial_region",
+    "count": 99504.0,
+    "mae": 4.279345946519738,
+    "rmse": 14.650397189960588
+  },
+  {
+    "name": "bikenyc_K02_seed17",
+    "set": "unseen_combinations",
+    "family": "node_plus_space",
+    "count": 135436.0,
+    "mae": 3.8830682134919816,
+    "rmse": 14.036012950406937
+  },
+  {
+    "name": "bikenyc_K02_seed17",
+    "set": "unseen_combinations",
+    "family": "time_plus_space",
+    "count": 135436.0,
+    "mae": 7.235270833640982,
+    "rmse": 24.81546233529965
+  },
+  {
+    "name": "bikenyc_K02_seed17",
+    "set": "unseen_combinations",
+    "family": "node_plus_time",
+    "count": 135436.0,
+    "mae": 6.142683802220237,
+    "rmse": 22.252971519050785
+  },
+  {
+    "name": "bikenyc_K02_seed17",
+    "set": "unseen_geometry",
+    "family": "moving_region",
+    "count": 204536.0,
+    "mae": 7.526950176252591,
+    "rmse": 22.69842407372875
+  },
+  {
+    "name": "bikenyc_K02_seed17",
+    "set": "unseen_geometry",
+    "family": "multi_block",
+    "count": 201772.0,
+    "mae": 6.992588943213132,
+    "rmse": 21.292875456580408
+  },
+  {
+    "name": "bikenyc_K02_seed17",
+    "set": "unseen_triple",
+    "family": "node_plus_time_plus_space",
+    "count": 406308.0,
+    "mae": 5.12362292737283,
+    "rmse": 19.648003347903597
+  },
+  {
+    "name": "bikenyc_K02_seed17",
+    "set": "unseen_combinations_repeat",
+    "family": "node_plus_space",
+    "count": 135436.0,
+    "mae": 3.248977636346688,
+    "rmse": 12.202885567538084
+  },
+  {
+    "name": "bikenyc_K02_seed17",
+    "set": "unseen_combinations_repeat",
+    "family": "time_plus_space",
+    "count": 135436.0,
+    "mae": 5.919079341441714,
+    "rmse": 22.067739230391084
+  },
+  {
+    "name": "bikenyc_K02_seed17",
+    "set": "unseen_combinations_repeat",
+    "family": "node_plus_time",
+    "count": 135436.0,
+    "mae": 6.517546225708084,
+    "rmse": 22.54214461980865
+  },
+  {
+    "name": "bikenyc_K02_seed17",
+    "set": "unseen_geometry_repeat",
+    "family": "moving_region",
+    "count": 204536.0,
+    "mae": 7.318379007851918,
+    "rmse": 23.091952727988282
+  },
+  {
+    "name": "bikenyc_K02_seed17",
+    "set": "unseen_geometry_repeat",
+    "family": "multi_block",
+    "count": 201772.0,
+    "mae": 6.838714226329719,
+    "rmse": 21.340381921629923
+  },
+  {
+    "name": "bikenyc_K03_seed17",
+    "set": "in_distribution",
+    "family": "random_point",
+    "count": 102268.0,
+    "mae": 3.2057904843157194,
+    "rmse": 12.989136266498312
+  },
+  {
+    "name": "bikenyc_K03_seed17",
+    "set": "in_distribution",
+    "family": "node_outage",
+    "count": 102268.0,
+    "mae": 3.524856871162045,
+    "rmse": 13.67912812895491
+  },
+  {
+    "name": "bikenyc_K03_seed17",
+    "set": "in_distribution",
+    "family": "temporal_gap",
+    "count": 102268.0,
+    "mae": 4.052063496768295,
+    "rmse": 15.662147631908498
+  },
+  {
+    "name": "bikenyc_K03_seed17",
+    "set": "in_distribution",
+    "family": "spatial_region",
+    "count": 99504.0,
+    "mae": 4.7987804667400304,
+    "rmse": 16.194081176316235
+  },
+  {
+    "name": "bikenyc_K03_seed17",
+    "set": "unseen_combinations",
+    "family": "node_plus_space",
+    "count": 135436.0,
+    "mae": 4.239390110919548,
+    "rmse": 15.025686705258712
+  },
+  {
+    "name": "bikenyc_K03_seed17",
+    "set": "unseen_combinations",
+    "family": "time_plus_space",
+    "count": 135436.0,
+    "mae": 7.458230155756224,
+    "rmse": 25.915440416482816
+  },
+  {
+    "name": "bikenyc_K03_seed17",
+    "set": "unseen_combinations",
+    "family": "node_plus_time",
+    "count": 135436.0,
+    "mae": 6.15179120869359,
+    "rmse": 23.03073047808075
+  },
+  {
+    "name": "bikenyc_K03_seed17",
+    "set": "unseen_geometry",
+    "family": "moving_region",
+    "count": 204536.0,
+    "mae": 8.506345765537606,
+    "rmse": 25.69562456980385
+  },
+  {
+    "name": "bikenyc_K03_seed17",
+    "set": "unseen_geometry",
+    "family": "multi_block",
+    "count": 201772.0,
+    "mae": 7.349194496139207,
+    "rmse": 23.036007752922654
+  },
+  {
+    "name": "bikenyc_K03_seed17",
+    "set": "unseen_triple",
+    "family": "node_plus_time_plus_space",
+    "count": 406308.0,
+    "mae": 5.388634130388769,
+    "rmse": 20.57718824184732
+  },
+  {
+    "name": "bikenyc_K03_seed17",
+    "set": "unseen_combinations_repeat",
+    "family": "node_plus_space",
+    "count": 135436.0,
+    "mae": 3.5536624540373314,
+    "rmse": 13.097382390017207
+  },
+  {
+    "name": "bikenyc_K03_seed17",
+    "set": "unseen_combinations_repeat",
+    "family": "time_plus_space",
+    "count": 135436.0,
+    "mae": 6.000414460058625,
+    "rmse": 23.133253637901515
+  },
+  {
+    "name": "bikenyc_K03_seed17",
+    "set": "unseen_combinations_repeat",
+    "family": "node_plus_time",
+    "count": 135436.0,
+    "mae": 6.3893826004533505,
+    "rmse": 22.471276102014603
+  },
+  {
+    "name": "bikenyc_K03_seed17",
+    "set": "unseen_geometry_repeat",
+    "family": "moving_region",
+    "count": 204536.0,
+    "mae": 8.608237058512927,
+    "rmse": 26.64914129431732
+  },
+  {
+    "name": "bikenyc_K03_seed17",
+    "set": "unseen_geometry_repeat",
+    "family": "multi_block",
+    "count": 201772.0,
+    "mae": 7.327848775474298,
+    "rmse": 22.456133958058043
+  },
+  {
+    "name": "bikenyc_K04_seed17",
+    "set": "in_distribution",
+    "family": "random_point",
+    "count": 102268.0,
+    "mae": 2.9894070832885165,
+    "rmse": 12.518968866954129
+  },
+  {
+    "name": "bikenyc_K04_seed17",
+    "set": "in_distribution",
+    "family": "node_outage",
+    "count": 102268.0,
+    "mae": 3.3690012470298627,
+    "rmse": 13.451277381452943
+  },
+  {
+    "name": "bikenyc_K04_seed17",
+    "set": "in_distribution",
+    "family": "temporal_gap",
+    "count": 102268.0,
+    "mae": 4.029145121457836,
+    "rmse": 15.635921379693317
+  },
+  {
+    "name": "bikenyc_K04_seed17",
+    "set": "in_distribution",
+    "family": "spatial_region",
+    "count": 99504.0,
+    "mae": 4.412401213142185,
+    "rmse": 15.113665588536412
+  },
+  {
+    "name": "bikenyc_K04_seed17",
+    "set": "unseen_combinations",
+    "family": "node_plus_space",
+    "count": 135436.0,
+    "mae": 4.017819936630586,
+    "rmse": 14.581718852912914
+  },
+  {
+    "name": "bikenyc_K04_seed17",
+    "set": "unseen_combinations",
+    "family": "time_plus_space",
+    "count": 135436.0,
+    "mae": 6.495819866025282,
+    "rmse": 22.830890896699792
+  },
+  {
+    "name": "bikenyc_K04_seed17",
+    "set": "unseen_combinations",
+    "family": "node_plus_time",
+    "count": 135436.0,
+    "mae": 5.613762623582356,
+    "rmse": 21.309681731901335
+  },
+  {
+    "name": "bikenyc_K04_seed17",
+    "set": "unseen_geometry",
+    "family": "moving_region",
+    "count": 204536.0,
+    "mae": 7.999051970068839,
+    "rmse": 25.560670858706644
+  },
+  {
+    "name": "bikenyc_K04_seed17",
+    "set": "unseen_geometry",
+    "family": "multi_block",
+    "count": 201772.0,
+    "mae": 6.709245615100212,
+    "rmse": 21.47587924556711
+  },
+  {
+    "name": "bikenyc_K04_seed17",
+    "set": "unseen_triple",
+    "family": "node_plus_time_plus_space",
+    "count": 406308.0,
+    "mae": 4.399150321307974,
+    "rmse": 16.89962136033017
+  },
+  {
+    "name": "bikenyc_K04_seed17",
+    "set": "unseen_combinations_repeat",
+    "family": "node_plus_space",
+    "count": 135436.0,
+    "mae": 3.416368709205824,
+    "rmse": 12.898322345796377
+  },
+  {
+    "name": "bikenyc_K04_seed17",
+    "set": "unseen_combinations_repeat",
+    "family": "time_plus_space",
+    "count": 135436.0,
+    "mae": 5.3041018912992115,
+    "rmse": 20.493083362704148
+  },
+  {
+    "name": "bikenyc_K04_seed17",
+    "set": "unseen_combinations_repeat",
+    "family": "node_plus_time",
+    "count": 135436.0,
+    "mae": 5.697431639759739,
+    "rmse": 20.33522117792186
+  },
+  {
+    "name": "bikenyc_K04_seed17",
+    "set": "unseen_geometry_repeat",
+    "family": "moving_region",
+    "count": 204536.0,
+    "mae": 7.911740934358743,
+    "rmse": 26.11758865300847
+  },
+  {
+    "name": "bikenyc_K04_seed17",
+    "set": "unseen_geometry_repeat",
+    "family": "multi_block",
+    "count": 201772.0,
+    "mae": 6.715968782214579,
+    "rmse": 21.581615488970513
+  },
+  {
+    "name": "bikenyc_K01_seed27",
+    "set": "in_distribution",
+    "family": "random_point",
+    "count": 102268.0,
+    "mae": 3.0428686377336995,
+    "rmse": 12.715325934904394
+  },
+  {
+    "name": "bikenyc_K01_seed27",
+    "set": "in_distribution",
+    "family": "node_outage",
+    "count": 102268.0,
+    "mae": 3.369903747078754,
+    "rmse": 13.605593505224427
+  },
+  {
+    "name": "bikenyc_K01_seed27",
+    "set": "in_distribution",
+    "family": "temporal_gap",
+    "count": 102268.0,
+    "mae": 3.8639704242162747,
+    "rmse": 15.579061365163094
+  },
+  {
+    "name": "bikenyc_K01_seed27",
+    "set": "in_distribution",
+    "family": "spatial_region",
+    "count": 99504.0,
+    "mae": 4.890763813515035,
+    "rmse": 16.439958264838697
+  },
+  {
+    "name": "bikenyc_K01_seed27",
+    "set": "unseen_combinations",
+    "family": "node_plus_space",
+    "count": 135436.0,
+    "mae": 4.135799265889424,
+    "rmse": 15.072465051313186
+  },
+  {
+    "name": "bikenyc_K01_seed27",
+    "set": "unseen_combinations",
+    "family": "time_plus_space",
+    "count": 135436.0,
+    "mae": 7.1227504365530585,
+    "rmse": 25.28465151028416
+  },
+  {
+    "name": "bikenyc_K01_seed27",
+    "set": "unseen_combinations",
+    "family": "node_plus_time",
+    "count": 135436.0,
+    "mae": 5.88165547288018,
+    "rmse": 22.4558575177778
+  },
+  {
+    "name": "bikenyc_K01_seed27",
+    "set": "unseen_geometry",
+    "family": "moving_region",
+    "count": 204536.0,
+    "mae": 7.129676591162436,
+    "rmse": 21.80238772639873
+  },
+  {
+    "name": "bikenyc_K01_seed27",
+    "set": "unseen_geometry",
+    "family": "multi_block",
+    "count": 201772.0,
+    "mae": 6.698325337509664,
+    "rmse": 20.869694270139377
+  },
+  {
+    "name": "bikenyc_K01_seed27",
+    "set": "unseen_triple",
+    "family": "node_plus_time_plus_space",
+    "count": 406308.0,
+    "mae": 5.107318062898097,
+    "rmse": 19.584319715617642
+  },
+  {
+    "name": "bikenyc_K01_seed27",
+    "set": "unseen_combinations_repeat",
+    "family": "node_plus_space",
+    "count": 135436.0,
+    "mae": 3.480626227517056,
+    "rmse": 13.238716666607296
+  },
+  {
+    "name": "bikenyc_K01_seed27",
+    "set": "unseen_combinations_repeat",
+    "family": "time_plus_space",
+    "count": 135436.0,
+    "mae": 5.496357539262087,
+    "rmse": 21.6848839044505
+  },
+  {
+    "name": "bikenyc_K01_seed27",
+    "set": "unseen_combinations_repeat",
+    "family": "node_plus_time",
+    "count": 135436.0,
+    "mae": 6.001346519296938,
+    "rmse": 21.821103444581983
+  },
+  {
+    "name": "bikenyc_K01_seed27",
+    "set": "unseen_geometry_repeat",
+    "family": "moving_region",
+    "count": 204536.0,
+    "mae": 7.143436699407439,
+    "rmse": 22.554487528948894
+  },
+  {
+    "name": "bikenyc_K01_seed27",
+    "set": "unseen_geometry_repeat",
+    "family": "multi_block",
+    "count": 201772.0,
+    "mae": 6.443791367855797,
+    "rmse": 20.2017518671641
+  },
+  {
+    "name": "bikenyc_K02_seed27",
+    "set": "in_distribution",
+    "family": "random_point",
+    "count": 102268.0,
+    "mae": 3.0810423119279737,
+    "rmse": 12.76438788066564
+  },
+  {
+    "name": "bikenyc_K02_seed27",
+    "set": "in_distribution",
+    "family": "node_outage",
+    "count": 102268.0,
+    "mae": 3.3900552271360542,
+    "rmse": 13.549816487363977
+  },
+  {
+    "name": "bikenyc_K02_seed27",
+    "set": "in_distribution",
+    "family": "temporal_gap",
+    "count": 102268.0,
+    "mae": 3.932337247477217,
+    "rmse": 15.489741844755786
+  },
+  {
+    "name": "bikenyc_K02_seed27",
+    "set": "in_distribution",
+    "family": "spatial_region",
+    "count": 99504.0,
+    "mae": 4.335999447886517,
+    "rmse": 15.040760482783652
+  },
+  {
+    "name": "bikenyc_K02_seed27",
+    "set": "unseen_combinations",
+    "family": "node_plus_space",
+    "count": 135436.0,
+    "mae": 3.9418638577446172,
+    "rmse": 14.477115561517808
+  },
+  {
+    "name": "bikenyc_K02_seed27",
+    "set": "unseen_combinations",
+    "family": "time_plus_space",
+    "count": 135436.0,
+    "mae": 6.501034506150506,
+    "rmse": 22.54578007343901
+  },
+  {
+    "name": "bikenyc_K02_seed27",
+    "set": "unseen_combinations",
+    "family": "node_plus_time",
+    "count": 135436.0,
+    "mae": 5.836133943107815,
+    "rmse": 22.28038471693801
+  },
+  {
+    "name": "bikenyc_K02_seed27",
+    "set": "unseen_geometry",
+    "family": "moving_region",
+    "count": 204536.0,
+    "mae": 6.565079619235734,
+    "rmse": 20.44061845295951
+  },
+  {
+    "name": "bikenyc_K02_seed27",
+    "set": "unseen_geometry",
+    "family": "multi_block",
+    "count": 201772.0,
+    "mae": 6.252238990667684,
+    "rmse": 19.197612271117425
+  },
+  {
+    "name": "bikenyc_K02_seed27",
+    "set": "unseen_triple",
+    "family": "node_plus_time_plus_space",
+    "count": 406308.0,
+    "mae": 4.932096617590596,
+    "rmse": 19.097325592545623
+  },
+  {
+    "name": "bikenyc_K02_seed27",
+    "set": "unseen_combinations_repeat",
+    "family": "node_plus_space",
+    "count": 135436.0,
+    "mae": 3.332833260497578,
+    "rmse": 12.644445551618126
+  },
+  {
+    "name": "bikenyc_K02_seed27",
+    "set": "unseen_combinations_repeat",
+    "family": "time_plus_space",
+    "count": 135436.0,
+    "mae": 5.588865255083582,
+    "rmse": 20.98554609967883
+  },
+  {
+    "name": "bikenyc_K02_seed27",
+    "set": "unseen_combinations_repeat",
+    "family": "node_plus_time",
+    "count": 135436.0,
+    "mae": 5.912667006925781,
+    "rmse": 21.1930453660937
+  },
+  {
+    "name": "bikenyc_K02_seed27",
+    "set": "unseen_geometry_repeat",
+    "family": "moving_region",
+    "count": 204536.0,
+    "mae": 6.237439711102202,
+    "rmse": 20.738535392756962
+  },
+  {
+    "name": "bikenyc_K02_seed27",
+    "set": "unseen_geometry_repeat",
+    "family": "multi_block",
+    "count": 201772.0,
+    "mae": 6.2770155639781535,
+    "rmse": 19.18058088556408
+  },
+  {
+    "name": "bikenyc_K03_seed27",
+    "set": "in_distribution",
+    "family": "random_point",
+    "count": 102268.0,
+    "mae": 3.1809758199656786,
+    "rmse": 13.013808740610285
+  },
+  {
+    "name": "bikenyc_K03_seed27",
+    "set": "in_distribution",
+    "family": "node_outage",
+    "count": 102268.0,
+    "mae": 3.408372907153264,
+    "rmse": 13.801081658332498
+  },
+  {
+    "name": "bikenyc_K03_seed27",
+    "set": "in_distribution",
+    "family": "temporal_gap",
+    "count": 102268.0,
+    "mae": 3.9175763985313097,
+    "rmse": 15.37353794601582
+  },
+  {
+    "name": "bikenyc_K03_seed27",
+    "set": "in_distribution",
+    "family": "spatial_region",
+    "count": 99504.0,
+    "mae": 4.867989996005186,
+    "rmse": 16.60058709140207
+  },
+  {
+    "name": "bikenyc_K03_seed27",
+    "set": "unseen_combinations",
+    "family": "node_plus_space",
+    "count": 135436.0,
+    "mae": 4.149808188923181,
+    "rmse": 15.244498678243675
+  },
+  {
+    "name": "bikenyc_K03_seed27",
+    "set": "unseen_combinations",
+    "family": "time_plus_space",
+    "count": 135436.0,
+    "mae": 8.471856287286984,
+    "rmse": 24.967951045346464
+  },
+  {
+    "name": "bikenyc_K03_seed27",
+    "set": "unseen_combinations",
+    "family": "node_plus_time",
+    "count": 135436.0,
+    "mae": 6.795202623379308,
+    "rmse": 22.785552749486868
+  },
+  {
+    "name": "bikenyc_K03_seed27",
+    "set": "unseen_geometry",
+    "family": "moving_region",
+    "count": 204536.0,
+    "mae": 8.985908730614659,
+    "rmse": 25.079193806465206
+  },
+  {
+    "name": "bikenyc_K03_seed27",
+    "set": "unseen_geometry",
+    "family": "multi_block",
+    "count": 201772.0,
+    "mae": 7.8663987074519754,
+    "rmse": 22.376354196509517
+  },
+  {
+    "name": "bikenyc_K03_seed27",
+    "set": "unseen_triple",
+    "family": "node_plus_time_plus_space",
+    "count": 406308.0,
+    "mae": 5.871519496908749,
+    "rmse": 20.33455114064863
+  },
+  {
+    "name": "bikenyc_K03_seed27",
+    "set": "unseen_combinations_repeat",
+    "family": "node_plus_space",
+    "count": 135436.0,
+    "mae": 3.4863266828981954,
+    "rmse": 13.267386422540476
+  },
+  {
+    "name": "bikenyc_K03_seed27",
+    "set": "unseen_combinations_repeat",
+    "family": "time_plus_space",
+    "count": 135436.0,
+    "mae": 6.606962940521722,
+    "rmse": 21.507481894557
+  },
+  {
+    "name": "bikenyc_K03_seed27",
+    "set": "unseen_combinations_repeat",
+    "family": "node_plus_time",
+    "count": 135436.0,
+    "mae": 7.108600187542455,
+    "rmse": 22.116080497427916
+  },
+  {
+    "name": "bikenyc_K03_seed27",
+    "set": "unseen_geometry_repeat",
+    "family": "moving_region",
+    "count": 204536.0,
+    "mae": 8.465502787406617,
+    "rmse": 24.431239483616704
+  },
+  {
+    "name": "bikenyc_K03_seed27",
+    "set": "unseen_geometry_repeat",
+    "family": "multi_block",
+    "count": 201772.0,
+    "mae": 7.314946294580021,
+    "rmse": 21.44866070162388
+  },
+  {
+    "name": "bikenyc_K04_seed27",
+    "set": "in_distribution",
+    "family": "random_point",
+    "count": 102268.0,
+    "mae": 3.0870159699881685,
+    "rmse": 13.266193092978604
+  },
+  {
+    "name": "bikenyc_K04_seed27",
+    "set": "in_distribution",
+    "family": "node_outage",
+    "count": 102268.0,
+    "mae": 3.5566841686793524,
+    "rmse": 14.256582830647691
+  },
+  {
+    "name": "bikenyc_K04_seed27",
+    "set": "in_distribution",
+    "family": "temporal_gap",
+    "count": 102268.0,
+    "mae": 3.81005422028396,
+    "rmse": 15.796739460979778
+  },
+  {
+    "name": "bikenyc_K04_seed27",
+    "set": "in_distribution",
+    "family": "spatial_region",
+    "count": 99504.0,
+    "mae": 4.571163125351744,
+    "rmse": 15.939194176259445
+  },
+  {
+    "name": "bikenyc_K04_seed27",
+    "set": "unseen_combinations",
+    "family": "node_plus_space",
+    "count": 135436.0,
+    "mae": 4.217155323824537,
+    "rmse": 15.400600559489849
+  },
+  {
+    "name": "bikenyc_K04_seed27",
+    "set": "unseen_combinations",
+    "family": "time_plus_space",
+    "count": 135436.0,
+    "mae": 6.502311054667888,
+    "rmse": 20.943924599811197
+  },
+  {
+    "name": "bikenyc_K04_seed27",
+    "set": "unseen_combinations",
+    "family": "node_plus_time",
+    "count": 135436.0,
+    "mae": 5.4565659702737825,
+    "rmse": 19.337730391153496
+  },
+  {
+    "name": "bikenyc_K04_seed27",
+    "set": "unseen_geometry",
+    "family": "moving_region",
+    "count": 204536.0,
+    "mae": 7.234582405420073,
+    "rmse": 22.669014662304324
+  },
+  {
+    "name": "bikenyc_K04_seed27",
+    "set": "unseen_geometry",
+    "family": "multi_block",
+    "count": 201772.0,
+    "mae": 6.224755231151994,
+    "rmse": 20.14992081679089
+  },
+  {
+    "name": "bikenyc_K04_seed27",
+    "set": "unseen_triple",
+    "family": "node_plus_time_plus_space",
+    "count": 406308.0,
+    "mae": 4.71482921361381,
+    "rmse": 16.798856686958022
+  },
+  {
+    "name": "bikenyc_K04_seed27",
+    "set": "unseen_combinations_repeat",
+    "family": "node_plus_space",
+    "count": 135436.0,
+    "mae": 3.5106042360413774,
+    "rmse": 13.443977277764185
+  },
+  {
+    "name": "bikenyc_K04_seed27",
+    "set": "unseen_combinations_repeat",
+    "family": "time_plus_space",
+    "count": 135436.0,
+    "mae": 5.26169284985159,
+    "rmse": 17.93894204223186
+  },
+  {
+    "name": "bikenyc_K04_seed27",
+    "set": "unseen_combinations_repeat",
+    "family": "node_plus_time",
+    "count": 135436.0,
+    "mae": 5.466659702276352,
+    "rmse": 18.339976741847867
+  },
+  {
+    "name": "bikenyc_K04_seed27",
+    "set": "unseen_geometry_repeat",
+    "family": "moving_region",
+    "count": 204536.0,
+    "mae": 7.045635532986858,
+    "rmse": 23.231637066073116
+  },
+  {
+    "name": "bikenyc_K04_seed27",
+    "set": "unseen_geometry_repeat",
+    "family": "multi_block",
+    "count": 201772.0,
+    "mae": 6.269886075000495,
+    "rmse": 20.39684152175519
+  }
+]

@@ -1,0 +1,4 @@
+{
+  "F01": {"name": "cmff_delta_shared_ffn4", "sharing": "shared", "method": "CMFF受控差分，四轮共用一个Pre-LN残差FFN，64→256→64"},
+  "F02": {"name": "cmff_delta_independent_ffn4", "sharing": "per_step", "method": "CMFF受控差分，每轮独立Pre-LN残差FFN，四个64→256→64模块"}
+}

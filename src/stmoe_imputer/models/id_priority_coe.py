@@ -26,6 +26,12 @@ class IDPriorityCoE(FourDirectionCoE):
         m.scale_policy = m.u.get('scale_policy', 'fixed')
         m.constraint = m.u.get('constraint', 'none')
         m.warmup_epochs = int(m.u.get('fixed_epochs', 0))
+        m.scale_soft_warmup_epochs = int(m.u.get('scale_soft_warmup_epochs', 0))
+        m.scale_soft_transition_epochs = int(m.u.get('scale_soft_transition_epochs', 0))
+        if min(m.scale_soft_warmup_epochs, m.scale_soft_transition_epochs) < 0:
+            raise ValueError('Scale soft-start epochs must be nonnegative')
+        if m.scale_soft_warmup_epochs and (m.scale_policy != 'st' or m.warmup_epochs or m.constraint != 'none'):
+            raise ValueError('Scale soft-start requires unconstrained ST routing without a fixed phase')
         m.bound = float(m.u.get('bound', .1))
         if m.communication not in ('none', 'delta', 'raw_delta', 'innovation', 'innovation_detach', 'innovation_router'):
             raise ValueError('Invalid U communication')
@@ -73,6 +79,14 @@ class IDPriorityCoE(FourDirectionCoE):
 
     def scales_open(self):
         return int(self.stage_epoch.item()) > self.warmup_epochs
+
+    def scale_soft_mass(self):
+        if not self.training or not self.scale_soft_warmup_epochs:
+            return 0.0
+        elapsed = int(self.stage_epoch.item()) - self.scale_soft_warmup_epochs
+        if elapsed <= 0:
+            return 1.0
+        return max(0.0, 1.0 - elapsed / (self.scale_soft_transition_epochs + 1))
 
     def learnable_steps(self):
         if self.constraint == 'last_two_fine':
@@ -167,9 +181,25 @@ class IDPriorityCoE(FourDirectionCoE):
             raise ValueError('Forced scale violates the path constraint')
         hard = F.one_hot(choice, 3).float()
         weights = hard + (probs - probs.detach()) if policy == 'st' and self.training and not probe else hard
+        soft_mass = self.scale_soft_mass() if not probe and force is None else 0.0
+        if soft_mass:
+            # Same two experts at each scale, with real proposals during warmup.
+            # A 5+5 schedule gives mass 1 for epochs1-5, 5/6..1/6 for6-10, 0 from11.
+            weights = soft_mass * probs + (1 - soft_mass) * weights
+            return weights, probs, weights.detach().gt(0), {'base': base, 'legal': legal, 'logits': logits}
         return weights, probs, hard.bool(), {'base': base, 'legal': legal, 'logits': logits}
 
     def _execute(self, c, corrected, weights, scale_weights, step):
+        # Opt-in deterministic spatial operators for the cross-dataset/rate
+        # comparison. Historical U checkpoints retain their original operators.
+        pool, resize, pool_observed = spatial_pool, spatial_resize, observed_pool
+        if self.u.get('deterministic_spatial_ops', False):
+            from ..utils.deterministic import pool, resize
+            def pool_observed(values, mask, factor):
+                coverage = pool(mask.float(), factor)
+                clean = torch.where(mask.bool(), values, torch.zeros_like(values))
+                mean = pool(clean.float(), factor) / coverage.clamp_min(1e-8)
+                return mean.to(values.dtype), coverage.to(values.dtype)
         out = torch.zeros_like(c['h'])
         innovation = torch.zeros_like(c['h']) if self.communication.startswith('innovation') else None
         for sid, factor in enumerate((1, 2, 4)):
@@ -179,9 +209,9 @@ class IDPriorityCoE(FourDirectionCoE):
             h, mask, completion, support, pos = [c[k].index_select(0, selected) for k in ('h', 'mask', 'completion', 'support', 'pos')]
             h = corrected.index_select(0, selected)
             if factor > 1:
-                values, coverage = observed_pool(completion, mask, factor)
-                completion = torch.where(coverage > 0, values, spatial_pool(completion, factor)); mask = coverage
-                h = spatial_pool(h, factor); support = spatial_pool(support, factor); pos = spatial_pool(pos, factor)
+                values, coverage = pool_observed(completion, mask, factor)
+                completion = torch.where(coverage > 0, values, pool(completion, factor)); mask = coverage
+                h = pool(h, factor); support = pool(support, factor); pos = pool(pos, factor)
             z = self.state_norm(self.state_projection(torch.cat((h, completion, mask, support, pos), 1)))
             if hasattr(self, 'scale_identity') and self.scales_open():
                 z = z + self.scale_identity[sid][None, :, None, None, None].to(z.dtype)
@@ -203,14 +233,18 @@ class IDPriorityCoE(FourDirectionCoE):
             if innovation is not None:
                 change = update - z
                 if factor > 1:
-                    change = spatial_resize(change, c['h'].shape[-2:])
+                    change = resize(change, c['h'].shape[-2:])
                 innovation = innovation.index_add(0, selected, (change * scale_weights[selected, sid, None, None, None, None].to(change.dtype)).to(innovation.dtype))
-            restored = spatial_resize(update, c['h'].shape[-2:]) if factor > 1 else update
+            restored = resize(update, c['h'].shape[-2:]) if factor > 1 else update
             out = out.index_add(0, selected, (restored * scale_weights[selected, sid, None, None, None, None].to(restored.dtype)).to(out.dtype))
         return out, innovation, []
 
     def _round(self, c, step, force_scale=None, force_pair=None, probe=False):
         new, row = super()._round(c, step, force_scale, force_pair, probe)
+        if self.scale_soft_mass() and not probe and force_scale is None:
+            # Keep history features in the same range as hard routing. Actual
+            # execution counts remain separately recorded by triscale_executed.
+            new['counts'] = c['counts'] + row['scale_weights'].detach().to(c['counts'].dtype)
         if c['has_prev'] and self.communication.startswith('innovation'):
             row['memory_norm'] = c['message'].detach().float().square().mean().sqrt()
         return new, row
@@ -220,6 +254,8 @@ class IDPriorityCoE(FourDirectionCoE):
         diagnostics = out['coe']['diagnostics']
         diagnostics['scale_phase_open'] = out['x_hat_main'].new_tensor(float(self.scales_open()))
         diagnostics['communication_bound'] = out['x_hat_main'].new_tensor(self.bound)
+        if self.scale_soft_warmup_epochs:
+            diagnostics['scale_soft_mass'] = out['x_hat_main'].new_tensor(self.scale_soft_mass())
         for i in range(1, 5):
             diagnostics[f'step{i}_gate_fraction_of_bound'] = diagnostics[f'step{i}_memory_gate_abs_mean'] / self.bound
         return out

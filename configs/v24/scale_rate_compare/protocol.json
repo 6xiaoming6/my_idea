@@ -1,0 +1,14 @@
+{
+  "rate": 0.4,
+  "split": "test",
+  "evaluations": {
+    "in_distribution": {"families": ["random_point", "node_outage", "temporal_gap", "spatial_region"], "seed": 20260917},
+    "unseen_combinations": {"families": ["node_plus_space", "time_plus_space", "node_plus_time"], "seed": 20260918},
+    "unseen_geometry": {"families": ["moving_region", "multi_block"], "seed": 20260919},
+    "unseen_triple": {"families": ["node_plus_time_plus_space"], "seed": 20260930},
+    "unseen_combinations_repeat": {"families": ["node_plus_space", "time_plus_space", "node_plus_time"], "seed": 20261001},
+    "unseen_geometry_repeat": {"families": ["moving_region", "multi_block"], "seed": 20261002}
+  },
+  "checkpoint_selection": "ID validation MAE only; each rate independently trained",
+  "primary_comparison": "Within each dataset/rate, compare ID MAE/RMSE; do not average raw errors across datasets"
+}

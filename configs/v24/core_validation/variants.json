@@ -1,0 +1,10 @@
+{
+  "K01": {"name":"fine_plain","method":"FFFF，共享专家，无差分","reference":"K01","path":"FFFF","communication":"none","sharing":"shared"},
+  "K02": {"name":"cmff_plain","method":"CMFF，共享专家，无差分","reference":"K01","path":"CMFF","communication":"none","sharing":"shared"},
+  "K03": {"name":"fine_delta","method":"FFFF，共享专家，±0.1 RMS匹配条件差分","reference":"K01","path":"FFFF","communication":"conditional","sharing":"shared"},
+  "K04": {"name":"cmff_delta","method":"CMFF，共享专家，±0.1 RMS匹配条件差分（固定主干）","reference":"K02","path":"CMFF","communication":"conditional","sharing":"shared"},
+  "K05": {"name":"cmff_independent_plain","method":"CMFF，四轮独立专家，无差分","reference":"K02","path":"CMFF","communication":"none","sharing":"per_step"},
+  "K06": {"name":"cmff_independent_delta","method":"CMFF，四轮独立专家，±0.1 RMS匹配条件差分","reference":"K04","path":"CMFF","communication":"conditional","sharing":"per_step"},
+  "K07": {"name":"cmff_unconditional_delta","method":"CMFF，共享专家，原门网络输入置零，RMS匹配差分","reference":"K04","path":"CMFF","communication":"unconditional","sharing":"shared"},
+  "K08": {"name":"cmff_raw_delta","method":"CMFF，共享专家，±0.1条件门传递原始差分（不匹配RMS）","reference":"K04","path":"CMFF","communication":"raw","sharing":"shared"}
+}

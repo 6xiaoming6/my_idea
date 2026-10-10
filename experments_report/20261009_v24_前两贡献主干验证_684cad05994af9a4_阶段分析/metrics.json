@@ -1,0 +1,678 @@
+[
+  {
+    "variant": "taxibj_K01_seed7",
+    "dataset": "taxibj",
+    "method": "K01",
+    "seed": 7,
+    "status": "finished",
+    "issues": [],
+    "epoch": 100,
+    "best_epoch": 90,
+    "val_mae": 16.497243862028757,
+    "run": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261009_112416_fine_plain_seed7/random/rate0.4/20261009_112416_seed7_bs32",
+    "seconds": 6382.592274222756,
+    "parameters": 330807,
+    "trainable": 250043,
+    "peak_gib": 11.099058628082275,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 15.937231044805541,
+        "rmse": 28.47551388721385
+      },
+      "unseen_combinations": {
+        "mae": 25.332755688644724,
+        "rmse": 46.97523656499151
+      },
+      "unseen_geometry": {
+        "mae": 31.654311880468676,
+        "rmse": 57.24015337229154
+      },
+      "unseen_triple": {
+        "mae": 24.221693524715064,
+        "rmse": 42.48105711680489
+      },
+      "unseen_combinations_repeat": {
+        "mae": 25.22670886865972,
+        "rmse": 46.45565558232765
+      },
+      "unseen_geometry_repeat": {
+        "mae": 31.478640153471822,
+        "rmse": 56.98372995819397
+      }
+    }
+  },
+  {
+    "variant": "taxibj_K02_seed7",
+    "dataset": "taxibj",
+    "method": "K02",
+    "seed": 7,
+    "status": "finished",
+    "issues": [],
+    "epoch": 100,
+    "best_epoch": 100,
+    "val_mae": 15.467767842801306,
+    "run": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261009_131133_cmff_plain_seed7/random/rate0.4/20261009_131133_seed7_bs32",
+    "seconds": 4468.979975987109,
+    "parameters": 330807,
+    "trainable": 250043,
+    "peak_gib": 7.473761558532715,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 14.76482837300588,
+        "rmse": 25.79473803910485
+      },
+      "unseen_combinations": {
+        "mae": 17.406888673035667,
+        "rmse": 29.81831284410353
+      },
+      "unseen_geometry": {
+        "mae": 20.982201253523478,
+        "rmse": 35.010043310507704
+      },
+      "unseen_triple": {
+        "mae": 16.422897622381043,
+        "rmse": 27.50204661288937
+      },
+      "unseen_combinations_repeat": {
+        "mae": 17.59447473653956,
+        "rmse": 30.195090727914987
+      },
+      "unseen_geometry_repeat": {
+        "mae": 20.92147049703517,
+        "rmse": 34.80647272807547
+      }
+    }
+  },
+  {
+    "variant": "taxibj_K03_seed7",
+    "dataset": "taxibj",
+    "method": "K03",
+    "seed": 7,
+    "status": "finished",
+    "issues": [],
+    "epoch": 100,
+    "best_epoch": 90,
+    "val_mae": 16.413775781858853,
+    "run": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261009_142644_fine_delta_seed7/random/rate0.4/20261009_142644_seed7_bs32",
+    "seconds": 6362.526794260484,
+    "parameters": 330807,
+    "trainable": 271163,
+    "peak_gib": 11.476171970367432,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 15.634775689910947,
+        "rmse": 28.168748581994063
+      },
+      "unseen_combinations": {
+        "mae": 28.48322825102413,
+        "rmse": 53.293828865308214
+      },
+      "unseen_geometry": {
+        "mae": 32.061021695197425,
+        "rmse": 55.394921318114264
+      },
+      "unseen_triple": {
+        "mae": 27.967321570661642,
+        "rmse": 49.13622649587281
+      },
+      "unseen_combinations_repeat": {
+        "mae": 28.177069148293263,
+        "rmse": 52.007347387942836
+      },
+      "unseen_geometry_repeat": {
+        "mae": 31.546811027927383,
+        "rmse": 54.592897349504135
+      }
+    }
+  },
+  {
+    "variant": "taxibj_K04_seed7",
+    "dataset": "taxibj",
+    "method": "K04",
+    "seed": 7,
+    "status": "finished",
+    "issues": [],
+    "epoch": 100,
+    "best_epoch": 100,
+    "val_mae": 14.341614612149227,
+    "run": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261009_161342_cmff_delta_seed7/random/rate0.4/20261009_161342_seed7_bs32",
+    "seconds": 4714.431394199026,
+    "parameters": 330807,
+    "trainable": 271163,
+    "peak_gib": 7.869661331176758,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 13.51282794961301,
+        "rmse": 24.148973123681294
+      },
+      "unseen_combinations": {
+        "mae": 22.128486947844618,
+        "rmse": 38.2790630217423
+      },
+      "unseen_geometry": {
+        "mae": 25.97744488698252,
+        "rmse": 44.29221365879767
+      },
+      "unseen_triple": {
+        "mae": 22.33873289341723,
+        "rmse": 37.11130000540129
+      },
+      "unseen_combinations_repeat": {
+        "mae": 22.312937781752307,
+        "rmse": 38.4998018505619
+      },
+      "unseen_geometry_repeat": {
+        "mae": 25.88692628827263,
+        "rmse": 43.95711047847427
+      }
+    }
+  },
+  {
+    "variant": "taxibj_K05_seed7",
+    "dataset": "taxibj",
+    "method": "K05",
+    "seed": 7,
+    "status": "finished",
+    "issues": [],
+    "epoch": 100,
+    "best_epoch": 80,
+    "val_mae": 14.306369242026735,
+    "run": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261009_173301_cmff_independent_plain_seed7/random/rate0.4/20261009_173301_seed7_bs32",
+    "seconds": 4482.367842974723,
+    "parameters": 821175,
+    "trainable": 740411,
+    "peak_gib": 7.473747253417969,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 13.515570915787626,
+        "rmse": 23.79842105826062
+      },
+      "unseen_combinations": {
+        "mae": 17.669424469877594,
+        "rmse": 31.22783168288077
+      },
+      "unseen_geometry": {
+        "mae": 22.25887982908885,
+        "rmse": 37.419609184672666
+      },
+      "unseen_triple": {
+        "mae": 17.46488456159233,
+        "rmse": 30.288974174961336
+      },
+      "unseen_combinations_repeat": {
+        "mae": 17.91391289833823,
+        "rmse": 32.10253316345766
+      },
+      "unseen_geometry_repeat": {
+        "mae": 21.881884855485257,
+        "rmse": 36.30478252791516
+      }
+    }
+  },
+  {
+    "variant": "taxibj_K06_seed7",
+    "dataset": "taxibj",
+    "method": "K06",
+    "seed": 7,
+    "status": "finished",
+    "issues": [],
+    "epoch": 100,
+    "best_epoch": 100,
+    "val_mae": 13.534147391622495,
+    "run": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261009_184831_cmff_independent_delta_seed7/random/rate0.4/20261009_184831_seed7_bs32",
+    "seconds": 4539.053168144659,
+    "parameters": 821175,
+    "trainable": 761531,
+    "peak_gib": 7.8744001388549805,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 12.69169562729053,
+        "rmse": 22.6919967433013
+      },
+      "unseen_combinations": {
+        "mae": 24.56731322510975,
+        "rmse": 45.59821434320678
+      },
+      "unseen_geometry": {
+        "mae": 24.93391788768326,
+        "rmse": 43.422242450960546
+      },
+      "unseen_triple": {
+        "mae": 22.75051661484271,
+        "rmse": 41.96370913276813
+      },
+      "unseen_combinations_repeat": {
+        "mae": 24.565601127944504,
+        "rmse": 45.467885215406085
+      },
+      "unseen_geometry_repeat": {
+        "mae": 24.673587731175385,
+        "rmse": 42.69174195939735
+      }
+    }
+  },
+  {
+    "variant": "taxibj_K07_seed7",
+    "dataset": "taxibj",
+    "method": "K07",
+    "seed": 7,
+    "status": "finished",
+    "issues": [],
+    "epoch": 100,
+    "best_epoch": 100,
+    "val_mae": 14.346897550760591,
+    "run": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261009_200500_cmff_unconditional_delta_seed7/random/rate0.4/20261009_200500_seed7_bs32",
+    "seconds": 4644.006873125094,
+    "parameters": 330807,
+    "trainable": 271163,
+    "peak_gib": 7.865882396697998,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 13.423781099771073,
+        "rmse": 24.141917318530627
+      },
+      "unseen_combinations": {
+        "mae": 21.3326619001095,
+        "rmse": 36.38085040512875
+      },
+      "unseen_geometry": {
+        "mae": 23.457607249334874,
+        "rmse": 40.23674806864465
+      },
+      "unseen_triple": {
+        "mae": 21.490545236128757,
+        "rmse": 36.328160988696176
+      },
+      "unseen_combinations_repeat": {
+        "mae": 21.72044003720965,
+        "rmse": 37.47652278629538
+      },
+      "unseen_geometry_repeat": {
+        "mae": 23.596795577864718,
+        "rmse": 40.6616559454119
+      }
+    }
+  },
+  {
+    "variant": "taxibj_K08_seed7",
+    "dataset": "taxibj",
+    "method": "K08",
+    "seed": 7,
+    "status": "finished",
+    "issues": [],
+    "epoch": 100,
+    "best_epoch": 90,
+    "val_mae": 14.765518938920717,
+    "run": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261009_212308_cmff_raw_delta_seed7/random/rate0.4/20261009_212308_seed7_bs32",
+    "seconds": 4708.903513223864,
+    "parameters": 330807,
+    "trainable": 271163,
+    "peak_gib": 7.878287315368652,
+    "evaluations": {
+      "in_distribution": {
+        "mae": 13.824986375526812,
+        "rmse": 24.227781847917708
+      },
+      "unseen_combinations": {
+        "mae": 24.265756649282498,
+        "rmse": 42.20655797993894
+      },
+      "unseen_geometry": {
+        "mae": 26.627185563346337,
+        "rmse": 45.15345474254535
+      },
+      "unseen_triple": {
+        "mae": 24.43640586936909,
+        "rmse": 40.38523645016149
+      },
+      "unseen_combinations_repeat": {
+        "mae": 24.265260111427505,
+        "rmse": 42.19447635613162
+      },
+      "unseen_geometry_repeat": {
+        "mae": 26.44183019032175,
+        "rmse": 44.769266324970864
+      }
+    }
+  },
+  {
+    "variant": "taxibj_K01_seed17",
+    "dataset": "taxibj",
+    "method": "K01",
+    "seed": 17,
+    "status": "pending",
+    "issues": [],
+    "epoch": 0,
+    "best_epoch": null,
+    "val_mae": null,
+    "run": null,
+    "seconds": null,
+    "parameters": null,
+    "trainable": null,
+    "peak_gib": 0,
+    "evaluations": {}
+  },
+  {
+    "variant": "taxibj_K02_seed17",
+    "dataset": "taxibj",
+    "method": "K02",
+    "seed": 17,
+    "status": "pending",
+    "issues": [],
+    "epoch": 0,
+    "best_epoch": null,
+    "val_mae": null,
+    "run": null,
+    "seconds": null,
+    "parameters": null,
+    "trainable": null,
+    "peak_gib": 0,
+    "evaluations": {}
+  },
+  {
+    "variant": "taxibj_K03_seed17",
+    "dataset": "taxibj",
+    "method": "K03",
+    "seed": 17,
+    "status": "pending",
+    "issues": [],
+    "epoch": 0,
+    "best_epoch": null,
+    "val_mae": null,
+    "run": null,
+    "seconds": null,
+    "parameters": null,
+    "trainable": null,
+    "peak_gib": 0,
+    "evaluations": {}
+  },
+  {
+    "variant": "taxibj_K04_seed17",
+    "dataset": "taxibj",
+    "method": "K04",
+    "seed": 17,
+    "status": "pending",
+    "issues": [],
+    "epoch": 0,
+    "best_epoch": null,
+    "val_mae": null,
+    "run": null,
+    "seconds": null,
+    "parameters": null,
+    "trainable": null,
+    "peak_gib": 0,
+    "evaluations": {}
+  },
+  {
+    "variant": "taxibj_K01_seed27",
+    "dataset": "taxibj",
+    "method": "K01",
+    "seed": 27,
+    "status": "pending",
+    "issues": [],
+    "epoch": 0,
+    "best_epoch": null,
+    "val_mae": null,
+    "run": null,
+    "seconds": null,
+    "parameters": null,
+    "trainable": null,
+    "peak_gib": 0,
+    "evaluations": {}
+  },
+  {
+    "variant": "taxibj_K02_seed27",
+    "dataset": "taxibj",
+    "method": "K02",
+    "seed": 27,
+    "status": "pending",
+    "issues": [],
+    "epoch": 0,
+    "best_epoch": null,
+    "val_mae": null,
+    "run": null,
+    "seconds": null,
+    "parameters": null,
+    "trainable": null,
+    "peak_gib": 0,
+    "evaluations": {}
+  },
+  {
+    "variant": "taxibj_K03_seed27",
+    "dataset": "taxibj",
+    "method": "K03",
+    "seed": 27,
+    "status": "pending",
+    "issues": [],
+    "epoch": 0,
+    "best_epoch": null,
+    "val_mae": null,
+    "run": null,
+    "seconds": null,
+    "parameters": null,
+    "trainable": null,
+    "peak_gib": 0,
+    "evaluations": {}
+  },
+  {
+    "variant": "taxibj_K04_seed27",
+    "dataset": "taxibj",
+    "method": "K04",
+    "seed": 27,
+    "status": "pending",
+    "issues": [],
+    "epoch": 0,
+    "best_epoch": null,
+    "val_mae": null,
+    "run": null,
+    "seconds": null,
+    "parameters": null,
+    "trainable": null,
+    "peak_gib": 0,
+    "evaluations": {}
+  },
+  {
+    "variant": "bikenyc_K01_seed7",
+    "dataset": "bikenyc",
+    "method": "K01",
+    "seed": 7,
+    "status": "pending",
+    "issues": [],
+    "epoch": 0,
+    "best_epoch": null,
+    "val_mae": null,
+    "run": null,
+    "seconds": null,
+    "parameters": null,
+    "trainable": null,
+    "peak_gib": 0,
+    "evaluations": {}
+  },
+  {
+    "variant": "bikenyc_K02_seed7",
+    "dataset": "bikenyc",
+    "method": "K02",
+    "seed": 7,
+    "status": "pending",
+    "issues": [],
+    "epoch": 0,
+    "best_epoch": null,
+    "val_mae": null,
+    "run": null,
+    "seconds": null,
+    "parameters": null,
+    "trainable": null,
+    "peak_gib": 0,
+    "evaluations": {}
+  },
+  {
+    "variant": "bikenyc_K03_seed7",
+    "dataset": "bikenyc",
+    "method": "K03",
+    "seed": 7,
+    "status": "pending",
+    "issues": [],
+    "epoch": 0,
+    "best_epoch": null,
+    "val_mae": null,
+    "run": null,
+    "seconds": null,
+    "parameters": null,
+    "trainable": null,
+    "peak_gib": 0,
+    "evaluations": {}
+  },
+  {
+    "variant": "bikenyc_K04_seed7",
+    "dataset": "bikenyc",
+    "method": "K04",
+    "seed": 7,
+    "status": "pending",
+    "issues": [],
+    "epoch": 0,
+    "best_epoch": null,
+    "val_mae": null,
+    "run": null,
+    "seconds": null,
+    "parameters": null,
+    "trainable": null,
+    "peak_gib": 0,
+    "evaluations": {}
+  },
+  {
+    "variant": "bikenyc_K01_seed17",
+    "dataset": "bikenyc",
+    "method": "K01",
+    "seed": 17,
+    "status": "pending",
+    "issues": [],
+    "epoch": 0,
+    "best_epoch": null,
+    "val_mae": null,
+    "run": null,
+    "seconds": null,
+    "parameters": null,
+    "trainable": null,
+    "peak_gib": 0,
+    "evaluations": {}
+  },
+  {
+    "variant": "bikenyc_K02_seed17",
+    "dataset": "bikenyc",
+    "method": "K02",
+    "seed": 17,
+    "status": "pending",
+    "issues": [],
+    "epoch": 0,
+    "best_epoch": null,
+    "val_mae": null,
+    "run": null,
+    "seconds": null,
+    "parameters": null,
+    "trainable": null,
+    "peak_gib": 0,
+    "evaluations": {}
+  },
+  {
+    "variant": "bikenyc_K03_seed17",
+    "dataset": "bikenyc",
+    "method": "K03",
+    "seed": 17,
+    "status": "pending",
+    "issues": [],
+    "epoch": 0,
+    "best_epoch": null,
+    "val_mae": null,
+    "run": null,
+    "seconds": null,
+    "parameters": null,
+    "trainable": null,
+    "peak_gib": 0,
+    "evaluations": {}
+  },
+  {
+    "variant": "bikenyc_K04_seed17",
+    "dataset": "bikenyc",
+    "method": "K04",
+    "seed": 17,
+    "status": "pending",
+    "issues": [],
+    "epoch": 0,
+    "best_epoch": null,
+    "val_mae": null,
+    "run": null,
+    "seconds": null,
+    "parameters": null,
+    "trainable": null,
+    "peak_gib": 0,
+    "evaluations": {}
+  },
+  {
+    "variant": "bikenyc_K01_seed27",
+    "dataset": "bikenyc",
+    "method": "K01",
+    "seed": 27,
+    "status": "pending",
+    "issues": [],
+    "epoch": 0,
+    "best_epoch": null,
+    "val_mae": null,
+    "run": null,
+    "seconds": null,
+    "parameters": null,
+    "trainable": null,
+    "peak_gib": 0,
+    "evaluations": {}
+  },
+  {
+    "variant": "bikenyc_K02_seed27",
+    "dataset": "bikenyc",
+    "method": "K02",
+    "seed": 27,
+    "status": "pending",
+    "issues": [],
+    "epoch": 0,
+    "best_epoch": null,
+    "val_mae": null,
+    "run": null,
+    "seconds": null,
+    "parameters": null,
+    "trainable": null,
+    "peak_gib": 0,
+    "evaluations": {}
+  },
+  {
+    "variant": "bikenyc_K03_seed27",
+    "dataset": "bikenyc",
+    "method": "K03",
+    "seed": 27,
+    "status": "pending",
+    "issues": [],
+    "epoch": 0,
+    "best_epoch": null,
+    "val_mae": null,
+    "run": null,
+    "seconds": null,
+    "parameters": null,
+    "trainable": null,
+    "peak_gib": 0,
+    "evaluations": {}
+  },
+  {
+    "variant": "bikenyc_K04_seed27",
+    "dataset": "bikenyc",
+    "method": "K04",
+    "seed": 27,
+    "status": "pending",
+    "issues": [],
+    "epoch": 0,
+    "best_epoch": null,
+    "val_mae": null,
+    "run": null,
+    "seconds": null,
+    "parameters": null,
+    "trainable": null,
+    "peak_gib": 0,
+    "evaluations": {}
+  }
+]

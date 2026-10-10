@@ -1,0 +1,349 @@
+[
+  {
+    "variant": "taxibj_r20_cmff",
+    "dataset": "taxibj",
+    "rate": 0.2,
+    "method": "cmff",
+    "status": "finished",
+    "completed_epochs": 100,
+    "best_epoch": 90,
+    "val_mae": 12.893905997958688,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261008_185522_scale_cmff_seed7/random/rate0.2/20261008_185522_seed7_bs32",
+    "training_seconds": 3365.270601148368,
+    "params": 330807,
+    "trainable_params": 271163,
+    "peak_gib": 8.036079406738281,
+    "issues": [],
+    "evaluations": {
+      "in_distribution": {
+        "mae": 12.250009872362048,
+        "rmse": 21.049844304907896
+      },
+      "unseen_combinations": {
+        "mae": 25.09753729163382,
+        "rmse": 46.20008373963765
+      },
+      "unseen_geometry": {
+        "mae": 23.46737538597519,
+        "rmse": 38.947676555543545
+      },
+      "unseen_triple": {
+        "mae": 21.929107638093665,
+        "rmse": 36.41849908241391
+      },
+      "unseen_combinations_repeat": {
+        "mae": 24.975115425714954,
+        "rmse": 45.877128465453886
+      },
+      "unseen_geometry_repeat": {
+        "mae": 23.246853503785808,
+        "rmse": 38.90454406744556
+      }
+    }
+  },
+  {
+    "variant": "taxibj_r20_top1",
+    "dataset": "taxibj",
+    "rate": 0.2,
+    "method": "top1",
+    "status": "finished",
+    "completed_epochs": 100,
+    "best_epoch": 100,
+    "val_mae": 12.211227347508315,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261008_195213_scale_soft_top1_seed7/random/rate0.2/20261008_195213_seed7_bs32",
+    "training_seconds": 5170.20597167185,
+    "params": 330807,
+    "trainable_params": 330807,
+    "peak_gib": 15.70198106765747,
+    "issues": [],
+    "evaluations": {
+      "in_distribution": {
+        "mae": 11.729926206161677,
+        "rmse": 20.098235079816302
+      },
+      "unseen_combinations": {
+        "mae": 23.81537842292235,
+        "rmse": 48.93204886006377
+      },
+      "unseen_geometry": {
+        "mae": 23.680989689729465,
+        "rmse": 41.91396773150604
+      },
+      "unseen_triple": {
+        "mae": 18.161406771670716,
+        "rmse": 29.838293528261545
+      },
+      "unseen_combinations_repeat": {
+        "mae": 22.27327786084868,
+        "rmse": 42.260016673710076
+      },
+      "unseen_geometry_repeat": {
+        "mae": 23.010589286145866,
+        "rmse": 41.331343086683056
+      }
+    }
+  },
+  {
+    "variant": "taxibj_r40_cmff",
+    "dataset": "taxibj",
+    "rate": 0.4,
+    "method": "cmff",
+    "status": "finished",
+    "completed_epochs": 100,
+    "best_epoch": 95,
+    "val_mae": 14.669126465706483,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261008_211914_scale_cmff_seed7/random/rate0.4/20261008_211914_seed7_bs32",
+    "training_seconds": 4755.740039434284,
+    "params": 330807,
+    "trainable_params": 271163,
+    "peak_gib": 8.051559925079346,
+    "issues": [],
+    "evaluations": {
+      "in_distribution": {
+        "mae": 14.01541062813228,
+        "rmse": 24.638919417719595
+      },
+      "unseen_combinations": {
+        "mae": 15.518570120981725,
+        "rmse": 26.473943805381932
+      },
+      "unseen_geometry": {
+        "mae": 20.04316484011793,
+        "rmse": 33.68345770651205
+      },
+      "unseen_triple": {
+        "mae": 15.304126538171547,
+        "rmse": 25.627892577606254
+      },
+      "unseen_combinations_repeat": {
+        "mae": 15.592570795100873,
+        "rmse": 26.852437479344765
+      },
+      "unseen_geometry_repeat": {
+        "mae": 19.969100364794144,
+        "rmse": 33.874801341978284
+      }
+    }
+  },
+  {
+    "variant": "taxibj_r40_top1",
+    "dataset": "taxibj",
+    "rate": 0.4,
+    "method": "top1",
+    "status": "pending",
+    "completed_epochs": 0,
+    "best_epoch": null,
+    "val_mae": null,
+    "run_dir": null,
+    "training_seconds": null,
+    "params": null,
+    "trainable_params": null,
+    "peak_gib": 0,
+    "issues": [],
+    "evaluations": {}
+  },
+  {
+    "variant": "taxibj_r60_cmff",
+    "dataset": "taxibj",
+    "rate": 0.6,
+    "method": "cmff",
+    "status": "pending",
+    "completed_epochs": 0,
+    "best_epoch": null,
+    "val_mae": null,
+    "run_dir": null,
+    "training_seconds": null,
+    "params": null,
+    "trainable_params": null,
+    "peak_gib": 0,
+    "issues": [],
+    "evaluations": {}
+  },
+  {
+    "variant": "taxibj_r60_top1",
+    "dataset": "taxibj",
+    "rate": 0.6,
+    "method": "top1",
+    "status": "pending",
+    "completed_epochs": 0,
+    "best_epoch": null,
+    "val_mae": null,
+    "run_dir": null,
+    "training_seconds": null,
+    "params": null,
+    "trainable_params": null,
+    "peak_gib": 0,
+    "issues": [],
+    "evaluations": {}
+  },
+  {
+    "variant": "taxibj_r80_cmff",
+    "dataset": "taxibj",
+    "rate": 0.8,
+    "method": "cmff",
+    "status": "pending",
+    "completed_epochs": 0,
+    "best_epoch": null,
+    "val_mae": null,
+    "run_dir": null,
+    "training_seconds": null,
+    "params": null,
+    "trainable_params": null,
+    "peak_gib": 0,
+    "issues": [],
+    "evaluations": {}
+  },
+  {
+    "variant": "taxibj_r80_top1",
+    "dataset": "taxibj",
+    "rate": 0.8,
+    "method": "top1",
+    "status": "pending",
+    "completed_epochs": 0,
+    "best_epoch": null,
+    "val_mae": null,
+    "run_dir": null,
+    "training_seconds": null,
+    "params": null,
+    "trainable_params": null,
+    "peak_gib": 0,
+    "issues": [],
+    "evaluations": {}
+  },
+  {
+    "variant": "bikenyc_r20_cmff",
+    "dataset": "bikenyc",
+    "rate": 0.2,
+    "method": "cmff",
+    "status": "pending",
+    "completed_epochs": 0,
+    "best_epoch": null,
+    "val_mae": null,
+    "run_dir": null,
+    "training_seconds": null,
+    "params": null,
+    "trainable_params": null,
+    "peak_gib": 0,
+    "issues": [],
+    "evaluations": {}
+  },
+  {
+    "variant": "bikenyc_r20_top1",
+    "dataset": "bikenyc",
+    "rate": 0.2,
+    "method": "top1",
+    "status": "pending",
+    "completed_epochs": 0,
+    "best_epoch": null,
+    "val_mae": null,
+    "run_dir": null,
+    "training_seconds": null,
+    "params": null,
+    "trainable_params": null,
+    "peak_gib": 0,
+    "issues": [],
+    "evaluations": {}
+  },
+  {
+    "variant": "bikenyc_r40_cmff",
+    "dataset": "bikenyc",
+    "rate": 0.4,
+    "method": "cmff",
+    "status": "pending",
+    "completed_epochs": 0,
+    "best_epoch": null,
+    "val_mae": null,
+    "run_dir": null,
+    "training_seconds": null,
+    "params": null,
+    "trainable_params": null,
+    "peak_gib": 0,
+    "issues": [],
+    "evaluations": {}
+  },
+  {
+    "variant": "bikenyc_r40_top1",
+    "dataset": "bikenyc",
+    "rate": 0.4,
+    "method": "top1",
+    "status": "pending",
+    "completed_epochs": 0,
+    "best_epoch": null,
+    "val_mae": null,
+    "run_dir": null,
+    "training_seconds": null,
+    "params": null,
+    "trainable_params": null,
+    "peak_gib": 0,
+    "issues": [],
+    "evaluations": {}
+  },
+  {
+    "variant": "bikenyc_r60_cmff",
+    "dataset": "bikenyc",
+    "rate": 0.6,
+    "method": "cmff",
+    "status": "pending",
+    "completed_epochs": 0,
+    "best_epoch": null,
+    "val_mae": null,
+    "run_dir": null,
+    "training_seconds": null,
+    "params": null,
+    "trainable_params": null,
+    "peak_gib": 0,
+    "issues": [],
+    "evaluations": {}
+  },
+  {
+    "variant": "bikenyc_r60_top1",
+    "dataset": "bikenyc",
+    "rate": 0.6,
+    "method": "top1",
+    "status": "pending",
+    "completed_epochs": 0,
+    "best_epoch": null,
+    "val_mae": null,
+    "run_dir": null,
+    "training_seconds": null,
+    "params": null,
+    "trainable_params": null,
+    "peak_gib": 0,
+    "issues": [],
+    "evaluations": {}
+  },
+  {
+    "variant": "bikenyc_r80_cmff",
+    "dataset": "bikenyc",
+    "rate": 0.8,
+    "method": "cmff",
+    "status": "pending",
+    "completed_epochs": 0,
+    "best_epoch": null,
+    "val_mae": null,
+    "run_dir": null,
+    "training_seconds": null,
+    "params": null,
+    "trainable_params": null,
+    "peak_gib": 0,
+    "issues": [],
+    "evaluations": {}
+  },
+  {
+    "variant": "bikenyc_r80_top1",
+    "dataset": "bikenyc",
+    "rate": 0.8,
+    "method": "top1",
+    "status": "pending",
+    "completed_epochs": 0,
+    "best_epoch": null,
+    "val_mae": null,
+    "run_dir": null,
+    "training_seconds": null,
+    "params": null,
+    "trainable_params": null,
+    "peak_gib": 0,
+    "issues": [],
+    "evaluations": {}
+  }
+]

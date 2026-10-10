@@ -1,0 +1,138 @@
+{
+  "taxibj_r20_top1": {
+    "mae_change_pct": {
+      "in_distribution": -4.245577527033362,
+      "unseen_combinations": -5.10870390912368,
+      "unseen_geometry": 0.9102607353438374,
+      "unseen_triple": -17.18127763611307,
+      "unseen_combinations_repeat": -10.818118430333257,
+      "unseen_geometry_repeat": -1.016327726251065
+    },
+    "rmse_change_pct": -4.520742345204532,
+    "val_change_pct": -5.294583740244829,
+    "A4_cmff_top1": [
+      20.68600754701618,
+      19.346925272621053
+    ],
+    "A4_change_pct": -6.473372260701327
+  },
+  "taxibj_r40_top1": {
+    "mae_change_pct": {
+      "in_distribution": -0.02064869918293466,
+      "unseen_combinations": 98.11655306264943,
+      "unseen_geometry": 56.54941864280627,
+      "unseen_triple": 105.82999801377957,
+      "unseen_combinations_repeat": 92.96169631849718,
+      "unseen_geometry_repeat": 57.812688447919584
+    },
+    "rmse_change_pct": -0.2445004920345606,
+    "val_change_pct": 1.511593214631013,
+    "A4_cmff_top1": [
+      16.22031803185087,
+      26.90882855520511
+    ],
+    "A4_change_pct": 65.89581352453047
+  },
+  "taxibj_r60_top1": {
+    "mae_change_pct": {
+      "in_distribution": 161.5981686352994,
+      "unseen_combinations": 123.84653126972847,
+      "unseen_geometry": 112.15391400134509,
+      "unseen_triple": 122.22697267810135,
+      "unseen_combinations_repeat": 122.15346393494757,
+      "unseen_geometry_repeat": 110.85032120882121
+    },
+    "rmse_change_pct": 158.16686129337904,
+    "val_change_pct": 163.82725442450678,
+    "A4_cmff_top1": [
+      18.41630781528556,
+      41.96774189632324
+    ],
+    "A4_change_pct": 127.88358186264652
+  },
+  "taxibj_r80_top1": {
+    "mae_change_pct": {
+      "in_distribution": 10.670058383517823,
+      "unseen_combinations": -14.131221197828536,
+      "unseen_geometry": -17.403569257232444,
+      "unseen_triple": -22.430476703888026,
+      "unseen_combinations_repeat": -13.888990067893726,
+      "unseen_geometry_repeat": -18.508102522819915
+    },
+    "rmse_change_pct": 8.941983295423128,
+    "val_change_pct": 10.126092622126158,
+    "A4_cmff_top1": [
+      27.199376307140053,
+      23.50462206205997
+    ],
+    "A4_change_pct": -13.583966791584778
+  },
+  "bikenyc_r20_top1": {
+    "mae_change_pct": {
+      "in_distribution": 5.690050643222633,
+      "unseen_combinations": 11.154633589518292,
+      "unseen_geometry": -4.20393344104234,
+      "unseen_triple": 6.84329722678616,
+      "unseen_combinations_repeat": 8.702812935483228,
+      "unseen_geometry_repeat": -5.85747496650918
+    },
+    "rmse_change_pct": 1.793836081402178,
+    "val_change_pct": 7.828739773878501,
+    "A4_cmff_top1": [
+      4.682634588861775,
+      4.844667965096676
+    ],
+    "A4_change_pct": 3.4603036636750906
+  },
+  "bikenyc_r40_top1": {
+    "mae_change_pct": {
+      "in_distribution": 13.18679166387482,
+      "unseen_combinations": 14.776251378458438,
+      "unseen_geometry": -2.6758269813379254,
+      "unseen_triple": 22.17185664707837,
+      "unseen_combinations_repeat": 11.672084734730026,
+      "unseen_geometry_repeat": -1.516695130876411
+    },
+    "rmse_change_pct": 8.18229235519794,
+    "val_change_pct": 16.56721621333588,
+    "A4_cmff_top1": [
+      4.757089564751371,
+      5.248741083580683
+    ],
+    "A4_change_pct": 10.335132692735161
+  },
+  "bikenyc_r60_top1": {
+    "mae_change_pct": {
+      "in_distribution": -3.3189857285256363,
+      "unseen_combinations": -7.186714102116277,
+      "unseen_geometry": -8.175503672976825,
+      "unseen_triple": -11.034972298724933,
+      "unseen_combinations_repeat": -6.759886893491118,
+      "unseen_geometry_repeat": -10.060259656004423
+    },
+    "rmse_change_pct": -2.6699718062373368,
+    "val_change_pct": -1.0941947980476097,
+    "A4_cmff_top1": [
+      5.544811559357349,
+      5.109965951032052
+    ],
+    "A4_change_pct": -7.842387494512004
+  },
+  "bikenyc_r80_top1": {
+    "mae_change_pct": {
+      "in_distribution": 13.02000997953665,
+      "unseen_combinations": 7.787964961137628,
+      "unseen_geometry": 2.5198018975743475,
+      "unseen_triple": 11.157185798672442,
+      "unseen_combinations_repeat": 10.010359215845831,
+      "unseen_geometry_repeat": 5.455050709800546
+    },
+    "rmse_change_pct": 5.155680285156672,
+    "val_change_pct": 16.895762024476156,
+    "A4_cmff_top1": [
+      5.872533754120997,
+      6.346721183387459
+    ],
+    "A4_change_pct": 8.074665027403283
+  }
+}

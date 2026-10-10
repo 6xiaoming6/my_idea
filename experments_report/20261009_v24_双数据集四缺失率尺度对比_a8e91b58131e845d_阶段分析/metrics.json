@@ -1,0 +1,649 @@
+[
+  {
+    "variant": "taxibj_r20_cmff",
+    "dataset": "taxibj",
+    "rate": 0.2,
+    "method": "cmff",
+    "status": "finished",
+    "completed_epochs": 100,
+    "best_epoch": 90,
+    "val_mae": 12.893905997958688,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261008_185522_scale_cmff_seed7/random/rate0.2/20261008_185522_seed7_bs32",
+    "training_seconds": 3365.270601148368,
+    "params": 330807,
+    "trainable_params": 271163,
+    "peak_gib": 8.036079406738281,
+    "issues": [],
+    "evaluations": {
+      "in_distribution": {
+        "mae": 12.250009872362048,
+        "rmse": 21.049844304907896
+      },
+      "unseen_combinations": {
+        "mae": 25.09753729163382,
+        "rmse": 46.20008373963765
+      },
+      "unseen_geometry": {
+        "mae": 23.46737538597519,
+        "rmse": 38.947676555543545
+      },
+      "unseen_triple": {
+        "mae": 21.929107638093665,
+        "rmse": 36.41849908241391
+      },
+      "unseen_combinations_repeat": {
+        "mae": 24.975115425714954,
+        "rmse": 45.877128465453886
+      },
+      "unseen_geometry_repeat": {
+        "mae": 23.246853503785808,
+        "rmse": 38.90454406744556
+      }
+    }
+  },
+  {
+    "variant": "taxibj_r20_top1",
+    "dataset": "taxibj",
+    "rate": 0.2,
+    "method": "top1",
+    "status": "finished",
+    "completed_epochs": 100,
+    "best_epoch": 100,
+    "val_mae": 12.211227347508315,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261008_195213_scale_soft_top1_seed7/random/rate0.2/20261008_195213_seed7_bs32",
+    "training_seconds": 5170.20597167185,
+    "params": 330807,
+    "trainable_params": 330807,
+    "peak_gib": 15.70198106765747,
+    "issues": [],
+    "evaluations": {
+      "in_distribution": {
+        "mae": 11.729926206161677,
+        "rmse": 20.098235079816302
+      },
+      "unseen_combinations": {
+        "mae": 23.81537842292235,
+        "rmse": 48.93204886006377
+      },
+      "unseen_geometry": {
+        "mae": 23.680989689729465,
+        "rmse": 41.91396773150604
+      },
+      "unseen_triple": {
+        "mae": 18.161406771670716,
+        "rmse": 29.838293528261545
+      },
+      "unseen_combinations_repeat": {
+        "mae": 22.27327786084868,
+        "rmse": 42.260016673710076
+      },
+      "unseen_geometry_repeat": {
+        "mae": 23.010589286145866,
+        "rmse": 41.331343086683056
+      }
+    }
+  },
+  {
+    "variant": "taxibj_r40_cmff",
+    "dataset": "taxibj",
+    "rate": 0.4,
+    "method": "cmff",
+    "status": "finished",
+    "completed_epochs": 100,
+    "best_epoch": 95,
+    "val_mae": 14.669126465706483,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261008_211914_scale_cmff_seed7/random/rate0.4/20261008_211914_seed7_bs32",
+    "training_seconds": 4755.740039434284,
+    "params": 330807,
+    "trainable_params": 271163,
+    "peak_gib": 8.051559925079346,
+    "issues": [],
+    "evaluations": {
+      "in_distribution": {
+        "mae": 14.01541062813228,
+        "rmse": 24.638919417719595
+      },
+      "unseen_combinations": {
+        "mae": 15.518570120981725,
+        "rmse": 26.473943805381932
+      },
+      "unseen_geometry": {
+        "mae": 20.04316484011793,
+        "rmse": 33.68345770651205
+      },
+      "unseen_triple": {
+        "mae": 15.304126538171547,
+        "rmse": 25.627892577606254
+      },
+      "unseen_combinations_repeat": {
+        "mae": 15.592570795100873,
+        "rmse": 26.852437479344765
+      },
+      "unseen_geometry_repeat": {
+        "mae": 19.969100364794144,
+        "rmse": 33.874801341978284
+      }
+    }
+  },
+  {
+    "variant": "taxibj_r40_top1",
+    "dataset": "taxibj",
+    "rate": 0.4,
+    "method": "top1",
+    "status": "finished",
+    "completed_epochs": 100,
+    "best_epoch": 100,
+    "val_mae": 14.890863986007746,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261008_223916_scale_soft_top1_seed7/random/rate0.4/20261008_223916_seed7_bs32",
+    "training_seconds": 5251.3634267083835,
+    "params": 330807,
+    "trainable_params": 330807,
+    "peak_gib": 15.709024906158447,
+    "issues": [],
+    "evaluations": {
+      "in_distribution": {
+        "mae": 14.012516628152424,
+        "rmse": 24.57867713851127
+      },
+      "unseen_combinations": {
+        "mae": 30.74485620829922,
+        "rmse": 55.6482881184525
+      },
+      "unseen_geometry": {
+        "mae": 31.377458034823974,
+        "rmse": 55.584128668830886
+      },
+      "unseen_triple": {
+        "mae": 31.500483349544808,
+        "rmse": 53.416535025195515
+      },
+      "unseen_combinations_repeat": {
+        "mae": 30.087689105889226,
+        "rmse": 54.45336950708955
+      },
+      "unseen_geometry_repeat": {
+        "mae": 31.513774144544957,
+        "rmse": 55.77202153383239
+      }
+    }
+  },
+  {
+    "variant": "taxibj_r60_cmff",
+    "dataset": "taxibj",
+    "rate": 0.6,
+    "method": "cmff",
+    "status": "finished",
+    "completed_epochs": 100,
+    "best_epoch": 100,
+    "val_mae": 16.123235521100778,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261009_000739_scale_cmff_seed7/random/rate0.6/20261009_000739_seed7_bs32",
+    "training_seconds": 3811.3795114196837,
+    "params": 330807,
+    "trainable_params": 271163,
+    "peak_gib": 8.045129776000977,
+    "issues": [],
+    "evaluations": {
+      "in_distribution": {
+        "mae": 15.228893294439304,
+        "rmse": 26.599590669340333
+      },
+      "unseen_combinations": {
+        "mae": 18.553699157213973,
+        "rmse": 32.678548176631274
+      },
+      "unseen_geometry": {
+        "mae": 21.13887430647891,
+        "rmse": 35.87158741092065
+      },
+      "unseen_triple": {
+        "mae": 18.743764503010045,
+        "rmse": 32.591591792927645
+      },
+      "unseen_combinations_repeat": {
+        "mae": 18.663519879578974,
+        "rmse": 32.79200264684851
+      },
+      "unseen_geometry_repeat": {
+        "mae": 21.36463267985699,
+        "rmse": 36.32227632357689
+      }
+    }
+  },
+  {
+    "variant": "taxibj_r60_top1",
+    "dataset": "taxibj",
+    "rate": 0.6,
+    "method": "top1",
+    "status": "finished",
+    "completed_epochs": 100,
+    "best_epoch": 90,
+    "val_mae": 42.537489599717,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261009_011156_scale_soft_top1_seed7/random/rate0.6/20261009_011156_seed7_bs32",
+    "training_seconds": 3211.3143100573216,
+    "params": 330807,
+    "trainable_params": 330807,
+    "peak_gib": 15.732303142547607,
+    "issues": [],
+    "evaluations": {
+      "in_distribution": {
+        "mae": 39.838505961677136,
+        "rmse": 68.67132834792245
+      },
+      "unseen_combinations": {
+        "mae": 41.531811985644325,
+        "rmse": 71.61610426341912
+      },
+      "unseen_geometry": {
+        "mae": 44.846949217019706,
+        "rmse": 75.10352435147789
+      },
+      "unseen_triple": {
+        "mae": 41.653700420951786,
+        "rmse": 71.9669774673056
+      },
+      "unseen_combinations_repeat": {
+        "mae": 41.46165590467225,
+        "rmse": 71.4122022054791
+      },
+      "unseen_geometry_repeat": {
+        "mae": 45.04739663056325,
+        "rmse": 75.85691884026451
+      }
+    }
+  },
+  {
+    "variant": "taxibj_r80_cmff",
+    "dataset": "taxibj",
+    "rate": 0.8,
+    "method": "cmff",
+    "status": "finished",
+    "completed_epochs": 100,
+    "best_epoch": 95,
+    "val_mae": 18.210817226178367,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261009_020610_scale_cmff_seed7/random/rate0.8/20261009_020610_seed7_bs32",
+    "training_seconds": 2897.8611059915274,
+    "params": 330807,
+    "trainable_params": 271163,
+    "peak_gib": 8.048738956451416,
+    "issues": [],
+    "evaluations": {
+      "in_distribution": {
+        "mae": 17.202492460225532,
+        "rmse": 30.57284217518733
+      },
+      "unseen_combinations": {
+        "mae": 28.56427669425495,
+        "rmse": 52.96569720296748
+      },
+      "unseen_geometry": {
+        "mae": 31.033846195075835,
+        "rmse": 54.74687333909322
+      },
+      "unseen_triple": {
+        "mae": 31.996889879003888,
+        "rmse": 59.23828836588668
+      },
+      "unseen_combinations_repeat": {
+        "mae": 28.861657081272725,
+        "rmse": 53.33438003273252
+      },
+      "unseen_geometry_repeat": {
+        "mae": 30.917599258109213,
+        "rmse": 54.735736767202674
+      }
+    }
+  },
+  {
+    "variant": "taxibj_r80_top1",
+    "dataset": "taxibj",
+    "rate": 0.8,
+    "method": "top1",
+    "status": "finished",
+    "completed_epochs": 100,
+    "best_epoch": 95,
+    "val_mae": 20.054861445747296,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/TaxiBJ/custom/20261009_025513_scale_soft_top1_seed7/random/rate0.8/20261009_025513_seed7_bs32",
+    "training_seconds": 4349.832944749738,
+    "params": 330807,
+    "trainable_params": 330807,
+    "peak_gib": 15.668851852416992,
+    "issues": [],
+    "evaluations": {
+      "in_distribution": {
+        "mae": 19.038008449151846,
+        "rmse": 33.306660615428655
+      },
+      "unseen_combinations": {
+        "mae": 24.527795571029998,
+        "rmse": 44.3263486297566
+      },
+      "unseen_geometry": {
+        "mae": 25.632849279332817,
+        "rmse": 44.11139023985093
+      },
+      "unseen_triple": {
+        "mae": 24.819834948725216,
+        "rmse": 44.42556679458051
+      },
+      "unseen_combinations_repeat": {
+        "mae": 24.85306439582521,
+        "rmse": 45.169424886194456
+      },
+      "unseen_geometry_repeat": {
+        "mae": 25.195338289823752,
+        "rmse": 43.718409800928825
+      }
+    }
+  },
+  {
+    "variant": "bikenyc_r20_cmff",
+    "dataset": "bikenyc",
+    "rate": 0.2,
+    "method": "cmff",
+    "status": "finished",
+    "completed_epochs": 100,
+    "best_epoch": 100,
+    "val_mae": 3.3269324410721013,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/BikeNYC/custom/20261009_040823_scale_cmff_seed7/random/rate0.2/20261009_040823_seed7_bs32",
+    "training_seconds": 231.46109903615434,
+    "params": 330807,
+    "trainable_params": 271163,
+    "peak_gib": 2.3302416801452637,
+    "issues": [],
+    "evaluations": {
+      "in_distribution": {
+        "mae": 3.207299134831212,
+        "rmse": 12.760778266808792
+      },
+      "unseen_combinations": {
+        "mae": 4.7500057684072186,
+        "rmse": 18.034216810523528
+      },
+      "unseen_geometry": {
+        "mae": 7.254791623595893,
+        "rmse": 23.38228850169206
+      },
+      "unseen_triple": {
+        "mae": 3.5184418286127763,
+        "rmse": 13.179236055716434
+      },
+      "unseen_combinations_repeat": {
+        "mae": 4.183856981649389,
+        "rmse": 16.60724346646091
+      },
+      "unseen_geometry_repeat": {
+        "mae": 7.165522599235063,
+        "rmse": 23.44741907661567
+      }
+    }
+  },
+  {
+    "variant": "bikenyc_r20_top1",
+    "dataset": "bikenyc",
+    "rate": 0.2,
+    "method": "top1",
+    "status": "finished",
+    "completed_epochs": 100,
+    "best_epoch": 95,
+    "val_mae": 3.5873893243363795,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/BikeNYC/custom/20261009_041225_scale_soft_top1_seed7/random/rate0.2/20261009_041225_seed7_bs32",
+    "training_seconds": 240.66906377708074,
+    "params": 330807,
+    "trainable_params": 330807,
+    "peak_gib": 4.517205715179443,
+    "issues": [],
+    "evaluations": {
+      "in_distribution": {
+        "mae": 3.389796079882749,
+        "rmse": 12.989685711626537
+      },
+      "unseen_combinations": {
+        "mae": 5.279851507354027,
+        "rmse": 19.679249527529848
+      },
+      "unseen_geometry": {
+        "mae": 6.949805012453607,
+        "rmse": 22.66748919494233
+      },
+      "unseen_triple": {
+        "mae": 3.759219260696319,
+        "rmse": 14.516893464555968
+      },
+      "unseen_combinations_repeat": {
+        "mae": 4.54797022825049,
+        "rmse": 17.786829455144968
+      },
+      "unseen_geometry_repeat": {
+        "mae": 6.745803906765311,
+        "rmse": 22.40611586983707
+      }
+    }
+  },
+  {
+    "variant": "bikenyc_r40_cmff",
+    "dataset": "bikenyc",
+    "rate": 0.4,
+    "method": "cmff",
+    "status": "finished",
+    "completed_epochs": 100,
+    "best_epoch": 100,
+    "val_mae": 3.5408761962759945,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/BikeNYC/custom/20261009_041637_scale_cmff_seed7/random/rate0.4/20261009_041637_seed7_bs32",
+    "training_seconds": 231.71697342849802,
+    "params": 330807,
+    "trainable_params": 271163,
+    "peak_gib": 2.3487091064453125,
+    "issues": [],
+    "evaluations": {
+      "in_distribution": {
+        "mae": 3.506736653597763,
+        "rmse": 13.579104695454488
+      },
+      "unseen_combinations": {
+        "mae": 4.90618839341091,
+        "rmse": 17.351969055677177
+      },
+      "unseen_geometry": {
+        "mae": 6.336241918076927,
+        "rmse": 18.84908298443418
+      },
+      "unseen_triple": {
+        "mae": 4.279191293919883,
+        "rmse": 15.585297269771049
+      },
+      "unseen_combinations_repeat": {
+        "mae": 4.530867131584906,
+        "rmse": 15.99768993225065
+      },
+      "unseen_geometry_repeat": {
+        "mae": 6.095674648296367,
+        "rmse": 19.143729209737604
+      }
+    }
+  },
+  {
+    "variant": "bikenyc_r40_top1",
+    "dataset": "bikenyc",
+    "rate": 0.4,
+    "method": "top1",
+    "status": "finished",
+    "completed_epochs": 100,
+    "best_epoch": 90,
+    "val_mae": 4.127500811559582,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/BikeNYC/custom/20261009_042039_scale_soft_top1_seed7/random/rate0.4/20261009_042039_seed7_bs32",
+    "training_seconds": 226.19388625293504,
+    "params": 330807,
+    "trainable_params": 330807,
+    "peak_gib": 4.535386562347412,
+    "issues": [],
+    "evaluations": {
+      "in_distribution": {
+        "mae": 3.969162710308436,
+        "rmse": 14.690186740854985
+      },
+      "unseen_combinations": {
+        "mae": 5.631139123522058,
+        "rmse": 19.977500955189115
+      },
+      "unseen_geometry": {
+        "mae": 6.1666950472301805,
+        "rmse": 19.797138456899333
+      },
+      "unseen_triple": {
+        "mae": 5.227967453262058,
+        "rmse": 19.353685316137227
+      },
+      "unseen_combinations_repeat": {
+        "mae": 5.059713782401528,
+        "rmse": 18.51148578794158
+      },
+      "unseen_geometry_repeat": {
+        "mae": 6.003221847711588,
+        "rmse": 19.402247613601716
+      }
+    }
+  },
+  {
+    "variant": "bikenyc_r60_cmff",
+    "dataset": "bikenyc",
+    "rate": 0.6,
+    "method": "cmff",
+    "status": "finished",
+    "completed_epochs": 100,
+    "best_epoch": 100,
+    "val_mae": 3.839787040461817,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/BikeNYC/custom/20261009_042436_scale_cmff_seed7/random/rate0.6/20261009_042436_seed7_bs32",
+    "training_seconds": 231.19118829758372,
+    "params": 330807,
+    "trainable_params": 271163,
+    "peak_gib": 2.3576273918151855,
+    "issues": [],
+    "evaluations": {
+      "in_distribution": {
+        "mae": 3.8313305855128936,
+        "rmse": 14.664126962279722
+      },
+      "unseen_combinations": {
+        "mae": 5.990358079707293,
+        "rmse": 21.446017755962725
+      },
+      "unseen_geometry": {
+        "mae": 6.362785175545628,
+        "rmse": 19.95405575682033
+      },
+      "unseen_triple": {
+        "mae": 5.994772396663583,
+        "rmse": 21.829338766055304
+      },
+      "unseen_combinations_repeat": {
+        "mae": 5.593025171134028,
+        "rmse": 20.18380434065276
+      },
+      "unseen_geometry_repeat": {
+        "mae": 6.509281478985037,
+        "rmse": 20.583021382336536
+      }
+    }
+  },
+  {
+    "variant": "bikenyc_r60_top1",
+    "dataset": "bikenyc",
+    "rate": 0.6,
+    "method": "top1",
+    "status": "finished",
+    "completed_epochs": 100,
+    "best_epoch": 100,
+    "val_mae": 3.7977722904089775,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/BikeNYC/custom/20261009_042838_scale_soft_top1_seed7/random/rate0.6/20261009_042838_seed7_bs32",
+    "training_seconds": 225.7686348350253,
+    "params": 330807,
+    "trainable_params": 330807,
+    "peak_gib": 4.541189670562744,
+    "issues": [],
+    "evaluations": {
+      "in_distribution": {
+        "mae": 3.704169270167083,
+        "rmse": 14.272598906756006
+      },
+      "unseen_combinations": {
+        "mae": 5.559848170825707,
+        "rmse": 19.411080187521904
+      },
+      "unseen_geometry": {
+        "mae": 5.842595439815271,
+        "rmse": 19.02239024665967
+      },
+      "unseen_triple": {
+        "mae": 5.333250923320148,
+        "rmse": 19.01181192605899
+      },
+      "unseen_combinations_repeat": {
+        "mae": 5.21494299564088,
+        "rmse": 18.221462812943233
+      },
+      "unseen_geometry_repeat": {
+        "mae": 5.854430860458938,
+        "rmse": 19.02893122842257
+      }
+    }
+  },
+  {
+    "variant": "bikenyc_r80_cmff",
+    "dataset": "bikenyc",
+    "rate": 0.8,
+    "method": "cmff",
+    "status": "finished",
+    "completed_epochs": 100,
+    "best_epoch": 100,
+    "val_mae": 4.529785811823428,
+    "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/BikeNYC/custom/20261009_043234_scale_cmff_seed7/random/rate0.8/20261009_043234_seed7_bs32",
+    "training_seconds": 230.00134093430825,
+    "params": 330807,
+    "trainable_params": 271163,
+    "peak_gib": 2.349851608276367,
+    "issues": [],
+    "evaluations": {
+      "in_distribution": {
+        "mae": 4.64647604747143,
+        "rmse": 17.163777885688425
+      },
+      "unseen_combinations": {
+        "mae": 5.991621458710067,
+        "rmse": 21.28964003751337
+      },
+      "unseen_geometry": {
+        "mae": 7.0481180265958105,
+        "rmse": 22.76993416672886
+      },
+      "unseen_triple": {
+        "mae": 5.803919483706683,
+        "rmse": 20.61760534877883
+      },
+      "unseen_combinations_repeat": {
+        "mae": 5.829694554132684,
+        "rmse": 20.383694208980994
+      },
+      "unseen_geometry_repeat": {
+        "mae": 7.065906896212373,
+        "rmse": 23.246411978568954
+      }
+    }
+  },
+  {
+    "variant": "bikenyc_r80_top1",
+    "dataset": "bikenyc",
+    "rate": 0.8,
+    "method": "top1",
+    "status": "pending",
+    "completed_epochs": 0,
+    "best_epoch": null,
+    "val_mae": null,
+    "run_dir": null,
+    "training_seconds": null,
+    "params": null,
+    "trainable_params": null,
+    "peak_gib": 0,
+    "issues": [],
+    "evaluations": {}
+  }
+]

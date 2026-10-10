@@ -1,0 +1,1238 @@
+{
+  "checked_at": "2026-10-10T12:20:46.547539+08:00",
+  "suite": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v24-COE/experiments/core_validation/684cad05994af9a4",
+  "suite_digest": "684cad05994af9a4",
+  "git_branch": "v24-COE",
+  "git_head": "7ea1c54416bce52cd45f410a3223cf7f48d0f0cd",
+  "git_status": " ? imputation_benchmark/baselines/PAST\n ? imputation_benchmark/baselines/SAITS\n ? imputation_benchmark/baselines/STAMImupter\n ? imputation_benchmark/baselines/grin\n M src/stmoe_imputer/models/id_priority_coe.py\n M src/stmoe_imputer/models/registry.py\n?? configs/v24/core_validation/\n?? configs/v24/scale_rate_compare/\n?? \"experments_report/20261008_v24_\\345\\217\\214\\346\\225\\260\\346\\215\\256\\351\\233\\206\\345\\233\\233\\347\\274\\272\\345\\244\\261\\347\\216\\207\\345\\260\\272\\345\\272\\246\\345\\257\\271\\346\\257\\224_a8e91b58131e845d_\\351\\230\\266\\346\\256\\265\\345\\210\\206\\346\\236\\220.md\"\n?? \"experments_report/20261008_v24_\\345\\217\\214\\346\\225\\260\\346\\215\\256\\351\\233\\206\\345\\233\\233\\347\\274\\272\\345\\244\\261\\347\\216\\207\\345\\260\\272\\345\\272\\246\\345\\257\\271\\346\\257\\224_a8e91b58131e845d_\\351\\230\\266\\346\\256\\265\\345\\210\\206\\346\\236\\220/\"\n?? \"experments_report/20261009_v24_\\345\\211\\215\\344\\270\\244\\350\\264\\241\\347\\214\\256\\344\\270\\273\\345\\271\\262\\351\\252\\214\\350\\257\\201_684cad05994af9a4_\\351\\230\\266\\346\\256\\265\\345\\210\\206\\346\\236\\220.md\"\n?? \"experments_report/20261009_v24_\\345\\211\\215\\344\\270\\244\\350\\264\\241\\347\\214\\256\\344\\270\\273\\345\\271\\262\\351\\252\\214\\350\\257\\201_684cad05994af9a4_\\351\\230\\266\\346\\256\\265\\345\\210\\206\\346\\236\\220/\"\n?? \"experments_report/20261009_v24_\\345\\217\\214\\346\\225\\260\\346\\215\\256\\351\\233\\206\\345\\233\\233\\347\\274\\272\\345\\244\\261\\347\\216\\207_CMFF\\344\\270\\216\\350\\275\\257\\351\\242\\204\\347\\203\\255Top1_\\346\\240\\270\\351\\252\\214\\345\\210\\206\\346\\236\\220\\346\\212\\245\\345\\221\\212.md\"\n?? \"experments_report/20261009_v24_\\345\\217\\214\\346\\225\\260\\346\\215\\256\\351\\233\\206\\345\\233\\233\\347\\274\\272\\345\\244\\261\\347\\216\\207_CMFF\\344\\270\\216\\350\\275\\257\\351\\242\\204\\347\\203\\255Top1_\\346\\240\\270\\351\\252\\214\\345\\210\\206\\346\\236\\220\\346\\212\\245\\345\\221\\212_assets/\"\n?? \"experments_report/20261009_v24_\\345\\217\\214\\346\\225\\260\\346\\215\\256\\351\\233\\206\\345\\233\\233\\347\\274\\272\\345\\244\\261\\347\\216\\207\\345\\260\\272\\345\\272\\246\\345\\257\\271\\346\\257\\224_a8e91b58131e845d_\\345\\256\\214\\346\\225\\264\\345\\210\\206\\346\\236\\220.md\"\n?? \"experments_report/20261009_v24_\\345\\217\\214\\346\\225\\260\\346\\215\\256\\351\\233\\206\\345\\233\\233\\347\\274\\272\\345\\244\\261\\347\\216\\207\\345\\260\\272\\345\\272\\246\\345\\257\\271\\346\\257\\224_a8e91b58131e845d_\\345\\256\\214\\346\\225\\264\\345\\210\\206\\346\\236\\220/\"\n?? \"experments_report/20261009_v24_\\345\\217\\214\\346\\225\\260\\346\\215\\256\\351\\233\\206\\345\\233\\233\\347\\274\\272\\345\\244\\261\\347\\216\\207\\345\\260\\272\\345\\272\\246\\345\\257\\271\\346\\257\\224_a8e91b58131e845d_\\351\\230\\266\\346\\256\\265\\345\\210\\206\\346\\236\\220.md\"\n?? \"experments_report/20261009_v24_\\345\\217\\214\\346\\225\\260\\346\\215\\256\\351\\233\\206\\345\\233\\233\\347\\274\\272\\345\\244\\261\\347\\216\\207\\345\\260\\272\\345\\272\\246\\345\\257\\271\\346\\257\\224_a8e91b58131e845d_\\351\\230\\266\\346\\256\\265\\345\\210\\206\\346\\236\\220/\"\n?? \"experments_report/20261010_v24_\\345\\211\\215\\344\\270\\244\\350\\264\\241\\347\\214\\256\\344\\270\\273\\345\\271\\262\\351\\252\\214\\350\\257\\201_684cad05994af9a4_\\345\\256\\214\\346\\225\\264\\345\\210\\206\\346\\236\\220.md\"\n?? \"experments_report/20261010_v24_\\345\\211\\215\\344\\270\\244\\350\\264\\241\\347\\214\\256\\344\\270\\273\\345\\271\\262\\351\\252\\214\\350\\257\\201_684cad05994af9a4_\\345\\256\\214\\346\\225\\264\\345\\210\\206\\346\\236\\220/\"\n?? \"experments_report/20261010_v24_\\345\\211\\215\\344\\270\\244\\350\\264\\241\\347\\214\\256\\344\\270\\273\\345\\271\\262\\351\\252\\214\\350\\257\\201_684cad05994af9a4_\\351\\230\\266\\346\\256\\265\\345\\210\\206\\346\\236\\220.md\"\n?? \"experments_report/20261010_v24_\\345\\211\\215\\344\\270\\244\\350\\264\\241\\347\\214\\256\\344\\270\\273\\345\\271\\262\\351\\252\\214\\350\\257\\201_684cad05994af9a4_\\351\\230\\266\\346\\256\\265\\345\\210\\206\\346\\236\\220/\"\n?? outputs/v24-COE/BikeNYC/custom/20261009_040823_scale_cmff_seed7/\n?? outputs/v24-COE/BikeNYC/custom/20261009_041225_scale_soft_top1_seed7/\n?? outputs/v24-COE/BikeNYC/custom/20261009_041637_scale_cmff_seed7/\n?? outputs/v24-COE/BikeNYC/custom/20261009_042039_scale_soft_top1_seed7/\n?? outputs/v24-COE/BikeNYC/custom/20261009_042436_scale_cmff_seed7/\n?? outputs/v24-COE/BikeNYC/custom/20261009_042838_scale_soft_top1_seed7/\n?? outputs/v24-COE/BikeNYC/custom/20261009_043234_scale_cmff_seed7/\n?? outputs/v24-COE/BikeNYC/custom/20261009_043635_scale_soft_top1_seed7/\n?? outputs/v24-COE/BikeNYC/custom/20261010_090113_fine_plain_seed7/\n?? outputs/v24-COE/BikeNYC/custom/20261010_090605_cmff_plain_seed7/\n?? outputs/v24-COE/BikeNYC/custom/20261010_090946_fine_delta_seed7/\n?? outputs/v24-COE/BikeNYC/custom/20261010_091447_cmff_delta_seed7/\n?? outputs/v24-COE/BikeNYC/custom/20261010_091844_fine_plain_seed17/\n?? outputs/v24-COE/BikeNYC/custom/20261010_092332_cmff_plain_seed17/\n?? outputs/v24-COE/BikeNYC/custom/20261010_092714_fine_delta_seed17/\n?? outputs/v24-COE/BikeNYC/custom/20261010_093214_cmff_delta_seed17/\n?? outputs/v24-COE/BikeNYC/custom/20261010_093606_fine_plain_seed27/\n?? outputs/v24-COE/BikeNYC/custom/20261010_094051_cmff_plain_seed27/\n?? outputs/v24-COE/BikeNYC/custom/20261010_094433_fine_delta_seed27/\n?? outputs/v24-COE/BikeNYC/custom/20261010_094930_cmff_delta_seed27/\n?? outputs/v24-COE/TaxiBJ/custom/20261008_185522_scale_cmff_seed7/\n?? outputs/v24-COE/TaxiBJ/custom/20261008_195213_scale_soft_top1_seed7/\n?? outputs/v24-COE/TaxiBJ/custom/20261008_211914_scale_cmff_seed7/\n?? outputs/v24-COE/TaxiBJ/custom/20261008_223916_scale_soft_top1_seed7/\n?? outputs/v24-COE/TaxiBJ/custom/20261009_000739_scale_cmff_seed7/\n?? outputs/v24-COE/TaxiBJ/custom/20261009_011156_scale_soft_top1_seed7/\n?? outputs/v24-COE/TaxiBJ/custom/20261009_020610_scale_cmff_seed7/\n?? outputs/v24-COE/TaxiBJ/custom/20261009_025513_scale_soft_top1_seed7/\n?? outputs/v24-COE/TaxiBJ/custom/20261009_112416_fine_plain_seed7/\n?? outputs/v24-COE/TaxiBJ/custom/20261009_131133_cmff_plain_seed7/\n?? outputs/v24-COE/TaxiBJ/custom/20261009_142644_fine_delta_seed7/\n?? outputs/v24-COE/TaxiBJ/custom/20261009_161342_cmff_delta_seed7/\n?? outputs/v24-COE/TaxiBJ/custom/20261009_173301_cmff_independent_plain_seed7/\n?? outputs/v24-COE/TaxiBJ/custom/20261009_184831_cmff_independent_delta_seed7/\n?? outputs/v24-COE/TaxiBJ/custom/20261009_200500_cmff_unconditional_delta_seed7/\n?? outputs/v24-COE/TaxiBJ/custom/20261009_212308_cmff_raw_delta_seed7/\n?? outputs/v24-COE/TaxiBJ/custom/20261009_224222_fine_plain_seed17/\n?? outputs/v24-COE/TaxiBJ/custom/20261009_235350_cmff_plain_seed17/\n?? outputs/v24-COE/TaxiBJ/custom/20261010_004609_fine_delta_seed17/\n?? outputs/v24-COE/TaxiBJ/custom/20261010_022111_cmff_delta_seed17/\n?? outputs/v24-COE/TaxiBJ/custom/20261010_033602_fine_plain_seed27/\n?? outputs/v24-COE/TaxiBJ/custom/20261010_050716_cmff_plain_seed27/\n?? outputs/v24-COE/TaxiBJ/custom/20261010_060902_fine_delta_seed27/\n?? outputs/v24-COE/TaxiBJ/custom/20261010_075923_cmff_delta_seed27/\n?? scripts/v24/README_CORE_VALIDATION.md\n?? scripts/v24/README_SCALE_RATE_COMPARE.md\n?? scripts/v24/preflight_core_validation.py\n?? scripts/v24/preflight_scale_rate_compare.py\n?? scripts/v24/report_core_validation.py\n?? scripts/v24/report_scale_rate_compare.py\n?? scripts/v24/run_core_validation.py\n?? scripts/v24/run_scale_rate_compare.py\n?? src/stmoe_imputer/models/core_validation_coe.py\n?? tests/test_v24_core_validation.py\n?? tests/test_v24_scale_rate_compare.py\n",
+  "completed": {
+    "time": 1791597205.4437902,
+    "count": 28
+  },
+  "source_count": 431,
+  "source_mismatch": [],
+  "current_source_difference": [],
+  "data": {
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/taxibj_train.npz": {
+      "sha256_match": true,
+      "stat_match": true,
+      "size": 92914372,
+      "mtime_ns": 1789651206671940063,
+      "sha256": "73386c831eaab76dc9b05e5c572b94e2ea42dc1841902999f820ed8b35855f8c"
+    },
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/taxibj_val.npz": {
+      "sha256_match": true,
+      "stat_match": true,
+      "size": 12754573,
+      "mtime_ns": 1789651211360073301,
+      "sha256": "bb0e60c333d71c61c55ad3ec35152b433a3b6d891995aac1bb5bc87b17ff91fc"
+    },
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v24_clean_abc_20260917/taxibj_test.npz": {
+      "sha256_match": true,
+      "stat_match": true,
+      "size": 25997879,
+      "mtime_ns": 1789651217364244030,
+      "sha256": "f1ce00e7bf24167001e5d99f547f170656e230a3b9cec698aa2da340851afa90"
+    },
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/BikeNYC/bikenyc_train.npz": {
+      "sha256_match": true,
+      "stat_match": true,
+      "size": 1210669,
+      "mtime_ns": 1781661667743528824,
+      "sha256": "b796f24106c7a5a469811ab85730a8f859c08da2bafa7800ec2dc7cbe9dda8e6"
+    },
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/BikeNYC/bikenyc_val.npz": {
+      "sha256_match": true,
+      "stat_match": true,
+      "size": 181539,
+      "mtime_ns": 1781661667903534187,
+      "sha256": "1738644133bb02f469fff91cfe8cc01e8b59770ac7bf28faf9b617ece8308e68"
+    },
+    "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/BikeNYC/bikenyc_test.npz": {
+      "sha256_match": true,
+      "stat_match": true,
+      "size": 366154,
+      "mtime_ns": 1781661667747528959,
+      "sha256": "048b4b3bd772bc75e2c27d67880f2e42d59b2e209f3f0628de5286eedadb4b42"
+    }
+  },
+  "runs": {
+    "taxibj_K01_seed7": {
+      "issues": [],
+      "checkpoints": {
+        "best": {
+          "epoch": 90,
+          "config_sha256": "fddfa726f68f814e7eaf607e39bbe97311fb7d3c49816381bfc9b8ffa1be3a3d",
+          "sha256": "74e0e897f27d500ad8ce2597916e761b7f75524297926c4c0e0603696d73dfc8",
+          "size": 3519001
+        },
+        "last": {
+          "epoch": 100,
+          "config_sha256": "fddfa726f68f814e7eaf607e39bbe97311fb7d3c49816381bfc9b8ffa1be3a3d",
+          "sha256": "1d50cb30f7493199689d425e0da3b212c9bfd91df239a875ca95ede3464d4679",
+          "size": 7146930
+        }
+      },
+      "full_initialization_sha256": "f3bd2d92902d744982617bce5d7bec71d3ccab2d5b2126170eacfb16523f7a44",
+      "common_initialization_sha256": "f3bd2d92902d744982617bce5d7bec71d3ccab2d5b2126170eacfb16523f7a44",
+      "config_sha256": "fddfa726f68f814e7eaf607e39bbe97311fb7d3c49816381bfc9b8ffa1be3a3d",
+      "validation_epochs": [
+        5,
+        10,
+        15,
+        20,
+        25,
+        30,
+        35,
+        40,
+        45,
+        50,
+        55,
+        60,
+        65,
+        70,
+        75,
+        80,
+        85,
+        90,
+        95,
+        100
+      ]
+    },
+    "taxibj_K02_seed7": {
+      "issues": [],
+      "checkpoints": {
+        "best": {
+          "epoch": 100,
+          "config_sha256": "5cd6b5ae6a046b39743befc57db064f882626dcd448b0428695502c578a08dd8",
+          "sha256": "e80e2ba3f8747d1871cae4937ab7dcba63b2ebe73f733552b5e773bc6eb32e8a",
+          "size": 3519001
+        },
+        "last": {
+          "epoch": 100,
+          "config_sha256": "5cd6b5ae6a046b39743befc57db064f882626dcd448b0428695502c578a08dd8",
+          "sha256": "08bb2926877516aabe72c972d4031f015784b0e7a0a9784ce93175ca7cebcba1",
+          "size": 7146482
+        }
+      },
+      "full_initialization_sha256": "f3bd2d92902d744982617bce5d7bec71d3ccab2d5b2126170eacfb16523f7a44",
+      "common_initialization_sha256": "f3bd2d92902d744982617bce5d7bec71d3ccab2d5b2126170eacfb16523f7a44",
+      "config_sha256": "5cd6b5ae6a046b39743befc57db064f882626dcd448b0428695502c578a08dd8",
+      "validation_epochs": [
+        5,
+        10,
+        15,
+        20,
+        25,
+        30,
+        35,
+        40,
+        45,
+        50,
+        55,
+        60,
+        65,
+        70,
+        75,
+        80,
+        85,
+        90,
+        95,
+        100
+      ]
+    },
+    "taxibj_K03_seed7": {
+      "issues": [],
+      "checkpoints": {
+        "best": {
+          "epoch": 90,
+          "config_sha256": "417173e93ddd1e98dad61fefce32390366b14ee0d7fb28ef72d92aaad1eb0505",
+          "sha256": "525a863fb79042ebc60467b63e0d75dd47a7efbe2f9ce368bdff3cb07ec17b24",
+          "size": 3693063
+        },
+        "last": {
+          "epoch": 100,
+          "config_sha256": "417173e93ddd1e98dad61fefce32390366b14ee0d7fb28ef72d92aaad1eb0505",
+          "sha256": "eb73a61c68e9b6ba5c8ed79096463632bef6cb4b1d29baf55e96c3989effd35b",
+          "size": 7321056
+        }
+      },
+      "full_initialization_sha256": "f3bd2d92902d744982617bce5d7bec71d3ccab2d5b2126170eacfb16523f7a44",
+      "common_initialization_sha256": "f3bd2d92902d744982617bce5d7bec71d3ccab2d5b2126170eacfb16523f7a44",
+      "config_sha256": "417173e93ddd1e98dad61fefce32390366b14ee0d7fb28ef72d92aaad1eb0505",
+      "validation_epochs": [
+        5,
+        10,
+        15,
+        20,
+        25,
+        30,
+        35,
+        40,
+        45,
+        50,
+        55,
+        60,
+        65,
+        70,
+        75,
+        80,
+        85,
+        90,
+        95,
+        100
+      ]
+    },
+    "taxibj_K04_seed7": {
+      "issues": [],
+      "checkpoints": {
+        "best": {
+          "epoch": 100,
+          "config_sha256": "c0658990b19cafb34b2157ae8c4aaca8f217d706e4de42d132115b7294f338f6",
+          "sha256": "9159ca3ad16c6ac23d108d870f4de8c7664041127dbfdbd234c965b1a6d8d552",
+          "size": 3693063
+        },
+        "last": {
+          "epoch": 100,
+          "config_sha256": "c0658990b19cafb34b2157ae8c4aaca8f217d706e4de42d132115b7294f338f6",
+          "sha256": "49f7d6b6355265b9e097bf4504e56d9e1df76c153858ee26ce91fcb8daaed198",
+          "size": 7320480
+        }
+      },
+      "full_initialization_sha256": "f3bd2d92902d744982617bce5d7bec71d3ccab2d5b2126170eacfb16523f7a44",
+      "common_initialization_sha256": "f3bd2d92902d744982617bce5d7bec71d3ccab2d5b2126170eacfb16523f7a44",
+      "config_sha256": "c0658990b19cafb34b2157ae8c4aaca8f217d706e4de42d132115b7294f338f6",
+      "validation_epochs": [
+        5,
+        10,
+        15,
+        20,
+        25,
+        30,
+        35,
+        40,
+        45,
+        50,
+        55,
+        60,
+        65,
+        70,
+        75,
+        80,
+        85,
+        90,
+        95,
+        100
+      ]
+    },
+    "taxibj_K05_seed7": {
+      "issues": [],
+      "checkpoints": {
+        "best": {
+          "epoch": 80,
+          "config_sha256": "c730a7acb85877dd4c5d30a6ae145283ea92f20e56c600c21d58d5e0b748658c",
+          "sha256": "82243917e627ae7ccfc390383db4291745f3b544561d29b2c8de16c4bdaaefe8",
+          "size": 9715662
+        },
+        "last": {
+          "epoch": 100,
+          "config_sha256": "c730a7acb85877dd4c5d30a6ae145283ea92f20e56c600c21d58d5e0b748658c",
+          "sha256": "136d69cd206f8b3cf81a02e01ee670b81bf69f559f84ddbbe4e1e1190903f435",
+          "size": 15556110
+        }
+      },
+      "full_initialization_sha256": "81059543caa2b8a515f9c3635adfbb0f484bb1cfcd253d1cfe40630ae9f0533d",
+      "common_initialization_sha256": "f3bd2d92902d744982617bce5d7bec71d3ccab2d5b2126170eacfb16523f7a44",
+      "config_sha256": "c730a7acb85877dd4c5d30a6ae145283ea92f20e56c600c21d58d5e0b748658c",
+      "validation_epochs": [
+        5,
+        10,
+        15,
+        20,
+        25,
+        30,
+        35,
+        40,
+        45,
+        50,
+        55,
+        60,
+        65,
+        70,
+        75,
+        80,
+        85,
+        90,
+        95,
+        100
+      ]
+    },
+    "taxibj_K06_seed7": {
+      "issues": [],
+      "checkpoints": {
+        "best": {
+          "epoch": 100,
+          "config_sha256": "cef1ab34900096a92ea88ece17d9202f6ba216ab850392e6a16e2be5c972bcc0",
+          "sha256": "90d7771e61326d7148df249c01216a6910ca31f542276811453fe67f88d862bb",
+          "size": 9889742
+        },
+        "last": {
+          "epoch": 100,
+          "config_sha256": "cef1ab34900096a92ea88ece17d9202f6ba216ab850392e6a16e2be5c972bcc0",
+          "sha256": "04ce80acb6ea24856f0f6c7bb5ea162602769ffc2f919a813672ea9bb01c5a1f",
+          "size": 15759822
+        }
+      },
+      "full_initialization_sha256": "81059543caa2b8a515f9c3635adfbb0f484bb1cfcd253d1cfe40630ae9f0533d",
+      "common_initialization_sha256": "f3bd2d92902d744982617bce5d7bec71d3ccab2d5b2126170eacfb16523f7a44",
+      "config_sha256": "cef1ab34900096a92ea88ece17d9202f6ba216ab850392e6a16e2be5c972bcc0",
+      "validation_epochs": [
+        5,
+        10,
+        15,
+        20,
+        25,
+        30,
+        35,
+        40,
+        45,
+        50,
+        55,
+        60,
+        65,
+        70,
+        75,
+        80,
+        85,
+        90,
+        95,
+        100
+      ]
+    },
+    "taxibj_K07_seed7": {
+      "issues": [],
+      "checkpoints": {
+        "best": {
+          "epoch": 100,
+          "config_sha256": "bce9f453ac97f5a01707bf07524ea88ef64436f0b880857db396e70bf3bb4692",
+          "sha256": "c21840f03a2d04b1a2e64b38d6276cf96d20d4fa5b54e10444c44a5f54abe39c",
+          "size": 3693063
+        },
+        "last": {
+          "epoch": 100,
+          "config_sha256": "bce9f453ac97f5a01707bf07524ea88ef64436f0b880857db396e70bf3bb4692",
+          "sha256": "330a5ea10dd68c5ef0af78acddcc6f3a42b33d5b640dc41a96ee7e3f0e574e97",
+          "size": 7319584
+        }
+      },
+      "full_initialization_sha256": "f3bd2d92902d744982617bce5d7bec71d3ccab2d5b2126170eacfb16523f7a44",
+      "common_initialization_sha256": "f3bd2d92902d744982617bce5d7bec71d3ccab2d5b2126170eacfb16523f7a44",
+      "config_sha256": "bce9f453ac97f5a01707bf07524ea88ef64436f0b880857db396e70bf3bb4692",
+      "validation_epochs": [
+        5,
+        10,
+        15,
+        20,
+        25,
+        30,
+        35,
+        40,
+        45,
+        50,
+        55,
+        60,
+        65,
+        70,
+        75,
+        80,
+        85,
+        90,
+        95,
+        100
+      ]
+    },
+    "taxibj_K08_seed7": {
+      "issues": [],
+      "checkpoints": {
+        "best": {
+          "epoch": 90,
+          "config_sha256": "7bb2d87b590be144a395abb402c488df3bfea7c516e094af9fb5c22c541e20b4",
+          "sha256": "8455449a9f9b4ff1e45ba38909f1b018c274a59a24d2652ee892929eb3b79b93",
+          "size": 3693063
+        },
+        "last": {
+          "epoch": 100,
+          "config_sha256": "7bb2d87b590be144a395abb402c488df3bfea7c516e094af9fb5c22c541e20b4",
+          "sha256": "1f6e0644672a991b3d56751b458bb22425fc5009fe42ee1cc24eef184e2fcee1",
+          "size": 7321056
+        }
+      },
+      "full_initialization_sha256": "f3bd2d92902d744982617bce5d7bec71d3ccab2d5b2126170eacfb16523f7a44",
+      "common_initialization_sha256": "f3bd2d92902d744982617bce5d7bec71d3ccab2d5b2126170eacfb16523f7a44",
+      "config_sha256": "7bb2d87b590be144a395abb402c488df3bfea7c516e094af9fb5c22c541e20b4",
+      "validation_epochs": [
+        5,
+        10,
+        15,
+        20,
+        25,
+        30,
+        35,
+        40,
+        45,
+        50,
+        55,
+        60,
+        65,
+        70,
+        75,
+        80,
+        85,
+        90,
+        95,
+        100
+      ]
+    },
+    "taxibj_K01_seed17": {
+      "issues": [],
+      "checkpoints": {
+        "best": {
+          "epoch": 100,
+          "config_sha256": "67b00b1dc28d3c382121bdf6c5d7ff98b5e5b58376e8b479d59de7983ebf4326",
+          "sha256": "99dcdccd3179c38cc5ff3815063b7c744ebad31d29baf65d30e1cc7e788c8aab",
+          "size": 3519129
+        },
+        "last": {
+          "epoch": 100,
+          "config_sha256": "67b00b1dc28d3c382121bdf6c5d7ff98b5e5b58376e8b479d59de7983ebf4326",
+          "sha256": "60abe3a85b8f24c8dfbf9d521b56fa4ed949af47fa804206745a7eb2f7c537ab",
+          "size": 7146738
+        }
+      },
+      "full_initialization_sha256": "04d8689d837ff9828bbe4c9eb048c669cf041110dd4c708732d18c5feef3361a",
+      "common_initialization_sha256": "04d8689d837ff9828bbe4c9eb048c669cf041110dd4c708732d18c5feef3361a",
+      "config_sha256": "67b00b1dc28d3c382121bdf6c5d7ff98b5e5b58376e8b479d59de7983ebf4326",
+      "validation_epochs": [
+        5,
+        10,
+        15,
+        20,
+        25,
+        30,
+        35,
+        40,
+        45,
+        50,
+        55,
+        60,
+        65,
+        70,
+        75,
+        80,
+        85,
+        90,
+        95,
+        100
+      ]
+    },
+    "taxibj_K02_seed17": {
+      "issues": [],
+      "checkpoints": {
+        "best": {
+          "epoch": 90,
+          "config_sha256": "c2400be06884c76418a3d54872f0b4a0c8b8ca75c18c8294ecb4ce6dced863e0",
+          "sha256": "044526fa39981940a86bbbbeec1115ac8aba708b6fd1cd393e380f2352450888",
+          "size": 3519129
+        },
+        "last": {
+          "epoch": 100,
+          "config_sha256": "c2400be06884c76418a3d54872f0b4a0c8b8ca75c18c8294ecb4ce6dced863e0",
+          "sha256": "2f0bf02a2128de9e8d1f0ce815c29f8d07a5370645f020d91868cc7a4c18c213",
+          "size": 7147122
+        }
+      },
+      "full_initialization_sha256": "04d8689d837ff9828bbe4c9eb048c669cf041110dd4c708732d18c5feef3361a",
+      "common_initialization_sha256": "04d8689d837ff9828bbe4c9eb048c669cf041110dd4c708732d18c5feef3361a",
+      "config_sha256": "c2400be06884c76418a3d54872f0b4a0c8b8ca75c18c8294ecb4ce6dced863e0",
+      "validation_epochs": [
+        5,
+        10,
+        15,
+        20,
+        25,
+        30,
+        35,
+        40,
+        45,
+        50,
+        55,
+        60,
+        65,
+        70,
+        75,
+        80,
+        85,
+        90,
+        95,
+        100
+      ]
+    },
+    "taxibj_K03_seed17": {
+      "issues": [],
+      "checkpoints": {
+        "best": {
+          "epoch": 100,
+          "config_sha256": "3a5891a3b026a1889edc7dec99f6ae962c6ef8003fba4b519f54a7a3a6ef0ddd",
+          "sha256": "62b84e22743e00e1ba112475771318769048997090b52471ea11f93d5b20abc2",
+          "size": 3693127
+        },
+        "last": {
+          "epoch": 100,
+          "config_sha256": "3a5891a3b026a1889edc7dec99f6ae962c6ef8003fba4b519f54a7a3a6ef0ddd",
+          "sha256": "c801cfb3a97503886f814f0d8f01d9a8b7459e3938137dcbdd32363895f5dc61",
+          "size": 7321120
+        }
+      },
+      "full_initialization_sha256": "04d8689d837ff9828bbe4c9eb048c669cf041110dd4c708732d18c5feef3361a",
+      "common_initialization_sha256": "04d8689d837ff9828bbe4c9eb048c669cf041110dd4c708732d18c5feef3361a",
+      "config_sha256": "3a5891a3b026a1889edc7dec99f6ae962c6ef8003fba4b519f54a7a3a6ef0ddd",
+      "validation_epochs": [
+        5,
+        10,
+        15,
+        20,
+        25,
+        30,
+        35,
+        40,
+        45,
+        50,
+        55,
+        60,
+        65,
+        70,
+        75,
+        80,
+        85,
+        90,
+        95,
+        100
+      ]
+    },
+    "taxibj_K04_seed17": {
+      "issues": [],
+      "checkpoints": {
+        "best": {
+          "epoch": 100,
+          "config_sha256": "5c9330f2bc7c0200bd9eb9103dba382640b3660d0ce914aca7d16c604242fee6",
+          "sha256": "2f19e074bafbb2f72b30611a6d3759486b3690d2703f70185385ad6b75d28f71",
+          "size": 3693127
+        },
+        "last": {
+          "epoch": 100,
+          "config_sha256": "5c9330f2bc7c0200bd9eb9103dba382640b3660d0ce914aca7d16c604242fee6",
+          "sha256": "5ee83506ca6e9e66bffa38c74ace1c464d8e2080b8670f86fd925fedefa40689",
+          "size": 7320928
+        }
+      },
+      "full_initialization_sha256": "04d8689d837ff9828bbe4c9eb048c669cf041110dd4c708732d18c5feef3361a",
+      "common_initialization_sha256": "04d8689d837ff9828bbe4c9eb048c669cf041110dd4c708732d18c5feef3361a",
+      "config_sha256": "5c9330f2bc7c0200bd9eb9103dba382640b3660d0ce914aca7d16c604242fee6",
+      "validation_epochs": [
+        5,
+        10,
+        15,
+        20,
+        25,
+        30,
+        35,
+        40,
+        45,
+        50,
+        55,
+        60,
+        65,
+        70,
+        75,
+        80,
+        85,
+        90,
+        95,
+        100
+      ]
+    },
+    "taxibj_K01_seed27": {
+      "issues": [],
+      "checkpoints": {
+        "best": {
+          "epoch": 90,
+          "config_sha256": "794eaf6cfc1acfb89f2ab0bde8e748fc048794455ea4ca55d1aa9fab85ddb783",
+          "sha256": "e14fe4698f2c3724c8f1bfc15ed9080d323a6430bb6a321d270bd1b1dceae064",
+          "size": 3519065
+        },
+        "last": {
+          "epoch": 100,
+          "config_sha256": "794eaf6cfc1acfb89f2ab0bde8e748fc048794455ea4ca55d1aa9fab85ddb783",
+          "sha256": "9330d309b1418e8f1ed1d1a6882e29cc067e54091868e81b52a186db845cc8a8",
+          "size": 7146610
+        }
+      },
+      "full_initialization_sha256": "403454c1d6eeddd818c6803c467eee7492225e5ca8ff35a70a9dd62aff140bfc",
+      "common_initialization_sha256": "403454c1d6eeddd818c6803c467eee7492225e5ca8ff35a70a9dd62aff140bfc",
+      "config_sha256": "794eaf6cfc1acfb89f2ab0bde8e748fc048794455ea4ca55d1aa9fab85ddb783",
+      "validation_epochs": [
+        5,
+        10,
+        15,
+        20,
+        25,
+        30,
+        35,
+        40,
+        45,
+        50,
+        55,
+        60,
+        65,
+        70,
+        75,
+        80,
+        85,
+        90,
+        95,
+        100
+      ]
+    },
+    "taxibj_K02_seed27": {
+      "issues": [],
+      "checkpoints": {
+        "best": {
+          "epoch": 100,
+          "config_sha256": "f4456341c406e88b90683115d5902cc8db8422c525a637c16d4d511cf4393ea4",
+          "sha256": "0e65ec30bbf6394f0151bb2af1dbc09ac115718ed79dd4db180f503669f45c00",
+          "size": 3519065
+        },
+        "last": {
+          "epoch": 100,
+          "config_sha256": "f4456341c406e88b90683115d5902cc8db8422c525a637c16d4d511cf4393ea4",
+          "sha256": "874ea1d0c7b25566585fd3d5f51aa90c4a21e0fde2ce997a5529402ecda03849",
+          "size": 7147058
+        }
+      },
+      "full_initialization_sha256": "403454c1d6eeddd818c6803c467eee7492225e5ca8ff35a70a9dd62aff140bfc",
+      "common_initialization_sha256": "403454c1d6eeddd818c6803c467eee7492225e5ca8ff35a70a9dd62aff140bfc",
+      "config_sha256": "f4456341c406e88b90683115d5902cc8db8422c525a637c16d4d511cf4393ea4",
+      "validation_epochs": [
+        5,
+        10,
+        15,
+        20,
+        25,
+        30,
+        35,
+        40,
+        45,
+        50,
+        55,
+        60,
+        65,
+        70,
+        75,
+        80,
+        85,
+        90,
+        95,
+        100
+      ]
+    },
+    "taxibj_K03_seed27": {
+      "issues": [],
+      "checkpoints": {
+        "best": {
+          "epoch": 100,
+          "config_sha256": "0e8bae64cc10087c40f84dcbb19a6c1fe7dc761aadf2c177e6277377f34294e7",
+          "sha256": "cd6c3046235f7b80faa8a1b1f4f013a8cbf5e170af8de17dfdea63b646a0b44c",
+          "size": 3693063
+        },
+        "last": {
+          "epoch": 100,
+          "config_sha256": "0e8bae64cc10087c40f84dcbb19a6c1fe7dc761aadf2c177e6277377f34294e7",
+          "sha256": "4f114d905e923329d1e81fac54a7ade7a89af0987f0975c211af94aa24a06646",
+          "size": 7321056
+        }
+      },
+      "full_initialization_sha256": "403454c1d6eeddd818c6803c467eee7492225e5ca8ff35a70a9dd62aff140bfc",
+      "common_initialization_sha256": "403454c1d6eeddd818c6803c467eee7492225e5ca8ff35a70a9dd62aff140bfc",
+      "config_sha256": "0e8bae64cc10087c40f84dcbb19a6c1fe7dc761aadf2c177e6277377f34294e7",
+      "validation_epochs": [
+        5,
+        10,
+        15,
+        20,
+        25,
+        30,
+        35,
+        40,
+        45,
+        50,
+        55,
+        60,
+        65,
+        70,
+        75,
+        80,
+        85,
+        90,
+        95,
+        100
+      ]
+    },
+    "taxibj_K04_seed27": {
+      "issues": [],
+      "checkpoints": {
+        "best": {
+          "epoch": 100,
+          "config_sha256": "62ddffd11a41c7036cc8f2e07e88ba7500a0ad6153d35a63253f10c696796742",
+          "sha256": "e9629d7045896486e8bae15d356d2ea6160e5cb71d33e76293428c5688d68bf0",
+          "size": 3693063
+        },
+        "last": {
+          "epoch": 100,
+          "config_sha256": "62ddffd11a41c7036cc8f2e07e88ba7500a0ad6153d35a63253f10c696796742",
+          "sha256": "59804005bfe63e04ce7108cbbf71cd144921e017accea1d0d6360b8a0580df3a",
+          "size": 7320288
+        }
+      },
+      "full_initialization_sha256": "403454c1d6eeddd818c6803c467eee7492225e5ca8ff35a70a9dd62aff140bfc",
+      "common_initialization_sha256": "403454c1d6eeddd818c6803c467eee7492225e5ca8ff35a70a9dd62aff140bfc",
+      "config_sha256": "62ddffd11a41c7036cc8f2e07e88ba7500a0ad6153d35a63253f10c696796742",
+      "validation_epochs": [
+        5,
+        10,
+        15,
+        20,
+        25,
+        30,
+        35,
+        40,
+        45,
+        50,
+        55,
+        60,
+        65,
+        70,
+        75,
+        80,
+        85,
+        90,
+        95,
+        100
+      ]
+    },
+    "bikenyc_K01_seed7": {
+      "issues": [],
+      "checkpoints": {
+        "best": {
+          "epoch": 95,
+          "config_sha256": "0d189e8f1fcab574d58e02871dc4e34791989158c26747180bfadfaa803c56bd",
+          "sha256": "75b8a5906cc0af7e2e22957f33dd24ee4bb083c57a4e95e819f280a060e5ea9b",
+          "size": 3519001
+        },
+        "last": {
+          "epoch": 100,
+          "config_sha256": "0d189e8f1fcab574d58e02871dc4e34791989158c26747180bfadfaa803c56bd",
+          "sha256": "36c54d6faa01ca210a566e31b8219a13becd2e6022bd74cde2e94fa7e9d86830",
+          "size": 7146994
+        }
+      },
+      "full_initialization_sha256": "f3bd2d92902d744982617bce5d7bec71d3ccab2d5b2126170eacfb16523f7a44",
+      "common_initialization_sha256": "f3bd2d92902d744982617bce5d7bec71d3ccab2d5b2126170eacfb16523f7a44",
+      "config_sha256": "0d189e8f1fcab574d58e02871dc4e34791989158c26747180bfadfaa803c56bd",
+      "validation_epochs": [
+        5,
+        10,
+        15,
+        20,
+        25,
+        30,
+        35,
+        40,
+        45,
+        50,
+        55,
+        60,
+        65,
+        70,
+        75,
+        80,
+        85,
+        90,
+        95,
+        100
+      ]
+    },
+    "bikenyc_K02_seed7": {
+      "issues": [],
+      "checkpoints": {
+        "best": {
+          "epoch": 100,
+          "config_sha256": "ddad32da793b099ab7f776dcfb863b75841ec9611bc66dd8576a31efbf0129fe",
+          "sha256": "9be30dc10c635c1fd6a2e4ebe0febc0edf9a3f04ff8ddbba0814c30f017def34",
+          "size": 3519001
+        },
+        "last": {
+          "epoch": 100,
+          "config_sha256": "ddad32da793b099ab7f776dcfb863b75841ec9611bc66dd8576a31efbf0129fe",
+          "sha256": "2bb56b58637e4e71e316649bf6fafbafdda9fd644be866ae78664bc294cd0c09",
+          "size": 7146994
+        }
+      },
+      "full_initialization_sha256": "f3bd2d92902d744982617bce5d7bec71d3ccab2d5b2126170eacfb16523f7a44",
+      "common_initialization_sha256": "f3bd2d92902d744982617bce5d7bec71d3ccab2d5b2126170eacfb16523f7a44",
+      "config_sha256": "ddad32da793b099ab7f776dcfb863b75841ec9611bc66dd8576a31efbf0129fe",
+      "validation_epochs": [
+        5,
+        10,
+        15,
+        20,
+        25,
+        30,
+        35,
+        40,
+        45,
+        50,
+        55,
+        60,
+        65,
+        70,
+        75,
+        80,
+        85,
+        90,
+        95,
+        100
+      ]
+    },
+    "bikenyc_K03_seed7": {
+      "issues": [],
+      "checkpoints": {
+        "best": {
+          "epoch": 100,
+          "config_sha256": "8b22fb58c325fc56b25f0e90d1996c84b971a91d272b6d3565b56949fcfd6779",
+          "sha256": "3d716d868d502fc36d510a5073a25d8d0721d6f9801324b071d38f97010843b1",
+          "size": 3693063
+        },
+        "last": {
+          "epoch": 100,
+          "config_sha256": "8b22fb58c325fc56b25f0e90d1996c84b971a91d272b6d3565b56949fcfd6779",
+          "sha256": "1bca755607ad46c45fdaa04ff148087dba86f98e00c45b747d05ed14b6669c2a",
+          "size": 7321056
+        }
+      },
+      "full_initialization_sha256": "f3bd2d92902d744982617bce5d7bec71d3ccab2d5b2126170eacfb16523f7a44",
+      "common_initialization_sha256": "f3bd2d92902d744982617bce5d7bec71d3ccab2d5b2126170eacfb16523f7a44",
+      "config_sha256": "8b22fb58c325fc56b25f0e90d1996c84b971a91d272b6d3565b56949fcfd6779",
+      "validation_epochs": [
+        5,
+        10,
+        15,
+        20,
+        25,
+        30,
+        35,
+        40,
+        45,
+        50,
+        55,
+        60,
+        65,
+        70,
+        75,
+        80,
+        85,
+        90,
+        95,
+        100
+      ]
+    },
+    "bikenyc_K04_seed7": {
+      "issues": [],
+      "checkpoints": {
+        "best": {
+          "epoch": 95,
+          "config_sha256": "79d1b62914efc2ebb32261f3c448696257682c7c1b8c77cc7b0387c82f40d0e0",
+          "sha256": "2d5d89063783501f2daf009cefdb8181b4fe20bc14e483978f1c5c26c30ad3c3",
+          "size": 3693063
+        },
+        "last": {
+          "epoch": 100,
+          "config_sha256": "79d1b62914efc2ebb32261f3c448696257682c7c1b8c77cc7b0387c82f40d0e0",
+          "sha256": "a57f7be9f1f2016d15c3235636592171cca1328bb6148a499b41a8382701e89b",
+          "size": 7321056
+        }
+      },
+      "full_initialization_sha256": "f3bd2d92902d744982617bce5d7bec71d3ccab2d5b2126170eacfb16523f7a44",
+      "common_initialization_sha256": "f3bd2d92902d744982617bce5d7bec71d3ccab2d5b2126170eacfb16523f7a44",
+      "config_sha256": "79d1b62914efc2ebb32261f3c448696257682c7c1b8c77cc7b0387c82f40d0e0",
+      "validation_epochs": [
+        5,
+        10,
+        15,
+        20,
+        25,
+        30,
+        35,
+        40,
+        45,
+        50,
+        55,
+        60,
+        65,
+        70,
+        75,
+        80,
+        85,
+        90,
+        95,
+        100
+      ]
+    },
+    "bikenyc_K01_seed17": {
+      "issues": [],
+      "checkpoints": {
+        "best": {
+          "epoch": 95,
+          "config_sha256": "a65cd86876581ac1488c513df56d60984e3628167c808bf773766d226457d414",
+          "sha256": "7369c3ff82fcc8650ff261af8dab89afa2951b66faf74e047cc9a8c7980b35af",
+          "size": 3519129
+        },
+        "last": {
+          "epoch": 100,
+          "config_sha256": "a65cd86876581ac1488c513df56d60984e3628167c808bf773766d226457d414",
+          "sha256": "cc817ee7d27c3f0865ae74014cea542863bf44285503aeb9fdd4393187958597",
+          "size": 7147122
+        }
+      },
+      "full_initialization_sha256": "04d8689d837ff9828bbe4c9eb048c669cf041110dd4c708732d18c5feef3361a",
+      "common_initialization_sha256": "04d8689d837ff9828bbe4c9eb048c669cf041110dd4c708732d18c5feef3361a",
+      "config_sha256": "a65cd86876581ac1488c513df56d60984e3628167c808bf773766d226457d414",
+      "validation_epochs": [
+        5,
+        10,
+        15,
+        20,
+        25,
+        30,
+        35,
+        40,
+        45,
+        50,
+        55,
+        60,
+        65,
+        70,
+        75,
+        80,
+        85,
+        90,
+        95,
+        100
+      ]
+    },
+    "bikenyc_K02_seed17": {
+      "issues": [],
+      "checkpoints": {
+        "best": {
+          "epoch": 100,
+          "config_sha256": "e03f43234a6454b3332a61c6c9f89d53bbeabbfce79368b35eddadfb87b68c3a",
+          "sha256": "0cc986437738590adc79372e1aa093d9b3b2e803e149bb9c7e382e6776c95786",
+          "size": 3519129
+        },
+        "last": {
+          "epoch": 100,
+          "config_sha256": "e03f43234a6454b3332a61c6c9f89d53bbeabbfce79368b35eddadfb87b68c3a",
+          "sha256": "da43d82ecadee849758a9edb6073518b2c9654d17379b27d95b3a5fcc57e68f4",
+          "size": 7147122
+        }
+      },
+      "full_initialization_sha256": "04d8689d837ff9828bbe4c9eb048c669cf041110dd4c708732d18c5feef3361a",
+      "common_initialization_sha256": "04d8689d837ff9828bbe4c9eb048c669cf041110dd4c708732d18c5feef3361a",
+      "config_sha256": "e03f43234a6454b3332a61c6c9f89d53bbeabbfce79368b35eddadfb87b68c3a",
+      "validation_epochs": [
+        5,
+        10,
+        15,
+        20,
+        25,
+        30,
+        35,
+        40,
+        45,
+        50,
+        55,
+        60,
+        65,
+        70,
+        75,
+        80,
+        85,
+        90,
+        95,
+        100
+      ]
+    },
+    "bikenyc_K03_seed17": {
+      "issues": [],
+      "checkpoints": {
+        "best": {
+          "epoch": 95,
+          "config_sha256": "3c1b0a04e69cfe4ce773a86ce786af0b9045c85554b187fcc17cfbd558e76cd9",
+          "sha256": "4c01cf7872738b2d1e12d9e1617353af1a6e879c47f996ac056ad29d01483f22",
+          "size": 3693127
+        },
+        "last": {
+          "epoch": 100,
+          "config_sha256": "3c1b0a04e69cfe4ce773a86ce786af0b9045c85554b187fcc17cfbd558e76cd9",
+          "sha256": "430fddb8ba64664128cd92bdbe03410dd1336feabae9d09d0b76af6a48de1544",
+          "size": 7320992
+        }
+      },
+      "full_initialization_sha256": "04d8689d837ff9828bbe4c9eb048c669cf041110dd4c708732d18c5feef3361a",
+      "common_initialization_sha256": "04d8689d837ff9828bbe4c9eb048c669cf041110dd4c708732d18c5feef3361a",
+      "config_sha256": "3c1b0a04e69cfe4ce773a86ce786af0b9045c85554b187fcc17cfbd558e76cd9",
+      "validation_epochs": [
+        5,
+        10,
+        15,
+        20,
+        25,
+        30,
+        35,
+        40,
+        45,
+        50,
+        55,
+        60,
+        65,
+        70,
+        75,
+        80,
+        85,
+        90,
+        95,
+        100
+      ]
+    },
+    "bikenyc_K04_seed17": {
+      "issues": [],
+      "checkpoints": {
+        "best": {
+          "epoch": 100,
+          "config_sha256": "7074920f36446f5dd5120a1e61695701cffdd2cb309555da4919c534c33b819f",
+          "sha256": "c8a0b6350d458bdb8df91c10843bd85a54d530fe2a12361212c98fb7a5392b42",
+          "size": 3693127
+        },
+        "last": {
+          "epoch": 100,
+          "config_sha256": "7074920f36446f5dd5120a1e61695701cffdd2cb309555da4919c534c33b819f",
+          "sha256": "6d9bf4999e2e28ee21577774b191bbe2645c890232f631e92b9321b336855087",
+          "size": 7321120
+        }
+      },
+      "full_initialization_sha256": "04d8689d837ff9828bbe4c9eb048c669cf041110dd4c708732d18c5feef3361a",
+      "common_initialization_sha256": "04d8689d837ff9828bbe4c9eb048c669cf041110dd4c708732d18c5feef3361a",
+      "config_sha256": "7074920f36446f5dd5120a1e61695701cffdd2cb309555da4919c534c33b819f",
+      "validation_epochs": [
+        5,
+        10,
+        15,
+        20,
+        25,
+        30,
+        35,
+        40,
+        45,
+        50,
+        55,
+        60,
+        65,
+        70,
+        75,
+        80,
+        85,
+        90,
+        95,
+        100
+      ]
+    },
+    "bikenyc_K01_seed27": {
+      "issues": [],
+      "checkpoints": {
+        "best": {
+          "epoch": 95,
+          "config_sha256": "fa3b0cd7dd637a8a7ff615e514e364a1d6670fb7afebbfbb9e85730d59a6cc87",
+          "sha256": "d725d36095edba47790160dafe7d0b82933ef126e40f705bb89511f0c84cf409",
+          "size": 3519065
+        },
+        "last": {
+          "epoch": 100,
+          "config_sha256": "fa3b0cd7dd637a8a7ff615e514e364a1d6670fb7afebbfbb9e85730d59a6cc87",
+          "sha256": "64e551a9e32d9bccea126a771f31a5b5d270a94a3c9f69091dff0a7f67633154",
+          "size": 7147058
+        }
+      },
+      "full_initialization_sha256": "403454c1d6eeddd818c6803c467eee7492225e5ca8ff35a70a9dd62aff140bfc",
+      "common_initialization_sha256": "403454c1d6eeddd818c6803c467eee7492225e5ca8ff35a70a9dd62aff140bfc",
+      "config_sha256": "fa3b0cd7dd637a8a7ff615e514e364a1d6670fb7afebbfbb9e85730d59a6cc87",
+      "validation_epochs": [
+        5,
+        10,
+        15,
+        20,
+        25,
+        30,
+        35,
+        40,
+        45,
+        50,
+        55,
+        60,
+        65,
+        70,
+        75,
+        80,
+        85,
+        90,
+        95,
+        100
+      ]
+    },
+    "bikenyc_K02_seed27": {
+      "issues": [],
+      "checkpoints": {
+        "best": {
+          "epoch": 95,
+          "config_sha256": "5743aa3120bf3dd3de09ccdb026cb359069f7238510c57d0603efc703a0f1c33",
+          "sha256": "f18ca3d8d9c846ef425bad818036a08cea593796f990c6a1c9cd22c32264c937",
+          "size": 3519065
+        },
+        "last": {
+          "epoch": 100,
+          "config_sha256": "5743aa3120bf3dd3de09ccdb026cb359069f7238510c57d0603efc703a0f1c33",
+          "sha256": "7b6c20cc83af777133cf0f76df91057c917c92d33f49c43de79a0d2a69cdba83",
+          "size": 7147058
+        }
+      },
+      "full_initialization_sha256": "403454c1d6eeddd818c6803c467eee7492225e5ca8ff35a70a9dd62aff140bfc",
+      "common_initialization_sha256": "403454c1d6eeddd818c6803c467eee7492225e5ca8ff35a70a9dd62aff140bfc",
+      "config_sha256": "5743aa3120bf3dd3de09ccdb026cb359069f7238510c57d0603efc703a0f1c33",
+      "validation_epochs": [
+        5,
+        10,
+        15,
+        20,
+        25,
+        30,
+        35,
+        40,
+        45,
+        50,
+        55,
+        60,
+        65,
+        70,
+        75,
+        80,
+        85,
+        90,
+        95,
+        100
+      ]
+    },
+    "bikenyc_K03_seed27": {
+      "issues": [],
+      "checkpoints": {
+        "best": {
+          "epoch": 95,
+          "config_sha256": "9432d0943ed094562027312ca5d6a9aa8e3b224f3fdbfa6065d79973f8f6389e",
+          "sha256": "3f7f6ec5cf030bf98c9cc7051a51c84e6d0ae6fe72bc1c71dbe79dde8135dc0d",
+          "size": 3693063
+        },
+        "last": {
+          "epoch": 100,
+          "config_sha256": "9432d0943ed094562027312ca5d6a9aa8e3b224f3fdbfa6065d79973f8f6389e",
+          "sha256": "7f3276719b6bb08bf686907e49866664e43b80bd49d429bcce51bad543a275aa",
+          "size": 7321056
+        }
+      },
+      "full_initialization_sha256": "403454c1d6eeddd818c6803c467eee7492225e5ca8ff35a70a9dd62aff140bfc",
+      "common_initialization_sha256": "403454c1d6eeddd818c6803c467eee7492225e5ca8ff35a70a9dd62aff140bfc",
+      "config_sha256": "9432d0943ed094562027312ca5d6a9aa8e3b224f3fdbfa6065d79973f8f6389e",
+      "validation_epochs": [
+        5,
+        10,
+        15,
+        20,
+        25,
+        30,
+        35,
+        40,
+        45,
+        50,
+        55,
+        60,
+        65,
+        70,
+        75,
+        80,
+        85,
+        90,
+        95,
+        100
+      ]
+    },
+    "bikenyc_K04_seed27": {
+      "issues": [],
+      "checkpoints": {
+        "best": {
+          "epoch": 90,
+          "config_sha256": "34383fc2ba6890d683611801474052cbd96a9962b95a2cb115d2dc995fe96a3b",
+          "sha256": "0d72d74e12d48086e209bcec05ea5e0e5d66124b77efb3b8d0a4d541f1e45696",
+          "size": 3693063
+        },
+        "last": {
+          "epoch": 100,
+          "config_sha256": "34383fc2ba6890d683611801474052cbd96a9962b95a2cb115d2dc995fe96a3b",
+          "sha256": "c7c02192bdaeb0ee57e39ee822187b6a2b30301ee90d8a2512e84d1a993ebe7f",
+          "size": 7321056
+        }
+      },
+      "full_initialization_sha256": "403454c1d6eeddd818c6803c467eee7492225e5ca8ff35a70a9dd62aff140bfc",
+      "common_initialization_sha256": "403454c1d6eeddd818c6803c467eee7492225e5ca8ff35a70a9dd62aff140bfc",
+      "config_sha256": "34383fc2ba6890d683611801474052cbd96a9962b95a2cb115d2dc995fe96a3b",
+      "validation_epochs": [
+        5,
+        10,
+        15,
+        20,
+        25,
+        30,
+        35,
+        40,
+        45,
+        50,
+        55,
+        60,
+        65,
+        70,
+        75,
+        80,
+        85,
+        90,
+        95,
+        100
+      ]
+    }
+  },
+  "failures": {}
+}
