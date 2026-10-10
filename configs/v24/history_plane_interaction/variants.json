@@ -1,0 +1,12 @@
+{
+  "X01":{"name":"x_plain","delta":false,"history":"none","residual":false,"plane":"none","interaction":"none","reference":"K02","method":"CMFF直接传递，无额外通信"},
+  "X02":{"name":"x_residual","delta":false,"history":"none","residual":true,"plane":"none","interaction":"none","reference":"X01","method":"CMFF简单残差Hnext=H+U，无差分"},
+  "X03":{"name":"x_history_last","delta":true,"history":"last","residual":false,"plane":"none","interaction":"none","reference":"K04","method":"CMFF差分＋只读上一轮预测"},
+  "X04":{"name":"x_history_mean","delta":true,"history":"mean","residual":false,"plane":"none","interaction":"none","reference":"X03","method":"CMFF差分＋全部预测历史等权读取"},
+  "X05":{"name":"x_history_adaptive","delta":true,"history":"adaptive","residual":false,"plane":"none","interaction":"none","reference":"X04","method":"CMFF差分＋全部预测历史逐位置自适应读取"},
+  "X06":{"name":"x_history_no_delta","delta":false,"history":"adaptive","residual":false,"plane":"none","interaction":"none","reference":"X05","method":"CMFF＋自适应预测历史，无差分"},
+  "X07":{"name":"x_plane_uniform","delta":true,"history":"none","residual":false,"plane":"uniform","interaction":"none","reference":"K04","method":"ST原3D分支＋三平面，有效视角等权融合"},
+  "X08":{"name":"x_plane_coverage","delta":true,"history":"none","residual":false,"plane":"coverage","interaction":"none","reference":"X07","method":"ST原3D分支＋三平面，按真实观测覆盖融合"},
+  "X09":{"name":"x_pair_concat","delta":true,"history":"none","residual":false,"plane":"none","interaction":"concat","reference":"K04","method":"原Top2加权和＋同容量拼接MLP交互"},
+  "X10":{"name":"x_pair_product","delta":true,"history":"none","residual":false,"plane":"none","interaction":"product","reference":"X09","method":"原Top2加权和＋乘积与差值交互"}
+}

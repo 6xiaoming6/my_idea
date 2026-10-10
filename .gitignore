@@ -151,5 +151,6 @@ requirements-freeze.txt
 /outputs/v24-COE/TaxiBJ/custom/20261002_212804_pair_equal_seed7/random/rate0.4/20261002_212804_seed7_bs32/logs/train.log
 
 # Rebuildable, dense report attachments; keep reports, scripts and small audit tables.
-/experments_report/*_assets/diagnostics.json
-/experments_report/*_assets/review_data.json
+/experments_report/**
+!/experments_report/*.md
+

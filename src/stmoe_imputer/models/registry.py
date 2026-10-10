@@ -34,6 +34,9 @@ def build_model_backbone(cfg: dict) -> nn.Module:
         raise ValueError(
             f"Unknown model architecture {architecture!r}; supported: {supported}"
         ) from error
+    if architecture == "v24_ts_coe" and cfg["model"].get("coe", {}).get("history_plane_interaction", {}).get("enabled", False):
+        from .history_plane_interaction_coe import HistoryPlaneInteractionCoE
+        return HistoryPlaneInteractionCoE.from_config(cfg)
     if architecture == "v24_ts_coe" and cfg["model"].get("coe", {}).get("post_fusion_ffn", {}).get("enabled", False):
         from .post_fusion_ffn_coe import PostFusionFFNCoE
         return PostFusionFFNCoE.from_config(cfg)

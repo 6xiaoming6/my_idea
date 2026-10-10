@@ -258,6 +258,24 @@ class _CoEQualityMetrics:
             return
         for step, (candidate, accepted) in enumerate(zip(candidates, completions), start=1):
             old_error = (old[selected].float() - target[selected].float()).abs()
+            if coe.get('x_progress_diagnostics', False):
+                # Evaluation/logging only: labels never enter the model or controller.
+                error = (accepted[selected].float() - target[selected].float()).abs()
+                delta = error - old_error
+                observed = torch.where(mask.bool(), batch['x_f_obs'].float().square(), 0.)
+                scale = (observed.sum((2,3,4),keepdim=True) / mask.sum((2,3,4),keepdim=True).clamp_min(1)).sqrt().clamp_min(1)
+                threshold = (.05 * scale).expand_as(target)[selected]
+                was_good = old_error <= threshold
+                values = {'mae': error.sum(), 'mse': error.square().sum(),
+                          'improved_fraction': (delta < -1e-6).sum(),
+                          'worsened_fraction': (delta > 1e-6).sum(),
+                          'stable_fraction': (delta.abs() <= 1e-6).sum(),
+                          'repaired_fraction': ((~was_good) & (error <= threshold)).sum(),
+                          'broken_fraction': (was_good & (error > threshold)).sum()}
+                for key, value in values.items():
+                    totals = self.acceptance[f'coe_x_step{step}_{key}']
+                    totals[0] += float(value.double().cpu())
+                    totals[1] += count
             for label, value in (("candidate", candidate), ("accepted", accepted)):
                 change = (value[selected].float() - target[selected].float()).abs() - old_error
                 for direction, delta in (("harm", change.clamp_min(0)),
@@ -292,6 +310,8 @@ class _CoEQualityMetrics:
             result.update(self.coordination.compute())
         for key, (total, count) in self.acceptance.items():
             result[key] = total / count
+            if key.startswith('coe_x_step') and key.endswith('_mse'):
+                result[key[:-3]+'rmse'] = (total / count) ** .5
         return result
 
 
