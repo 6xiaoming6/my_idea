@@ -17,6 +17,12 @@ def build_datasets(
     val_npz: str | None = None,
     synthetic: bool = False,
 ):
+    if cfg['model'].get('architecture') == 'v25_observed_multiscale_coe':
+        from .observed_multiscale import build_observed_dataset
+        if synthetic:
+            raise ValueError('v25 requires preconstructed physical multi-scale data')
+        return (build_observed_dataset(cfg,train_npz,'train'),
+                build_observed_dataset(cfg,val_npz,'val'))
     data_cfg = cfg["data"]
     scale_cfg = data_cfg.get("scales", {})
     mask_cfg = data_cfg["mask"]
@@ -120,6 +126,11 @@ def build_datasets(
 
 
 def build_test_dataset(cfg: dict, test_npz: str | None = None, synthetic: bool = False):
+    if cfg['model'].get('architecture') == 'v25_observed_multiscale_coe':
+        from .observed_multiscale import build_observed_dataset
+        if synthetic:
+            raise ValueError('v25 requires preconstructed physical multi-scale data')
+        return build_observed_dataset(cfg,test_npz,'test')
     data_cfg = cfg["data"]
     scale_cfg = data_cfg.get("scales", {})
     mask_cfg = data_cfg["mask"]

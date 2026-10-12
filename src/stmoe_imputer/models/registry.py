@@ -7,6 +7,7 @@ from torch import nn
 from .main_branch import MultiScaleMoEBackbone
 from .temporal_spatial_coe import TemporalSpatialCoE
 from .v_single import V14SafeC2FMoE
+from .observed_multiscale_coe import ObservedMultiScaleCoE
 
 
 ModelBuilder = Callable[[dict], nn.Module]
@@ -16,6 +17,7 @@ MODEL_REGISTRY: dict[str, ModelBuilder] = {
     "main": MultiScaleMoEBackbone.from_config,
     "v14_safe_c2f_moe": V14SafeC2FMoE.from_config,
     "v24_ts_coe": TemporalSpatialCoE.from_config,
+    "v25_observed_multiscale_coe": ObservedMultiScaleCoE.from_config,
 }
 
 
@@ -34,6 +36,9 @@ def build_model_backbone(cfg: dict) -> nn.Module:
         raise ValueError(
             f"Unknown model architecture {architecture!r}; supported: {supported}"
         ) from error
+    if architecture == "v24_ts_coe" and cfg["model"].get("coe", {}).get("delta_dependence", {}).get("enabled", False):
+        from .delta_dependence_coe import DeltaDependenceCoE
+        return DeltaDependenceCoE.from_config(cfg)
     if architecture == "v24_ts_coe" and cfg["model"].get("coe", {}).get("history_mechanism", {}).get("enabled", False):
         from .history_mechanism_coe import HistoryMechanismCoE
         return HistoryMechanismCoE.from_config(cfg)

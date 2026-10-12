@@ -1,0 +1,6 @@
+{
+  "Z09": {"parent":"Y12","control":["Y12","X06","Z11"],"method":"CMFF绝对历史池＋乘积差值交互，无受控差分"},
+  "Z10": {"parent":"Z06","control":["Z06","Z09"],"method":"CMFF相对历史池＋乘积差值交互，无受控差分"},
+  "Z11": {"parent":"X10","control":["X10","X01","Z12"],"method":"CMFF乘积差值交互，无受控差分、无历史池"},
+  "Z12": {"parent":"X09","control":["X09","X01"],"method":"CMFF普通拼接交互，无受控差分、无历史池"}
+}

@@ -413,7 +413,7 @@ def _append_lr_logs(logs: dict[str, list[float]], optimizer: torch.optim.Optimiz
 
 
 def _routing_accumulator(cfg: dict) -> RoutingMetricAccumulator | CoERoutingMetricAccumulator | None:
-    if resolve_architecture(cfg) == "v24_ts_coe":
+    if resolve_architecture(cfg) in ("v24_ts_coe", "v25_observed_multiscale_coe"):
         return CoERoutingMetricAccumulator()
     main_cfg = cfg["model"]["main"]
     if (
@@ -459,7 +459,7 @@ def train_one_epoch(
     core_model = model.module if hasattr(model, "module") else model
     if hasattr(core_model.main_branch, "set_routing_epoch"):
         core_model.main_branch.set_routing_epoch(epoch)
-    is_coe = resolve_architecture(cfg) == "v24_ts_coe"
+    is_coe = resolve_architecture(cfg) in ("v24_ts_coe", "v25_observed_multiscale_coe")
     logs: dict[str, list[float]] = defaultdict(list)
     exact_metrics = {
         "": MaskedMetricAccumulator(),
@@ -696,7 +696,7 @@ def evaluate(
     }
     active_exact_metrics = {""}
     routing_metrics = _routing_accumulator(cfg)
-    coe_quality = _CoEQualityMetrics() if resolve_architecture(cfg) == "v24_ts_coe" else None
+    coe_quality = _CoEQualityMetrics() if resolve_architecture(cfg) in ("v24_ts_coe", "v25_observed_multiscale_coe") else None
     measure_forward = bool(cfg.get("train", {}).get("measure_forward_latency", False))
     counters = {"forward_seconds": 0.0, "forward_batches": 0.0, "forward_samples": 0.0}
     for batch in tqdm(loader, desc=desc, leave=False, disable=not show_progress):
@@ -734,7 +734,7 @@ def evaluate(
         _append_model_diagnostics(logs, outputs)
         if coe_quality is not None:
             coe_quality.update(outputs, batch)
-        if resolve_architecture(cfg) == "v24_ts_coe" and 'mask_family' in batch:
+        if resolve_architecture(cfg) in ("v24_ts_coe", "v25_observed_multiscale_coe") and 'mask_family' in batch:
             outputs['coe']['mask_family'] = batch['mask_family'].repeat_interleave(outputs['coe'].get('routing_region_count', 1))
         _update_routing_metrics(routing_metrics, outputs)
     logs, exact_metrics, active_exact_metrics, routing_metrics, coe_quality, counters = _distributed_merge(
@@ -744,7 +744,7 @@ def evaluate(
     if measure_forward and counters["forward_batches"]:
         result["forward_ms_per_batch_per_rank"] = 1000.0 * counters["forward_seconds"] / counters["forward_batches"]
         result["forward_ms_per_sample_per_rank"] = 1000.0 * counters["forward_seconds"] / counters["forward_samples"]
-    if resolve_architecture(cfg) == "v24_ts_coe" and exact_metrics[""].count == 0:
+    if resolve_architecture(cfg) in ("v24_ts_coe", "v25_observed_multiscale_coe") and exact_metrics[""].count == 0:
         raise ValueError("TS-CoE evaluation has no finite hidden supervision targets")
     for suffix in active_exact_metrics:
         for key, value in exact_metrics[suffix].compute().items():
