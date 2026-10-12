@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+from contextlib import ExitStack
 import csv
 import hashlib
 import json
@@ -39,6 +40,7 @@ from stmoe_imputer.utils.run_naming import experiment_label
 from stmoe_imputer.utils.checkpoint import load_checkpoint, save_checkpoint, snapshot_model_state
 from stmoe_imputer.utils.train_logger import TrainLogger
 from stmoe_imputer.utils.metric_logging import compact_metrics
+from stmoe_imputer.utils.gpu_monitor import GPUMonitor
 
 
 def _rng_snapshot(device: torch.device) -> dict:
@@ -324,6 +326,11 @@ def _distributed_device(cfg: dict) -> tuple[torch.device, int, int]:
 
 
 def main() -> None:
+    with ExitStack() as monitors:
+        _main(monitors)
+
+
+def _main(monitors) -> None:
     args = parse_args()
     cfg = load_config(args.config)
     if args.override_config:
@@ -387,6 +394,8 @@ def main() -> None:
         dist.broadcast_object_list(paths, src=0)
         run_path = paths[0]
     run_dir = Path(run_path)
+    if is_main:
+        monitors.enter_context(GPUMonitor(run_dir, enabled=device.type == 'cuda'))
     ckpt_dir = run_dir / "checkpoints"
     best_path = ckpt_dir / best_checkpoint_name
     last_path = ckpt_dir / "last.pth"

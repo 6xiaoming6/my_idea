@@ -169,7 +169,7 @@ class HistoryPlaneInteractionCoE(CoreValidationCoE):
         if pair:
             a=F.layer_norm(first.movedim(1,-1),(self.dim,)).movedim(-1,1)
             b=F.layer_norm(second.movedim(1,-1),(self.dim,)).movedim(-1,1)
-            features=torch.cat((a,b),1) if self.x_spec['interaction']=='concat' else torch.cat((a*b,a-b),1)
+            features=self._interaction_features(a,b)
             rms=out.detach().float().square().mean((2,3,4),keepdim=True).sqrt()
             delta=.1*rms*self.x_interaction(features).float().tanh()
             stats['interaction_abs']=delta.detach().abs().mean()
@@ -182,6 +182,9 @@ class HistoryPlaneInteractionCoE(CoreValidationCoE):
                     stats[f'pair_{i}_{j}_interaction']=torch.where(chosen,per_sample,0.).mean()
             out=out+delta.to(out.dtype)
         return out
+
+    def _interaction_features(self, a, b):
+        return torch.cat((a,b),1) if self.x_spec['interaction']=='concat' else torch.cat((a*b,a-b),1)
 
     def _execute(self,c,corrected,weights,scale_weights,step):
         if self.x_spec['plane']=='none' and self.x_spec['interaction']=='none':

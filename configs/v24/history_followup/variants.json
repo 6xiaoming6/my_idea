@@ -1,0 +1,14 @@
+{
+  "Y01": {"rate":0.4,"delta":false,"history":false,"mid":0.1,"global_plane":"none","history_pair":false,"control":"X01","method":"纯CMFF＋中间轮监督"},
+  "Y02": {"rate":0.4,"delta":true,"history":false,"mid":0.1,"global_plane":"none","history_pair":false,"control":"K04","method":"CMFF受控差分＋中间轮监督"},
+  "Y03": {"rate":0.4,"delta":false,"history":true,"mid":0.1,"global_plane":"none","history_pair":false,"control":"X06 / Y01","method":"CMFF自适应历史池＋中间轮监督，无差分"},
+  "Y04": {"rate":0.4,"delta":true,"history":true,"mid":0.1,"global_plane":"none","history_pair":false,"control":"X05 / Y02 / Y03","method":"CMFF差分＋自适应历史池＋中间轮监督"},
+  "Y05": {"rate":0.6,"delta":false,"history":false,"mid":0.0,"global_plane":"none","history_pair":false,"control":"X01（率变化）","method":"random0.6纯CMFF"},
+  "Y06": {"rate":0.6,"delta":true,"history":false,"mid":0.0,"global_plane":"none","history_pair":false,"control":"Y05 / K04（率变化）","method":"random0.6 CMFF受控差分"},
+  "Y07": {"rate":0.6,"delta":false,"history":true,"mid":0.0,"global_plane":"none","history_pair":false,"control":"Y05 / X06（率变化）","method":"random0.6 CMFF自适应历史池，无差分"},
+  "Y08": {"rate":0.6,"delta":true,"history":true,"mid":0.0,"global_plane":"none","history_pair":false,"control":"Y06 / Y07 / X05（率变化）","method":"random0.6 CMFF差分＋自适应历史池"},
+  "Y09": {"rate":0.4,"delta":true,"history":false,"mid":0.0,"global_plane":"uniform","history_pair":false,"control":"K04 / X07（非等容量位置对照）","method":"差分＋全专家可见三平面，有效视角等权"},
+  "Y10": {"rate":0.4,"delta":true,"history":false,"mid":0.0,"global_plane":"coverage","history_pair":false,"control":"Y09 / X08（非等容量位置对照）","method":"差分＋全专家可见三平面，观测覆盖加权"},
+  "Y11": {"rate":0.4,"delta":true,"history":true,"mid":0.0,"global_plane":"coverage","history_pair":false,"control":"Y10 / X05","method":"差分＋自适应历史池＋全专家覆盖三平面"},
+  "Y12": {"rate":0.4,"delta":true,"history":true,"mid":0.0,"global_plane":"none","history_pair":true,"control":"X05 / X10","method":"差分＋自适应历史池＋双专家乘积差值交互"}
+}

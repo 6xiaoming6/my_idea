@@ -34,6 +34,12 @@ def build_model_backbone(cfg: dict) -> nn.Module:
         raise ValueError(
             f"Unknown model architecture {architecture!r}; supported: {supported}"
         ) from error
+    if architecture == "v24_ts_coe" and cfg["model"].get("coe", {}).get("history_mechanism", {}).get("enabled", False):
+        from .history_mechanism_coe import HistoryMechanismCoE
+        return HistoryMechanismCoE.from_config(cfg)
+    if architecture == "v24_ts_coe" and cfg["model"].get("coe", {}).get("history_followup", {}).get("enabled", False):
+        from .history_followup_coe import HistoryFollowupCoE
+        return HistoryFollowupCoE.from_config(cfg)
     if architecture == "v24_ts_coe" and cfg["model"].get("coe", {}).get("history_plane_interaction", {}).get("enabled", False):
         from .history_plane_interaction_coe import HistoryPlaneInteractionCoE
         return HistoryPlaneInteractionCoE.from_config(cfg)

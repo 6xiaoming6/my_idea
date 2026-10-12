@@ -12,6 +12,7 @@ from stmoe_imputer.models import DualBranchSTImputer
 from stmoe_imputer.utils.checkpoint import save_checkpoint,snapshot_model_state
 from run_b3_c3 import load,write,digest
 from stmoe_imputer.utils.metric_logging import MetricLogPolicy, compact_metrics, compact_epoch
+from stmoe_imputer.utils.gpu_monitor import GPUMonitor
 
 
 def rng_snapshot(loaders,device):
@@ -30,6 +31,11 @@ def restore_rng(state,loaders,device):
 
 
 def train(job,run_dir,result_file,device='cuda',stop_after=None):
+    with GPUMonitor(run_dir, enabled=str(device).startswith('cuda') and not Path(result_file).exists()):
+        return _train(job,run_dir,result_file,device,stop_after)
+
+
+def _train(job,run_dir,result_file,device='cuda',stop_after=None):
     cfg=job['config'];run=Path(run_dir);run.mkdir(parents=True,exist_ok=True);log=run/'logs';log.mkdir(exist_ok=True)
     cp=run/'checkpoints';cp.mkdir(exist_ok=True)
     logging=MetricLogPolicy(cfg['train'].get('logging'),cfg['train']['epochs'])

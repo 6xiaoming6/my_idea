@@ -1,0 +1,10 @@
+{
+  "Z01": {"rate":0.4,"interaction":"concat","history":"adaptive","representation":"absolute","control":["Y12","X05","X09"],"method":"差分＋自适应历史池＋同容量拼接MLP"},
+  "Z02": {"rate":0.4,"interaction":"product_only","history":"adaptive","representation":"absolute","control":["Y12","Z01"],"method":"差分＋自适应历史池＋仅乘积项，差值输入置零"},
+  "Z03": {"rate":0.4,"interaction":"difference_only","history":"adaptive","representation":"absolute","control":["Y12","Z01"],"method":"差分＋自适应历史池＋仅差值项，乘积输入置零"},
+  "Z04": {"rate":0.4,"interaction":"product_difference","history":"mean","representation":"absolute","control":["Y12","X04"],"method":"差分＋全历史等权读取＋乘积差值交互"},
+  "Z05": {"rate":0.4,"interaction":"product_difference","history":"last","representation":"absolute","control":["Y12","Z04"],"method":"差分＋仅最近历史读取＋乘积差值交互"},
+  "Z06": {"rate":0.4,"interaction":"product_difference","history":"adaptive","representation":"innovation","control":["Y12","Z05"],"method":"差分＋自适应历史创新量注入＋乘积差值交互"},
+  "Z07": {"rate":0.6,"interaction":"concat","history":"adaptive","representation":"absolute","control":["Y08","Z08"],"method":"0.6差分＋自适应历史池＋拼接MLP"},
+  "Z08": {"rate":0.6,"interaction":"product_difference","history":"adaptive","representation":"absolute","control":["Y08","Z07"],"method":"0.6差分＋自适应历史池＋乘积差值交互"}
+}

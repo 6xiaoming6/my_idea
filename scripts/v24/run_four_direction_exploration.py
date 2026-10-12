@@ -140,7 +140,7 @@ def evaluate_record(suite,name,cp,sha,protocol,npz,group,gpu):
     if output.exists():
         r=load(output)
         if r.get('status')=='finished' and r['protocol_sha256']==ph and r['config_sha256']==sha and r['checkpoint']==str(Path(cp).resolve()) and r.get('npz')==str(Path(npz).resolve()):return r
-    protocolpath=suite/'protocols'/f'{group}.json';frozen(protocolpath,protocol)
+    protocolpath=suite/'protocols'/group/f'{ph}.json';frozen(protocolpath,protocol)
     subprocess_run([sys.executable,'-u',str(suite/'source_snapshot/scripts/v24/evaluate_four_direction.py'),
         '--checkpoint',str(cp),'--protocol',str(protocolpath),'--npz',npz,'--output',str(output),'--expected-sha',sha],suite/'launcher_logs'/f'{name}.{group}.log',gpu)
     r=load(output)
