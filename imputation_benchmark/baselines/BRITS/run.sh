@@ -1,1 +1,0 @@
-python main.py --config configurations/PEMS04_12_SR-TC_0.5.conf

@@ -1,0 +1,12 @@
+{
+  "python": "3.11.15",
+  "torch": "2.6.0+cu124",
+  "cuda_build": "12.4",
+  "cudnn": 90100,
+  "numpy": "1.26.4",
+  "tqdm": "4.68.4",
+  "matplotlib": "3.10.0",
+  "source_branch": "v25",
+  "source_commit": "d8c1e60b5c4c7c0eb37d8096b0f50a6454c16c67",
+  "includes_uncommitted_v25_changes": true
+}

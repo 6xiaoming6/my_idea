@@ -1,6 +1,0 @@
-{
-    "combine_params": {
-        "_type": "choice",
-        "_value": [{"alpha":70, "learning_rate":0.001, "z_dim":256, "h_dim":256},{"alpha":70, "learning_rate":0.001, "z_dim":256, "h_dim":256},{"alpha":70, "learning_rate":0.001, "z_dim":256, "h_dim":256},{"alpha":70, "learning_rate":0.001, "z_dim":256, "h_dim":256},{"alpha":70, "learning_rate":0.001, "z_dim":256, "h_dim":256}]
-    }
-}

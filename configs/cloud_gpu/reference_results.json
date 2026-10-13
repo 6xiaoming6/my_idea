@@ -1,0 +1,306 @@
+{
+  "taxibj_A1": {
+    "seed": 7,
+    "epochs": 100,
+    "rate": 0.4,
+    "scheduler": {
+      "type": "cosine",
+      "total_epochs": 100,
+      "eta_min": 0.0003,
+      "reach_min_at_last_epoch": true
+    },
+    "protocol_sha256": "862b06300c02a6e15297cdcfd58226af6e856358c132e13ccca1864411e94154",
+    "metrics": {
+      "in_distribution": {
+        "mae": 14.009721268459138,
+        "rmse": 24.505659470239348
+      },
+      "unseen_combinations": {
+        "mae": 32.05185443019305,
+        "rmse": 61.27756644987209
+      },
+      "unseen_geometry": {
+        "mae": 33.35574163178562,
+        "rmse": 60.72459635895072
+      },
+      "unseen_triple": {
+        "mae": 30.654242076402088,
+        "rmse": 57.60879810777768
+      },
+      "unseen_combinations_repeat": {
+        "mae": 31.8457852444887,
+        "rmse": 60.434966305937905
+      },
+      "unseen_geometry_repeat": {
+        "mae": 33.100004766317355,
+        "rmse": 60.62018283138423
+      }
+    }
+  },
+  "taxibj_A2": {
+    "seed": 7,
+    "epochs": 100,
+    "rate": 0.4,
+    "scheduler": {
+      "type": "cosine",
+      "total_epochs": 100,
+      "eta_min": 0.0003,
+      "reach_min_at_last_epoch": true
+    },
+    "protocol_sha256": "862b06300c02a6e15297cdcfd58226af6e856358c132e13ccca1864411e94154",
+    "metrics": {
+      "in_distribution": {
+        "mae": 13.59684327701045,
+        "rmse": 24.06677383556949
+      },
+      "unseen_combinations": {
+        "mae": 17.111045859527096,
+        "rmse": 30.125383353737956
+      },
+      "unseen_geometry": {
+        "mae": 20.635811950254755,
+        "rmse": 34.39039617670667
+      },
+      "unseen_triple": {
+        "mae": 17.04061709061111,
+        "rmse": 29.640244111494614
+      },
+      "unseen_combinations_repeat": {
+        "mae": 17.168866415053074,
+        "rmse": 30.524654800668053
+      },
+      "unseen_geometry_repeat": {
+        "mae": 20.241311318223087,
+        "rmse": 33.68761851104319
+      }
+    }
+  },
+  "taxibj_B1": {
+    "seed": 7,
+    "epochs": 100,
+    "rate": 0.4,
+    "scheduler": {
+      "type": "cosine",
+      "total_epochs": 100,
+      "eta_min": 0.0003,
+      "reach_min_at_last_epoch": true
+    },
+    "protocol_sha256": "862b06300c02a6e15297cdcfd58226af6e856358c132e13ccca1864411e94154",
+    "metrics": {
+      "in_distribution": {
+        "mae": 12.370915032209513,
+        "rmse": 20.30080034136215
+      },
+      "unseen_combinations": {
+        "mae": 12.75361303042817,
+        "rmse": 20.567422825120033
+      },
+      "unseen_geometry": {
+        "mae": 14.974828340630895,
+        "rmse": 24.101907895981185
+      },
+      "unseen_triple": {
+        "mae": 12.42426992608431,
+        "rmse": 19.870449650067087
+      },
+      "unseen_combinations_repeat": {
+        "mae": 12.78388166367138,
+        "rmse": 20.515523839616787
+      },
+      "unseen_geometry_repeat": {
+        "mae": 15.05394796764228,
+        "rmse": 24.185563634706924
+      }
+    }
+  },
+  "taxibj_B2": {
+    "seed": 7,
+    "epochs": 100,
+    "rate": 0.4,
+    "scheduler": {
+      "type": "cosine",
+      "total_epochs": 100,
+      "eta_min": 0.0003,
+      "reach_min_at_last_epoch": true
+    },
+    "protocol_sha256": "862b06300c02a6e15297cdcfd58226af6e856358c132e13ccca1864411e94154",
+    "metrics": {
+      "in_distribution": {
+        "mae": 10.40542457725463,
+        "rmse": 17.456986308636612
+      },
+      "unseen_combinations": {
+        "mae": 21.718441610274237,
+        "rmse": 37.24703332666779
+      },
+      "unseen_geometry": {
+        "mae": 19.978794038074422,
+        "rmse": 34.37074405126031
+      },
+      "unseen_triple": {
+        "mae": 23.21807699598982,
+        "rmse": 37.32103319509567
+      },
+      "unseen_combinations_repeat": {
+        "mae": 21.672494733668977,
+        "rmse": 37.13337446011244
+      },
+      "unseen_geometry_repeat": {
+        "mae": 19.973007040839967,
+        "rmse": 34.32960892297219
+      }
+    }
+  },
+  "bikenyc_A1": {
+    "seed": 7,
+    "epochs": 200,
+    "rate": 0.4,
+    "scheduler": {
+      "type": "cosine",
+      "total_epochs": 200,
+      "eta_min": 0.0003,
+      "reach_min_at_last_epoch": true
+    },
+    "protocol_sha256": "862b06300c02a6e15297cdcfd58226af6e856358c132e13ccca1864411e94154",
+    "metrics": {
+      "in_distribution": {
+        "mae": 3.1726056359405668,
+        "rmse": 11.63122990655022
+      },
+      "unseen_combinations": {
+        "mae": 4.982426405175148,
+        "rmse": 18.70783577971253
+      },
+      "unseen_geometry": {
+        "mae": 5.488482591117697,
+        "rmse": 17.29494378099462
+      },
+      "unseen_triple": {
+        "mae": 4.459815758938307,
+        "rmse": 16.750225870386306
+      },
+      "unseen_combinations_repeat": {
+        "mae": 5.055608867930139,
+        "rmse": 19.026707200670995
+      },
+      "unseen_geometry_repeat": {
+        "mae": 4.833196705315901,
+        "rmse": 15.996704093629042
+      }
+    }
+  },
+  "bikenyc_A2": {
+    "seed": 7,
+    "epochs": 200,
+    "rate": 0.4,
+    "scheduler": {
+      "type": "cosine",
+      "total_epochs": 200,
+      "eta_min": 0.0003,
+      "reach_min_at_last_epoch": true
+    },
+    "protocol_sha256": "862b06300c02a6e15297cdcfd58226af6e856358c132e13ccca1864411e94154",
+    "metrics": {
+      "in_distribution": {
+        "mae": 3.1371424956138614,
+        "rmse": 11.375222490821834
+      },
+      "unseen_combinations": {
+        "mae": 5.214150671921773,
+        "rmse": 19.22463260044798
+      },
+      "unseen_geometry": {
+        "mae": 6.147107254723153,
+        "rmse": 19.295913582684413
+      },
+      "unseen_triple": {
+        "mae": 4.611718262134984,
+        "rmse": 16.953380325307776
+      },
+      "unseen_combinations_repeat": {
+        "mae": 5.296766120918661,
+        "rmse": 19.637559927022444
+      },
+      "unseen_geometry_repeat": {
+        "mae": 5.286898779934778,
+        "rmse": 17.435074733924687
+      }
+    }
+  },
+  "bikenyc_B1": {
+    "seed": 7,
+    "epochs": 200,
+    "rate": 0.4,
+    "scheduler": {
+      "type": "cosine",
+      "total_epochs": 200,
+      "eta_min": 0.0003,
+      "reach_min_at_last_epoch": true
+    },
+    "protocol_sha256": "862b06300c02a6e15297cdcfd58226af6e856358c132e13ccca1864411e94154",
+    "metrics": {
+      "in_distribution": {
+        "mae": 2.8507019990385185,
+        "rmse": 10.73202225662942
+      },
+      "unseen_combinations": {
+        "mae": 2.948797908344567,
+        "rmse": 10.560366807765957
+      },
+      "unseen_geometry": {
+        "mae": 3.8671740256328926,
+        "rmse": 12.87381689590858
+      },
+      "unseen_triple": {
+        "mae": 2.6981390969757943,
+        "rmse": 9.648993496788181
+      },
+      "unseen_combinations_repeat": {
+        "mae": 2.8836817902756575,
+        "rmse": 10.329234237675138
+      },
+      "unseen_geometry_repeat": {
+        "mae": 3.3909696417862736,
+        "rmse": 11.549113828009439
+      }
+    }
+  },
+  "bikenyc_B2": {
+    "seed": 7,
+    "epochs": 200,
+    "rate": 0.4,
+    "scheduler": {
+      "type": "cosine",
+      "total_epochs": 200,
+      "eta_min": 0.0003,
+      "reach_min_at_last_epoch": true
+    },
+    "protocol_sha256": "862b06300c02a6e15297cdcfd58226af6e856358c132e13ccca1864411e94154",
+    "metrics": {
+      "in_distribution": {
+        "mae": 2.855595478745812,
+        "rmse": 10.718482574659944
+      },
+      "unseen_combinations": {
+        "mae": 3.1673359193792994,
+        "rmse": 11.255146602339053
+      },
+      "unseen_geometry": {
+        "mae": 4.233408446476716,
+        "rmse": 13.779234312457813
+      },
+      "unseen_triple": {
+        "mae": 2.7933303509034952,
+        "rmse": 9.956149955760884
+      },
+      "unseen_combinations_repeat": {
+        "mae": 3.1137349644648413,
+        "rmse": 11.139901736158865
+      },
+      "unseen_geometry_repeat": {
+        "mae": 3.8006261399004817,
+        "rmse": 12.76970674930694
+      }
+    }
+  }
+}

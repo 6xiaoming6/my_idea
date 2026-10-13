@@ -1,0 +1,4 @@
+# Python 3.11 recommended. Install the CUDA-matching torch wheel separately.
+numpy==1.26.4
+tqdm==4.68.4
+matplotlib==3.10.0

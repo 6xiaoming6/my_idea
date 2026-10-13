@@ -49,11 +49,12 @@ class _TriScaleTotals:
                 result[f'coe_step{step+1}_{name}_fraction']=float(self.choices[step,sid]/self.count)
                 result[f'coe_step{step+1}_{name}_probability']=float(self.probs[step,sid]/self.count)
         for sid,name in enumerate(names):result[f'coe_{name}_rounds_mean']=float(self.choices[:,sid].sum()/self.count)
-        result['coe_expert_execution_count']=float(top_k*n)
-        result['coe_expert_grid_equivalents']=float(top_k*(self.choices*torch.tensor([1.,.25,.0625])).sum()/self.count)
+        ks=torch.tensor([top_k]*n if isinstance(top_k,int) else top_k,dtype=torch.float64)[:,None]
+        result['coe_expert_execution_count']=float(ks.sum())
+        result['coe_expert_grid_equivalents']=float((ks*self.choices*torch.tensor([1.,.25,.0625])).sum()/self.count)
         if self.executed is not None:
-            result['coe_expert_execution_count']=float(top_k*self.executed.sum()/self.count)
-            result['coe_expert_grid_equivalents']=float(top_k*(self.executed*torch.tensor([1.,.25,.0625])).sum()/self.count)
+            result['coe_expert_execution_count']=float((ks*self.executed).sum()/self.count)
+            result['coe_expert_grid_equivalents']=float((ks*self.executed*torch.tensor([1.,.25,.0625])).sum()/self.count)
             for step in range(n):
                 for sid,name in enumerate(names):
                     result[f'coe_step{step+1}_{name}_executed_fraction']=float(self.executed[step,sid]/self.count)
@@ -89,6 +90,7 @@ class _CoERoutingTotals:
         self.scale_path_counts: Counter = Counter()
         self.mode = None
         self.top_k = None
+        self.top_k_per_step = None
         self.expert_names: tuple[str, ...] | None = None
 
     @torch.no_grad()
@@ -100,16 +102,20 @@ class _CoERoutingTotals:
         names = tuple(coe.get("expert_names", ("T", "S")))
         mode = coe["routing_mode"]
         top_k = int(coe.get("top_k", 1))
+        step_ks = tuple(coe.get('top_k_per_step', [top_k]*weights.shape[1]))
+        if len(step_ks) != weights.shape[1] or any(type(k) is not int or not 1 <= k <= len(names) for k in step_ks) or max(step_ks) != top_k:
+            raise ValueError('Invalid per-round Top-k metadata')
         if weights.ndim != 3 or probs.shape != weights.shape or len(names) != weights.shape[-1]:
             raise ValueError("CoE routing tensors must match [batch, steps, len(expert_names)]")
         if len(set(names)) != len(names):
             raise ValueError("CoE expert_names must be unique")
         if self.weight_sum is not None and (
-            names != self.expert_names or mode != self.mode or top_k != self.top_k
+            names != self.expert_names or mode != self.mode or top_k != self.top_k or step_ks != self.top_k_per_step
             or weights.shape[1:] != self.weight_sum.shape
         ):
             raise ValueError("CoE routing configuration changed during accumulation")
         self.mode, self.expert_names, self.top_k = mode, names, top_k
+        self.top_k_per_step = step_ks
         if self.weight_sum is None:
             self.weight_sum = torch.zeros_like(weights[0])
             self.probability_sum = torch.zeros_like(probs[0])
@@ -149,15 +155,16 @@ class _CoERoutingTotals:
         pair_ids = coe.get("pair_ids")
         if selected is not None:
             selected = selected.detach().long().cpu()
-            if (selected.shape != (*weights.shape[:2], top_k) or
-                    bool(((selected < 0) | (selected >= len(names))).any()) or
-                    bool((selected.diff(dim=-1) <= 0).any())):
-                raise ValueError("selected_experts must be sorted unique indices [batch, steps, top_k]")
+            if selected.shape != (*weights.shape[:2], top_k):
+                raise ValueError('Invalid padded selected_experts shape')
             if self.selection_sum is None:
                 self.selection_sum = torch.zeros_like(weights[0])
             for step in range(weights.shape[1]):
-                self.selection_sum[step].scatter_add_(0, selected[:, step].reshape(-1),
-                                                       torch.ones(selected.shape[0] * top_k, dtype=torch.float64))
+                k=step_ks[step];real=selected[:,step,:k]
+                if bool(((real<0)|(real>=len(names))).any()) or bool((real.diff(dim=-1)<=0).any()) or bool((selected[:,step,k:]!=-1).any()):
+                    raise ValueError('Invalid sorted Top-k ids or padding')
+                self.selection_sum[step].scatter_add_(0, real.reshape(-1),
+                                                       torch.ones(selected.shape[0] * k, dtype=torch.float64))
         if pair_ids is not None:
             pair_ids = pair_ids.detach().long().cpu()
             if pair_ids.shape != weights.shape[:2] or top_k != 2:
@@ -178,10 +185,11 @@ class _CoERoutingTotals:
     def merge(self, other: "_CoERoutingTotals") -> None:
         if not other.count:
             return
-        if self.count and (self.mode, self.top_k, self.expert_names) != (other.mode, other.top_k, other.expert_names):
+        if self.count and (self.mode, self.top_k, self.expert_names, self.top_k_per_step) != (other.mode, other.top_k, other.expert_names, other.top_k_per_step):
             raise ValueError("Cannot merge different CoE routing configurations")
         if not self.count:
             self.mode, self.top_k, self.expert_names = other.mode, other.top_k, other.expert_names
+            self.top_k_per_step = other.top_k_per_step
         self.count += other.count
         for name in ("probability_sum", "weight_sum", "entropy_sum", "selection_sum", "scale_choice_sum", "scale_probability_sum", "scale_weight_sum", "scale_execution_sum", "scale_both_sum", "scale_entropy_sum"):
             value = getattr(other, name)
@@ -207,7 +215,10 @@ class _CoERoutingTotals:
             "coe_num_steps": float(self.weight_sum.shape[0]),
             "coe_top_k": float(self.top_k),
         }
-        result.update(self.triscale.compute(self.top_k))
+        result.update(self.triscale.compute(self.top_k_per_step))
+        if len(set(self.top_k_per_step)) > 1:
+            result['coe_top_k_variable']=1.
+            for step,k in enumerate(self.top_k_per_step,1):result[f'coe_step{step}_top_k']=float(k)
         if self.scale_choice_sum is not None:
             for step in range(len(self.scale_choice_sum)):
                 result[f'coe_step{step+1}_coarse_fraction']=float(self.scale_choice_sum[step]/self.count)
@@ -378,6 +389,7 @@ class CoERoutingMetricAccumulator(_CoERoutingTotals):
             if value is not None:
                 route_record[name] = value.detach().cpu()
         route_record["top_k"] = self.top_k
+        route_record['top_k_per_step'] = self.top_k_per_step
         for group, selected in groups.items():
             totals = self._condition_totals.setdefault(group, _CoERoutingTotals())
             if not bool(selected.any()):

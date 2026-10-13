@@ -17,8 +17,14 @@ class ObservedMultiScaleCoE(CoreValidationCoE):
         m = super().from_config(cfg)
         if m.core_spec['path'] != 'CMFF' or m.core_spec['communication'] not in ('none','conditional'):
             raise ValueError('v25 initial validation is CMFF with/without controlled delta')
-        if cfg['data'].get('scales', {}).get('pooling_mode') != 'sum':
-            raise ValueError('Expected physical sum observations')
+        m.observation_pooling = cfg['data'].get('scales', {}).get('pooling_mode')
+        if m.observation_pooling not in ('sum', 'mean'):
+            raise ValueError('Expected physical sum or mean observations')
+        # Controls H0 only. data.input_scales continues to control observations
+        # available throughout the run, including the native CMFF injections.
+        m.initial_observation_scales = cfg['model']['coe'].get('initial_observation_scales', 'FMC')
+        if m.initial_observation_scales not in ('F', 'FMC'):
+            raise ValueError('initial_observation_scales must be F or FMC')
         # Identical additions and RNG consumption in all four factorial cells.
         with torch.random.fork_rng(devices=[]):
             torch.manual_seed(int(cfg['seed']) + 25001)
@@ -40,7 +46,8 @@ class ObservedMultiScaleCoE(CoreValidationCoE):
                 raise ValueError('Nonfinite observed value')
             # An invertible, known area conversion; stored inputs remain physical sums.
             # Do not equate partial-F means with independent coarse observations.
-            values = torch.where(obs,x,0.) / (factor*factor)
+            divisor = factor*factor if self.observation_pooling == 'sum' else 1
+            values = torch.where(obs,x,0.) / divisor
             observations.append((values,obs.to(x.dtype)))
         self._observations = observations
         try:
@@ -51,7 +58,9 @@ class ObservedMultiScaleCoE(CoreValidationCoE):
                 out['coe']['diagnostics']['v25_observed_fraction_'+name] = mask.float().mean()
                 if factor>1:
                     residual = (pool(comp,factor)-values.detach().float()).abs()*mask
-                    out['coe']['diagnostics']['v25_observed_sum_residual_'+name] = residual.sum()*factor**2/mask.sum().clamp_min(1)
+                    multiplier = factor**2 if self.observation_pooling == 'sum' else 1
+                    key = 'v25_observed_'+self.observation_pooling+'_residual_'+name
+                    out['coe']['diagnostics'][key] = residual.sum()*multiplier/mask.sum().clamp_min(1)
             return out
         finally:
             del self._observations
@@ -65,11 +74,15 @@ class ObservedMultiScaleCoE(CoreValidationCoE):
             pos = pool(c['pos'],factor) if factor>1 else c['pos']
             support = self._observation_support(native_mask)
             pyramid.append((values,native_mask,support,pos))
-            if sid:
+            if sid and self.initial_observation_scales == 'FMC':
                 encoded = self.encoder(torch.cat((values,native_mask,support,pos),1))
                 # No pseudo-observations when this scale is unavailable.
                 encoded = encoded * native_mask.mean(1,keepdim=True)
                 encodings.append(resize(encoded,x.shape[-2:]))
+            elif sid:
+                # Keep the same projection and state_dict as the FMC baseline.
+                # Real M/C observations remain in pyramid for their own rounds.
+                encodings.append(torch.zeros_like(c['h']))
         h = self.observation_fusion(torch.cat(encodings,1))
         pred = self.decoder(h)
         c.update(h=h,h0=h,prev=h,initial_prediction=pred,last_prediction=pred,

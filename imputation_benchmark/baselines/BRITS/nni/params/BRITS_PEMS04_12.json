@@ -1,4 +1,0 @@
-{
-  "hid_size": {"_type": "choice", "_value": [32,64,128,256]},
-  "learning_rate":{"_type": "choice", "_value": [1e-3,1e-4,1e-5,1e-6]}
-}

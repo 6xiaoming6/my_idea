@@ -29,6 +29,12 @@ def resolve_architecture(cfg: dict) -> str:
 
 def build_model_backbone(cfg: dict) -> nn.Module:
     architecture = resolve_architecture(cfg)
+    if architecture == 'v25_observed_multiscale_coe' and cfg['model'].get('coe', {}).get('observed_history', {}).get('enabled', False):
+        from .observed_history_coe import ObservedHistoryCoE
+        return ObservedHistoryCoE.from_config(cfg)
+    if architecture == 'v25_observed_multiscale_coe' and cfg['model'].get('coe', {}).get('scale_delta_exploration', {}).get('enabled', False):
+        from .scale_delta_exploration_coe import ScaleDeltaExplorationCoE
+        return ScaleDeltaExplorationCoE.from_config(cfg)
     try:
         builder = MODEL_REGISTRY[architecture]
     except KeyError as error:

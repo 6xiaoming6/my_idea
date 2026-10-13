@@ -1,0 +1,75 @@
+{
+  "schema": 1,
+  "datasets": {
+    "taxibj": {
+      "pooling": "sum",
+      "files": {
+        "train": {
+          "source_relative": "data/TaxiBJ/v25_observed_multiscale/73fe84df49ca05de/taxibj_train.npz",
+          "target": "data/cloud_gpu/taxibj/train.npz",
+          "sha256": "375e057cd9ff0094ef9973d7029615329d13f99344aec608092d395f6f2c1089",
+          "size": 111840952
+        },
+        "val": {
+          "source_relative": "data/TaxiBJ/v25_observed_multiscale/73fe84df49ca05de/taxibj_val.npz",
+          "target": "data/cloud_gpu/taxibj/val.npz",
+          "sha256": "2e3f084a3d37ff36e114b079c3e20e291b21d58fcdeb60d7dc42c7d05bb4071b",
+          "size": 15420051
+        },
+        "test": {
+          "source_relative": "data/TaxiBJ/v25_observed_multiscale/73fe84df49ca05de/taxibj_test.npz",
+          "target": "data/cloud_gpu/taxibj/test.npz",
+          "sha256": "6b3eb5670d380ef40f451b9b525b5dc7ddaca66acd7542b323b9740a2171deb9",
+          "size": 31286138
+        }
+      }
+    },
+    "bikenyc": {
+      "pooling": "sum",
+      "files": {
+        "train": {
+          "source_relative": "data/BikeNYC/v25_observed_multiscale/253c100576901dac/bikenyc_train.npz",
+          "target": "data/cloud_gpu/bikenyc/train.npz",
+          "sha256": "d60fd0407345b7d4902921c17ebcfdf4c44b7895421ac00c2adef8d1995ca71e",
+          "size": 1807414
+        },
+        "val": {
+          "source_relative": "data/BikeNYC/v25_observed_multiscale/253c100576901dac/bikenyc_val.npz",
+          "target": "data/cloud_gpu/bikenyc/val.npz",
+          "sha256": "00881ea97a0822999b774b1e8a693db1e0f556168e0380597126c363a1dac8ed",
+          "size": 267087
+        },
+        "test": {
+          "source_relative": "data/BikeNYC/v25_observed_multiscale/253c100576901dac/bikenyc_test.npz",
+          "target": "data/cloud_gpu/bikenyc/test.npz",
+          "sha256": "eec0dd9bad37b4ede87c0aec795987d46d45889481354a01ed3ea53e457caa08",
+          "size": 544507
+        }
+      }
+    },
+    "chap": {
+      "pooling": "mean",
+      "files": {
+        "train": {
+          "source_relative": "data/CHAP/beijing/v25_observed_multiscale/6242967c1d51e6b0/chap_beijing_train.npz",
+          "target": "data/cloud_gpu/chap/train.npz",
+          "sha256": "9aa22b6927caa1264867827e7581287f99dfa77af56911b95e2932336bfb20e2",
+          "size": 6765942
+        },
+        "val": {
+          "source_relative": "data/CHAP/beijing/v25_observed_multiscale/6242967c1d51e6b0/chap_beijing_val.npz",
+          "target": "data/cloud_gpu/chap/val.npz",
+          "sha256": "5985644bb90905d4b718950fea0d4352cd6f7744102aac264c201a12da50cbec",
+          "size": 809077
+        },
+        "test": {
+          "source_relative": "data/CHAP/beijing/v25_observed_multiscale/6242967c1d51e6b0/chap_beijing_test.npz",
+          "target": "data/cloud_gpu/chap/test.npz",
+          "sha256": "2cf77cfb81c7a3bceac670e910b87d1863fafdf5c46f74591417c125df8f1c56",
+          "size": 797138
+        }
+      }
+    }
+  },
+  "bundled": false
+}

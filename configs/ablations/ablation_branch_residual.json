@@ -1,8 +1,0 @@
-{
-  "model": {
-    "main": {
-      "branch_fusion_mode": "residual",
-      "route_gamma_init": -4.0
-    }
-  }
-}

@@ -70,8 +70,8 @@ def build_observed_dataset(cfg, path, split):
     if path is None or split not in ('train','val','test'):
         raise ValueError('v25 requires explicit preconstructed data and split')
     data = cfg['data']
-    if data.get('scales', {}).get('pooling_mode') != 'sum':
-        raise ValueError('v25 first validation uses physical sums')
+    if data.get('scales', {}).get('pooling_mode') not in ('sum', 'mean'):
+        raise ValueError('v25 requires physical sum or mean observations')
     schedule = deepcopy(data['train_mask_diversity' if split=='train' else 'eval_mask_diversity'])
     schedule['seed'] += {'train':0, 'val':20000, 'test':30000}[split]
     if split != 'train':
