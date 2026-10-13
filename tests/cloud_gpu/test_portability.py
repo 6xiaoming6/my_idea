@@ -56,10 +56,12 @@ class CloudTests(unittest.TestCase):
 
     def test_consistency_resume_and_evaluation(self):
         """Tiny CPU integration: new loss/projection survives strict checkpoints."""
-        js=self.jobs(['I04','I05']);cloud.initialize(self.root,js)
+        js=self.jobs(['I04','I05','I06','I07','I08']);cloud.initialize(self.root,js)
+        cloud.write(self.root/'plan.json',{'project_root':str(self.root)})
         for name,j in js.items():
             with self.subTest(method=j['method']):
                 run=self.root/'runs'/name;receipt=self.root/'results'/(name+'.json')
+                cloud.write(self.root/'runs'/(name+'.json'),{'run_dir':str(run)})
                 train(j,run,receipt,'cpu',stop_after=1)
                 train(j,run,receipt,'cpu')
                 full=self.root/'full'/name
@@ -75,10 +77,15 @@ class CloudTests(unittest.TestCase):
                 for evaluation in cloud.load(path)['sets'].values():
                     metrics=evaluation['metrics']
                     self.assertTrue(np.isfinite(metrics['mae']))
-                    if j['method']=='I05':
+                    if j['method'] in ('I05','I07','I08'):
                         for scale in ['M','C']:
                             self.assertLess(metrics['coe_v25_observed_sum_residual_'+scale],2e-3)
 
+        report=export_report(self.root,js)
+        self.assertTrue(cloud.load(self.root/'report_path.json')['complete'])
+        content=report.read_text()
+        for label in ('I06/I04','I05/I07','I08/I05'):
+            self.assertIn('|'+label+'|',content)
 
     def test_frozen_subprocess_queue_and_skip_completed(self):
         import os,shutil,subprocess

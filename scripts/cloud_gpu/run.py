@@ -6,7 +6,7 @@ ROOT=Path(__file__).resolve().parents[2]
 sys.path[:0]=[str(ROOT/'src'),str(ROOT/'scripts/v24'),str(ROOT/'scripts/v25'),str(ROOT/'scripts/cloud_gpu')]
 from run_b3_c3 import load,write,digest
 from unpack_data import sha
-METHODS=['A1','A2','B1','B2','I01','I02','I03','I04','I05']+[f'S{i:02}' for i in range(1,10)]
+METHODS=['A1','A2','B1','B2','I01','I02','I03','I04','I05','I06','I07','I08']+[f'S{i:02}' for i in range(1,10)]
 SPECS={'S01':('free',[2,2,2,2],[]),'S02':('CMFF',[4,4,4,4],[]),'S03':('CMFF',[1,2,4,8],[]),
        'S04':('CMFF',[2,2,2,2],[2,3,4]),'S05':('CMFF',[2,2,2,2],[2]),'S06':('CMFF',[2,2,2,2],[3]),
        'S07':('CMFF',[2,2,2,2],[4]),'S08':('CFFF',[2,2,2,2],[]),'S09':('CFFF',[2,2,2,2],[4])}
@@ -30,13 +30,17 @@ def make_jobs(dataset,methods,rate,epochs=None,batch=32,seed=7,lr=.001,scheduler
             path,ks,steps=SPECS[method] if method in SPECS else ('free',[2]*4,[2,3,4])
             coe['core_validation']['communication']='conditional' if steps else 'none'
             coe['scale_delta_exploration']={'enabled':True,'path':path,'top_k_per_step':ks,'delta_steps':steps,'same_scale_only':method=='S09','scale_gradient':'selected_branch_st','top1_gradient':'selected_probability_st'}
-        if method=='I03':coe['observed_history']={'enabled':True,'mode':'adaptive'}
+        if method in ('I03','I08'):coe['observed_history']={'enabled':True,'mode':'adaptive'}
         if method=='I04':
             coe['observation_consistency']={'enabled':True,'mode':'full_target_loss'}
             c['data']['return_multiscale_targets']=True
             c['loss']['lambda_observation_consistency']=0.1
-        if method=='I05':
+        if method in ('I05','I07','I08'):
             coe['observation_consistency']={'enabled':True,'mode':'residual_projection','weight_bound':2.0}
+        if method=='I07':coe['observation_consistency']['weight_mode']='uniform'
+        if method=='I06':
+            coe['observation_consistency']={'enabled':True,'mode':'observed_loss'}
+            c['loss']['lambda_observation_consistency']=0.1
         p=load(ROOT/'configs/cloud_gpu/test_protocol.json');p['rate']=rate
         n=f'{dataset}_{method}_seed{seed}'
         c['experiment_plan']={'suite':'cloud_gpu_v25','variant':n,'method':method,'protocol':p,'selection':'ID validation MAE only','cloud_scheduler':scheduler,'scope':'from-scratch cloud run; original mixed-mask protocol'}

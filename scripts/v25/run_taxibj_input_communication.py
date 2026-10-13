@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Selectable TaxiBJ I01-I05 interventions; frozen previous suites stay immutable."""
+"""Selectable TaxiBJ I01-I08 interventions; frozen previous suites stay immutable."""
 import argparse,copy,fcntl,os,shutil,subprocess,sys,time
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[2]
@@ -14,13 +14,16 @@ METHODS={'I01':'H0仅F；CMFF各轮注入对应尺度观测；完整受控差分
          'I02':'H0三尺度；四轮自由硬选择尺度、共享Top2；完整受控差分',
          'I03':'H0三尺度；CMFF共享Top2；完整受控差分＋自适应预测历史池',
          'I04':'H0三尺度；CMFF共享Top2；完整受控差分＋最终F聚合对完整M/C真值的L1损失',
-         'I05':'H0三尺度；CMFF共享Top2；完整受控差分＋可见观测剩余区域自适应非负一致性校正'}
+         'I05':'H0三尺度；CMFF共享Top2；完整受控差分＋可见观测剩余区域自适应非负一致性校正',
+         'I06':'H0三尺度；CMFF共享Top2；完整受控差分＋仅可见M/C观测的一致性软损失',
+         'I07':'H0三尺度；CMFF共享Top2；完整受控差分＋固定等权剩余区域非负投影',
+         'I08':'H0三尺度；CMFF共享Top2；完整受控差分＋自适应预测历史池＋自适应剩余区域投影'}
 
 
 def jobs(reference=REFERENCE, methods=None):
     selected=list(METHODS) if methods is None else list(methods)
     if not selected or len(set(selected))!=len(selected) or any(m not in METHODS for m in selected):
-        raise ValueError('Select distinct methods from I01-I05')
+        raise ValueError('Select distinct methods from I01-I08')
     origin=load(reference/'jobs/taxibj_B2_seed7.json');result={}
     for method in selected:
         description=METHODS[method]
@@ -34,9 +37,19 @@ def jobs(reference=REFERENCE, methods=None):
             c['data']['return_multiscale_targets']=True
         if method=='I05':
             c['model']['coe']['observation_consistency']={'enabled':True,'mode':'residual_projection','weight_bound':2.0}
+        if method=='I06':
+            c['model']['coe']['observation_consistency']={'enabled':True,'mode':'observed_loss'}
+            c['loss']['lambda_observation_consistency']=0.1
+        if method=='I07':
+            c['model']['coe']['observation_consistency']={'enabled':True,'mode':'residual_projection','weight_bound':2.0,'weight_mode':'uniform'}
+        if method=='I08':
+            c['model']['coe']['observed_history']={'enabled':True,'mode':'adaptive'}
+            c['model']['coe']['observation_consistency']={'enabled':True,'mode':'residual_projection','weight_bound':2.0}
         c['experiment_plan'].update(suite='v25_taxibj_input_communication',variant=name,method=description,reference='B2',scope='three requested interventions; 100 epochs original B2 protocol')
         if method in ('I04','I05'):
             c['experiment_plan']['scope']='consistency followup; full-target soft loss versus observed-only adaptive residual projection; no history; 100 epochs original B2 protocol'
+        if method in ('I06','I07','I08'):
+            c['experiment_plan']['scope']='eight-run mechanism controls: observed-only soft loss, fixed projection, history plus learned projection; original B2 protocol'
         j.update(variant=name,method=method,name=method.lower()+'_v25_taxibj_input_communication',reference='B2')
         result[name]=j
     return result
@@ -49,13 +62,19 @@ def freeze(methods=None):
         if sha(path)!=stamp['sha256']:raise RuntimeError('B2 dataset changed '+path)
     files=list((ROOT/'src').rglob('*.py'))+list((ROOT/'scripts/v24').glob('*.py'))+list((ROOT/'scripts/v25').glob('*.py'))
     files+=list((ROOT/'configs/v24').rglob('*.json'))+list((ROOT/'configs/v25').glob('*.json'))
-    files += [ROOT/'AGENTS.md',ROOT/'scripts/v25/README_TAXIBJ_INPUT_COMMUNICATION.md',ROOT/'tests/test_v25_taxibj_input_communication.py',ROOT/'tests/test_v25_observed_multiscale.py',ROOT/'tests/test_v25_observation_consistency.py']
+    files += [ROOT/'AGENTS.md',ROOT/'scripts/v25/README_TAXIBJ_INPUT_COMMUNICATION.md',ROOT/'tests/test_v25_taxibj_input_communication.py',ROOT/'tests/test_v25_observed_multiscale.py',ROOT/'tests/test_v25_observation_consistency.py',ROOT/'tests/test_v25_consistency_controls.py']
     sources={str(p.relative_to(ROOT)):sha(p) for p in sorted(set(files))};refs={}
     for method in ['A2','B1','B2']:
         n=f'taxibj_{method}_seed7';r=load(REFERENCE/'results'/f'{n}.json');run=Path(r['run_dir'])
         for label,p in [('receipt',REFERENCE/'results'/f'{n}.json'),('evaluation',REFERENCE/'evaluations'/f'{n}.json'),('job',REFERENCE/'jobs'/f'{n}.json'),('config',run/'config.json'),('metadata',run/'training_metadata.json'),('history',run/'logs/metrics.jsonl')]:refs[f'{method}/{label}.json']={'path':str(p),'sha256':sha(p)}
     init=REFERENCE/'initialization/taxibj_B2_seed7.pth';refs['initialization.pth']={'path':str(init),'sha256':sha(init)}
     payload={'project_root':str(ROOT),'jobs':js,'order':list(js),'gpu':1,'source':sources,'data':old['data'],'references':refs,'reference_suite':str(REFERENCE),'origin':{'branch':subprocess.check_output(['git','branch','--show-current'],text=True,cwd=ROOT).strip(),'head':subprocess.check_output(['git','rev-parse','HEAD'],text=True,cwd=ROOT).strip()}}
+    if any(j['method'] in ('I06','I07','I08') for j in js.values()):
+        # These already frozen suites are read-only comparison dependencies.
+        # Never import their jobs into this training order or retrain them here.
+        previous=ROOT/'outputs/v25/experiments/taxibj_input_communication'
+        payload['comparison_suites']={str(previous/name):sha(previous/name/'plan.json')
+                                      for name in ('ea1ca776ade869d6','b5925acd4615e143')}
     suite=ROOT/'outputs/v25/experiments/taxibj_input_communication'/digest(payload)[:16];suite.mkdir(parents=True,exist_ok=True);base.frozen(suite/'plan.json',payload)
     for name,stamp in sources.items():
         target=suite/'source_snapshot'/name;target.parent.mkdir(parents=True,exist_ok=True)
@@ -104,7 +123,7 @@ def worker(suite,payload):
 
 
 def main():
-    p=argparse.ArgumentParser();p.add_argument('--suite',type=Path);p.add_argument('--methods',nargs='+',choices=list(METHODS),help='New suite only; use I04 I05 for the two-run suffix after the existing frozen I01-I03 suite');p.add_argument('--prepare-only',action='store_true');p.add_argument('--worker',action='store_true');p.add_argument('--summary-only',action='store_true');a=p.parse_args()
+    p=argparse.ArgumentParser();p.add_argument('--suite',type=Path);p.add_argument('--methods',nargs='+',choices=list(METHODS),help='New suite only; use I06 I07 I08 after the existing frozen I01-I03 and I04-I05 suites');p.add_argument('--prepare-only',action='store_true');p.add_argument('--worker',action='store_true');p.add_argument('--summary-only',action='store_true');a=p.parse_args()
     if a.suite and a.methods:p.error('--methods cannot modify an existing --suite')
     suite=a.suite.resolve() if a.suite else freeze(a.methods);payload=load(suite/'plan.json');verify(suite,payload)
     for name,row in payload['references'].items():

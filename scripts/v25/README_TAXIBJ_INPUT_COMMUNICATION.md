@@ -1,6 +1,6 @@
-# TaxiBJ I01–I05：初始尺度入口、跨轮通信与一致性
+# TaxiBJ I01–I08：初始尺度入口、跨轮通信与一致性
 
-原 I01–I03 后追加 I04、I05 两次训练；原始参照为 `outputs/v25/experiments/first_validation/659d3ba9678e1dca` 的 B2，A2/B1只作为辅助冻结参考。各组均从头训练，不是把已训练B2继续微调。本次只新增代码和配置，不启动训练、不执行GPU预检、不改写已冻结三组队列。
+八组预算包含原 I01–I03、一致性 I04–I05，以及新增机制对照 I06–I08；原始参照为 `outputs/v25/experiments/first_validation/659d3ba9678e1dca` 的 B2，A2/B1只作为辅助冻结参考。各组均从头训练，不是把已训练B2继续微调。本次只新增代码和配置，不启动训练、不执行GPU预检、不改写已冻结三组与两组队列。
 
 |组|初始H0|尺度计算/观测注入|跨轮通信|问题|
 |---|---|---|---|---|
@@ -9,6 +9,9 @@
 |I03|原B2的F/M/C融合|固定CMFF|完整受控差分＋X05自适应预测历史池|已有历史读取是否改善多尺度差分的表现|
 |I04|原B2的F/M/C融合|固定CMFF|完整受控差分；无历史池|最终F聚合到M/C，对完整粗尺度真值计算辅助损失，作为一致性监督基线|
 |I05|原B2的F/M/C融合|固定CMFF|完整受控差分；无历史池|根据可见F/M/C构造独立剩余区域，学习非负一致性校正分配|
+|I06|原B2的F/M/C融合|固定CMFF|完整受控差分；无历史池|只对可见M/C观测计算软一致性损失，区分标签范围与约束形式|
+|I07|原B2的F/M/C融合|固定CMFF|完整受控差分；无历史池|I05的固定等权非负投影，不加权重头，检验学习分配的增量|
+|I08|原B2的F/M/C融合|固定CMFF|完整受控差分＋I03历史池|I03叠加I05最终输出投影，检验历史读取与约束校正能否互补|
 
 ## 固定配置与边界
 
@@ -46,33 +49,35 @@
 
 可见F保持原值；没有任何可见粗尺度约束的缺失位置保留骨干预测，因此只有受约束的位置执行非负投影。权重头使用独立fork RNG，保证原B2公共参数初值不变；新增参数为 `main_branch.x_consistency.*`。模型不读取 `x_f_gt/x_m_gt/x_c_gt`。当前适用于精确、对齐、非负、聚合相容的观测，不把它描述为支持任意噪声或非对齐数据的通用求解器。
 
-I04使用全部粗尺度训练目标，I05只使用可见观测；因此两组**不构成等监督的纯软约束/硬约束对照**。虽然M/C完整目标由既有F真值确定性聚合、没有新原始数据，I04仍改变监督目标及权重。若后续有收益，还需可见观测软损失、固定联合投影和等容量普通修正等控制。聚合残差变小不等于F补全MAE变小，更不证明稳定泛化。
+I04使用全部粗尺度训练目标，I05只使用可见观测；因此两组**不构成等监督的纯软约束/硬约束对照**。虽然M/C完整目标由既有F真值确定性聚合、没有新原始数据，I04仍改变监督目标及权重。本批I06/I07补充可见观测软损失和固定投影；等容量普通修正对照仍未覆盖。聚合残差变小不等于F补全MAE变小，更不证明稳定泛化。
 
-## 准备、顺序追加与恢复（以下命令仅供后续启动）
+## I06–I08：新增机制对照
 
-现有三组冻结suite为 `outputs/v25/experiments/taxibj_input_communication/ea1ca776ade869d6`。它的计划、源码和初始化保持不变；不能把新源码塞进旧snapshot，也不能重建五组队列来假定旧run已完成。
+- **I06：可见观测软损失。** 沿用I04的最终F回填、2×2/4×4聚合，但目标只取 `x_m_obs/x_c_obs`，仅在 `m_m/m_c` 可见位置计算L1；每个尺度按自己的可见单元数平均，求和数据除面积4/16，再取两尺度均值，空观测尺度贡献0。系数固定0.1，不返回完整粗尺度标签，不增加参数，也不在推理时强制投影。配置 `mode=observed_loss`。
+- **I07：固定等权投影。** 直接复用I05的独立剩余区域、非负条件及求解器；配置 `mode=residual_projection, weight_mode=uniform`，所有权重为1且不构造权重头。任务损失仍通过投影反传到骨干，因此不是只在测试时后处理。I05零初始化时与I07输出相同，但训练后I05可以学习非均匀权重。
+- **I08：历史池＋学习投影。** 复用I03的因果预测历史池与受控差分，在第四轮之后执行I05投影。历史池仍按轮写入原始预测（可见F回填后detach），不把最终投影结果反向送入历史。历史头和权重头分别独立初始化，公共骨干保持B2初值；不加额外粗尺度损失。
 
-只准备新增两组时使用：
+|比较|可以回答的问题|边界|
+|---|---|---|
+|I06/I04|完整粗尺度目标与仅可见目标的差异|有效监督位置和平均分母也改变|
+|I07/I06|同可见信息、无新增参数下，软损失与固定投影如何不同|同时改变训练目标及推理约束，λ只取预定值|
+|I05/I07|学习分配是否优于等权投影|I05增加少量参数，仍缺等容量普通修正头|
+|I08/I03、I08/I05|历史池与最终约束校正是否互补|与既有B2构成2×2；不能证明历史与差分不冗余|
+
+八组均保留受控差分，当前目的为入口/通信/一致性探索，不是新一轮差分有无的完整因子实验。单训练seed7只能筛选；观测残差降到0不等于F补全和OOD改善。B2/A2/B1为已完成参考，不新增到八次训练预算。
+
+## 准备、顺序追加与恢复
+
+原三组冻结suite：`outputs/v25/experiments/taxibj_input_communication/ea1ca776ade869d6`。
+原一致性两组：`outputs/v25/experiments/taxibj_input_communication/b5925acd4615e143`。
+它们的计划、源码和初始化保持不变。新增三组单独冻结：
 
 ```bash
-python scripts/v25/run_taxibj_input_communication.py --methods I04 I05 --prepare-only
+python scripts/v25/run_taxibj_input_communication.py --methods I06 I07 I08 --prepare-only
 ```
 
-命令会生成独立的两组冻结suite，保留原B2参考。以后只通过该suite的 `source_snapshot/scripts/v25/run_taxibj_input_communication.py --suite <suite>` 启动或恢复；`--suite` 与 `--methods` 不可同时使用。无 `--methods` 的新队列包含I01–I05全部五组，**不是**接续既有三组的入口。
+随后由组合入口顺序执行旧三组→旧两组→新三组；每个阶段必须成功才能进入下一阶段。现有完整回执由冻结入口核验并跳过，中断训练按last完整epoch恢复。不把新源码塞入旧snapshot，不重建八组后假定旧run可以直接抵扣。无 `--methods` 的新队列会从头准备八组，**不是**接续旧队列的入口；`--suite` 不允许同时传 `--methods`。
 
-需要严格接在原三组后面时，以下队列脚本可供之后授权启动时使用。`set -e` 确保原队列未成功完成不会提前训练后续组；旧队列已有的完成凭据由其冻结入口检查并跳过。
+新增suite将旧两个plan的SHA256登记为只读报告依赖，最终报告核验并合并八组结果；旧组不进入新suite训练列表。报告列出所有ID/OOD、训练曲线、参数与成本、一致性诊断及负结果，包含历史×投影的原始误差交互量，但不将单种子的交互量解释为统计显著性。
 
-```bash
-#!/usr/bin/env bash
-set -euo pipefail
-export CUDA_VISIBLE_DEVICES=1 OMP_NUM_THREADS=2 MKL_NUM_THREADS=2 OPENBLAS_NUM_THREADS=2
-previous_suite=outputs/v25/experiments/taxibj_input_communication/ea1ca776ade869d6
-python -u "$previous_suite/source_snapshot/scripts/v25/run_taxibj_input_communication.py" --suite "$previous_suite"
-followup_suite=$(python scripts/v25/run_taxibj_input_communication.py --methods I04 I05 --prepare-only)
-mkdir -p "$followup_suite/launcher_logs"
-python -u "$followup_suite/source_snapshot/scripts/v25/run_taxibj_input_communication.py" --suite "$followup_suite" 2>&1 | tee -a "$followup_suite/launcher_logs/queue.log"
-```
-
-将队列脚本作为专用tmux的主命令运行；训练、六套评估与正式报告完成后主命令退出，会话自动关闭。不要向常驻shell仅发送训练命令，不要关闭其他会话。本次没有执行上述命令。
-
-报告逻辑按实际选定的2/3/5组审计完成状态，逐组列出全部ID/OOD、训练曲线、参数与成本、一致性诊断和失败信息，明确监督差异。CPU验证覆盖目标隔离、残余区域约束、边界mask、梯度与恢复；正式GPU预检仍在以后启动时检查batch32原生与TA/ST路径、AMP梯度和8次稀疏执行，并增加输出约束核验。预检与CPU测试不是实验结果。
+组合脚本需作为专用tmux的主进程启动，训练、评估与正式报告完成后会话自动结束；GPU状态随每个训练run记录。此次只准备队列，不启动训练。CPU检查覆盖输入/标签隔离、损失公式、固定投影、公共初值、历史因果性、头部梯度与严格检查点恢复；GPU预检留待以后授权启动时进行。测试通过不是实验结果。

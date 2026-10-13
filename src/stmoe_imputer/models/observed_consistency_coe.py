@@ -13,6 +13,7 @@ import torch
 from torch import nn
 
 from .observed_multiscale_coe import ObservedMultiScaleCoE
+from .observed_history_coe import ObservedHistoryCoE
 
 
 def _blocks(x: torch.Tensor, factor: int) -> torch.Tensor:
@@ -169,25 +170,37 @@ region, so later corrections cannot undo an already satisfied M constraint.
 class ObservedConsistencyCoE(ObservedMultiScaleCoE):
     """B2 plus a small observation-only, weighted residual-region projection."""
 
+    with_history = False
+
     @classmethod
     def from_config(cls, cfg):
         coe = cfg['model']['coe']
         spec = coe.get('observation_consistency', {})
         if spec.get('enabled') is not True or spec.get('mode') != 'residual_projection':
             raise ValueError('ObservedConsistencyCoE requires residual_projection')
-        if set(spec) - {'enabled', 'mode', 'weight_bound'}:
+        if set(spec) - {'enabled', 'mode', 'weight_bound', 'weight_mode'}:
             raise ValueError('Unknown observation-consistency configuration')
+        weight_mode = spec.get('weight_mode', 'learned')
+        if weight_mode not in ('learned', 'uniform'):
+            raise ValueError('Expected learned or uniform consistency weights')
         bound = float(spec.get('weight_bound', 2.0))
         if not math.isfinite(bound) or not 0 < bound <= 8:
             raise ValueError('weight_bound must lie in (0, 8]')
         if cfg['data'].get('input_scales') != 'FMC' or coe.get('initial_observation_scales', 'FMC') != 'FMC':
             raise ValueError('I05 requires real F/M/C observations and fused FMC H0')
-        if coe.get('observed_history', {}).get('enabled') or coe.get('scale_delta_exploration', {}).get('enabled'):
-            raise ValueError('I05 excludes history and free-scale extensions')
+        if bool(coe.get('observed_history', {}).get('enabled')) != cls.with_history:
+            raise ValueError('History configuration and consistency model must agree')
+        if coe.get('scale_delta_exploration', {}).get('enabled'):
+            raise ValueError('Consistency excludes free-scale extensions')
+        if cfg['data'].get('return_multiscale_targets', False):
+            raise ValueError('Observed projection excludes full coarse target labels')
         model = super().from_config(cfg)
         if model.core_spec['communication'] != 'conditional':
             raise ValueError('I05 retains conditional controlled difference')
         model.consistency_weight_bound = bound
+        model.consistency_weight_mode = weight_mode
+        if weight_mode == 'uniform':
+            return model
         with torch.random.fork_rng(devices=[]):
             torch.random.default_generator.manual_seed(int(cfg['seed']) + 105501)
             model.x_consistency = nn.Sequential(
@@ -209,15 +222,18 @@ class ObservedConsistencyCoE(ObservedMultiScaleCoE):
             mf = m_f.bool().expand_as(x_f)
             mm = m_m.bool().expand_as(x_m)
             mc = m_c.bool().expand_as(x_c)
-            squares, counts = [], []
-            for x, mask, factor in ((x_f, mf, 1), (x_m, mm, 2), (x_c, mc, 4)):
-                density = torch.where(mask, x.float(), 0.) / (factor * factor if self.observation_pooling == 'sum' else 1)
-                squares.append(density.square().sum((2, 3, 4), keepdim=True))
-                counts.append(mask.sum((2, 3, 4), keepdim=True))
-            scale = (sum(squares) / sum(counts).clamp_min(1)).sqrt().clamp_min(1).detach()
-            features = torch.cat((hidden, raw / scale, mf.float(),
-                                  _expand_cells(mm.float(), 2), _expand_cells(mc.float(), 4)), 1)
-            weights = (self.consistency_weight_bound * self.x_consistency(features).tanh()).exp()
+            if self.consistency_weight_mode == 'uniform':
+                weights = torch.ones_like(raw)
+            else:
+                squares, counts = [], []
+                for x, mask, factor in ((x_f, mf, 1), (x_m, mm, 2), (x_c, mc, 4)):
+                    density = torch.where(mask, x.float(), 0.) / (factor * factor if self.observation_pooling == 'sum' else 1)
+                    squares.append(density.square().sum((2, 3, 4), keepdim=True))
+                    counts.append(mask.sum((2, 3, 4), keepdim=True))
+                scale = (sum(squares) / sum(counts).clamp_min(1)).sqrt().clamp_min(1).detach()
+                features = torch.cat((hidden, raw / scale, mf.float(),
+                                      _expand_cells(mm.float(), 2), _expand_cells(mc.float(), 4)), 1)
+                weights = (self.consistency_weight_bound * self.x_consistency(features).tanh()).exp()
             corrected, stats = project_observed_residual_regions(
                 raw, weights, x_f, m_f, x_m, m_m, x_c, m_c, pooling=self.observation_pooling)
         out['x_hat_raw_consistency'] = out['x_hat_main']
@@ -240,3 +256,13 @@ class ObservedConsistencyCoE(ObservedMultiScaleCoE):
             key = 'observed_' + self.observation_pooling + '_residual_' + name
             info['diagnostics']['v25_' + key] = stats['after_' + key]
         return out
+
+
+class ObservedHistoryConsistencyCoE(ObservedConsistencyCoE, ObservedHistoryCoE):
+    """I08: I03 causal history inside rounds, I05 projection after round four.
+
+    Cooperative super() builds/executes the unchanged history backbone first,
+    then attaches the independently initialized consistency head and projection.
+    """
+
+    with_history = True

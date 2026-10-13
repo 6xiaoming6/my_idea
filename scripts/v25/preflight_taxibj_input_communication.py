@@ -17,6 +17,10 @@ from stmoe_imputer.utils.gpu_monitor import GPUMonitor
 def check_consistency(out,batch,cfg):
     spec=cfg['model']['coe'].get('observation_consistency',{})
     if not spec.get('enabled'):return
+    if spec['mode']=='observed_loss':
+        if any('x_'+scale+'_gt' in batch for scale in ('m','c')):
+            raise RuntimeError('Observed-only control received full coarse labels')
+        return
     if spec['mode']=='full_target_loss':
         for scale in ('m','c'):
             target=batch.get('x_'+scale+'_gt')
