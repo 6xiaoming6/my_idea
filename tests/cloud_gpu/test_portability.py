@@ -54,6 +54,32 @@ class CloudTests(unittest.TestCase):
         export_report(self.root,js);self.assertFalse(cloud.load(self.root/'report_path.json')['complete'])
 
 
+    def test_consistency_resume_and_evaluation(self):
+        """Tiny CPU integration: new loss/projection survives strict checkpoints."""
+        js=self.jobs(['I04','I05']);cloud.initialize(self.root,js)
+        for name,j in js.items():
+            with self.subTest(method=j['method']):
+                run=self.root/'runs'/name;receipt=self.root/'results'/(name+'.json')
+                train(j,run,receipt,'cpu',stop_after=1)
+                train(j,run,receipt,'cpu')
+                full=self.root/'full'/name
+                train(j,full,self.root/(name+'.full.json'),'cpu')
+                resumed=torch.load(run/'checkpoints/last.pth',weights_only=False)
+                direct=torch.load(full/'checkpoints/last.pth',weights_only=False)
+                for key in ['model','optimizer','scheduler','scaler','rng_states']:
+                    self.assertEqual(state_hash(resumed[key]),state_hash(direct[key]),key)
+                protocol=j['config']['experiment_plan']['protocol']
+                path=self.root/'evaluations'/(name+'.json')
+                evaluate_sets(run/'checkpoints/best.pth',protocol,j['sources']['test'],path,cloud.digest(j['config']),'cpu')
+                self.assertEqual(len(cloud.load(path)['sets']),6)
+                for evaluation in cloud.load(path)['sets'].values():
+                    metrics=evaluation['metrics']
+                    self.assertTrue(np.isfinite(metrics['mae']))
+                    if j['method']=='I05':
+                        for scale in ['M','C']:
+                            self.assertLess(metrics['coe_v25_observed_sum_residual_'+scale],2e-3)
+
+
     def test_frozen_subprocess_queue_and_skip_completed(self):
         import os,shutil,subprocess
         js=self.jobs(['I01','I02','I03']);suite=self.root/'suite';snap=suite/'source_snapshot'

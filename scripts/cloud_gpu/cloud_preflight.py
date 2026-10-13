@@ -12,6 +12,7 @@ from stmoe_imputer.engine import build_optimizer,build_grad_scaler,move_batch_to
 from stmoe_imputer.losses import compute_coe_loss
 from stmoe_imputer.utils.deterministic import configure,common_initialization
 from stmoe_imputer.utils.gpu_monitor import GPUMonitor
+from preflight_taxibj_input_communication import check_consistency
 
 
 def run(suite):
@@ -44,6 +45,7 @@ def run(suite):
                         finally:
                             for hook in hooks:hook.remove()
                         if sum(calls)!=expected*len(batch['m_f']) or not bool(torch.isfinite(loss)):raise RuntimeError('Nonfinite loss / incorrect native expert calls')
+                        check_consistency(out,batch,cfg)
                         old=scaler.get_scale();scaler.scale(loss).backward();scaler.unscale_(optimizer)
                         finite=all(bool(torch.isfinite(p.grad).all()) for p in model.parameters() if p.grad is not None)
                         torch.nn.utils.clip_grad_norm_(model.parameters(),1.);scaler.step(optimizer);scaler.update()
@@ -66,6 +68,9 @@ def run(suite):
                                 if not bool(model.main_branch.x_history.inject[-1].weight.grad.abs().sum()>0):raise RuntimeError('History injection unused')
                             if spec.get('path')=='free':
                                 if not any(p.grad is not None and bool(p.grad.abs().sum()>0) for p in model.main_branch.scale_heads.parameters()):raise RuntimeError('Free scale heads unused')
+                            if hasattr(model.main_branch,'x_consistency'):
+                                grads=[p.grad for p in model.main_branch.x_consistency.parameters() if p.requires_grad and p.grad is not None]
+                                if not grads:raise RuntimeError('Consistency weights detached from task loss')
                             updates+=1
                         del out,loss
                         if updates>=3:break

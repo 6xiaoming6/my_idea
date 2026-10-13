@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Three isolated TaxiBJ input/communication interventions on frozen B2."""
+"""Selectable TaxiBJ I01-I05 interventions; frozen previous suites stay immutable."""
 import argparse,copy,fcntl,os,shutil,subprocess,sys,time
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[2]
@@ -12,30 +12,44 @@ import run_four_direction_exploration as base
 REFERENCE=ROOT/'outputs/v25/experiments/first_validation/659d3ba9678e1dca'
 METHODS={'I01':'H0仅F；CMFF各轮注入对应尺度观测；完整受控差分',
          'I02':'H0三尺度；四轮自由硬选择尺度、共享Top2；完整受控差分',
-         'I03':'H0三尺度；CMFF共享Top2；完整受控差分＋自适应预测历史池'}
+         'I03':'H0三尺度；CMFF共享Top2；完整受控差分＋自适应预测历史池',
+         'I04':'H0三尺度；CMFF共享Top2；完整受控差分＋最终F聚合对完整M/C真值的L1损失',
+         'I05':'H0三尺度；CMFF共享Top2；完整受控差分＋可见观测剩余区域自适应非负一致性校正'}
 
 
-def jobs(reference=REFERENCE):
+def jobs(reference=REFERENCE, methods=None):
+    selected=list(METHODS) if methods is None else list(methods)
+    if not selected or len(set(selected))!=len(selected) or any(m not in METHODS for m in selected):
+        raise ValueError('Select distinct methods from I01-I05')
     origin=load(reference/'jobs/taxibj_B2_seed7.json');result={}
-    for method,description in METHODS.items():
+    for method in selected:
+        description=METHODS[method]
         j=copy.deepcopy(origin);j.pop('common_initialization',None);c=j['config'];name=f'taxibj_{method}_seed7'
         c['model']['coe']['initial_observation_scales']='F' if method=='I01' else 'FMC'
         if method=='I02':c['model']['coe']['scale_delta_exploration']={'enabled':True,'path':'free','top_k_per_step':[2]*4,'delta_steps':[2,3,4],'same_scale_only':False,'scale_gradient':'selected_branch_st','top1_gradient':'selected_probability_st'}
         if method=='I03':c['model']['coe']['observed_history']={'enabled':True,'mode':'adaptive'}
+        if method=='I04':
+            c['model']['coe']['observation_consistency']={'enabled':True,'mode':'full_target_loss'}
+            c['loss']['lambda_observation_consistency']=0.1
+            c['data']['return_multiscale_targets']=True
+        if method=='I05':
+            c['model']['coe']['observation_consistency']={'enabled':True,'mode':'residual_projection','weight_bound':2.0}
         c['experiment_plan'].update(suite='v25_taxibj_input_communication',variant=name,method=description,reference='B2',scope='three requested interventions; 100 epochs original B2 protocol')
+        if method in ('I04','I05'):
+            c['experiment_plan']['scope']='consistency followup; full-target soft loss versus observed-only adaptive residual projection; no history; 100 epochs original B2 protocol'
         j.update(variant=name,method=method,name=method.lower()+'_v25_taxibj_input_communication',reference='B2')
         result[name]=j
     return result
 
 
-def freeze():
-    js=jobs();old=load(REFERENCE/'plan.json')
+def freeze(methods=None):
+    js=jobs(methods=methods);old=load(REFERENCE/'plan.json')
     # Check historical data before inheriting a reference comparison.
     for path,stamp in old['data'].items():
         if sha(path)!=stamp['sha256']:raise RuntimeError('B2 dataset changed '+path)
     files=list((ROOT/'src').rglob('*.py'))+list((ROOT/'scripts/v24').glob('*.py'))+list((ROOT/'scripts/v25').glob('*.py'))
     files+=list((ROOT/'configs/v24').rglob('*.json'))+list((ROOT/'configs/v25').glob('*.json'))
-    files += [ROOT/'AGENTS.md',ROOT/'scripts/v25/README_TAXIBJ_INPUT_COMMUNICATION.md',ROOT/'tests/test_v25_taxibj_input_communication.py',ROOT/'tests/test_v25_observed_multiscale.py']
+    files += [ROOT/'AGENTS.md',ROOT/'scripts/v25/README_TAXIBJ_INPUT_COMMUNICATION.md',ROOT/'tests/test_v25_taxibj_input_communication.py',ROOT/'tests/test_v25_observed_multiscale.py',ROOT/'tests/test_v25_observation_consistency.py']
     sources={str(p.relative_to(ROOT)):sha(p) for p in sorted(set(files))};refs={}
     for method in ['A2','B1','B2']:
         n=f'taxibj_{method}_seed7';r=load(REFERENCE/'results'/f'{n}.json');run=Path(r['run_dir'])
@@ -84,14 +98,15 @@ def worker(suite,payload):
             export_report(Path(payload['project_root']),suite,js);raise
     report=export_report(Path(payload['project_root']),suite,js)
     if not load(suite/'report_path.json')['complete']:raise RuntimeError('Final report audit failed')
-    write(suite/'completed.json',{'count':3,'time':time.time(),'report':str(report)})
+    write(suite/'completed.json',{'count':len(js),'time':time.time(),'report':str(report)})
     write(suite/'state.json',{'phase':'completed','time':time.time(),'report':str(report)})
     print('Completed '+str(suite),flush=True)
 
 
 def main():
-    p=argparse.ArgumentParser();p.add_argument('--suite',type=Path);p.add_argument('--prepare-only',action='store_true');p.add_argument('--worker',action='store_true');p.add_argument('--summary-only',action='store_true');a=p.parse_args()
-    suite=a.suite.resolve() if a.suite else freeze();payload=load(suite/'plan.json');verify(suite,payload)
+    p=argparse.ArgumentParser();p.add_argument('--suite',type=Path);p.add_argument('--methods',nargs='+',choices=list(METHODS),help='New suite only; use I04 I05 for the two-run suffix after the existing frozen I01-I03 suite');p.add_argument('--prepare-only',action='store_true');p.add_argument('--worker',action='store_true');p.add_argument('--summary-only',action='store_true');a=p.parse_args()
+    if a.suite and a.methods:p.error('--methods cannot modify an existing --suite')
+    suite=a.suite.resolve() if a.suite else freeze(a.methods);payload=load(suite/'plan.json');verify(suite,payload)
     for name,row in payload['references'].items():
         if sha(suite/'references'/name)!=row['sha256']:raise RuntimeError('Reference changed '+name)
     if a.prepare_only:print(suite);return

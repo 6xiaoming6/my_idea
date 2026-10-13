@@ -29,6 +29,24 @@ def resolve_architecture(cfg: dict) -> str:
 
 def build_model_backbone(cfg: dict) -> nn.Module:
     architecture = resolve_architecture(cfg)
+    consistency = cfg['model'].get('coe', {}).get('observation_consistency', {})
+    if consistency.get('enabled', False):
+        if architecture != 'v25_observed_multiscale_coe':
+            raise ValueError('Observation consistency requires v25 observed multi-scale input')
+        coe = cfg['model']['coe']
+        if (cfg['data'].get('input_scales') != 'FMC'
+                or coe.get('initial_observation_scales', 'FMC') != 'FMC'
+                or coe.get('core_validation', {}).get('communication') != 'conditional'
+                or any(coe.get(k, {}).get('enabled', False)
+                       for k in ('observed_history', 'scale_delta_exploration'))):
+            raise ValueError('I04/I05 require B2 FMC H0, CMFF controlled delta without other extensions')
+        if consistency.get('mode') == 'residual_projection':
+            from .observed_consistency_coe import ObservedConsistencyCoE
+            return ObservedConsistencyCoE.from_config(cfg)
+        if consistency != {'enabled': True, 'mode': 'full_target_loss'}:
+            raise ValueError('Unsupported observation consistency configuration')
+        if not cfg['data'].get('return_multiscale_targets', False):
+            raise ValueError('Full-target consistency needs explicit multi-scale training labels')
     if architecture == 'v25_observed_multiscale_coe' and cfg['model'].get('coe', {}).get('observed_history', {}).get('enabled', False):
         from .observed_history_coe import ObservedHistoryCoE
         return ObservedHistoryCoE.from_config(cfg)

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Full-size GPU1 AMP checks with native/TA-ST paths for all three interventions."""
+"""Full-size GPU1 AMP checks for selected I groups, including consistency safety."""
 import argparse,copy,gc,os,sys,time
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[2]
@@ -12,6 +12,35 @@ from stmoe_imputer.engine import build_optimizer,build_grad_scaler,move_batch_to
 from stmoe_imputer.losses import compute_coe_loss
 from stmoe_imputer.utils.deterministic import configure,common_initialization
 from stmoe_imputer.utils.gpu_monitor import GPUMonitor
+
+
+def check_consistency(out,batch,cfg):
+    spec=cfg['model']['coe'].get('observation_consistency',{})
+    if not spec.get('enabled'):return
+    if spec['mode']=='full_target_loss':
+        for scale in ('m','c'):
+            target=batch.get('x_'+scale+'_gt')
+            if target is None or target.shape!=batch['m_'+scale].shape:
+                raise RuntimeError('Full coarse supervision missing '+scale)
+        return
+    # Final completion is constrained only by visible observations. FP32 checks
+    # tolerate accumulation roundoff under AMP, never a percent-level residual.
+    final=out['x_hat_main'].float();visible=batch['m_f'].bool()
+    if not bool(torch.isfinite(final).all()):raise RuntimeError('Nonfinite corrected completion')
+    if not torch.equal(final[visible],batch['x_f_obs'].float()[visible]):
+        raise RuntimeError('Consistency changed visible F')
+    h,w=final.shape[-2:];constrained=torch.zeros_like(visible)
+    for scale in ('m','c'):
+        target=batch['x_'+scale+'_obs'].float();mask=batch['m_'+scale].bool()
+        sh,sw=target.shape[-2:];rh,rw=h//sh,w//sw
+        constrained|=mask.repeat_interleave(rh,-2).repeat_interleave(rw,-1)
+        aggregate=final.reshape(*final.shape[:-2],sh,rh,sw,rw).sum(dim=(-3,-1))
+        if cfg['data']['scales']['pooling_mode']=='mean':aggregate=aggregate/(rh*rw)
+        if mask.any() and not torch.allclose(aggregate[mask],target[mask],atol=2e-3,rtol=2e-5):
+            raise RuntimeError('Visible scale constraint violated '+scale)
+    free=constrained&~visible
+    if free.any() and float(final[free].min()) < -1e-6:
+        raise RuntimeError('Negative missing-region projection')
 
 
 def run(suite):
@@ -41,6 +70,7 @@ def run(suite):
                         finally:
                             for hook in hooks:hook.remove()
                         if sum(calls)!=8*len(batch['m_f']) or not bool(torch.isfinite(loss)):raise RuntimeError('Nonfinite loss / non-native Top2')
+                        check_consistency(out,batch,cfg)
                         old=scaler.get_scale();scaler.scale(loss).backward();scaler.unscale_(optimizer)
                         finite=all(bool(torch.isfinite(p.grad).all()) for p in model.parameters() if p.grad is not None)
                         torch.nn.utils.clip_grad_norm_(model.parameters(),1.);scaler.step(optimizer);scaler.update()
@@ -63,6 +93,9 @@ def run(suite):
                                 if not bool(model.main_branch.x_history.inject[-1].weight.grad.abs().sum()>0):raise RuntimeError('History injection unused')
                             if hasattr(model.main_branch,'exploration'):
                                 if not any(p.grad is not None and bool(p.grad.abs().sum()>0) for p in model.main_branch.scale_heads.parameters()):raise RuntimeError('Free scale heads unused')
+                            if hasattr(model.main_branch,'x_consistency'):
+                                grads=[p.grad for p in model.main_branch.x_consistency.parameters() if p.requires_grad and p.grad is not None]
+                                if not grads:raise RuntimeError('Consistency weights detached from task loss')
                             updates+=1
                         del out,loss
                         if updates>=3:break

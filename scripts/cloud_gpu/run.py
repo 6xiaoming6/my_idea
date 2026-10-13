@@ -6,7 +6,7 @@ ROOT=Path(__file__).resolve().parents[2]
 sys.path[:0]=[str(ROOT/'src'),str(ROOT/'scripts/v24'),str(ROOT/'scripts/v25'),str(ROOT/'scripts/cloud_gpu')]
 from run_b3_c3 import load,write,digest
 from unpack_data import sha
-METHODS=['A1','A2','B1','B2','I01','I02','I03']+[f'S{i:02}' for i in range(1,10)]
+METHODS=['A1','A2','B1','B2','I01','I02','I03','I04','I05']+[f'S{i:02}' for i in range(1,10)]
 SPECS={'S01':('free',[2,2,2,2],[]),'S02':('CMFF',[4,4,4,4],[]),'S03':('CMFF',[1,2,4,8],[]),
        'S04':('CMFF',[2,2,2,2],[2,3,4]),'S05':('CMFF',[2,2,2,2],[2]),'S06':('CMFF',[2,2,2,2],[3]),
        'S07':('CMFF',[2,2,2,2],[4]),'S08':('CFFF',[2,2,2,2],[]),'S09':('CFFF',[2,2,2,2],[4])}
@@ -24,13 +24,19 @@ def make_jobs(dataset,methods,rate,epochs=None,batch=32,seed=7,lr=.001,scheduler
         c['train']['scheduler']={'type':'cosine','total_epochs':c['train']['epochs'],'eta_min':lr if scheduler=='constant' else .0003,'reach_min_at_last_epoch':True}
         if scheduler=='cosine' and lr<.0003:raise ValueError('Cosine starting LR must be >= 3e-4')
         coe=c['model']['coe'];coe['initial_observation_scales']='F' if method=='I01' else 'FMC'
-        coe.pop('scale_delta_exploration',None);coe.pop('observed_history',None)
+        coe.pop('scale_delta_exploration',None);coe.pop('observed_history',None);coe.pop('observation_consistency',None)
         coe['core_validation']['communication']='none' if method in ['A1','B1'] else 'conditional'
         if method in SPECS or method=='I02':
             path,ks,steps=SPECS[method] if method in SPECS else ('free',[2]*4,[2,3,4])
             coe['core_validation']['communication']='conditional' if steps else 'none'
             coe['scale_delta_exploration']={'enabled':True,'path':path,'top_k_per_step':ks,'delta_steps':steps,'same_scale_only':method=='S09','scale_gradient':'selected_branch_st','top1_gradient':'selected_probability_st'}
         if method=='I03':coe['observed_history']={'enabled':True,'mode':'adaptive'}
+        if method=='I04':
+            coe['observation_consistency']={'enabled':True,'mode':'full_target_loss'}
+            c['data']['return_multiscale_targets']=True
+            c['loss']['lambda_observation_consistency']=0.1
+        if method=='I05':
+            coe['observation_consistency']={'enabled':True,'mode':'residual_projection','weight_bound':2.0}
         p=load(ROOT/'configs/cloud_gpu/test_protocol.json');p['rate']=rate
         n=f'{dataset}_{method}_seed{seed}'
         c['experiment_plan']={'suite':'cloud_gpu_v25','variant':n,'method':method,'protocol':p,'selection':'ID validation MAE only','cloud_scheduler':scheduler,'scope':'from-scratch cloud run; original mixed-mask protocol'}
@@ -83,7 +89,7 @@ def initialize(suite,js):
     for name,j in js.items():
         with torch.random.fork_rng(devices=[]):
             torch.manual_seed(j['config']['seed']);model=DualBranchSTImputer.from_config(j['config'])
-        state={k:v.detach().cpu().clone() for k,v in model.state_dict().items()};base={k:v for k,v in state.items() if not k.startswith('main_branch.x_history.')}
+        state={k:v.detach().cpu().clone() for k,v in model.state_dict().items()};base={k:v for k,v in state.items() if not k.startswith(('main_branch.x_history.','main_branch.x_consistency.'))}
         base_hash=state_hash(base)
         if common is None:common=base_hash
         if base_hash!=common:raise RuntimeError('Shared initialization differs '+name)
