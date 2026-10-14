@@ -29,6 +29,41 @@ def resolve_architecture(cfg: dict) -> str:
 
 def build_model_backbone(cfg: dict) -> nn.Module:
     architecture = resolve_architecture(cfg)
+    consistency = cfg['model'].get('coe', {}).get('observation_consistency', {})
+    if consistency.get('enabled', False):
+        if architecture != 'v25_observed_multiscale_coe':
+            raise ValueError('Observation consistency requires v25 observed multi-scale input')
+        coe = cfg['model']['coe']
+        if (coe.get('scale_delta_exploration', {}).get('enabled', False)
+                and coe.get('observed_history', {}).get('enabled', False)
+                and consistency.get('mode') == 'residual_projection'):
+            from .observed_consistency_coe import FreeScaleHistoryConsistencyCoE
+            return FreeScaleHistoryConsistencyCoE.from_config(cfg)
+        if (cfg['data'].get('input_scales') != 'FMC'
+                or coe.get('initial_observation_scales', 'FMC') != 'FMC'
+                or coe.get('core_validation', {}).get('communication') != 'conditional'
+                or coe.get('scale_delta_exploration', {}).get('enabled', False)):
+            raise ValueError('Consistency requires B2 FMC H0 and CMFF controlled delta')
+        if consistency.get('mode') == 'residual_projection':
+            from .observed_consistency_coe import ObservedConsistencyCoE, ObservedHistoryConsistencyCoE
+            builder = (ObservedHistoryConsistencyCoE if coe.get('observed_history', {}).get('enabled', False)
+                       else ObservedConsistencyCoE)
+            return builder.from_config(cfg)
+        if coe.get('observed_history', {}).get('enabled', False):
+            raise ValueError('Soft consistency controls exclude the history extension')
+        if consistency not in ({'enabled': True, 'mode': 'full_target_loss'},
+                               {'enabled': True, 'mode': 'observed_loss'}):
+            raise ValueError('Unsupported observation consistency configuration')
+        if consistency['mode'] == 'full_target_loss' and not cfg['data'].get('return_multiscale_targets', False):
+            raise ValueError('Full-target consistency needs explicit multi-scale training labels')
+        if consistency['mode'] == 'observed_loss' and cfg['data'].get('return_multiscale_targets', False):
+            raise ValueError('Observed-only loss excludes full coarse target labels')
+    if architecture == 'v25_observed_multiscale_coe' and cfg['model'].get('coe', {}).get('observed_history', {}).get('enabled', False):
+        from .observed_history_coe import ObservedHistoryCoE
+        return ObservedHistoryCoE.from_config(cfg)
+    if architecture == 'v25_observed_multiscale_coe' and cfg['model'].get('coe', {}).get('scale_delta_exploration', {}).get('enabled', False):
+        from .scale_delta_exploration_coe import ScaleDeltaExplorationCoE
+        return ScaleDeltaExplorationCoE.from_config(cfg)
     try:
         builder = MODEL_REGISTRY[architecture]
     except KeyError as error:

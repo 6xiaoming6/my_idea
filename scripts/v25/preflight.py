@@ -15,9 +15,9 @@ from stmoe_imputer.utils.deterministic import configure,common_initialization
 from stmoe_imputer.utils.gpu_monitor import GPUMonitor
 
 
-def run(suite):
-    if os.environ.get('CUDA_VISIBLE_DEVICES')!='0':raise RuntimeError('GPU0 only')
-    check_gpu0();torch.set_num_threads(2)
+def run(suite, gpu=0, check_gpu=check_gpu0):
+    if os.environ.get('CUDA_VISIBLE_DEVICES')!=str(gpu):raise RuntimeError('Incorrect physical GPU visibility')
+    check_gpu([gpu]);torch.set_num_threads(2)
     js=load(suite/'resolved_jobs.json');result={'status':'running','cases':[]}
     for name,j in js.items():
         ds,_=build_datasets(j['config'],j['sources']['train'],j['sources']['val'])

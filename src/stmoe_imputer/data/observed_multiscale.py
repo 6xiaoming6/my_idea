@@ -18,15 +18,19 @@ def aggregate_sum(x: np.ndarray, factor: int) -> np.ndarray:
 
 
 class ObservedMultiScaleDataset(Dataset):
-    """Only visible values/masks reach the model; full F is a training label.
+    """Only visible values/masks reach the model; full values are labels.
 
     M/C ground truth must already be present on disk. No fallback from masked F.
     Fine-only controls mask M/C out but retain the identical model/interface.
+    Full M/C targets are returned only for the opt-in I04 auxiliary loss.
     """
-    def __init__(self, path, schedule, input_scales='FMC'):
+    def __init__(self, path, schedule, input_scales='FMC', return_multiscale_targets=False):
         if input_scales not in ('F', 'FMC'):
             raise ValueError('input_scales must be F or FMC')
         self.input_scales = input_scales
+        if type(return_multiscale_targets) is not bool:
+            raise ValueError('return_multiscale_targets must be boolean')
+        self.return_multiscale_targets = return_multiscale_targets
         with np.load(path, allow_pickle=False) as z:
             self.values = [np.array(z[k], dtype=np.float32) for k in ('x_f_gt','x_m_gt','x_c_gt')]
         f = self.values[0]
@@ -62,6 +66,10 @@ class ObservedMultiScaleDataset(Dataset):
                 m.zero_()
             sample['m_'+name] = m
             sample['x_'+name+'_obs'] = torch.where(m.bool(), x, 0.)
+            # Opt-in labels for I04 only. The model wrapper passes *_obs and
+            # masks explicitly; these full targets never enter its forward.
+            if self.return_multiscale_targets:
+                sample['x_'+name+'_gt'] = x
         return sample
 
 
@@ -70,10 +78,11 @@ def build_observed_dataset(cfg, path, split):
     if path is None or split not in ('train','val','test'):
         raise ValueError('v25 requires explicit preconstructed data and split')
     data = cfg['data']
-    if data.get('scales', {}).get('pooling_mode') != 'sum':
-        raise ValueError('v25 first validation uses physical sums')
+    if data.get('scales', {}).get('pooling_mode') not in ('sum', 'mean'):
+        raise ValueError('v25 requires physical sum or mean observations')
     schedule = deepcopy(data['train_mask_diversity' if split=='train' else 'eval_mask_diversity'])
     schedule['seed'] += {'train':0, 'val':20000, 'test':30000}[split]
     if split != 'train':
         schedule['resample_each_epoch'] = False
-    return ObservedMultiScaleDataset(path, schedule, data['input_scales'])
+    return ObservedMultiScaleDataset(path, schedule, data['input_scales'],
+                                     data.get('return_multiscale_targets', False))

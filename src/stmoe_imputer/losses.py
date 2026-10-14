@@ -64,6 +64,71 @@ def coe_load_balance_per_step(
     return route_probs.shape[-1] * (load * importance).sum(dim=-1)
 
 
+def full_target_observation_consistency_loss(outputs: dict, batch: dict, cfg: dict):
+    """I04: final F completion aggregated against ALL stored M/C labels.
+
+    This is auxiliary supervised learning, unlike the observed-only I05
+    projection. Sum errors are divided by known area to keep scale units
+    comparable. No M/C mask is used to select these full-label targets.
+    """
+    pooling = cfg['data']['scales']['pooling_mode']
+    if pooling not in ('sum', 'mean'):
+        raise ValueError('Expected physical sum or mean aggregation')
+    with torch.autocast(device_type=outputs['x_hat_main'].device.type, enabled=False):
+        completed = torch.where(batch['m_f'].bool(), batch['x_f_obs'].float(),
+                                outputs['x_hat_main'].float())
+        values = []
+        for scale, factor in (('m', 2), ('c', 4)):
+            key = 'x_'+scale+'_gt'
+            if key not in batch:
+                raise ValueError('I04 requires preconstructed full target '+key)
+            b, c, t, h, w = completed.shape
+            if h % factor or w % factor:
+                raise ValueError('Fine grid is not divisible by consistency scale')
+            aggregate = completed.reshape(b,c,t,h//factor,factor,w//factor,factor).sum((4,6))
+            if pooling == 'mean':
+                aggregate = aggregate / (factor*factor)
+            target = batch[key].float()
+            if aggregate.shape != target.shape or not bool(torch.isfinite(target).all()):
+                raise ValueError('Invalid full consistency target '+key)
+            divisor = factor*factor if pooling == 'sum' else 1
+            values.append((aggregate-target).abs().mean()/divisor)
+        return torch.stack(values).mean(), values
+
+
+def visible_observation_consistency_loss(outputs: dict, batch: dict, cfg: dict):
+    """I06: area-normalized aggregate L1 on visible M/C observations only.
+
+    No coarse target is read. A scale with no observations contributes zero;
+    the two scale terms retain equal, fixed weights, as in I04.
+    """
+    pooling = cfg['data']['scales']['pooling_mode']
+    if pooling not in ('sum', 'mean'):
+        raise ValueError('Expected physical sum or mean aggregation')
+    with torch.autocast(device_type=outputs['x_hat_main'].device.type, enabled=False):
+        completed = torch.where(batch['m_f'].bool(), batch['x_f_obs'].float(),
+                                outputs['x_hat_main'].float())
+        b, c, t, h, w = completed.shape
+        values = []
+        for scale, factor in (('m', 2), ('c', 4)):
+            if h % factor or w % factor:
+                raise ValueError('Fine grid is not divisible by consistency scale')
+            aggregate = completed.reshape(b,c,t,h//factor,factor,w//factor,factor).sum((4,6))
+            if pooling == 'mean':
+                aggregate = aggregate / (factor*factor)
+            observed = batch['x_'+scale+'_obs'].float()
+            mask = batch['m_'+scale].bool().expand_as(observed)
+            if aggregate.shape != observed.shape:
+                raise ValueError('Invalid visible consistency observation shape')
+            target = torch.where(mask, observed, 0.)
+            if not bool(torch.isfinite(target).all()):
+                raise ValueError('Nonfinite visible consistency observation')
+            error = torch.where(mask, (aggregate-target).abs(), 0.)
+            divisor = factor*factor if pooling == 'sum' else 1
+            values.append(error.sum()/mask.sum().clamp_min(1)/divisor)
+        return torch.stack(values).mean(), values
+
+
 def compute_coe_loss(outputs: dict, batch: dict, cfg: dict) -> tuple[torch.Tensor, dict]:
     loss_cfg = cfg.get("loss", {})
     loss_type = loss_cfg.get("type", "l1")
@@ -155,6 +220,20 @@ def compute_coe_loss(outputs: dict, batch: dict, cfg: dict) -> tuple[torch.Tenso
         total = total + auxiliary
         logs.update(coordination_logs)
         logs["loss"] = total.detach()
+    spec = cfg.get('model', {}).get('coe', {}).get('observation_consistency', {})
+    if spec.get('enabled', False) and spec.get('mode') in ('full_target_loss', 'observed_loss'):
+        weight = float(loss_cfg.get('lambda_observation_consistency', 0.1))
+        if not math.isfinite(weight) or weight < 0:
+            raise ValueError('lambda_observation_consistency must be finite and nonnegative')
+        loss_fn = (full_target_observation_consistency_loss if spec['mode'] == 'full_target_loss'
+                   else visible_observation_consistency_loss)
+        consistency, per_scale = loss_fn(outputs, batch, cfg)
+        total = total + weight*consistency
+        logs.update(l_observation_consistency=consistency.detach(),
+                    l_observation_consistency_m=per_scale[0].detach(),
+                    l_observation_consistency_c=per_scale[1].detach(),
+                    l_observation_consistency_weighted=(weight*consistency).detach(),
+                    loss=total.detach())
     return total, logs
 
 
