@@ -74,6 +74,12 @@ def run(suite):
                         finally:
                             for hook in hooks:hook.remove()
                         if sum(calls)!=8*len(batch['m_f']) or not bool(torch.isfinite(loss)):raise RuntimeError('Nonfinite loss / non-native Top2')
+                        exploration=cfg['model']['coe'].get('scale_delta_exploration',{})
+                        if exploration.get('last_round_fine'):
+                            choices=out['coe']['triscale_choices']
+                            if not bool((choices[:,3]==0).all()):raise RuntimeError('Last-round F constraint violated')
+                            if exploration.get('first_three_unique') and not bool((choices[:,:3].sort(1).values==choices.new_tensor([0,1,2])).all()):
+                                raise RuntimeError('First three scales must be a permutation of F/M/C')
                         check_consistency(out,batch,cfg)
                         old=scaler.get_scale();scaler.scale(loss).backward();scaler.unscale_(optimizer)
                         finite=all(bool(torch.isfinite(p.grad).all()) for p in model.parameters() if p.grad is not None)

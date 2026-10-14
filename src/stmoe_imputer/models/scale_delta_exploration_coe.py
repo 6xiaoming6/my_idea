@@ -21,6 +21,15 @@ class ScaleDeltaExplorationCoE(ObservedMultiScaleCoE):
         steps = tuple(spec['delta_steps'])
         if path not in ('CMFF', 'CFFF', 'free') or len(ks) != 4 or any(k not in (1,2,4,8) for k in ks):
             raise ValueError('Invalid path / per-round Top-k')
+        last_fine = spec.get('last_round_fine', False)
+        if not isinstance(last_fine, bool) or (last_fine and path != 'free'):
+            raise ValueError('last_round_fine requires free-scale routing')
+        first_three_unique = spec.get('first_three_unique', False)
+        if not isinstance(first_three_unique, bool):
+            raise ValueError('first_three_unique must be boolean')
+        if first_three_unique and (path != 'free' or not last_fine
+                or cfg['model']['coe']['id_priority'].get('constraint', 'none') != 'none'):
+            raise ValueError('first_three_unique requires free routing, last_round_fine, and no parent constraint')
         if len(set(steps)) != len(steps) or any(s not in (2,3,4) for s in steps):
             raise ValueError('Delta steps are one-based expert INPUT rounds 2/3/4')
         if spec.get('same_scale_only', False) and (path != 'CFFF' or steps != (4,)):
@@ -38,9 +47,29 @@ class ScaleDeltaExplorationCoE(ObservedMultiScaleCoE):
         m.spec['fixed_path'] = [2,1,0,0] if path != 'CFFF' else [2,0,0,0]
         if path == 'free':
             m.scale_policy = 'st'
-            for h in m.scale_heads:
-                h.requires_grad_(True)
+            for step, h in enumerate(m.scale_heads):
+                h.requires_grad_(not ((last_fine and step == 3)
+                                     or (first_three_unique and step == 2)))
         return m
+
+    def legal_scales(self, c, step):
+        legal = super().legal_scales(c, step)
+        if self.exploration.get('first_three_unique', False) and step < 3:
+            # Counts are per-sample and freshly initialized by every forward.
+            # The fourth F is deliberately exempt from this no-repeat mask.
+            legal &= c['counts'] == 0
+            if not bool(legal.any(1).all()):
+                raise ValueError('No unused scale remains in the first three rounds')
+        if self.exploration.get('last_round_fine', False) and step == 3:
+            legal[:, 1:] = False
+        return legal
+
+    def learnable_steps(self):
+        if self.exploration.get('first_three_unique', False):
+            # After two choices the remaining scale is forced, like final F.
+            return (0, 1)
+        steps = super().learnable_steps()
+        return tuple(s for s in steps if s != 3) if self.exploration.get('last_round_fine', False) else steps
 
     def _initialize(self, x, mask):
         c = super()._initialize(x, mask)

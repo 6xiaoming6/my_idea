@@ -273,7 +273,7 @@ from .scale_delta_exploration_coe import ScaleDeltaExplorationCoE
 
 class FreeScaleHistoryConsistencyCoE(ObservedConsistencyCoE, ObservedHistoryCoE,
                                      ScaleDeltaExplorationCoE):
-    """I09: I08 with exactly I02's native single-scale ST execution.
+    """I09/I10/I11: I08 with native single-scale ST execution.
 
     Cooperative MRO applies controlled delta then causal history before scale
     dispatch; output projection runs once after all four unprojected rounds.
@@ -288,8 +288,13 @@ class FreeScaleHistoryConsistencyCoE(ObservedConsistencyCoE, ObservedHistoryCoE,
                     'delta_steps': [2,3,4], 'same_scale_only': False,
                     'scale_gradient': 'selected_branch_st',
                     'top1_gradient': 'selected_probability_st'}
-        if coe.get('scale_delta_exploration') != expected:
-            raise ValueError('I09 requires the original I02 free-scale protocol')
+        exploration = dict(coe.get('scale_delta_exploration', {}))
+        last_fine = exploration.pop('last_round_fine', False)
+        first_three_unique = exploration.pop('first_three_unique', False)
+        if (exploration != expected or not isinstance(last_fine, bool)
+                or not isinstance(first_three_unique, bool)
+                or (first_three_unique and not last_fine)):
+            raise ValueError('Requires I02 free-scale protocol; first_three_unique also requires last_round_fine')
         if coe.get('observation_consistency') != {'enabled': True,
                 'mode': 'residual_projection', 'weight_bound': 2.0}:
             raise ValueError('I09 requires the original I05 learned projection')

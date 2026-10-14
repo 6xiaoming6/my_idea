@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Evidence-checked I01-I09 reports with read-only frozen comparison suites."""
+"""Evidence-checked I01-I12 reports with read-only frozen comparison suites."""
 import csv,json,math,sys
 from datetime import datetime
 from zoneinfo import ZoneInfo
@@ -38,8 +38,8 @@ def export_report(root,suite,js):
     matplotlib.use('Agg')
     import matplotlib.pyplot as plt
     root,suite=Path(root),Path(suite);records=[];histories={};evals={};issues=[];sources=[]
-    allowed={f'taxibj_I{i:02d}_seed7' for i in range(1,10)}
-    if not js or not set(js).issubset(allowed):raise ValueError('Expected a nonempty subset of I01-I09')
+    allowed={f'taxibj_I{i:02d}_seed7' for i in range(1,13)}
+    if not js or not set(js).issubset(allowed):raise ValueError('Expected a nonempty subset of I01-I12')
     entries=comparison_jobs(suite,js)
     methods=[j['method'] for _,_,j,_ in entries]
     if len(set(methods))!=len(methods):issues.append('Duplicate configured method')
@@ -50,6 +50,23 @@ def export_report(root,suite,js):
         records.append(row);histories[j['method']]=h;evals[j['method']]=e;issues+=bad
         if j['config']['experiment_plan']['protocol']!=protocol:issues.append(n+': protocol mismatch')
         sources.append((j['method'],str(origin/'configs'/f'{n}.json'),row['run']))
+    paused=suite/'references/I09'
+    if set(methods)&{'I10','I11'} and paused.exists():
+        r=load(paused/'paused.json');e=load(paused/'evaluation.json');c=load(paused/'config.json');meta=load(paused/'metadata.json')
+        h=[json.loads(x) for x in (paused/'history.json').read_text().splitlines() if x.strip()]
+        valid=(r['status']=='paused_by_user' and e['status']=='finished' and
+               r['best_epoch']==e['best_epoch'] and r['checkpoint']==e['checkpoint'] and
+               e['config_sha256']==digest(c) and e['protocol_sha256']==digest(protocol) and
+               set(e['sets'])==set(protocol['evaluations']))
+        if not valid:issues.append('Invalid paused I09 comparison')
+        records.append({'name':'paused_I09','method':'I09','state':'用户暂停，best六套评估完成；预算不等',
+            'complete':False,'comparison_ready':valid,'epochs':r['completed_epochs'],
+            'best_epoch':r['best_epoch'],'val_mae':r['best_val_mae'],
+            'minutes':sum(x.get('perf',{}).get('epoch_time_sec',0) for x in h)/60,
+            'params':meta['total_params'],'trainable':meta['trainable_params'],
+            'peak_gib':max((x.get('perf',{}).get('peak_memory_gb',0) for x in h),default=0),'failure':None})
+        methods.append('I09');histories['I09']=h;evals['I09']=e
+        sources.append(('I09暂停参考',str(paused/'config.json'),str(Path(r['checkpoint']).parents[1])))
     for method in ['A2','B1','B2']:
         directory=suite/'references'/method;c=load(directory/'config.json');r=load(directory/'receipt.json');e=load(directory/'evaluation.json');meta=load(directory/'metadata.json')
         h=[json.loads(x) for x in (directory/'history.json').read_text().splitlines() if x.strip()]
@@ -66,7 +83,7 @@ def export_report(root,suite,js):
             results.append({'method':method,'protocol':label,'mae':m['mae'],'rmse':m['rmse'],'samples':ev['samples'],'mask_seed':ev['effective_mask_seed'],'ms_per_sample':m.get('forward_ms_per_sample_per_rank'),'expert_calls':m.get('coe_expert_execution_count'),'area_proxy':m.get('coe_expert_grid_equivalents')})
             for k,v in m.items():
                 if k.startswith('coe_family_') and k.endswith('_mae'):families.append({'method':method,'protocol':label,'family':k[len('coe_family_'):-4],'mae':v,'rmse':m.get(k[:-3]+'rmse'),'count':m.get(k[:-3]+'count')})
-    final=bool(js) and all(r['complete'] for r in records) and not issues;phase='完整' if final else '阶段'
+    final=bool(js) and all(r['complete'] or r.get('comparison_ready',False) for r in records) and not issues;phase='完整' if final else '阶段'
     stem=datetime.now(ZoneInfo('Asia/Shanghai')).strftime('%Y%m%d')+'_v25_TaxiBJ输入通信与一致性验证_'+suite.name
     dest=root/'experments_report';dest.mkdir(parents=True,exist_ok=True);assets=dest/(stem+'_assets');assets.mkdir(exist_ok=True)
     for name,value in [('summary.json',records),('curves.json',histories),('evaluations.json',evals),('audit.json',{'complete':final,'issues':issues})]:write(assets/name,value)
@@ -94,6 +111,9 @@ def export_report(root,suite,js):
             'I07':'|I07|F/M/C融合|CMFF＋完整差分＋固定等权剩余区域投影|I05：去掉学习权重；无额外参数、无历史池|',
             'I08':'|I08|F/M/C融合|CMFF＋完整差分＋自适应预测历史池＋自适应投影|I03/I05/B2：历史读取与输出约束的2×2对照|',
             'I09':'|I09|F/M/C融合|自由硬选尺度＋共享Top2＋完整差分＋历史池＋学习投影|I08：只加入I02尺度训练；I02/I03/I05：组合收益与损失|',
+            'I10':'|I10|F/M/C融合|前三轮自由硬选尺度，第四轮固定F；共享Top2＋完整差分＋历史池＋学习投影|I09：仅限制末轮尺度；从头100轮。I09主动暂停，预算不等|',
+            'I11':'|I11|F/M/C融合|前三轮逐样本无放回选F/M/C各一次，第四轮固定F；其余沿用I10|I10：覆盖约束；I08：同尺度次数下固定顺序与动态顺序|',
+            'I12':'|I12|F/M/C融合|固定CMFF＋共享Top2＋完整差分＋历史池＋学习分配投影；同I08|I08同配置同seed重复核验；不是新结构或独立训练种子|',
         }.items() if method in methods],
         '|旧A2|仅F，M/C全程不可用|CMFF＋完整差分|辅助参考：与I01的区别是各轮是否还能读M/C|',
         '|旧B1|F/M/C融合|CMFF，无差分|辅助无差分参考|',
@@ -112,6 +132,10 @@ def export_report(root,suite,js):
         'I07与I05使用完全相同的剩余区域、非负与总量约束，但所有位置权重固定为1，且不构造权重头；训练和推理均投影，骨干通过投影反传。初始预测与I05一致，不等于B2。I05/I07差异包括学习分配及其新增参数，不宣称等容量。',
         'I08在I03的原四轮内部保留0/1/2/3条detach历史预测，并仅在第4轮最终输出后执行I05投影。池内存储校正前的各轮预测，以可见F回填；投影不反馈到历史池、不改变路由执行数。两模块分别隔离初始化，同时通过最终F任务损失学习，无额外粗尺度损失。',
         'I09是在I08基础上替换为I02自由尺度执行：FMC融合H0；每轮依据未修正状态硬选一个尺度与原生Top2专家；RMS匹配受控差分后叠加因果历史读取，再在被选尺度上注入对应观测并执行专家；恢复F网格后写入detach历史。最终只执行一次I05学习投影，不把投影结果写回历史。无完整粗尺度标签、无额外一致性损失。尺度头解冻增加可训练参数，训练使用所选分支直通梯度；初值相同不等于训练轨迹相同。',
+        'I10仅在I09上增加last_round_fine=True：前三轮每样本仍可选F/M/C，无单调或必须覆盖约束；第四轮训练与推理均通过合法尺度mask只允许F，冻结第四尺度头。其余受控差分、历史池和最终投影保持原样；全部参数初值一致，总参数相同，可训练参数因末轮尺度头冻结而减少。I10从公共随机初始化训练100轮，不加载I09已训练权重，不使用损失反馈教师。',
+        'I11在I10上仅增加first_three_unique=True。每个样本前三轮根据已选次数屏蔽已用尺度，候选数依次为3/2/1；第四轮单独允许F，不受此前已用F限制。合法路径仅FMCF、FCMF、MFCF、MCFF、CFMF、CMFF六种。按样本逐轮贪心选择，不是并行执行六条路径。第三轮由前两轮决定，第三/第四尺度头冻结，仅前两头接受原ST梯度；总参数与初值不变，可训练参数比I10少一个尺度头。历史、差分、Top2、学习投影与损失都沿用I10。',
+        'I11覆盖约束只保证三尺度都被用于轮内计算，不保证融合更好或逐轮误差下降。H0仍已融合F/M/C，不能将轮内覆盖说成首次获得三尺度数据。I11每窗口仍8次专家执行，网格面积代理为2×(1/16+1/4+1+1)=4.625，与固定CMFF相同；不同专家和路由开销仍影响实际成本。I11从公共初值独立训练，不接续I10权重。依赖I10训练、六套评估及正式报告全部完成后，才在GPU1启动预检与训练。',
+        'I12按用户指定固定为CMFF，沿用I08的模型、数据、损失、优化器、seed7和公共初始化；不启用自由尺度或无放回路由。H0三尺度融合、逐轮对应原生观测注入、受控差分、因果预测历史池与末轮学习投影全部保留。它是同配置同seed重新运行，不是新增结构消融，也不是新训练种子；不加载I11训练权重。I12在新套件中单独保存，不覆盖I08；只有显式启动后才训练。',
         '本套件所选各组均从头训练，公共初值逐张量与旧B2核对；I03历史模块、I05一致性权重头在独立fork RNG下新增，披露新增容量，不声称与B2等参数。I04不增加可训练参数。无FFN、三平面或额外视图；I04/I05各自只加入下述一致性干预。',
         '本套件所选组物理GPU1串行；各run日志含每15秒GPU状态，未启用周期线程栈采样。旧B2存在历史中断/换卡记录，比较数值协议一致不代表执行历程完全相同。',
         f'六套协议：`{json.dumps(protocol,ensure_ascii=False)}`。训练四族逐epoch重采样，val/test固定且分别偏移基础mask seed 20000/30000；测试mask复测不是独立训练种子。','',
@@ -134,7 +158,7 @@ def export_report(root,suite,js):
     for method,e in evals.items():
         for label,ev in e.get('sets',{}).items():
             m=ev['metrics'];vals=['/'.join(fmt(m.get(pattern.format(i=i))) for i in range(1,5)) for pattern in ['coe_x_step{i}_mae','coe_step{i}_memory_gate_abs_mean','coe_x_step{i}_pool_delta_abs']];lines.append('|'+method+'|'+label+'|'+'|'.join(vals)+'|')
-    if set(methods)&{'I04','I05','I06','I07','I08','I09'}:
+    if set(methods)&{'I04','I05','I06','I07','I08','I09','I10','I11','I12'}:
         lines+=['','### 一致性监督与输出约束诊断','','|组|协议|M/C聚合观测残差|投影前M/C残差|约束覆盖比例|修正幅度|权重最小/最大|','|---|---|---|---|---|---|---|']
         for method in methods:
             for label,ev in evals[method].get('sets',{}).items():
@@ -151,7 +175,9 @@ def export_report(root,suite,js):
     pairs=[(m,ref) for m in methods for ref in ('B2','B1')]
     if 'I01' in methods:pairs.append(('I01','A2'))
     if 'I04' in methods and 'I05' in methods:pairs.append(('I05','I04'))
-    pairs += [('I06','I04'),('I05','I06'),('I07','I06'),('I05','I07'),('I08','I03'),('I08','I05'),('I09','I08'),('I09','I02'),('I09','I03'),('I09','I05'),('I09','I07')]
+    pairs += [('I06','I04'),('I05','I06'),('I07','I06'),('I05','I07'),('I08','I03'),('I08','I05'),('I09','I08'),('I09','I02'),('I09','I03'),('I09','I05'),('I09','I07'),('I10','I09'),('I10','I08'),('I10','I02'),('I10','I03'),('I10','I05')]
+    pairs += [('I11','I10'),('I11','I08'),('I11','I09'),('I11','I03'),('I11','I05')]
+    pairs += [('I12','I08'),('I12','I11'),('I12','I10'),('I12','I03'),('I12','I05')]
     for a,b in pairs:
         ea,eb=evals.get(a,{}).get('sets',{}),evals.get(b,{}).get('sets',{})
         for lab in protocol['evaluations']:
@@ -177,6 +203,8 @@ def export_report(root,suite,js):
         'I06/I04控制标签可见范围但改变有效监督位置的归一化；I07/I06对比同可见信息、无新增参数下的软损失和固定投影，但损失权重与推理约束也不同。I05/I07检查学习分配的增量，仍有新增参数因素。I08/I03及I08/I05检验模块组合；本批没有历史无差分对照，不能据此证明历史与差分不冗余。',
         'I05只处理本批精确、对齐、相容的嵌套非负观测。固定欧氏投影的平方误差不增性质不自动适用于学习权重，也不保证MAE不增。约束组分解属于实现机制，独立新颖性和稳定泛化须由后续控制支持。',
         'I09/I08主要检查自由尺度训练在历史加投影基础上的增量；与I02相比同时加入历史和投影，不能独立归因为其中一个模块。本批缺少自由尺度×历史×投影的完整因子设计；若测试路径仍集中CMFF，不能把收益归因于按样本动态切换尺度。单种子组合成败不是普遍结论。',
+        'I10/I09对比须注意：I09由用户在64轮后暂停，best来自epoch25；I10计划从头100轮。I09六套测试完成仅代表暂停检查点已评估，不代表完成原100轮训练。末轮固定F若改善，支持该结构限制在本次训练中有帮助，不能据此证明尺度切换是此前反弹的唯一原因；同时改变训练轨迹且预算不等。I10最终报告完成只指本套件新增训练结束，不能把暂停参考计为已完成100轮。',
+        'I11/I10隔离前三轮不重复覆盖约束，但也改变计算尺度分布、路由选择自由度和可训练尺度头数；I11/I08的尺度计数及网格面积代理一致，主要比较学习顺序与固定CMFF。若I11最终仍集中CMFF，不能据此宣称按样本动态顺序有收益，应进一步匹配固定路径或路由训练对照。只有六条路径合法不代表六条都被实际使用。',
         '单seed7、同率训练测试，不支持显著性或稳定跨数据集结论；五套OOD及mask复测不是五个独立训练样本。只按ID验证选checkpoint，研究筛选仍已参考OOD，正式确认应保留新的条件/种子。中间轮无监督，逐轮读出不保证单调。MAPE受零值影响不作为主判据。',
         '所有成本是实际运行记录，未严格GPU独占；累计训练分钟不含故障等待与评估，不能等同墙钟时长。先逐协议检查已配置各组与B2和B1的改善/退步，再决定补机制对照，不根据单个最好结果直接更换主线。']
     path=dest/(stem+'_'+phase+'分析报告.md');path.write_text('\n'.join(lines)+'\n');write(suite/'report_path.json',{'path':str(path),'complete':final,'issues':issues});return path

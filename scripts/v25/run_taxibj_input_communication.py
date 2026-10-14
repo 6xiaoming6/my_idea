@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Selectable TaxiBJ I01-I09 interventions; frozen previous suites stay immutable."""
+"""Selectable TaxiBJ I01-I12 jobs; frozen previous suites stay immutable."""
 import argparse,copy,fcntl,os,shutil,subprocess,sys,time
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[2]
@@ -18,19 +18,24 @@ METHODS={'I01':'H0仅F；CMFF各轮注入对应尺度观测；完整受控差分
          'I06':'H0三尺度；CMFF共享Top2；完整受控差分＋仅可见M/C观测的一致性软损失',
          'I07':'H0三尺度；CMFF共享Top2；完整受控差分＋固定等权剩余区域非负投影',
          'I08':'H0三尺度；CMFF共享Top2；完整受控差分＋自适应预测历史池＋自适应剩余区域投影',
-         'I09':'H0三尺度；自由硬选择尺度共享Top2；完整受控差分＋自适应预测历史池＋学习分配投影'}
+         'I09':'H0三尺度；自由硬选择尺度共享Top2；完整受控差分＋自适应预测历史池＋学习分配投影',
+         'I10':'I09基础；前三轮自由硬选择尺度，第四轮固定F；共享Top2＋完整差分＋历史池＋学习分配投影',
+         'I11':'I10基础；前三轮按样本无放回选择F/M/C各一次，第四轮固定F；其余组合不变',
+         'I12':'固定CMFF复核；H0三尺度＋共享Top2＋完整差分＋历史池＋学习投影；与I08同配置同seed重复'}
 
 
 def jobs(reference=REFERENCE, methods=None):
     selected=[f'I{i:02}' for i in range(1,9)] if methods is None else list(methods)
     if not selected or len(set(selected))!=len(selected) or any(m not in METHODS for m in selected):
-        raise ValueError('Select distinct methods from I01-I09')
+        raise ValueError('Select distinct methods from I01-I12')
     origin=load(reference/'jobs/taxibj_B2_seed7.json');result={}
     for method in selected:
         description=METHODS[method]
         j=copy.deepcopy(origin);j.pop('common_initialization',None);c=j['config'];name=f'taxibj_{method}_seed7'
         c['model']['coe']['initial_observation_scales']='F' if method=='I01' else 'FMC'
-        if method in ('I02','I09'):c['model']['coe']['scale_delta_exploration']={'enabled':True,'path':'free','top_k_per_step':[2]*4,'delta_steps':[2,3,4],'same_scale_only':False,'scale_gradient':'selected_branch_st','top1_gradient':'selected_probability_st'}
+        if method in ('I02','I09','I10','I11'):c['model']['coe']['scale_delta_exploration']={'enabled':True,'path':'free','top_k_per_step':[2]*4,'delta_steps':[2,3,4],'same_scale_only':False,'scale_gradient':'selected_branch_st','top1_gradient':'selected_probability_st'}
+        if method in ('I10','I11'):c['model']['coe']['scale_delta_exploration']['last_round_fine']=True
+        if method=='I11':c['model']['coe']['scale_delta_exploration']['first_three_unique']=True
         if method=='I03':c['model']['coe']['observed_history']={'enabled':True,'mode':'adaptive'}
         if method=='I04':
             c['model']['coe']['observation_consistency']={'enabled':True,'mode':'full_target_loss'}
@@ -43,7 +48,7 @@ def jobs(reference=REFERENCE, methods=None):
             c['loss']['lambda_observation_consistency']=0.1
         if method=='I07':
             c['model']['coe']['observation_consistency']={'enabled':True,'mode':'residual_projection','weight_bound':2.0,'weight_mode':'uniform'}
-        if method in ('I08','I09'):
+        if method in ('I08','I09','I10','I11','I12'):
             c['model']['coe']['observed_history']={'enabled':True,'mode':'adaptive'}
             c['model']['coe']['observation_consistency']={'enabled':True,'mode':'residual_projection','weight_bound':2.0}
         c['experiment_plan'].update(suite='v25_taxibj_input_communication',variant=name,method=description,reference='B2',scope='three requested interventions; 100 epochs original B2 protocol')
@@ -53,6 +58,13 @@ def jobs(reference=REFERENCE, methods=None):
             c['experiment_plan']['scope']='eight-run mechanism controls: observed-only soft loss, fixed projection, history plus learned projection; original B2 protocol'
         if method=='I09':
             c['experiment_plan']['scope']='single requested full combination; I08 plus I02 free-scale training; original B2 100-epoch protocol'
+        if method=='I10':
+            c['experiment_plan']['scope']='I09 control: free first three scales, hard final F; train from common initialization for 100 epochs; I09 paused at user request'
+        if method=='I11':
+            c['experiment_plan']['scope']='I10 control: per-sample scale selection without replacement for rounds 1-3, final F; independent 100 epochs after I10 training/evaluation/report complete'
+        if method=='I12':
+            c['experiment_plan']['scope']='requested fixed CMFF recheck; same computational config and seed as I08, not a new architecture or independent training-seed replicate; prepare only until explicitly launched'
+            c['experiment_plan']['replicates_method']='I08'
         j.update(variant=name,method=method,name=method.lower()+'_v25_taxibj_input_communication',reference='B2')
         result[name]=j
     return result
@@ -65,21 +77,37 @@ def freeze(methods=None):
         if sha(path)!=stamp['sha256']:raise RuntimeError('B2 dataset changed '+path)
     files=list((ROOT/'src').rglob('*.py'))+list((ROOT/'scripts/v24').glob('*.py'))+list((ROOT/'scripts/v25').glob('*.py'))
     files+=list((ROOT/'configs/v24').rglob('*.json'))+list((ROOT/'configs/v25').glob('*.json'))
-    files += [ROOT/'AGENTS.md',ROOT/'scripts/v25/README_TAXIBJ_INPUT_COMMUNICATION.md',ROOT/'tests/test_v25_taxibj_input_communication.py',ROOT/'tests/test_v25_observed_multiscale.py',ROOT/'tests/test_v25_observation_consistency.py',ROOT/'tests/test_v25_consistency_controls.py',ROOT/'tests/test_v25_full_combination.py']
+    files += [ROOT/'AGENTS.md',ROOT/'scripts/v25/README_TAXIBJ_INPUT_COMMUNICATION.md',ROOT/'tests/test_v25_taxibj_input_communication.py',ROOT/'tests/test_v25_observed_multiscale.py',ROOT/'tests/test_v25_observation_consistency.py',ROOT/'tests/test_v25_consistency_controls.py',ROOT/'tests/test_v25_full_combination.py',ROOT/'tests/test_v25_permutation_scales.py',ROOT/'tests/test_v25_queue_dependency.py']
     sources={str(p.relative_to(ROOT)):sha(p) for p in sorted(set(files))};refs={}
     for method in ['A2','B1','B2']:
         n=f'taxibj_{method}_seed7';r=load(REFERENCE/'results'/f'{n}.json');run=Path(r['run_dir'])
         for label,p in [('receipt',REFERENCE/'results'/f'{n}.json'),('evaluation',REFERENCE/'evaluations'/f'{n}.json'),('job',REFERENCE/'jobs'/f'{n}.json'),('config',run/'config.json'),('metadata',run/'training_metadata.json'),('history',run/'logs/metrics.jsonl')]:refs[f'{method}/{label}.json']={'path':str(p),'sha256':sha(p)}
     init=REFERENCE/'initialization/taxibj_B2_seed7.pth';refs['initialization.pth']={'path':str(init),'sha256':sha(init)}
+    if any(j['method'] in ('I10','I11') for j in js.values()):
+        paused=ROOT/'outputs/v25/experiments/taxibj_input_communication/70c7693b8f5709d1'
+        record=load(paused/'paused_evaluation.json');evaluation=load(paused/'evaluations/taxibj_I09_seed7.json')
+        run=Path(load(paused/'runs/taxibj_I09_seed7.json')['run_dir'])
+        if record['status']!='paused_by_user' or evaluation['status']!='finished' or sha(record['checkpoint'])!=record['checkpoint_sha256']:
+            raise RuntimeError('Paused I09 best evaluation must be complete and unchanged')
+        for label,p in [('evaluation',paused/'evaluations/taxibj_I09_seed7.json'),('paused',paused/'paused_evaluation.json'),('config',run/'config.json'),('metadata',run/'training_metadata.json'),('history',run/'logs/metrics.jsonl')]:
+            refs[f'I09/{label}.json']={'path':str(p),'sha256':sha(p)}
     payload={'project_root':str(ROOT),'jobs':js,'order':list(js),'gpu':1,'source':sources,'data':old['data'],'references':refs,'reference_suite':str(REFERENCE),'origin':{'branch':subprocess.check_output(['git','branch','--show-current'],text=True,cwd=ROOT).strip(),'head':subprocess.check_output(['git','rev-parse','HEAD'],text=True,cwd=ROOT).strip()}}
-    if any(j['method'] in ('I06','I07','I08','I09') for j in js.values()):
+    if any(j['method'] in ('I06','I07','I08','I09','I10','I11','I12') for j in js.values()):
         # These already frozen suites are read-only comparison dependencies.
         # Never import their jobs into this training order or retrain them here.
         previous=ROOT/'outputs/v25/experiments/taxibj_input_communication'
         payload['comparison_suites']={str(previous/name):sha(previous/name/'plan.json')
                                       for name in ('ea1ca776ade869d6','b5925acd4615e143')}
-        if any(j['method']=='I09' for j in js.values()):
+        if any(j['method'] in ('I09','I10','I11','I12') for j in js.values()):
             payload['comparison_suites'][str(previous/'0670f12cc0d77181')]=sha(previous/'0670f12cc0d77181/plan.json')
+        if any(j['method']=='I11' for j in js.values()):
+            dependency=previous/'a8c5e28f7e93b169'
+            payload['run_after_suite']={'path':str(dependency),'plan_sha256':sha(dependency/'plan.json')}
+            payload['comparison_suites'][str(dependency)]=sha(dependency/'plan.json')
+        if any(j['method']=='I12' for j in js.values()):
+            # Read-only comparisons; never schedule I08/I10/I11 or a waiter.
+            for name in ('a8c5e28f7e93b169','8cc101c9c2074582'):
+                payload['comparison_suites'][str(previous/name)]=sha(previous/name/'plan.json')
     suite=ROOT/'outputs/v25/experiments/taxibj_input_communication'/digest(payload)[:16];suite.mkdir(parents=True,exist_ok=True);base.frozen(suite/'plan.json',payload)
     for name,stamp in sources.items():
         target=suite/'source_snapshot'/name;target.parent.mkdir(parents=True,exist_ok=True)
@@ -128,7 +156,7 @@ def worker(suite,payload):
 
 
 def main():
-    p=argparse.ArgumentParser();p.add_argument('--suite',type=Path);p.add_argument('--methods',nargs='+',choices=list(METHODS),help='New suite only; use I06 I07 I08 after the existing frozen I01-I03 and I04-I05 suites');p.add_argument('--prepare-only',action='store_true');p.add_argument('--worker',action='store_true');p.add_argument('--summary-only',action='store_true');a=p.parse_args()
+    p=argparse.ArgumentParser();p.add_argument('--suite',type=Path);p.add_argument('--methods',nargs='+',choices=list(METHODS),help='Select new jobs only; I11 must wait for the frozen I10 suite');p.add_argument('--prepare-only',action='store_true');p.add_argument('--worker',action='store_true');p.add_argument('--summary-only',action='store_true');a=p.parse_args()
     if a.suite and a.methods:p.error('--methods cannot modify an existing --suite')
     suite=a.suite.resolve() if a.suite else freeze(a.methods);payload=load(suite/'plan.json');verify(suite,payload)
     for name,row in payload['references'].items():
@@ -137,6 +165,10 @@ def main():
     if a.summary_only:
         from report_taxibj_input_communication import export_report
         print(export_report(Path(payload['project_root']),suite,load(suite/'resolved_jobs.json')));return
+    if payload.get('run_after_suite'):
+        from run_after_suite import dependency_status
+        status,detail=dependency_status(payload['run_after_suite'])
+        if status!='ready':raise RuntimeError('Dependency not ready; use run_after_suite.py to queue: '+str(detail))
     if a.worker:worker(suite,payload);return
     gpu_lock=Path(payload['project_root'])/'outputs/v24-COE/experiments/gpu1.queue.lock';gpu_lock.parent.mkdir(parents=True,exist_ok=True)
     with (suite.parent/'queue.lock').open('a') as lock,gpu_lock.open('a') as gpu:

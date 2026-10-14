@@ -68,4 +68,42 @@ class FullCombinationTests(unittest.TestCase):
             self.assertEqual(row['metrics']['coe_expert_execution_count'],8.)
             self.assertLess(row['metrics']['coe_v25_observed_sum_residual_C'],2e-3)
 
+    def test_i10_final_fine_with_three_genuinely_free_rounds(self):
+        a,b=[self.job(m) for m in ('I09','I10')]
+        for key in ('data','train','loss','seed'):
+            self.assertEqual(a['config'][key],b['config'][key])
+        original=self.helper.model(a).eval();model=self.helper.model(b).train()
+        self.assertEqual(state_hash(original.state_dict()),state_hash(model.state_dict()))
+        branch=model.main_branch
+        self.assertEqual(branch.learnable_steps(),(0,1,2))
+        self.assertTrue(all(p.requires_grad for h in branch.scale_heads[:3] for p in h.parameters()))
+        self.assertTrue(all(not p.requires_grad for p in branch.scale_heads[3].parameters()))
+        calls=[];hooks=[x.register_forward_pre_hook(lambda mod,args:calls.append(len(args[0]))) for x in branch.routed_experts()]
+        try:out=model(self.batch)
+        finally:
+            for hook in hooks:hook.remove()
+        self.assertEqual(sum(calls),8*len(self.batch['m_f']))
+        self.assertTrue((out['coe']['triscale_choices'][:,3]==0).all())
+        check_consistency(out,self.batch,b['config'])
+        loss,_=compute_coe_loss(out,self.batch,b['config']);loss.backward()
+        for head in branch.scale_heads[:3]:
+            self.assertTrue(any(p.grad is not None and bool(p.grad.abs().sum()>0) for p in head.parameters()))
+        self.assertTrue(all(p.grad is None for p in branch.scale_heads[3].parameters()))
+        # A strong preference for any scale can control all first three rounds,
+        # but cannot override the final F constraint, in training or inference.
+        for training in (True,False):
+            model.train(training)
+            for sid in range(3):
+                with torch.no_grad():
+                    for head in branch.scale_heads:
+                        head[-1].weight.zero_();head[-1].bias.zero_();head[-1].bias[sid]=20
+                    changed=model(self.batch)
+                self.assertTrue((changed['coe']['triscale_choices']==torch.tensor([sid,sid,sid,0])).all())
+                check_consistency(changed,self.batch,b['config'])
+        poison=copy.deepcopy(self.batch)
+        for scale in ('f','m','c'):
+            poison['x_'+scale+'_gt']=torch.full_like(poison['x_'+scale+'_obs'],float('nan'))
+            poison['x_'+scale+'_obs'][~poison['m_'+scale].bool()]=float('nan')
+        with torch.no_grad():torch.testing.assert_close(model(poison)['x_hat_main'],model(self.batch)['x_hat_main'],rtol=0,atol=0)
+
 if __name__=='__main__':unittest.main()

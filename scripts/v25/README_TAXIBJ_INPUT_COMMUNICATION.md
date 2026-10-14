@@ -89,3 +89,49 @@ I09 = B2三尺度融合H0＋I02自由硬尺度路由＋原生共享Top2＋受控
 沿用TaxiBJ四族混合0.4、seed7、100epoch、batch32、val5、GPU1与原B2优化器/余弦学习率；从头训练，不微调I02/I08。不新增粗尺度真值标签或软一致性损失。比较I09/I08、I09/I02、I09/I03、I09/I05，必须披露ID/OOD及路径集中，不能预设组合一定互补。
 
 独立准备命令：`python scripts/v25/run_taxibj_input_communication.py --methods I09 --prepare-only`。默认不带methods仍为旧八组；不要用默认入口接续已完成实验。新suite只训练I09，原三个suite作为只读比较依赖，完成后导出含旧八组参考的正式报告。
+
+## I10：前三轮自由尺度，末轮固定 F（2026-10-14）
+
+用户主动暂停 I09 后新增的独立对照。I09 保存至 epoch64，按 ID 验证选择的 `best.pth` 是 epoch25；使用原冻结源码补齐全部六套测试，暂停记录与评估在 `70c7693b8f5709d1/paused_evaluation.json`。原 best/last 与源码均保留，退出143来自用户主动暂停。
+
+I10 在 I09 完整组合上只增加 `scale_delta_exploration.last_round_fine=true`：H0仍融合F/M/C；第1—3轮分别可自由选择F/M/C，允许重复、跳跃、不要求覆盖；第4轮训练和推理均只允许F。尺度合法性mask在softmax/argmax前生效，第四尺度头冻结，前三个尺度头沿用原选中分支ST梯度。专家仍为共享八种专家中的原生Top2，合计每窗口8次。受控差分、因果预测历史池、最终学习分配投影完全沿用I09。不加入候选损失反馈、尺度均衡或软预热。
+
+从公共初值重新训练，不接续I09已训练参数。TaxiBJ四族混合mask0.4（非纯随机点缺失）、seed7、100epoch、batch32、每5epoch验证、原B2余弦学习率1e-3到3e-4、GPU1。保存best/last；仅ID验证选择最佳点；完成后运行原六套ID/OOD及mask复测，并导出正式报告。总参数与I09相同，第四尺度头冻结使可训练参数减少。I09仅训练64轮，跨组比较必须披露预算差异。
+
+```bash
+python scripts/v25/run_taxibj_input_communication.py --methods I10 --prepare-only
+# 使用输出套件的 source_snapshot 运行，不改写原冻结套件。
+```
+
+测试覆盖训练/推理末轮强制F、前三轮可选择全部尺度、原生Top2调用数、路由梯度、历史/投影与隐藏真值隔离，以及原I09严格恢复回归。GPU预检通过后启动，运行日志可在专用tmux会话读取；队列完成或失败即退出，无空闲shell。
+
+## I11：前三轮三尺度无放回选择，末轮固定 F（2026-10-14）
+
+I11 在 I10 基础上仅增加 `scale_delta_exploration.first_three_unique=true`，保留 `last_round_fine=true`。每个输入样本从独立的空尺度记录开始，前三轮分别在尚未使用的尺度里硬选一个：候选数3→2→1，确保F/M/C各一次。第四轮固定F，允许与前三轮出现过的F重复。训练和评估应用相同合法尺度mask；不跨样本或batch共享已选记录。
+
+只有六种合法路径：`FMCF / FCMF / MFCF / MCFF / CFMF / CMFF`。按样本逐轮贪心选择，不是一次打分整条路径，也不并行计算六条候选。第一、二轮仍是动态选择；第三轮由剩余尺度唯一确定，所以第三和第四尺度头冻结，前两个头使用原生选中分支ST梯度。总参数与公共初值保持一致，可训练参数比I10减少第三尺度头；不引入新损失、辅助监督、均衡项或教师。
+
+仍为真实F/M/C融合H0＋共享八专家、原生Top2＋受控差分＋因果预测历史池＋学习分配投影。每窗口四轮合计8次专家执行；尺度网格面积代理4.625与固定CMFF相同，不等于实际FLOPs或延迟必然相同。覆盖约束保证各尺度参与轮内计算，不保证结果更好；H0本来就融合三尺度，不能称为首次获得这些信息。
+
+TaxiBJ四族混合mask0.4、seed7、100epoch、batch32、val每5epoch、AdamW与原B2余弦学习率。独立从公共初值重训，不加载I10已训练权重。六套原ID/OOD和mask复测、best/last与GPU状态日志、结束自动报告均沿用。重点配对I11/I10（覆盖约束）及I11/I08（同尺度次数下的动态顺序与固定CMFF）。
+
+```bash
+python scripts/v25/run_taxibj_input_communication.py --methods I11 --prepare-only
+python <新套件>/source_snapshot/scripts/v25/run_after_suite.py --suite <新套件>
+```
+
+新套件冻结 `run_after_suite` 为 I10 的 `a8c5e28f7e93b169` 及其计划SHA256。等待器只读I10状态，必须核实100轮训练、全部六套评估和正式报告完成，并等原GPU队列锁释放，才启动I11的GPU预检与训练。等待时不占GPU、不干预I10、不把停止或失败当作完成。I10失败/暂停时留下阻塞日志并退出；不会自动恢复I10。独立tmux专用主进程显示等待/训练日志，任务完成或失败后自动退出。
+
+## I12：固定 CMFF 同配置复核（2026-10-14，仅准备）
+
+按本次指定使用 **CMFF**，不是I11最终实际选中的FMCF。保留F/M/C融合H0、逐轮注入对应尺度观测、共享八专家原生Top2、RMS匹配的±0.1受控差分、因果预测历史池及最终学习分配投影。固定的是尺度顺序，专家仍动态选择；不启用自由尺度或前三轮无放回路由。
+
+**I12与I08的计算配置和seed7相同。** 因此它属于同配置重复运行核验，不是新增结构对照，不增加独立训练种子数，也不能用来证明新的方法贡献。若需要隔离I11所选路径本身的影响，需要另行指定固定FMCF对照，不能把本组CMFF误写为FMCF。
+
+TaxiBJ四类混合mask0.4、100epoch、batch32、每5轮验证、AdamW lr1e-3余弦到3e-4，仍只按ID验证MAE选best，保留best/last和原六套评估。将来如获准启动，从公共随机初始化重新训练，不从I11检查点恢复。新套件只包含I12，I08/I10/I11及其他旧组仅作只读比较；默认八组入口不变。
+
+```bash
+python scripts/v25/run_taxibj_input_communication.py --methods I12 --prepare-only
+```
+
+当前仅冻结计划、源码、配置与初始化并做CPU前向核验；不执行GPU预检或训练，不创建tmux会话、等待器或自动接续。后续显式启动时沿用GPU1串行、每15秒GPU状态日志、自动评估/正式报告与专用会话退出规则。
