@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Evidence-checked I01-I12 reports with read-only frozen comparison suites."""
+"""Evidence-checked I01-I25 reports with read-only frozen comparison suites."""
 import csv,json,math,sys
 from datetime import datetime
 from zoneinfo import ZoneInfo
@@ -20,8 +20,10 @@ def comparison_jobs(suite,js):
         if sha(plan_path)!=stamp:raise RuntimeError('Comparison plan changed '+directory)
         plan=load(plan_path)
         resolved=load(previous/'resolved_jobs.json') if (previous/'resolved_jobs.json').exists() else plan['jobs']
+        selected_methods = load(Path(suite)/'plan.json').get('comparison_methods', {}).get(directory)
         for name,original in plan['jobs'].items():
             if name in js:continue
+            if selected_methods is not None and original['method'] not in selected_methods:continue
             j=resolved[name];cfg=j['config']
             if cfg!=original['config'] or j['sources']!=original['sources']:raise RuntimeError('Comparison config/data paths changed '+name)
             if (cfg['train']!=expected['train'] or cfg['seed']!=expected['seed']
@@ -33,13 +35,45 @@ def comparison_jobs(suite,js):
     return sorted(entries,key=lambda row:row[2]['method'])
 
 
+OOD_CATEGORIES = {
+    '二元组合': ('unseen_combinations', 'unseen_combinations_repeat'),
+    '未见形态': ('unseen_geometry', 'unseen_geometry_repeat'),
+    '三元组合': ('unseen_triple',),
+}
+
+
+def combination_ranking(evals, threshold=8.8709):
+    reference = evals.get('I08', {}).get('sets', {})
+    required = {'in_distribution', *(p for group in OOD_CATEGORIES.values() for p in group)}
+    if not required.issubset(reference):
+        return []
+    rows = []
+    for method, evaluation in evals.items():
+        sets = evaluation.get('sets', {})
+        if not required.issubset(sets):
+            continue
+        if not all(math.isfinite(sets[p]['metrics'][k]) for p in required for k in ('mae','rmse')):
+            continue
+        row = {'method': method, 'id_mae': sets['in_distribution']['metrics']['mae']}
+        row['eligible'] = row['id_mae'] <= threshold
+        for metric in ('mae', 'rmse'):
+            ratios = {category: sum(sets[p]['metrics'][metric] / reference[p]['metrics'][metric]
+                                   for p in protocols) / len(protocols)
+                      for category, protocols in OOD_CATEGORIES.items()}
+            row[metric+'_categories'] = ratios
+            row[metric+'_score'] = sum(ratios.values()) / 3
+            row[metric+'_worst_change_pct'] = 100 * (max(ratios.values()) - 1)
+        rows.append(row)
+    return sorted(rows, key=lambda r: (not r['eligible'], r['mae_score'], r['rmse_score'], r['id_mae'], r['method']))
+
+
 def export_report(root,suite,js):
     import matplotlib
     matplotlib.use('Agg')
     import matplotlib.pyplot as plt
     root,suite=Path(root),Path(suite);records=[];histories={};evals={};issues=[];sources=[]
-    allowed={f'taxibj_I{i:02d}_seed7' for i in range(1,13)}
-    if not js or not set(js).issubset(allowed):raise ValueError('Expected a nonempty subset of I01-I12')
+    allowed={f'taxibj_I{i:02d}_seed7' for i in range(1,26)}
+    if not js or not set(js).issubset(allowed):raise ValueError('Expected a nonempty subset of I01-I25')
     entries=comparison_jobs(suite,js)
     methods=[j['method'] for _,_,j,_ in entries]
     if len(set(methods))!=len(methods):issues.append('Duplicate configured method')
@@ -114,6 +148,8 @@ def export_report(root,suite,js):
             'I10':'|I10|F/M/C融合|前三轮自由硬选尺度，第四轮固定F；共享Top2＋完整差分＋历史池＋学习投影|I09：仅限制末轮尺度；从头100轮。I09主动暂停，预算不等|',
             'I11':'|I11|F/M/C融合|前三轮逐样本无放回选F/M/C各一次，第四轮固定F；其余沿用I10|I10：覆盖约束；I08：同尺度次数下固定顺序与动态顺序|',
             'I12':'|I12|F/M/C融合|固定CMFF＋共享Top2＋完整差分＋历史池＋学习分配投影；同I08|I08同配置同seed重复核验；不是新结构或独立训练种子|',
+            **{m: '|'+m+'|F/M/C融合|'+description+'|'+('I13' if 17<=int(m[1:])<=22 else parent)+'|'
+               for m,(parent,description) in __import__('run_taxibj_input_communication').COMBINATIONS.items()},
         }.items() if method in methods],
         '|旧A2|仅F，M/C全程不可用|CMFF＋完整差分|辅助参考：与I01的区别是各轮是否还能读M/C|',
         '|旧B1|F/M/C融合|CMFF，无差分|辅助无差分参考|',
@@ -143,6 +179,24 @@ def export_report(root,suite,js):
         f'恢复：`python -u {suite/"source_snapshot/scripts/v25/run_taxibj_input_communication.py"} --suite {suite}`，外部设置CUDA_VISIBLE_DEVICES=1和OMP/MKL/OPENBLAS线程2；完成组跳过，完整队列结束后tmux退出。','',
         '|组|配置|run|','|---|---|---|']
     lines += [f'|{m}|`{c}`|`{r}`|' for m,c,r in sources]
+    if any(int(m[1:]) >= 13 for m in methods if m.startswith('I')):
+        lines += ['', '### I13–I22 的独立辅助约束', '',
+            'I13–I22保持最终F缺失位置L1与候选均衡不变。独立visible_consistency_aux读取投影前x_hat_raw_consistency；只有无投影I16读取x_hat_main。先回填可见F，按数据sum/mean规则聚合，仅对m_m/m_c可见的x_m_obs/x_c_obs计算L1；sum误差除面积4/16，按每尺度可见数平均后再平均两尺度，空尺度贡献0。禁止完整粗尺度目标、detach或与旧I06重复计损失。',
+            '除I14前三轮自由、末轮F外均为CMFF。I13/I14/I15/I16/I19/I20/I21/I22的可见辅助系数0.1，I17为0.03，I18为0.3。I15移除历史参数，I16移除投影头，I19不构造学习分配头，参数差异见结果表。',
+            'I20只在历史读取输出后乘0.5，将最大注入从0.1倍隐藏RMS降至0.05倍；池、读写顺序和detach不变。I21采用communication=none，仍逐轮顺序传递隐藏状态并读取历史，差分门保留但冻结。I22在原损失上额外使用相同F监督掩码计算投影前L1，系数0.1。',
+            '投影算法及可见F保留、非负剩余总量约束不变。辅助损失反传到骨干。投影前诊断明确使用原始字段；第四轮普通读出已被投影覆盖，不能替代原始字段。无粗尺度约束的F缺失区与受约束区分别记录误差及有效计数；空区域显示—。']
+
+    if set(methods) & {'I23','I24'}:
+        lines += ['', '### I23/I24：I14投影前后双重监督', '',
+            '两组都从公共初始化独立训练，沿用I14的FMC H0、前三轮自由末轮F、原生共享Top2、受控差分、历史池与学习投影。I23任务损失为0.9×最终F L1＋0.1×投影前F L1；I24为0.7×最终F L1＋0.3×投影前F L1。两项均使用原F缺失监督掩码；保留0.1×投影前可见M/C损失与原候选均衡。',
+            'lambda_final_f默认1，旧I01–I22行为不变；新组仅重新分配两项F任务权重，权重和为1。I22则是在完整最终F任务上额外加0.1原始F，且采用固定CMFF；它不是I23的严格单因素对照。I23/I24主要对照I14及彼此。总参数、推理投影和每窗口8次专家执行不变，不载入I14训练权重。',
+            '按用户要求在I18训练及六套评估完成后、I19开始前插入。边界控制器仅暂停原队列调度进程，保留原队列GPU1锁；I18评估子进程自然完成后才预检和训练I23/I24。新批结束后恢复原调度器运行I19–I22。前序I13–I18作为只读参考；尚未运行的I19–I22不属于新批报告完成条件。失败时记录原因并停留在边界，不无限重试。']
+    if 'I25' in methods:
+        lines += ['', '### I25：可学习的投影前后F损失分配', '',
+            '沿用I24模型与协议，从公共初始化独立训练。新增一个全局标量a，β=sigmoid(a)，初值log(0.3/0.7)。F任务为(1−β)×投影后缺失位置L1＋β×投影前同位置L1；两权重非负且和为1。保留0.1×投影前可见M/C损失及候选均衡，无额外熵正则或权重下界。',
+            '标量和骨干通过同一训练损失联合优化，不detach；标量使用主学习率余弦调度且无weight decay。增加1个可训练参数，不改变推理预测和每窗口8次专家执行。完整检查点保存标量及优化器状态；日志记录β、1−β和前后加权损失。',
+            '固定β=0.3的I24按用户要求在完成第2轮后暂停，尚未验证，没有best检查点或六套最终结果，不能作为已完成的等预算对照。I25不续接其两轮权重。I14和I23为已完成参考；不因训练总损失下降就认定泛化改善，因为权重本身可以偏向数值较小的损失。',
+            f'I24暂停记录：`{suite/"references/I24/paused.json"}`；实际暂停轮数以该记录为准。']
     lines += ['','## 2. 实验结果','','|组|状态|epoch/best|val MAE|累计训练分钟|总/可训参数|峰值GiB|','|---|---|---|---|---|---|---|']
     lines += [f'|{r["method"]}|{r["state"]}|{r["epochs"]}/{r["best_epoch"]}|{fmt(r["val_mae"])}|{fmt(r["minutes"])}|{r["params"]}/{r["trainable"]}|{fmt(r["peak_gib"])}|' for r in records]
     lines += ['','|组|协议|MAE|RMSE|ms/窗口|专家执行数|面积代理|','|---|---|---|---|---|---|---|']
@@ -167,7 +221,34 @@ def export_report(root,suite,js):
                 weights='/'.join(fmt(m.get('coe_v25_consistency_weight_'+k)) for k in ('min','max'))
                 lines.append(f'|{method}|{label}|{after}|{before}|{fmt(m.get("coe_v25_consistency_constrained_fraction"))}|{fmt(m.get("coe_v25_consistency_correction_abs"))}|{weights}|')
         lines+=['','只有聚合残差下降不能证明细粒度MAE改善。I05的校正位于最终读出之后，不能将校正后输出与前几轮读出当作未经处理的逐轮修复轨迹。全量训练损失分量与约束组数见curves.json、evaluations.json；缺失诊断显示为“—”，不补造。']
-    lines+=['','### 完成与失败审计','',('；'.join(issues) if issues else '已有凭据/配置/检查点/主指标未发现核验异常；未完成组以上表为准。')]
+    if any(m in evals for m in [f'I{i:02}' for i in range(13,26)]):
+        lines += ['', '### 原始预测与分区域诊断', '',
+                  '|组|协议|区域|有效F缺失数|原始MAE/RMSE|最终MAE/RMSE|', '|---|---|---|---|---|---|']
+        diagnostics = []
+        for method, evaluation in evals.items():
+            for label, ev in evaluation.get('sets', {}).items():
+                metrics = ev['metrics']
+                if 'combination_raw_all_count' not in metrics: continue
+                for area in ('all','constrained','unconstrained'):
+                    count = metrics['combination_raw_'+area+'_count']
+                    values = ['/'.join(fmt(metrics.get(f'combination_{stage}_{area}_{k}')) for k in ('mae','rmse'))
+                              if count else '—' for stage in ('raw','post')]
+                    lines.append(f'|{method}|{label}|{area}|{int(count)}|{values[0]}|{values[1]}|')
+                diagnostics.append({'method':method, 'protocol':label,
+                    **{k:v for k,v in metrics.items() if k.startswith(('combination_', 'l_visible_consistency', 'l_raw_f'))}})
+        write(assets/'combination_diagnostics.json', diagnostics)
+        lines += ['', '|组|协议|可见M原始/最终残差|可见C原始/最终残差|辅助损失/加权|raw F损失/加权|', '|---|---|---|---|---|---|']
+        for d in diagnostics:
+            residuals = ['/'.join(fmt(d.get(f'combination_{stage}_visible_{scale}_mae')) for stage in ('raw','post')) for scale in ('m','c')]
+            aux = '/'.join(fmt(d.get(k)) for k in ('l_visible_consistency_aux','l_visible_consistency_aux_weighted'))
+            raw = '/'.join(fmt(d.get(k)) for k in ('l_raw_f','l_raw_f_weighted'))
+            lines.append(f'|{d["method"]}|{d["protocol"]}|{residuals[0]}|{residuals[1]}|{aux}|{raw}|')
+    if 'I25' in methods:
+        lines += ['', '### 学习权重轨迹', '', '|epoch|训练平均投影前权重β|训练平均投影后权重|验证时β|', '|---|---|---|---|']
+        for row in histories.get('I25',[]):
+            if row['epoch']==1 or row['epoch']%5==0:
+                lines.append(f'|{row["epoch"]}|{fmt(row["train"].get("f_loss_raw_weight"))}|{fmt(row["train"].get("f_loss_final_weight"))}|{fmt((row.get("val") or {}).get("f_loss_raw_weight"))}|')
+    lines+=['','### 完成与失败审计' ,'',('；'.join(issues) if issues else '已有凭据/配置/检查点/主指标未发现核验异常；未完成组以上表为准。')]
     for r in records:
         if not r['complete']:lines.append(f'- {r["method"]}：未完成。')
         if r['failure']:lines.append(f'- {r["method"]}历史失败：`{r["failure"]}`。')
@@ -178,6 +259,9 @@ def export_report(root,suite,js):
     pairs += [('I06','I04'),('I05','I06'),('I07','I06'),('I05','I07'),('I08','I03'),('I08','I05'),('I09','I08'),('I09','I02'),('I09','I03'),('I09','I05'),('I09','I07'),('I10','I09'),('I10','I08'),('I10','I02'),('I10','I03'),('I10','I05')]
     pairs += [('I11','I10'),('I11','I08'),('I11','I09'),('I11','I03'),('I11','I05')]
     pairs += [('I12','I08'),('I12','I11'),('I12','I10'),('I12','I03'),('I12','I05')]
+    pairs += [('I13','I08'),('I14','I10'),('I14','I13'),('I15','I05'),('I15','I13'),('I16','I03'),('I16','I13')] + [(f'I{i:02}','I13') for i in range(17,23)]
+    pairs += [('I23','I14'),('I24','I14'),('I24','I23'),('I23','I06'),('I24','I06'),('I23','I16'),('I24','I16')]
+    pairs += [('I25','I14'),('I25','I23'),('I25','I06'),('I25','I16')]
     for a,b in pairs:
         ea,eb=evals.get(a,{}).get('sets',{}),evals.get(b,{}).get('sets',{})
         for lab in protocol['evaluations']:
@@ -190,6 +274,26 @@ def export_report(root,suite,js):
             if all(sets):
                 values=[sum(sign*row['metrics'][key] for sign,row in zip((1,-1,-1,1),sets)) for key in ('mae','rmse')]
                 lines.append(f'|{label}|{fmt(values[0])}|{fmt(values[1])}|')
+    if any(m in evals for m in [f'I{i:02}' for i in range(13,26)]):
+        ranking = combination_ranking(evals)
+        write(assets/'combination_ranking.json', ranking)
+        lines += ['', '### 预设 ID 门槛与三类 OOD 等权排序', '',
+            'ID测试MAE≤8.8709才进入候选。二元与形态各先平均两套相对I08误差比，再与三元类别等权平均；不是把五套协议直接平均。排序依次为OOD MAE比、OOD RMSE比、ID MAE。最差类别变化为三类中最大变化，负数表示所有类别均改善。I12是I08同seed重复，不能作为独立证据。', '',
+            '|组|ID MAE|门槛|三类MAE比（二元/形态/三元）|OOD MAE比|OOD RMSE比|最差类别MAE/RMSE变化%|', '|---|---|---|---|---|---|---|']
+        for r in ranking:
+            ratios = '/'.join(fmt(v) for v in r['mae_categories'].values())
+            lines.append(f'|{r["method"]}|{fmt(r["id_mae"])}|{"通过" if r["eligible"] else "未达"}|{ratios}|{fmt(r["mae_score"])}|{fmt(r["rmse_score"])}|{r["mae_worst_change_pct"]:+.3f}/{r["rmse_worst_change_pct"]:+.3f}|')
+        candidates = [r for r in ranking if r['eligible'] and r['method'] != 'I12']
+        if candidates and final:
+            best = candidates[0]
+            lines += ['', f'按预设规则，当前合格模型中排序第一为{best["method"]}，OOD MAE比{best["mae_score"]:.6f}、ID MAE {best["id_mae"]:.6f}。']
+            if best['method'] not in {f'I{i:02}' for i in range(13,26)}:
+                lines += ['本批新增组未超过既有合格参考的该项折中，保留既有参考，不强行推荐新组。']
+        elif final:
+            lines += ['', '没有模型通过预设ID门槛，不推荐本批新模型。']
+        else:
+            lines += ['', '本批仍未完成，以上为已有完整六套评估的阶段排序，不代表最终推荐。']
+        lines += ['', '本批将OOD用于探索筛选；最终确认仍需新种子与未用于筛选的条件。I21/I13检验完整组合中差分的增量，不单独证明所有骨干上的历史与差分都冗余。辅助约束的作用由配对数据判断，不能只看投影后残差为零。']
     if final:
         for name in methods:
             changes={lab:100*(ev['metrics']['mae']/evals['B2']['sets'][lab]['metrics']['mae']-1) for lab,ev in evals[name]['sets'].items()};ood=[v for k,v in changes.items() if k!='in_distribution'];wins=sum(v<0 for v in ood)
@@ -200,7 +304,7 @@ def export_report(root,suite,js):
         'I02/B2比较的是当前硬尺度估计器与完整差分的组合，若路径集中，需要固定该路径对照；没有对应同协议自由尺度无差分结果时，不能称为二者互补。不得以BikeNYC的S01结果替代TaxiBJ配对。',
         'I03/B2包含新增历史模块容量与绝对预测读取，不能单凭改善证明历史与差分不冗余；需要历史无差分、仅最近历史、等容量分支等后续控制。历史权重不是因果重要性，零初始化不保证训练后不破坏泛化。',
         'I04/B2检验完整粗尺度监督的增量；I05/B2检验仅可见观测约束下的学习校正。I05/I04同时改变监督范围、输出约束、计算及参数量，不能单独证明自适应分配优于同信息量软约束。I06/I07补充可见观测软损失和固定投影，仍缺等容量修正头。',
-        'I06/I04控制标签可见范围但改变有效监督位置的归一化；I07/I06对比同可见信息、无新增参数下的软损失和固定投影，但损失权重与推理约束也不同。I05/I07检查学习分配的增量，仍有新增参数因素。I08/I03及I08/I05检验模块组合；本批没有历史无差分对照，不能据此证明历史与差分不冗余。',
+        'I06/I04控制标签可见范围但改变有效监督位置的归一化；I07/I06对比同可见信息、无新增参数下的软损失和固定投影，但损失权重与推理约束也不同。I05/I07检查学习分配的增量，仍有新增参数因素。I08/I03及I08/I05检验模块组合；旧I01–I12没有历史无差分对照；新I21/I13补充完整组合中的差分消融，仍不是普遍独立性证明。',
         'I05只处理本批精确、对齐、相容的嵌套非负观测。固定欧氏投影的平方误差不增性质不自动适用于学习权重，也不保证MAE不增。约束组分解属于实现机制，独立新颖性和稳定泛化须由后续控制支持。',
         'I09/I08主要检查自由尺度训练在历史加投影基础上的增量；与I02相比同时加入历史和投影，不能独立归因为其中一个模块。本批缺少自由尺度×历史×投影的完整因子设计；若测试路径仍集中CMFF，不能把收益归因于按样本动态切换尺度。单种子组合成败不是普遍结论。',
         'I10/I09对比须注意：I09由用户在64轮后暂停，best来自epoch25；I10计划从头100轮。I09六套测试完成仅代表暂停检查点已评估，不代表完成原100轮训练。末轮固定F若改善，支持该结构限制在本次训练中有帮助，不能据此证明尺度切换是此前反弹的唯一原因；同时改变训练轨迹且预算不等。I10最终报告完成只指本套件新增训练结束，不能把暂停参考计为已完成100轮。',

@@ -75,7 +75,9 @@ def build_optimizer(model: torch.nn.Module, cfg: dict) -> torch.optim.Optimizer:
                 "main_branch.local_residual_gate",
             )
         )
-        if "lr_router" in train_cfg and name_l.startswith("main_branch.routers."):
+        if name_l == 'main_branch.x_loss_mix_logit':
+            grouped['no_decay']['params'].append(param)
+        elif "lr_router" in train_cfg and name_l.startswith("main_branch.routers."):
             grouped["router"]["params"].append(param)
         elif is_v14_new and (name_l.endswith(".bias") or "norm" in name_l):
             grouped["v14_no_decay"]["params"].append(param)
@@ -229,10 +231,46 @@ class _CoEQualityMetrics:
         self.family = {name: MaskedMetricAccumulator() for name in FAMILIES}
         self.acceptance: dict[str, list[float]] = defaultdict(_zero_pair)
         self.coordination = None
+        self.combination = {}
+
+    @torch.no_grad()
+    def update_combination(self, outputs, batch):
+        pooling = outputs.get('_combination_diagnostics')
+        if pooling is None:
+            return
+        # Never use coe.predictions[-1]: projection has overwritten that readout.
+        raw = outputs.get('x_hat_raw_consistency', outputs['x_hat_main'])
+        post = outputs['x_hat_main']
+        target, mask = batch['x_f_gt'], batch['m_f']
+        covered = torch.zeros_like(mask, dtype=torch.bool)
+        for scale, factor in (('m', 2), ('c', 4)):
+            covered |= batch['m_'+scale].bool().repeat_interleave(factor, -2).repeat_interleave(factor, -1)
+        selected = supervision_mask(target, mask, batch.get('target_mask'))
+        for stage, prediction in (('raw', raw), ('post', post)):
+            for area, area_mask in (('all', selected), ('constrained', selected & covered),
+                                    ('unconstrained', selected & ~covered)):
+                key = f'combination_{stage}_{area}'
+                metric = self.combination.setdefault(key, MaskedMetricAccumulator())
+                metric.update(prediction, target, mask, target_mask=area_mask)
+            completed = torch.where(mask.bool(), batch['x_f_obs'].float(), prediction.float())
+            for scale, factor in (('m', 2), ('c', 4)):
+                b, c, t, h, w = completed.shape
+                aggregate = completed.reshape(b,c,t,h//factor,factor,w//factor,factor).sum((4,6))
+                divisor = factor**2
+                if pooling == 'mean':
+                    aggregate = aggregate / divisor
+                    divisor = 1
+                visible = batch['m_'+scale].bool()
+                metric = self.combination.setdefault(f'combination_{stage}_visible_{scale}', MaskedMetricAccumulator())
+                metric.update(aggregate/divisor, batch['x_'+scale+'_obs'].float()/divisor, ~visible,
+                              target_mask=visible)
+        correction = self.combination.setdefault('combination_correction', MaskedMetricAccumulator())
+        correction.update(post.float()-raw.float(), torch.zeros_like(target), mask, target_mask=selected)
 
     @torch.no_grad()
     def update(self, outputs: dict, batch: dict) -> None:
         target, mask = batch["x_f_gt"], batch["m_f"]
+        self.update_combination(outputs, batch)
         if "coordination" in outputs:
             if self.coordination is None:
                 from .coordination import CoordinationMetrics
@@ -286,6 +324,8 @@ class _CoEQualityMetrics:
             old = accepted
 
     def merge(self, other: "_CoEQualityMetrics") -> None:
+        for name, metric in other.combination.items():
+            self.combination.setdefault(name, MaskedMetricAccumulator()).merge(metric)
         if other.coordination is not None:
             if self.coordination is None:
                 from .coordination import CoordinationMetrics
@@ -299,6 +339,11 @@ class _CoEQualityMetrics:
 
     def compute(self) -> dict[str, float]:
         result: dict[str, float] = {}
+        for name, metric in self.combination.items():
+            result[name+'_count'] = metric.count
+            if metric.count:
+                result[name+'_mae'] = metric.absolute_error / metric.count
+                result[name+'_rmse'] = (metric.squared_error / metric.count) ** .5
         for name, metric in self.family.items():
             if metric.count:
                 result[f"coe_family_{name}_absolute_error"] = metric.absolute_error

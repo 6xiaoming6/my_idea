@@ -1,4 +1,5 @@
 """v25 observations with the existing X05 prediction-history reader only."""
+import math
 import torch
 
 from .observed_multiscale_coe import ObservedMultiScaleCoE
@@ -9,14 +10,19 @@ class ObservedHistoryCoE(ObservedMultiScaleCoE):
     @classmethod
     def from_config(cls, cfg):
         spec = cfg['model']['coe'].get('observed_history', {})
-        if spec != {'enabled': True, 'mode': 'adaptive'}:
+        if (set(spec) - {'enabled', 'mode', 'gain'} or not spec.get('enabled')
+                or spec.get('mode') != 'adaptive'):
             raise ValueError('Expected isolated adaptive observed-history experiment')
+        gain = float(spec.get('gain', 1.0))
+        if not math.isfinite(gain) or not 0 <= gain <= 1:
+            raise ValueError('observed_history.gain must be finite in [0, 1]')
         if (cfg['model']['coe'].get('scale_delta_exploration', {}).get('enabled')
                 and not getattr(cls, 'with_free_scales', False)):
             raise ValueError('History and free scales are separate experiments')
         model = super().from_config(cfg)
-        if model.core_spec['communication'] != 'conditional':
-            raise ValueError('This experiment retains controlled difference')
+        if model.core_spec['communication'] not in ('conditional', 'none'):
+            raise ValueError('Expected controlled difference or sequential state only')
+        model.history_gain = gain
         with torch.random.fork_rng(devices=[]):
             torch.random.default_generator.manual_seed(int(cfg['seed']) + 105001)
             model.x_history = HistoryReader(model.c_in, model.dim, 'adaptive')
@@ -36,6 +42,8 @@ class ObservedHistoryCoE(ObservedMultiScaleCoE):
                  'pool_delta_abs': c['h'].new_zeros(())}
         if c['x_pool']:
             delta, weights = self.x_history(c['h'], c['x_pool'], c['mask'], c['x_scale'])
+            if self.history_gain != 1.0:
+                delta = delta * self.history_gain
             corrected = corrected + delta
             stats['pool_delta_abs'] = delta.detach().float().abs().mean()
             for i in range(len(c['x_pool'])):

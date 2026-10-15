@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Selectable TaxiBJ I01-I12 jobs; frozen previous suites stay immutable."""
+"""Selectable TaxiBJ I01-I25 jobs; frozen previous suites stay immutable."""
 import argparse,copy,fcntl,os,shutil,subprocess,sys,time
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[2]
@@ -24,13 +24,59 @@ METHODS={'I01':'H0仅F；CMFF各轮注入对应尺度观测；完整受控差分
          'I12':'固定CMFF复核；H0三尺度＋共享Top2＋完整差分＋历史池＋学习投影；与I08同配置同seed重复'}
 
 
+COMBINATIONS = {
+    'I13': ('I08', 'I08＋投影前可见M/C辅助损失λ=0.1'),
+    'I14': ('I10', 'I10＋投影前可见M/C辅助损失λ=0.1；前三轮自由、末轮F'),
+    'I15': ('I05', 'I05＋投影前可见M/C辅助损失λ=0.1；无历史池'),
+    'I16': ('I03', 'I03＋未投影预测可见M/C辅助损失λ=0.1；无投影'),
+    'I17': ('I08', 'I13将辅助损失λ降至0.03'),
+    'I18': ('I08', 'I13将辅助损失λ提高至0.3'),
+    'I19': ('I08', 'I13将学习分配投影改为固定等权投影；移除分配头'),
+    'I20': ('I08', 'I13历史注入gain=0.5；读取、池内容及截断不变'),
+    'I21': ('I08', 'I13关闭差分；保留顺序状态、历史池、投影；冻结差分门'),
+    'I22': ('I08', 'I13额外增加投影前F缺失位置L1λ=0.1'),
+    'I23': ('I14', 'I14双重监督β=0.1：0.9最终F＋0.1原始F；保留0.1可见M/C损失'),
+    'I24': ('I14', 'I14双重监督β=0.3：0.7最终F＋0.3原始F；保留0.1可见M/C损失'),
+    'I25': ('I24', 'I24的F前后损失权重可学习：β=sigmoid(a)，初始0.3/0.7，始终和为1'),
+}
+METHODS.update({name: description for name, (_, description) in COMBINATIONS.items()})
+
+
 def jobs(reference=REFERENCE, methods=None):
     selected=[f'I{i:02}' for i in range(1,9)] if methods is None else list(methods)
     if not selected or len(set(selected))!=len(selected) or any(m not in METHODS for m in selected):
-        raise ValueError('Select distinct methods from I01-I12')
+        raise ValueError('Select distinct methods from I01-I25')
     origin=load(reference/'jobs/taxibj_B2_seed7.json');result={}
     for method in selected:
         description=METHODS[method]
+        if method in COMBINATIONS:
+            parent, _ = COMBINATIONS[method]
+            j = copy.deepcopy(next(iter(jobs(reference, [parent]).values())))
+            c = j['config']; coe = c['model']['coe']; name = f'taxibj_{method}_seed7'
+            c['loss']['visible_consistency_aux'] = {
+                'weight': {'I17': 0.03, 'I18': 0.3}.get(method, 0.1),
+                'source': 'prediction' if method == 'I16' else 'pre_projection'}
+            if method == 'I19': coe['observation_consistency']['weight_mode'] = 'uniform'
+            if method == 'I20': coe['observed_history']['gain'] = 0.5
+            if method == 'I21': coe['core_validation']['communication'] = 'none'
+            if method == 'I22': c['loss']['lambda_raw_f'] = 0.1
+            if method in ('I23', 'I24'):
+                beta = 0.1 if method == 'I23' else 0.3
+                c['loss'].update(lambda_final_f=1.0-beta, lambda_raw_f=beta)
+            if method == 'I25':
+                c['loss'].pop('lambda_final_f');c['loss'].pop('lambda_raw_f')
+                c['loss']['learnable_f_mix']={'enabled': True, 'initial_raw_weight': 0.3}
+            c['experiment_plan'].update(variant=name, method=description,
+                reference=parent if method in ('I13','I14','I15','I16','I23','I24','I25') else 'I13',
+                scope='I13-I22 combination exploration; observed-only auxiliaries; single seed; ID threshold 8.8709')
+            if method in ('I23','I24'):
+                c['experiment_plan']['scope']='I14 normalized pre/post projection F supervision; common initialization; insert after I18 before I19; same six protocols'
+            if method=='I25':
+                c['experiment_plan']['scope']='learnable convex F loss weights from 0.3 raw/0.7 final; replaces user-paused I24; common initialization, no checkpoint warm start'
+            j.update(variant=name, method=method, name=method.lower()+'_v25_taxibj_input_communication',
+                     reference=c['experiment_plan']['reference'])
+            result[name] = j
+            continue
         j=copy.deepcopy(origin);j.pop('common_initialization',None);c=j['config'];name=f'taxibj_{method}_seed7'
         c['model']['coe']['initial_observation_scales']='F' if method=='I01' else 'FMC'
         if method in ('I02','I09','I10','I11'):c['model']['coe']['scale_delta_exploration']={'enabled':True,'path':'free','top_k_per_step':[2]*4,'delta_steps':[2,3,4],'same_scale_only':False,'scale_gradient':'selected_branch_st','top1_gradient':'selected_probability_st'}
@@ -78,6 +124,9 @@ def freeze(methods=None):
     files=list((ROOT/'src').rglob('*.py'))+list((ROOT/'scripts/v24').glob('*.py'))+list((ROOT/'scripts/v25').glob('*.py'))
     files+=list((ROOT/'configs/v24').rglob('*.json'))+list((ROOT/'configs/v25').glob('*.json'))
     files += [ROOT/'AGENTS.md',ROOT/'scripts/v25/README_TAXIBJ_INPUT_COMMUNICATION.md',ROOT/'tests/test_v25_taxibj_input_communication.py',ROOT/'tests/test_v25_observed_multiscale.py',ROOT/'tests/test_v25_observation_consistency.py',ROOT/'tests/test_v25_consistency_controls.py',ROOT/'tests/test_v25_full_combination.py',ROOT/'tests/test_v25_permutation_scales.py',ROOT/'tests/test_v25_queue_dependency.py']
+    files += [ROOT/'tests/test_v25_combination_aux.py', ROOT/'scripts/v25/README_COMBINATION_EXPLORATION.md']
+    files += [ROOT/'tests/test_v25_dual_supervision.py']
+    files += [ROOT/'tests/test_v25_learnable_loss_mix.py']
     sources={str(p.relative_to(ROOT)):sha(p) for p in sorted(set(files))};refs={}
     for method in ['A2','B1','B2']:
         n=f'taxibj_{method}_seed7';r=load(REFERENCE/'results'/f'{n}.json');run=Path(r['run_dir'])
@@ -108,6 +157,32 @@ def freeze(methods=None):
             # Read-only comparisons; never schedule I08/I10/I11 or a waiter.
             for name in ('a8c5e28f7e93b169','8cc101c9c2074582'):
                 payload['comparison_suites'][str(previous/name)]=sha(previous/name/'plan.json')
+    if any(j['method'] in COMBINATIONS for j in js.values()):
+        previous = ROOT/'outputs/v25/experiments/taxibj_input_communication'
+        payload['comparison_suites'] = {str(previous/name): sha(previous/name/'plan.json')
+            for name in ('ea1ca776ade869d6','b5925acd4615e143','0670f12cc0d77181',
+                         'a8c5e28f7e93b169','8cc101c9c2074582','cc54874eb82b0d91')}
+        payload['selection'] = {'id_mae_max': 8.8709, 'reference': 'I08',
+            'ood_categories': [['unseen_combinations','unseen_combinations_repeat'],
+                               ['unseen_geometry','unseen_geometry_repeat'], ['unseen_triple']],
+            'ranking': ['category_macro_relative_mae','category_macro_relative_rmse','id_mae'],
+            'training_seeds': [7]}
+    if any(j['method'] in ('I23','I24','I25') for j in js.values()):
+        dependency = ROOT/'outputs/v25/experiments/taxibj_input_communication/22d4ae99d3e86986'
+        if set(js) & set(load(dependency/'plan.json')['jobs']):
+            raise ValueError('Do not schedule dependency jobs alongside their followup')
+        payload['interleave_after'] = {'path': str(dependency), 'plan_sha256': sha(dependency/'plan.json'), 'job': 'taxibj_I18_seed7'}
+        payload['comparison_methods'] = {str(dependency): [f'I{i:02}' for i in range(13,19)]}
+        payload['comparison_suites'][str(dependency)] = sha(dependency/'plan.json')
+    if any(j['method']=='I25' for j in js.values()):
+        paused=ROOT/'outputs/v25/experiments/taxibj_input_communication/37ae81a02eea687f'
+        if load(paused/'paused.json').get('status')!='paused_by_user':raise RuntimeError('I24 must be explicitly paused')
+        payload['adopt_suspended_from']={'path':str(paused), 'pause_sha256':sha(paused/'paused.json'),
+                                       'lease_sha256':sha(paused/'interleave_lease.json')}
+        payload['comparison_suites'][str(paused)]=sha(paused/'plan.json')
+        payload['comparison_methods'][str(paused)]=['I23']
+        for label,p in [('paused',paused/'paused.json'),('job',paused/'jobs/taxibj_I24_seed7.json')]:
+            refs[f'I24/{label}.json']={'path':str(p),'sha256':sha(p)}
     suite=ROOT/'outputs/v25/experiments/taxibj_input_communication'/digest(payload)[:16];suite.mkdir(parents=True,exist_ok=True);base.frozen(suite/'plan.json',payload)
     for name,stamp in sources.items():
         target=suite/'source_snapshot'/name;target.parent.mkdir(parents=True,exist_ok=True)
@@ -169,6 +244,10 @@ def main():
         from run_after_suite import dependency_status
         status,detail=dependency_status(payload['run_after_suite'])
         if status!='ready':raise RuntimeError('Dependency not ready; use run_after_suite.py to queue: '+str(detail))
+    if payload.get('interleave_after'):
+        from run_interleaved import validate_launch
+        if not a.worker:raise RuntimeError('Use run_interleaved.py for the I18 boundary insertion')
+        validate_launch(suite,payload)
     if a.worker:worker(suite,payload);return
     gpu_lock=Path(payload['project_root'])/'outputs/v24-COE/experiments/gpu1.queue.lock';gpu_lock.parent.mkdir(parents=True,exist_ok=True)
     with (suite.parent/'queue.lock').open('a') as lock,gpu_lock.open('a') as gpu:

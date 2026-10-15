@@ -41,7 +41,7 @@ def build_model_backbone(cfg: dict) -> nn.Module:
             return FreeScaleHistoryConsistencyCoE.from_config(cfg)
         if (cfg['data'].get('input_scales') != 'FMC'
                 or coe.get('initial_observation_scales', 'FMC') != 'FMC'
-                or coe.get('core_validation', {}).get('communication') != 'conditional'
+                or coe.get('core_validation', {}).get('communication') not in ('conditional', 'none')
                 or coe.get('scale_delta_exploration', {}).get('enabled', False)):
             raise ValueError('Consistency requires B2 FMC H0 and CMFF controlled delta')
         if consistency.get('mode') == 'residual_projection':

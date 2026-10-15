@@ -194,11 +194,25 @@ def compute_coe_loss(outputs: dict, batch: dict, cfg: dict) -> tuple[torch.Tenso
             raise ValueError("Router z-loss requires route_logits")
         z = logits[supervised_samples].float().logsumexp(dim=-1).square().mean()
     weighted_z = z_weight * z
-    total = main + mid_weight * mid + weighted_balance + weighted_z
+    final_weight = float(loss_cfg.get('lambda_final_f', 1.0))
+    if not math.isfinite(final_weight) or final_weight < 0:
+        raise ValueError('lambda_final_f must be finite and nonnegative')
+    learnable_mix = loss_cfg.get('learnable_f_mix', {}).get('enabled', False)
+    beta = None
+    if learnable_mix:
+        if 'lambda_final_f' in loss_cfg or 'lambda_raw_f' in loss_cfg:
+            raise ValueError('Learnable F mixture excludes fixed lambda_final_f/lambda_raw_f')
+        beta = outputs.get('f_loss_raw_weight')
+        if beta is None or beta.numel() != 1 or not bool(torch.isfinite(beta).all()) or not bool(((beta >= 0) & (beta <= 1)).all()):
+            raise ValueError('Learnable F mixture requires finite scalar f_loss_raw_weight in [0,1]')
+        if 'x_hat_raw_consistency' not in outputs:
+            raise ValueError('Learnable F mixture requires x_hat_raw_consistency')
+    weighted_main = (1-beta)*main if learnable_mix else (main if final_weight == 1.0 else final_weight * main)
+    total = weighted_main + mid_weight * mid + weighted_balance + weighted_z
     train_cfg = cfg.get("train", {})
     if (train_cfg.get("router_grad_diagnostic_every", 0) or
             train_cfg.get("partner_probe", {}).get("grad_diagnostic_interval_batches", 0)):
-        coe["_loss_terms"] = {"main": main, "balance": weighted_balance, "z": weighted_z}
+        coe["_loss_terms"] = {"main": weighted_main, "balance": weighted_balance, "z": weighted_z}
     logs = {
         "loss": total.detach(), "l_main": main.detach(), "l_final": main.detach(),
         "l_coe_z": z.detach(), "l_coe_z_weighted": weighted_z.detach(),
@@ -208,6 +222,10 @@ def compute_coe_loss(outputs: dict, batch: dict, cfg: dict) -> tuple[torch.Tenso
     }
     logs.update({f"l_coe_balance_step{step}": value.detach()
                  for step, value in enumerate(balance_steps, start=1)})
+    if final_weight != 1.0 or learnable_mix:
+        logs['l_final_weighted'] = weighted_main.detach()
+    if learnable_mix:
+        logs.update(f_loss_raw_weight=beta.detach(), f_loss_final_weight=(1-beta).detach())
     if "w_spec" in outputs:
         from .backbone_training import structural_loss
         extra, extra_logs = structural_loss(outputs, batch)
@@ -234,6 +252,38 @@ def compute_coe_loss(outputs: dict, batch: dict, cfg: dict) -> tuple[torch.Tenso
                     l_observation_consistency_c=per_scale[1].detach(),
                     l_observation_consistency_weighted=(weight*consistency).detach(),
                     loss=total.detach())
+    auxiliary = loss_cfg.get('visible_consistency_aux', {})
+    weight = float(auxiliary.get('weight', 0.0))
+    raw_weight = float(loss_cfg.get('lambda_raw_f', 0.0))
+    if any(not math.isfinite(w) or w < 0 for w in (weight, raw_weight)):
+        raise ValueError('Visible consistency and raw F weights must be finite and nonnegative')
+    if weight:
+        if spec.get('enabled') and spec.get('mode') in ('full_target_loss', 'observed_loss'):
+            raise ValueError('Do not combine legacy consistency loss with visible_consistency_aux')
+        source = auxiliary.get('source')
+        if source not in ('pre_projection', 'prediction'):
+            raise ValueError('visible_consistency_aux.source must be pre_projection or prediction')
+        if source == 'pre_projection' and 'x_hat_raw_consistency' not in outputs:
+            raise ValueError('pre_projection requires x_hat_raw_consistency')
+        if source == 'prediction' and 'x_hat_raw_consistency' in outputs:
+            raise ValueError('Projected models must use pre_projection auxiliary loss')
+        prediction = outputs['x_hat_raw_consistency'] if source == 'pre_projection' else outputs['x_hat_main']
+        auxiliary_loss, per_scale = visible_observation_consistency_loss({'x_hat_main': prediction}, batch, cfg)
+        total = total + weight * auxiliary_loss
+        logs.update(l_visible_consistency_aux=auxiliary_loss.detach(),
+                    l_visible_consistency_aux_m=per_scale[0].detach(),
+                    l_visible_consistency_aux_c=per_scale[1].detach(),
+                    l_visible_consistency_aux_weighted=(weight * auxiliary_loss).detach())
+    if raw_weight or learnable_mix:
+        if 'x_hat_raw_consistency' not in outputs:
+            raise ValueError('lambda_raw_f requires x_hat_raw_consistency')
+        raw_loss = _selected_loss(outputs['x_hat_raw_consistency'], target, selected, loss_type)
+        weighted_raw = (beta if learnable_mix else raw_weight) * raw_loss
+        total = total + weighted_raw
+        logs.update(l_raw_f=raw_loss.detach(), l_raw_f_weighted=weighted_raw.detach())
+    if weight or raw_weight or learnable_mix:
+        outputs['_combination_diagnostics'] = cfg['data']['scales']['pooling_mode']
+        logs['loss'] = total.detach()
     return total, logs
 
 

@@ -8,7 +8,7 @@ import torch
 from run_b3_c3 import load,write
 from stmoe_imputer.models import DualBranchSTImputer
 from stmoe_imputer.data import build_datasets,build_loader
-from stmoe_imputer.engine import build_optimizer,build_grad_scaler,move_batch_to_device
+from stmoe_imputer.engine import build_optimizer,build_scheduler,build_grad_scaler,move_batch_to_device
 from stmoe_imputer.losses import compute_coe_loss
 from stmoe_imputer.utils.deterministic import configure,common_initialization
 from stmoe_imputer.utils.gpu_monitor import GPUMonitor
@@ -46,6 +46,37 @@ def check_consistency(out,batch,cfg):
     if free.any() and float(final[free].min()) < -1e-6:
         raise RuntimeError('Negative missing-region projection')
 
+
+
+def check_amp_resume(model, optimizer, scaler, batch, cfg, path):
+    """Replay a full-size AMP update from a serialized complete checkpoint."""
+    from train_four_direction import rng_snapshot, restore_rng
+    from stmoe_imputer.utils.checkpoint import save_checkpoint
+    from stmoe_imputer.utils.deterministic import state_hash
+    device = torch.device('cuda'); scheduler = build_scheduler(optimizer, cfg)
+    save_checkpoint(path, model, optimizer, 0, {}, cfg, scheduler=scheduler, scaler=scaler,
+                    rng_states=[rng_snapshot({}, device)])
+    def step():
+        optimizer.zero_grad(set_to_none=True)
+        with torch.autocast('cuda', dtype=torch.float16):
+            output = model(batch); loss, _ = compute_coe_loss(output, batch, cfg)
+        scaler.scale(loss).backward(); scaler.unscale_(optimizer)
+        torch.nn.utils.clip_grad_norm_(model.parameters(), 1.)
+        previous = scaler.get_scale(); scaler.step(optimizer); scaler.update()
+        accepted = scaler.get_scale() >= previous
+        if accepted: scheduler.step()
+        return state_hash({'model': model.state_dict(), 'optimizer': optimizer.state_dict(),
+                           'scheduler': scheduler.state_dict(), 'scaler': scaler.state_dict(),
+                           'rng': rng_snapshot({}, device), 'loss': loss.detach(), 'accepted': accepted}), accepted
+    expected, accepted = step()
+    checkpoint = torch.load(path, map_location='cpu', weights_only=False)
+    model.load_state_dict(checkpoint['model']); optimizer.load_state_dict(checkpoint['optimizer'])
+    scheduler.load_state_dict(checkpoint['scheduler']); scaler.load_state_dict(checkpoint['scaler'])
+    restore_rng(checkpoint['rng_states'][0], {}, device)
+    actual, replay_accepted = step()
+    if actual != expected or not accepted or not replay_accepted:
+        raise RuntimeError('AMP complete-checkpoint replay mismatch or skipped update')
+    return {'status': 'passed', 'state_sha256': actual, 'checkpoint': str(path)}
 
 def run(suite):
     if os.environ.get('CUDA_VISIBLE_DEVICES')!='1':raise RuntimeError('Physical GPU1 required')
@@ -87,7 +118,10 @@ def run(suite):
                         if scaler.get_scale()>=old:
                             if not finite:raise RuntimeError('Nonfinite accepted gradient')
                             gate=[p.grad for p in model.main_branch.history_gate.parameters() if p.grad is not None]
-                            if not gate or not any(bool(g.abs().sum()>0) for g in gate):raise RuntimeError('Difference gate unused')
+                            if cfg['model']['coe']['core_validation']['communication'] == 'none':
+                                if gate or any(p.requires_grad for p in model.main_branch.history_gate.parameters()):
+                                    raise RuntimeError('Disabled difference gate must remain frozen')
+                            elif not gate or not any(bool(g.abs().sum()>0) for g in gate):raise RuntimeError('Difference gate unused')
                             fusion=model.main_branch.observation_fusion.weight.grad;dim=model.main_branch.dim
                             if fusion is None or not bool(fusion[:,:dim].abs().sum()>0):raise RuntimeError('F initialization unused')
                             if cfg['model']['coe']['initial_observation_scales']=='F':
@@ -106,11 +140,21 @@ def run(suite):
                             if hasattr(model.main_branch,'x_consistency'):
                                 grads=[p.grad for p in model.main_branch.x_consistency.parameters() if p.requires_grad and p.grad is not None]
                                 if not grads:raise RuntimeError('Consistency weights detached from task loss')
+                            if hasattr(model.main_branch,'x_loss_mix_logit'):
+                                grad=model.main_branch.x_loss_mix_logit.grad
+                                if grad is None or not bool(torch.isfinite(grad).all()) or not bool(grad.abs().sum()>0):
+                                    raise RuntimeError('Learnable F loss mixture received no finite nonzero gradient')
+                                beta=out['f_loss_raw_weight']
+                                if not bool(((beta>=0)&(beta<=1)).all()):raise RuntimeError('Learnable weight out of range')
                             updates+=1
                         del out,loss
                         if updates>=3:break
                     if updates<3:raise RuntimeError('Insufficient AMP updates')
-                    torch.cuda.synchronize();row={'case':label,'status':'passed','attempts':attempt+1,'updates':updates,'calls_per_window':8,'peak_gib':torch.cuda.max_memory_allocated()/2**30,'seconds':time.monotonic()-start};result['cases'].append(row);print(row,flush=True)
+                    replay = None
+                    if not heavy and cfg.get('loss', {}).get('visible_consistency_aux', {}).get('weight', 0):
+                        replay = check_amp_resume(model, optimizer, scaler, batch, cfg,
+                                                 suite/'acceptance'/label/'resume.pth')
+                    torch.cuda.synchronize();row={'case':label,'status':'passed','attempts':attempt+1,'updates':updates,'calls_per_window':8,'peak_gib':torch.cuda.max_memory_allocated()/2**30,'seconds':time.monotonic()-start};row['resume_check']=replay;result['cases'].append(row);print(row,flush=True)
                 except BaseException as error:
                     result['status']='failed';result['cases'].append({'case':label,'error':repr(error)});write(suite/'acceptance/preflight.json',result);raise
                 finally:

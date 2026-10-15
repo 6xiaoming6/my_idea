@@ -195,10 +195,17 @@ class ObservedConsistencyCoE(ObservedMultiScaleCoE):
         if cfg['data'].get('return_multiscale_targets', False):
             raise ValueError('Observed projection excludes full coarse target labels')
         model = super().from_config(cfg)
-        if model.core_spec['communication'] != 'conditional':
-            raise ValueError('I05 retains conditional controlled difference')
+        if model.core_spec['communication'] not in ('conditional', 'none'):
+            raise ValueError('Expected controlled difference or sequential state only')
         model.consistency_weight_bound = bound
         model.consistency_weight_mode = weight_mode
+        mix = cfg.get('loss', {}).get('learnable_f_mix', {})
+        if mix.get('enabled', False):
+            initial = float(mix.get('initial_raw_weight', 0.3))
+            if not math.isfinite(initial) or not 0 < initial < 1:
+                raise ValueError('initial_raw_weight must be finite in (0,1)')
+            # A single global training scalar; constant construction consumes no RNG.
+            model.x_loss_mix_logit = nn.Parameter(torch.tensor(math.log(initial/(1-initial)), dtype=torch.float32))
         if weight_mode == 'uniform':
             return model
         with torch.random.fork_rng(devices=[]):
@@ -238,6 +245,8 @@ class ObservedConsistencyCoE(ObservedMultiScaleCoE):
                 raw, weights, x_f, m_f, x_m, m_m, x_c, m_c, pooling=self.observation_pooling)
         out['x_hat_raw_consistency'] = out['x_hat_main']
         out['x_hat_main'] = corrected
+        if hasattr(self, 'x_loss_mix_logit'):
+            out['f_loss_raw_weight'] = self.x_loss_mix_logit.float().sigmoid()
         info = out['coe']
         info['x_consistency_diagnostics'] = stats
         # The fourth entry is the actual model output after output-level
