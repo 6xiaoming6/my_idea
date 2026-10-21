@@ -1,0 +1,19 @@
+{
+  "status": "passed",
+  "physical_gpu": 1,
+  "gpu": "NVIDIA GeForce RTX 3090",
+  "batch_shape": [
+    32,
+    2,
+    12,
+    32,
+    32
+  ],
+  "amp": true,
+  "expert_executions": 256,
+  "loss": 95.1094741821289,
+  "peak_allocated_gib": 8.48349905014038,
+  "seconds": 2.1843485520003014,
+  "checkpoint_and_rng_roundtrip": true,
+  "torch": "2.6.0+cu124"
+}

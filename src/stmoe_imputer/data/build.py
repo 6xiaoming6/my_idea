@@ -1,0 +1,183 @@
+from __future__ import annotations
+
+from copy import deepcopy
+
+import torch
+from torch.utils.data import DataLoader
+
+from ..config import uses_multiscale
+
+from .npz_dataset import FlowNPZDataset
+from .synthetic import SyntheticFlowDataset
+
+
+def build_datasets(
+    cfg: dict,
+    train_npz: str | None = None,
+    val_npz: str | None = None,
+    synthetic: bool = False,
+):
+    if cfg['model'].get('architecture') == 'v25_observed_multiscale_coe':
+        from .observed_multiscale import build_observed_dataset
+        if synthetic:
+            raise ValueError('v25 requires preconstructed physical multi-scale data')
+        return (build_observed_dataset(cfg,train_npz,'train'),
+                build_observed_dataset(cfg,val_npz,'val'))
+    data_cfg = cfg["data"]
+    scale_cfg = data_cfg.get("scales", {})
+    mask_cfg = data_cfg["mask"]
+    diverse = data_cfg.get('train_mask_diversity')
+    eval_diverse = data_cfg.get('eval_mask_diversity')
+    if diverse is not None and (synthetic or train_npz is None):
+        raise ValueError('train_mask_diversity requires a real NPZ; it must not silently fall back to synthetic masks')
+    if eval_diverse is not None and synthetic:
+        raise ValueError('eval_mask_diversity requires real NPZ validation/test data')
+    if synthetic or train_npz is None:
+        syn = data_cfg["synthetic"]
+        train_ds = SyntheticFlowDataset(
+            num_samples=syn["num_train"],
+            t=syn["t"],
+            h=syn["h"],
+            w=syn["w"],
+            c_in=cfg["model"]["c_in"],
+            mask_cfg=mask_cfg,
+            fine_to_mid=scale_cfg.get("fine_to_mid", 2),
+            fine_to_coarse=scale_cfg.get("fine_to_coarse", 4),
+            pooling_mode=scale_cfg.get("pooling_mode", "avg"),
+            multiscale=uses_multiscale(cfg),
+            seed=cfg.get("seed", 42),
+        )
+        val_ds = SyntheticFlowDataset(
+            num_samples=syn["num_val"],
+            t=syn["t"],
+            h=syn["h"],
+            w=syn["w"],
+            c_in=cfg["model"]["c_in"],
+            mask_cfg=mask_cfg,
+            fine_to_mid=scale_cfg.get("fine_to_mid", 2),
+            fine_to_coarse=scale_cfg.get("fine_to_coarse", 4),
+            pooling_mode=scale_cfg.get("pooling_mode", "avg"),
+            multiscale=uses_multiscale(cfg),
+            seed=cfg.get("seed", 42) + 10000,
+        )
+        return train_ds, val_ds
+
+    pattern = mask_cfg.get("pattern", "random")
+    if pattern not in {"fixed", "random"}:
+        raise ValueError(f"Unsupported data.mask.pattern={pattern!r}. Use 'fixed' or 'random'.")
+
+    train_csv = (
+        mask_cfg.get("train_csv")
+        or mask_cfg.get(f"{pattern}_train_csv")
+        or mask_cfg.get("fixed_train_csv")
+    )
+    val_csv = (
+        mask_cfg.get("val_csv")
+        or mask_cfg.get(f"{pattern}_val_csv")
+        or mask_cfg.get("fixed_val_csv")
+    )
+    if train_csv is None and diverse is None:
+        raise ValueError(
+            f"data.mask.pattern='{pattern}' requires data.mask.train_csv "
+            f"(or data.mask.{pattern}_train_csv)."
+        )
+
+    val_npz_path = val_npz or train_npz
+    if val_csv is None and val_npz_path == train_npz:
+        val_csv = train_csv
+    if val_csv is None and eval_diverse is None:
+        raise ValueError(
+            f"data.mask.pattern='{pattern}' requires data.mask.val_csv "
+            f"(or data.mask.{pattern}_val_csv) when validation uses a separate NPZ."
+        )
+
+    def eval_schedule(offset: int) -> dict:
+        """Keep evaluation masks deterministic while using the same families/rates."""
+        if eval_diverse is None:
+            return None
+        schedule = deepcopy(eval_diverse)
+        schedule["seed"] = int(schedule.get("seed", cfg.get("seed", 42))) + offset
+        schedule["resample_each_epoch"] = False
+        return schedule
+
+    train_ds = FlowNPZDataset(
+        train_npz,
+        mask_cfg=mask_cfg,
+        fine_to_mid=scale_cfg.get("fine_to_mid", 2),
+        fine_to_coarse=scale_cfg.get("fine_to_coarse", 4),
+        pooling_mode=scale_cfg.get("pooling_mode", "avg"),
+        multiscale=uses_multiscale(cfg),
+        seed=cfg.get("seed", 42),
+        mask_csv=None if diverse is not None else train_csv,
+        diverse_mask_config=diverse,
+    )
+    val_ds = FlowNPZDataset(
+        val_npz_path,
+        mask_cfg=mask_cfg,
+        fine_to_mid=scale_cfg.get("fine_to_mid", 2),
+        fine_to_coarse=scale_cfg.get("fine_to_coarse", 4),
+        pooling_mode=scale_cfg.get("pooling_mode", "avg"),
+        multiscale=uses_multiscale(cfg),
+        seed=cfg.get("seed", 42) + 20000,
+        mask_csv=None if eval_diverse is not None else val_csv,
+        diverse_mask_config=eval_schedule(20000),
+    )
+    return train_ds, val_ds
+
+
+def build_test_dataset(cfg: dict, test_npz: str | None = None, synthetic: bool = False):
+    if cfg['model'].get('architecture') == 'v25_observed_multiscale_coe':
+        from .observed_multiscale import build_observed_dataset
+        if synthetic:
+            raise ValueError('v25 requires preconstructed physical multi-scale data')
+        return build_observed_dataset(cfg,test_npz,'test')
+    data_cfg = cfg["data"]
+    scale_cfg = data_cfg.get("scales", {})
+    mask_cfg = data_cfg["mask"]
+    eval_diverse = data_cfg.get('eval_mask_diversity')
+    if eval_diverse is not None and synthetic:
+        raise ValueError('eval_mask_diversity requires real NPZ validation/test data')
+    if synthetic:
+        syn = data_cfg["synthetic"]
+        return SyntheticFlowDataset(
+            num_samples=syn["num_val"], t=syn["t"], h=syn["h"], w=syn["w"],
+            c_in=cfg["model"]["c_in"], mask_cfg=mask_cfg,
+            fine_to_mid=scale_cfg.get("fine_to_mid", 2), fine_to_coarse=scale_cfg.get("fine_to_coarse", 4),
+            pooling_mode=scale_cfg.get("pooling_mode", "avg"),
+            multiscale=uses_multiscale(cfg), seed=cfg.get("seed", 42) + 30000,
+        )
+    if test_npz is None:
+        return None
+    pattern = mask_cfg.get("pattern", "random")
+    test_csv = mask_cfg.get("test_csv") or mask_cfg.get(f"{pattern}_test_csv")
+    if test_csv is None and eval_diverse is None:
+        raise ValueError(f"data.mask.pattern='{pattern}' requires data.mask.test_csv for final testing.")
+    diverse_config = None
+    if eval_diverse is not None:
+        diverse_config = deepcopy(eval_diverse)
+        diverse_config["seed"] = int(diverse_config.get("seed", cfg.get("seed", 42))) + 30000
+        diverse_config["resample_each_epoch"] = False
+    return FlowNPZDataset(
+        test_npz, mask_cfg=mask_cfg,
+        fine_to_mid=scale_cfg.get("fine_to_mid", 2), fine_to_coarse=scale_cfg.get("fine_to_coarse", 4),
+        pooling_mode=scale_cfg.get("pooling_mode", "avg"),
+        multiscale=uses_multiscale(cfg),
+        seed=cfg.get("seed", 42) + 30000,
+        mask_csv=None if eval_diverse is not None else test_csv,
+        diverse_mask_config=diverse_config,
+    )
+
+
+def build_loader(dataset, cfg: dict, shuffle: bool, sampler=None, batch_size: int | None = None) -> DataLoader:
+    data_cfg = cfg["data"]
+    return DataLoader(
+        dataset,
+        batch_size=batch_size or data_cfg["batch_size"],
+        shuffle=shuffle and sampler is None,
+        sampler=sampler,
+        generator=(torch.Generator().manual_seed(data_cfg["loader_seed"] + (0 if shuffle else 1))
+                   if "loader_seed" in data_cfg else None),
+        num_workers=data_cfg["num_workers"],
+        pin_memory=data_cfg.get("pin_memory", True),
+        drop_last=data_cfg.get("drop_last", False) and shuffle,
+    )

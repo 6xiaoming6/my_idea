@@ -1,0 +1,35 @@
+[
+  {
+    "file": "taxibj_train.npz",
+    "sha256": "375e057cd9ff0094ef9973d7029615329d13f99344aec608092d395f6f2c1089",
+    "F_shape": [
+      2452,
+      2,
+      12,
+      32,
+      32
+    ]
+  },
+  {
+    "file": "taxibj_val.npz",
+    "sha256": "2e3f084a3d37ff36e114b079c3e20e291b21d58fcdeb60d7dc42c7d05bb4071b",
+    "F_shape": [
+      342,
+      2,
+      12,
+      32,
+      32
+    ]
+  },
+  {
+    "file": "taxibj_test.npz",
+    "sha256": "6b3eb5670d380ef40f451b9b525b5dc7ddaca66acd7542b323b9740a2171deb9",
+    "F_shape": [
+      707,
+      2,
+      12,
+      32,
+      32
+    ]
+  }
+]
