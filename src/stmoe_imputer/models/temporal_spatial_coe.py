@@ -65,7 +65,7 @@ def _kernel_size(name: str, value: int) -> int:
 
 
 def compute_observation_support(
-    mask: torch.Tensor, temporal_kernel: int = 3, spatial_kernel: int = 3
+    mask: torch.Tensor, temporal_kernel: int = 3, spatial_kernel: int = 3, *, cache: bool = False
 ) -> torch.Tensor:
     """Compute offline support solely from a binary, per-variable input mask.
 
@@ -89,27 +89,32 @@ def compute_observation_support(
     with torch.autocast(device_type=mask.device.type, enabled=False):
         values = visible.to(dtype=torch.float32)
         flat = values.reshape(b * c, 1, t, h, w)
-        ones = torch.ones((1, 1, t, h, w), device=mask.device)
-        time_filter = torch.ones((1, 1, temporal_kernel, 1, 1), device=mask.device)
         time_padding = (temporal_kernel // 2, 0, 0)
+        if cache:
+            from ..performance import support_constants
+            time_filter, cached_space_filter, cached_time_denominator, cached_space_denominator, cached_index = support_constants(mask.device,torch.get_default_dtype(),t,h,w,temporal_kernel,spatial_kernel)
+        else:
+            ones = torch.ones((1, 1, t, h, w), device=mask.device)
+            time_filter = torch.ones((1, 1, temporal_kernel, 1, 1), device=mask.device)
         time_count = F.conv3d(flat, time_filter, padding=time_padding)
-        time_denominator = F.conv3d(ones, time_filter, padding=time_padding)
+        time_denominator = cached_time_denominator if cache else F.conv3d(ones, time_filter, padding=time_padding)
         time_coverage = (time_count / time_denominator).reshape(b, c, t, h, w)
 
-        space_filter = torch.ones(
-            (1, 1, 1, spatial_kernel, spatial_kernel), device=mask.device
-        )
-        space_filter[..., spatial_kernel // 2, spatial_kernel // 2] = 0
         space_padding = (0, spatial_kernel // 2, spatial_kernel // 2)
+        if cache:
+            space_filter = cached_space_filter
+        else:
+            space_filter = torch.ones((1, 1, 1, spatial_kernel, spatial_kernel), device=mask.device)
+            space_filter[..., spatial_kernel // 2, spatial_kernel // 2] = 0
         space_count = F.conv3d(flat, space_filter, padding=space_padding)
-        space_denominator = F.conv3d(ones, space_filter, padding=space_padding)
+        space_denominator = cached_space_denominator if cache else F.conv3d(ones, space_filter, padding=space_padding)
         space_coverage = (space_count / space_denominator.clamp_min(1)).reshape(
             b, c, t, h, w
         )
         empty_neighbors = (space_denominator == 0).expand(b * c, 1, t, h, w)
         no_space_observation = (space_count == 0) & ~empty_neighbors
 
-        index = torch.arange(t, device=mask.device).reshape(1, 1, t, 1, 1)
+        index = cached_index if cache else torch.arange(t, device=mask.device).reshape(1, 1, t, 1, 1)
         previous = torch.where(visible, index, -1).cummax(dim=2).values
         next_visible = torch.where(visible, index, t).flip(2).cummin(dim=2).values.flip(2)
         no_previous = previous < 0
@@ -619,10 +624,14 @@ class TemporalSpatialCoE(nn.Module):
         return tuple(pool[name] for name in self.expert_names)
 
     def _observation_support(self, mask: torch.Tensor) -> torch.Tensor:
-        return compute_observation_support(mask, self.temporal_kernel, self.spatial_kernel).to(mask.dtype)
+        from ..performance import enabled
+        return compute_observation_support(mask, self.temporal_kernel, self.spatial_kernel, cache=enabled(self,"cache_constants")).to(mask.dtype)
 
     def _position(self, x: torch.Tensor) -> torch.Tensor:
         b, _, t, h, w = x.shape
+        from ..performance import enabled, coordinates as cached_coordinates
+        if enabled(self,"cache_constants"):
+            return self.position_projection(cached_coordinates(x.device,x.dtype,t,h,w).unsqueeze(0)).expand(b,-1,-1,-1,-1)
         axes = [
             torch.linspace(-1, 1, size, device=x.device, dtype=x.dtype)
             if size > 1

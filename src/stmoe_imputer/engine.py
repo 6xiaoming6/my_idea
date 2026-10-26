@@ -15,6 +15,7 @@ from .routing_metrics import CoERoutingMetricAccumulator, RoutingMetricAccumulat
 from .models.registry import resolve_architecture
 from .partner_study import partner_candidate_loss
 from .utils.device import move_batch_to_device
+from .performance import enabled as perf, sample_batch, append_scalars
 
 
 
@@ -507,9 +508,9 @@ def train_one_epoch(
     is_coe = resolve_architecture(cfg) in ("v24_ts_coe", "v25_observed_multiscale_coe")
     logs: dict[str, list[float]] = defaultdict(list)
     exact_metrics = {
-        "": MaskedMetricAccumulator(),
-        "_shared_aux": MaskedMetricAccumulator(),
-        "_route_aux": MaskedMetricAccumulator(),
+        "": MaskedMetricAccumulator(pack_scalars=perf(core_model.main_branch,"pack_scalar_logs")),
+        "_shared_aux": MaskedMetricAccumulator(pack_scalars=perf(core_model.main_branch,"pack_scalar_logs")),
+        "_route_aux": MaskedMetricAccumulator(pack_scalars=perf(core_model.main_branch,"pack_scalar_logs")),
     }
     active_exact_metrics = {""}
     routing_metrics = _routing_accumulator(cfg)
@@ -536,7 +537,9 @@ def train_one_epoch(
         raise ValueError("train.partner_probe.grad_diagnostic_interval_batches must be nonnegative")
     total_epochs = int(total_epochs or cfg["train"]["epochs"])
     progress = tqdm(loader, desc=f"train epoch {epoch}/{total_epochs}", leave=True, disable=not show_progress)
+    diagnostic_batches = 0
     for batch_index, batch in enumerate(progress):
+        collect = sample_batch(core_model.main_branch,batch_index,len(loader))
         if training_context is not None:
             training_context.record_batch(batch)
         batch = move_batch_to_device(batch, device)
@@ -545,6 +548,7 @@ def train_one_epoch(
         ).any()):
             skipped_empty_batches += 1
             continue
+        diagnostic_batches += int(collect)
         seen_samples += int(batch["x_f_gt"].shape[0])
         optimizer.zero_grad(set_to_none=True)
         weighted_ranking = None
@@ -552,7 +556,7 @@ def train_one_epoch(
         if four_direction:
             core_model.main_branch.prepare_training_batch(batch)
         with torch.autocast(device_type=device.type, enabled=use_amp):
-            outputs = model(batch)
+            outputs = model(batch, collect_diagnostics=collect) if perf(core_model.main_branch) else model(batch)
             loss, loss_dict = compute_main_stage_loss(outputs, batch, cfg, epoch=epoch)
             if training_context is not None:
                 extra, extra_logs = training_context.extra_loss(core_model, batch, outputs)
@@ -607,7 +611,7 @@ def train_one_epoch(
         grad_clip = cfg["train"].get("grad_clip_norm")
         if grad_clip or is_coe:
             scaler.unscale_(optimizer)
-        if is_coe:
+        if is_coe and collect:
             for step, router in enumerate(core_model.main_branch.routers):
                 gradients = [p.grad.detach().float().square().sum()
                              for p in router.parameters() if p.grad is not None]
@@ -646,7 +650,7 @@ def train_one_epoch(
                 if gradients:
                     logs["coe_acceptance_head_grad_norm"].append(
                         float(torch.stack(gradients).sum().sqrt().cpu()))
-        if training_context is not None:
+        if training_context is not None and collect:
             for group in ('adapter','feedback','coverage'):
                 gs=[p.grad.detach().float().square().sum() for n,p in core_model.main_branch.named_parameters()
                     if n.startswith(group) and p.grad is not None]
@@ -679,17 +683,23 @@ def train_one_epoch(
                 outputs["x_hat_route"], batch["x_f_gt"], batch["m_f"], target_mask=batch.get("target_mask")
             )
             active_exact_metrics.add("_route_aux")
-        for key, value in {**loss_dict, **metrics}.items():
-            logs[key].append(float(value.detach().cpu()))
-        _append_model_diagnostics(logs, outputs)
-        if coe_quality is not None:
+        if perf(core_model.main_branch,'pack_scalar_logs'):
+            append_scalars(logs,{**loss_dict,**metrics})
+        else:
+            for key, value in {**loss_dict, **metrics}.items():
+                logs[key].append(float(value.detach().cpu()))
+        if collect:_append_model_diagnostics(logs, outputs)
+        if coe_quality is not None and collect:
             coe_quality.update(outputs, batch)
         if is_coe and 'mask_family' in batch:
             # Labels are introduced after forward and used only for diagnostics.
             outputs['coe']['mask_family'] = batch['mask_family'].repeat_interleave(outputs['coe'].get('routing_region_count', 1))
-        _update_routing_metrics(routing_metrics, outputs)
+        if collect:_update_routing_metrics(routing_metrics, outputs)
         _append_lr_logs(logs, optimizer)
         progress.set_postfix(loss=logs["loss"][-1], mae=logs["mae"][-1], rmse=logs["rmse"][-1])
+        if perf(core_model.main_branch):
+            del outputs,loss,loss_dict,metrics,batch,task_loss
+            if training_context is not None:del extra,extra_logs
     logs, exact_metrics, active_exact_metrics, routing_metrics, coe_quality, counters = _distributed_merge(
         logs, exact_metrics, active_exact_metrics, routing_metrics, coe_quality,
         {"optimizer_steps": optimizer_steps, "seen_samples": seen_samples,
@@ -700,6 +710,10 @@ def train_one_epoch(
     skipped_empty_batches = counters["skipped_empty_batches"]
     skipped_amp_steps = counters["skipped_amp_steps"]
     result = _mean_logs(logs)
+    if perf(core_model.main_branch):
+        result['train_diagnostic_batches'] = float(diagnostic_batches)
+        result['train_diagnostic_total_batches'] = float(len(loader))
+        result['train_diagnostic_interval'] = float(core_model.main_branch.performance['diagnostic_interval'])
     if is_coe:
         result.update({
             "train_optimizer_steps": float(optimizer_steps),

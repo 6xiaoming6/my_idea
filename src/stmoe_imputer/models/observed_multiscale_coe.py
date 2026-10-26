@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import torch
+from ..performance import enabled as perf, diagnostics as collect_diagnostics
 from torch import nn
 
 from .core_validation_coe import CoreValidationCoE
@@ -53,14 +54,15 @@ class ObservedMultiScaleCoE(CoreValidationCoE):
         try:
             out = super().forward(x_f=x_f,m_f=m_f,**kwargs)
             out['coe']['x_progress_diagnostics'] = True  # Diagnostics only; no round-wise supervision.
-            comp = torch.where(m_f.bool(),x_f,out['x_hat_main']).detach().float()
-            for name, (values,mask), factor in zip(('F','M','C'),observations,(1,2,4)):
-                out['coe']['diagnostics']['v25_observed_fraction_'+name] = mask.float().mean()
-                if factor>1:
-                    residual = (pool(comp,factor)-values.detach().float()).abs()*mask
-                    multiplier = factor**2 if self.observation_pooling == 'sum' else 1
-                    key = 'v25_observed_'+self.observation_pooling+'_residual_'+name
-                    out['coe']['diagnostics'][key] = residual.sum()*multiplier/mask.sum().clamp_min(1)
+            if collect_diagnostics(self):
+                comp = torch.where(m_f.bool(),x_f,out['x_hat_main']).detach().float()
+                for name, (values,mask), factor in zip(('F','M','C'),observations,(1,2,4)):
+                    out['coe']['diagnostics']['v25_observed_fraction_'+name] = mask.float().mean()
+                    if factor>1:
+                        residual = (pool(comp,factor)-values.detach().float()).abs()*mask
+                        multiplier = factor**2 if self.observation_pooling == 'sum' else 1
+                        key = 'v25_observed_'+self.observation_pooling+'_residual_'+name
+                        out['coe']['diagnostics'][key] = residual.sum()*multiplier/mask.sum().clamp_min(1)
             return out
         finally:
             del self._observations
@@ -72,7 +74,7 @@ class ObservedMultiScaleCoE(CoreValidationCoE):
         for sid, ((values, native_mask),factor) in enumerate(zip(self._observations,(1,2,4))):
             # Pool normalized physical coordinates to retain region-center geometry.
             pos = pool(c['pos'],factor) if factor>1 else c['pos']
-            support = self._observation_support(native_mask)
+            support = c['support'] if sid==0 and perf(self,'reuse_fine_support') else self._observation_support(native_mask)
             pyramid.append((values,native_mask,support,pos))
             if sid and self.initial_observation_scales == 'FMC':
                 encoded = self.encoder(torch.cat((values,native_mask,support,pos),1))

@@ -61,6 +61,12 @@ class ReleaseContract(unittest.TestCase):
     def test_frozen_source_integrity(self):
         for name, digest in load(ROOT / 'docs/provenance.json')['unchanged_source_sha256'].items():
             self.assertEqual(hashlib.sha256((ROOT / name).read_bytes()).hexdigest(), digest, name)
+        provenance=load(ROOT/'docs/provenance.json')
+        for name, record in provenance.get('performance_modified_source_sha256',{}).items():
+            self.assertEqual(hashlib.sha256((ROOT/name).read_bytes()).hexdigest(),record['candidate_sha256'],name)
+            self.assertEqual(load(ROOT/'docs/provenance_original_i37.json')['unchanged_source_sha256'][name],record['reference_sha256'])
+        for name,digest in provenance.get('performance_added_source_sha256',{}).items():
+            self.assertEqual(hashlib.sha256((ROOT/name).read_bytes()).hexdigest(),digest,name)
 
     def test_forward_projection_no_target_leak_and_native_top2(self):
         torch.manual_seed(7)

@@ -11,6 +11,7 @@ import math
 
 import torch
 from torch import nn
+from ..performance import diagnostics as collect_diagnostics
 
 from .observed_multiscale_coe import ObservedMultiScaleCoE
 from .observed_history_coe import ObservedHistoryCoE
@@ -92,7 +93,7 @@ def project_observed_residual_regions(raw: torch.Tensor, weights: torch.Tensor,
                                       x_f: torch.Tensor, m_f: torch.Tensor,
                                       x_m: torch.Tensor, m_m: torch.Tensor,
                                       x_c: torch.Tensor, m_c: torch.Tensor,
-                                      pooling: str = 'sum'):
+                                      pooling: str = 'sum', collect_stats: bool = True):
     """Return (corrected F, detached scalar diagnostics), using observations only.
 
 For mean observations, the 2x2/4x4 means are converted to sums. All observed
@@ -147,6 +148,8 @@ region, so later corrections cannot undo an already satisfied M constraint.
     corrected = torch.where(mf, vf, corrected)
     constrained = assign_m | assign_c
     count_missing = (~mf).sum().clamp_min(1)
+    if not collect_stats:
+        return corrected, {}
     with torch.no_grad():
         stats = {
             'group_count_M': (mm & (fine_m.sum(-1) > 0)).sum().to(dtype),
@@ -242,7 +245,7 @@ class ObservedConsistencyCoE(ObservedMultiScaleCoE):
                                       _expand_cells(mm.float(), 2), _expand_cells(mc.float(), 4)), 1)
                 weights = (self.consistency_weight_bound * self.x_consistency(features).tanh()).exp()
             corrected, stats = project_observed_residual_regions(
-                raw, weights, x_f, m_f, x_m, m_m, x_c, m_c, pooling=self.observation_pooling)
+                raw, weights, x_f, m_f, x_m, m_m, x_c, m_c, pooling=self.observation_pooling, collect_stats=collect_diagnostics(self))
         out['x_hat_raw_consistency'] = out['x_hat_main']
         out['x_hat_main'] = corrected
         if hasattr(self, 'x_loss_mix_logit'):
@@ -261,7 +264,7 @@ class ObservedConsistencyCoE(ObservedMultiScaleCoE):
                 info[key] = [*info[key][:-1], torch.where(mf, 0., (corrected - previous).abs())]
         for key, value in stats.items():
             info['diagnostics']['v25_consistency_' + key] = value
-        for name in ('M', 'C'):
+        for name in (('M', 'C') if stats else ()):
             key = 'observed_' + self.observation_pooling + '_residual_' + name
             info['diagnostics']['v25_' + key] = stats['after_' + key]
         return out

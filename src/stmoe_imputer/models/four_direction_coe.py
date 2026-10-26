@@ -10,6 +10,7 @@ import math
 import time
 from itertools import permutations
 import torch
+from ..performance import enabled as perf, diagnostics as collect_diagnostics
 from torch import nn
 from torch.nn import functional as F
 from .temporal_spatial_coe import TemporalSpatialCoE, SUPPORT_FEATURE_NAMES
@@ -104,7 +105,9 @@ class FourDirectionCoE(TemporalSpatialCoE):
         mask=obs.to(x.dtype);x=torch.where(obs,x,torch.zeros_like(x));support=self._observation_support(mask)
         miss=1-mask;sm=miss.repeat(1,len(SUPPORT_FEATURE_NAMES),1,1,1)
         ss=torch.cat((support.mean((2,3,4)),support.std((2,3,4),unbiased=False),support.amax((2,3,4)),self._missing_pool(support,sm)),1)
-        pos=self._position(x);h=self.encoder(torch.cat((x,mask,support,pos),1));pred=self.decoder(h)
+        pos=self._position(x);h=self.encoder(torch.cat((x,mask,support,pos),1))
+        # ObservedMultiScaleCoE immediately replaces these predictions after FMC fusion.
+        pred=h.new_zeros((len(x),self.c_in,*x.shape[2:])) if perf(self,"skip_redundant_init") else self.decoder(h)
         ctx={'h':h,'h0':h,'prev':h,'has_prev':False,'x':x,'mask':mask,'support':support,'ss':ss,'pos':pos,
              'initial_prediction':pred,'completion':torch.where(obs,x,pred),'last_prediction':pred,
              'counts':x.new_zeros((len(x),3)),'last_scale':x.new_zeros((len(x),3)),
@@ -273,7 +276,12 @@ class FourDirectionCoE(TemporalSpatialCoE):
         next_h=update*coefficient[:,None,None,None,None].to(update.dtype)
         if self.memory=='residual':
             keep=self.keep_logits[step].sigmoid();next_h=keep*h+(1-keep)*next_h
-        pred=self.decoder(next_h);change=torch.where(c['mask'].bool(),torch.zeros_like(pred),(pred-c['last_prediction']).abs())
+        # Only P0 and P4 feed the I37 task gradient; P1-P3 are detached history.
+        if self.training and step<3 and perf(self,'no_grad_intermediate'):
+            with torch.no_grad():pred=self.decoder(next_h)
+        else:pred=self.decoder(next_h)
+        change=(torch.where(c['mask'].bool(),torch.zeros_like(pred),(pred-c['last_prediction']).abs())
+                if collect_diagnostics(self) else torch.empty(0,device=pred.device,dtype=pred.dtype))
         new=dict(c);new.update(h=next_h,prev=h,has_prev=True,last_prediction=pred,
             counts=c['counts']+active.to(c['counts'].dtype),last_scale=sw.detach(),
             last_ids=F.one_hot(ids,self.num_experts).flatten(1).to(h.dtype),last_within=ew.gather(1,ids),
@@ -283,9 +291,9 @@ class FourDirectionCoE(TemporalSpatialCoE):
         if self.memory=='gru':new['gru']=self.memory_gru(torch.cat((self.summary(next_h,c['mask']),self.summary(next_h-h,c['mask'])),1),c['gru'].to(next_h.dtype))
         row={'prediction':pred,'change':change,'logits':logits,'probs':logits.float().softmax(1),'weights':ew,
              'ids':ids,'importance':importance,'scale_weights':sw,'scale_probs':sp,'active':active,
-             'gate':gate,'input_delta':(corrected-h).detach().float().abs().mean(),
+             'gate':gate,'input_delta':((corrected-h).detach().float().abs().mean() if collect_diagnostics(self) else h.new_zeros(())),
              'route_delta':route.detach().float().abs().mean(),'memory_norm':(c['message'] if self.memory=='message' else c['gru']).detach().float().norm(dim=1).mean(),
-             'cache_age':c['ages'].detach().float().mean(),'delta':(next_h-h).detach().float().abs().mean(),'scale_record':scale_record,'pair_record':pair_record}
+             'cache_age':c['ages'].detach().float().mean(),'delta':((next_h-h).detach().float().abs().mean() if collect_diagnostics(self) else h.new_zeros(())),'scale_record':scale_record,'pair_record':pair_record}
         return new,row
 
     def forward(self,x_f,m_f,**kwargs):
@@ -308,9 +316,9 @@ class FourDirectionCoE(TemporalSpatialCoE):
             diagnostics[f'step{i}_pair_vs_top2_disagreement_rate']=(r['ids']!=r['logits'].topk(2,1).indices.sort(1).values).any(1).float().mean()
         coe={'predictions':predictions,'initial_prediction':initial,'initial_completion':ctx['completion'],
              'candidate_predictions':predictions,'candidate_changes':[r['change'] for r in rows],
-             'changes':[r['change'] for r in rows], 'acceptance_weights':torch.ones_like(torch.stack(predictions,1)),
-             'completions':[torch.where(ctx['mask'].bool(),ctx['x'],p) for p in predictions],
-             'candidate_completions':[torch.where(ctx['mask'].bool(),ctx['x'],p) for p in predictions],
+             'changes':[r['change'] for r in rows], 'acceptance_weights':(torch.ones_like(torch.stack(predictions,1)) if collect_diagnostics(self) else None),
+             'completions':([torch.where(ctx['mask'].bool(),ctx['x'],p) for p in predictions] if collect_diagnostics(self) else []),
+             'candidate_completions':([torch.where(ctx['mask'].bool(),ctx['x'],p) for p in predictions] if collect_diagnostics(self) else []),
              'selected_experts':ids,'pair_ids':a*(2*self.num_experts-a-1)//2+b-a-1,
              'route_logits':stack('logits'),'route_probs':stack('probs'),'route_weights':weights,'route_importance':stack('importance'),
              'paths':weights.argmax(2),'paths_are_discrete':True,'routing_mode':'hard','configured_routing_mode':'hard',
@@ -320,6 +328,9 @@ class FourDirectionCoE(TemporalSpatialCoE):
              'triscale_choices':stack('scale_weights').detach().argmax(2),'triscale_probabilities':stack('scale_probs'),
              'triscale_executed':stack('active'),'triscale_weights':stack('scale_weights')}
         output={'x_hat_main':predictions[-1],'h_st_aux':ctx['h'],'coe':coe,'diagnostics':{'coe':diagnostics}}
+        if perf(self,'compact_outputs') and not collect_diagnostics(self):
+            for key in ('candidate_completions','completions','candidate_changes','changes','acceptance_weights'):
+                coe.pop(key,None)
         if capture is not None:output['four_probe']={'context':capture,'step':request[0],'ids':request[1], 'record':rows[request[0]]}
         return output
 

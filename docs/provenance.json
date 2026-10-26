@@ -2,15 +2,13 @@
   "method": "I37",
   "source_commit": "147b8c0bdb8266423ebe345d5674c8714ac30d70",
   "frozen_suite": "f84c43ccee2d4261",
-  "source_kind": "experiment frozen snapshot; not the dirty v25 workspace",
+  "source_kind": "Original I37 release plus explicitly tracked opt-in execution optimizations; numerical equivalence is separately tested.",
   "unchanged_source_sha256": {
     "src/stmoe_imputer/coordination.py": "c9a0cc4c03a17671f99c3730c82dc5e797256655eebc6fa29f5cfeedd9feae35",
     "src/stmoe_imputer/backbone_training.py": "fc628ce2428fad1610f6c8d333b71893490296ead48bc83a3b17bb7d570ad654",
     "src/stmoe_imputer/routing_metrics.py": "a162027bfc4c9d12eec38bab691bc16b48e55e9f08455565560e98d4ffc9abff",
-    "src/stmoe_imputer/engine.py": "c6901378b308c4e0f57c9700611427e9fedfacfa0f1d00d7a7ed1cd248e1abd2",
     "src/stmoe_imputer/partner_study.py": "ebaab5e2db4dc418c1603f5648475e5e5c7fc6d0c941440f45cc064ea2b9cc6c",
     "src/stmoe_imputer/losses.py": "0ebe47c53cf7868a33e373bc638bc590c94335e37fa611601aa9305299f08647",
-    "src/stmoe_imputer/metrics.py": "46630ecbeeb96b37d132b3e58c6f70bf584feada649892e9ce19f273fb20e5bf",
     "src/stmoe_imputer/config.py": "07d65db2fff5ca719d671557b609b07c751a8fd2c18e7ee3a79b66983a6fe145",
     "src/stmoe_imputer/utils/checkpoint.py": "dc455a845c3c417f9c04c3fb42ddfb31e120cf4999ff48f17f6e172a3312bcab",
     "src/stmoe_imputer/utils/seed.py": "d5c42fea97dd899788162728af6c66ba7b66671f49382a8e30a3aa3969e1fc44",
@@ -30,17 +28,10 @@
     "src/stmoe_imputer/data/__init__.py": "a5a817005197fe4424daf161f1fca7e7fc96fc29ff15dcddc4961d7301e63c84",
     "src/stmoe_imputer/models/coe_router.py": "c74d7573d8673e5b006b6714390b27c5df545196c69005e886743fcc32940940",
     "src/stmoe_imputer/models/history_plane_interaction_coe.py": "7a1cec07653ec223232cb29161753112f7c4074d479d7951940576b84d8d32b3",
-    "src/stmoe_imputer/models/four_direction_coe.py": "5b9a0f863f4df5facd77141599f94bf66d8d0d758c820f2c34045caa7cca0db1",
     "src/stmoe_imputer/models/coe_pattern_experts.py": "b45acee9756bc2e4d9f7e5888b6cecda7df8bef2783b84f68e71ab908ba90492",
-    "src/stmoe_imputer/models/observed_history_coe.py": "9a63ee2298e89a5fa9be45e0d535e4efc48b2d35d013a2a061ca079f36f761e0",
     "src/stmoe_imputer/models/id_priority_coe.py": "4aef490f88d53da820ddc90d4d3f4968a6a231d629bb8f3a65d242bd32b7eb65",
-    "src/stmoe_imputer/models/scale_delta_exploration_coe.py": "9cf00371a7a4b05b4b5cedeecf352da606a05e1f0dec2d010f21d3e9a07cbd18",
-    "src/stmoe_imputer/models/temporal_spatial_coe.py": "89c6de6235b7387670cf8bf3ded28e282e95536a70b27032ad03268ad01f1960",
-    "src/stmoe_imputer/models/observed_multiscale_coe.py": "78fbc4c475d5ef592b098bb2c2460ca12c4ad801c3c12cb1098992cf9c8d2819",
-    "src/stmoe_imputer/models/observed_consistency_coe.py": "c6c2b68dac79c5901f9ea4d09dc46de1e0dfccbe5577f9267866888edf4cce5b",
     "src/stmoe_imputer/models/core_validation_coe.py": "52cba14a0d2303c2016bb1932934ab030244d9d4cff4df90d24be639c42a4adc",
     "src/stmoe_imputer/models/local_support_coe.py": "99800b9a545882aa65493325582a01d75201d725a938a0961d791b1724d1bffc",
-    "src/stmoe_imputer/models/imputer.py": "e7dae88ac72be1410991e07210c0ed7c587cbd654fa039670183ed5e30c65b00",
     "src/stmoe_imputer/models/aux_branch.py": "f64f568cd7be99a95a86e868077e57716fe4b9ff9d45cb83c5813f5f790a76e0",
     "src/stmoe_imputer/models/backbone_exploration_coe.py": "5743cfbb6237e3a41201188dc6597ecd009d286abbf21947499d72cd785bebdf",
     "src/stmoe_imputer/models/spatial_scale_coe.py": "6f427562b07a3ed9dcf05a3edbf2ad18d0228c22c817b76be863df1f19e33c69"
@@ -54,5 +45,47 @@
   ],
   "reference_initialization_file_sha256": "767506aba67a870a0a509ea1492f62fde6669bc584c2c4fe0092d1dac4a43532",
   "reference_initialization_state_sha256": "2baf7361f1aa2308e5f2a55c07fd657e7d5feea87dd296ca071406aec3179f99",
-  "parameter_count": 347930
+  "parameter_count": 347930,
+  "performance_modified_source_sha256": {
+    "src/stmoe_imputer/engine.py": {
+      "reference_sha256": "c6901378b308c4e0f57c9700611427e9fedfacfa0f1d00d7a7ed1cd248e1abd2",
+      "candidate_sha256": "fecee38393699d6b4f4722c18c2a9bb6b52f1fff2e2cbf51d9a97130f9646369"
+    },
+    "src/stmoe_imputer/metrics.py": {
+      "reference_sha256": "46630ecbeeb96b37d132b3e58c6f70bf584feada649892e9ce19f273fb20e5bf",
+      "candidate_sha256": "0cb5a3cef41c2ca53063ef991afcd77d5a9beab885f7fdf7c20c3d3b5c9c6b67"
+    },
+    "src/stmoe_imputer/models/four_direction_coe.py": {
+      "reference_sha256": "5b9a0f863f4df5facd77141599f94bf66d8d0d758c820f2c34045caa7cca0db1",
+      "candidate_sha256": "e3ee4d421776888285bda5bdfd2b9843c2399f16e251317d94a0abe01239e1bb"
+    },
+    "src/stmoe_imputer/models/observed_history_coe.py": {
+      "reference_sha256": "9a63ee2298e89a5fa9be45e0d535e4efc48b2d35d013a2a061ca079f36f761e0",
+      "candidate_sha256": "2c9006e5666481e1acdbfca124c5738672d2639ff1769f972a42c543636c01d6"
+    },
+    "src/stmoe_imputer/models/scale_delta_exploration_coe.py": {
+      "reference_sha256": "9cf00371a7a4b05b4b5cedeecf352da606a05e1f0dec2d010f21d3e9a07cbd18",
+      "candidate_sha256": "d0657e2b8e8cf029bfbb5ddb342a51ad756304792050682335e49aa6bc8cda89"
+    },
+    "src/stmoe_imputer/models/temporal_spatial_coe.py": {
+      "reference_sha256": "89c6de6235b7387670cf8bf3ded28e282e95536a70b27032ad03268ad01f1960",
+      "candidate_sha256": "a1fefe7d4639fc7c6a0cca84de0965b15a0628a8afd1a41a7fc30a1955371b2e"
+    },
+    "src/stmoe_imputer/models/observed_multiscale_coe.py": {
+      "reference_sha256": "78fbc4c475d5ef592b098bb2c2460ca12c4ad801c3c12cb1098992cf9c8d2819",
+      "candidate_sha256": "56a36f402c2208f7e68e77bfc6da95ae61cce5ea1d39ab24cd549b150b11f1f4"
+    },
+    "src/stmoe_imputer/models/observed_consistency_coe.py": {
+      "reference_sha256": "c6c2b68dac79c5901f9ea4d09dc46de1e0dfccbe5577f9267866888edf4cce5b",
+      "candidate_sha256": "8615e24068ceca530b1da369a4614d2bd089aa18c9ea3e1c196c3fdf9e8f6468"
+    },
+    "src/stmoe_imputer/models/imputer.py": {
+      "reference_sha256": "e7dae88ac72be1410991e07210c0ed7c587cbd654fa039670183ed5e30c65b00",
+      "candidate_sha256": "ed45011d17ed06eff20198b965c2b1e91f4b9a2aa4f6537fb48aa81610302e8a"
+    }
+  },
+  "performance_added_source_sha256": {
+    "src/stmoe_imputer/performance.py": "14052cc2ed425ba2d8bbc4b7726a709cf7e7523afc66c50651ed7f192e7b6163"
+  },
+  "performance_base_commit": "6caef6740bc00013a65d70dd0a98083648e1f88d"
 }

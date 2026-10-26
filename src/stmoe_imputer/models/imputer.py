@@ -26,14 +26,17 @@ class DualBranchSTImputer(nn.Module):
         main_branch = build_model_backbone(cfg)
         aux_branch = NullResidualBranch(c_out=cfg["model"]["c_in"])
         aux_cfg = cfg["model"].get("aux", {})
-        return cls(
+        model = cls(
             main_branch=main_branch,
             aux_branch=aux_branch,
             aux_enabled=aux_cfg.get("enabled", False),
             alpha_init=aux_cfg.get("alpha_init", 0.0),
         )
+        from ..performance import configure
+        configure(model.main_branch, cfg)
+        return model
 
-    def forward(self, batch: dict[str, torch.Tensor]) -> dict:
+    def forward(self, batch: dict[str, torch.Tensor], *, collect_diagnostics: bool = True) -> dict:
         inputs = {"x_f": batch["x_f_obs"], "m_f": batch["m_f"]}
         for key in ("forced_partner_step", "forced_partner_ids",
                     "forced_pair_step", "forced_pair_indices"):
@@ -45,7 +48,12 @@ class DualBranchSTImputer(nn.Module):
                 x_c=batch["x_c_obs"], m_c=batch["m_c"],
                 r_m=batch.get("r_m"), r_c=batch.get("r_c"),
             )
-        main_outputs = self.main_branch(**inputs)
+        previous = getattr(self.main_branch, "_collect_diagnostics", True)
+        self.main_branch._collect_diagnostics = collect_diagnostics
+        try:
+            main_outputs = self.main_branch(**inputs)
+        finally:
+            self.main_branch._collect_diagnostics = previous
         x_hat_main = main_outputs["x_hat_main"]
         h_st_aux = main_outputs["h_st_aux"]
         if self.aux_enabled:

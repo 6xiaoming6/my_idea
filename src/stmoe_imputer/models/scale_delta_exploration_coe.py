@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import copy
 import torch
+from ..performance import diagnostics as collect_diagnostics
 from torch.nn import functional as F
 
 from .observed_multiscale_coe import ObservedMultiScaleCoE
@@ -149,7 +150,7 @@ class ScaleDeltaExplorationCoE(ObservedMultiScaleCoE):
             raise RuntimeError('Executed expert set differs from configured Top-k')
         actual = row['weights'].topk(self.step_top_k[step],1).indices.sort(1).values
         with torch.no_grad():
-            if step+1 in self.delta_steps:
+            if collect_diagnostics(self) and step+1 in self.delta_steps:
                 delta = (c['h']-c['prev']).float()
                 rms = delta.square().mean((2,3,4)).sqrt()
                 ratio = c['h'].detach().float().square().mean((2,3,4)).sqrt()/rms.clamp_min(1e-6)

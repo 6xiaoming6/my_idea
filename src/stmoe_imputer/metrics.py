@@ -14,8 +14,9 @@ class MaskedMetricAccumulator:
     split.
     """
 
-    def __init__(self, eps: float = 1e-6) -> None:
+    def __init__(self, eps: float = 1e-6, pack_scalars: bool = False) -> None:
         self.eps = float(eps)
+        self.pack_scalars = pack_scalars
         self.absolute_error = 0.0
         self.squared_error = 0.0
         self.absolute_percentage_error = 0.0
@@ -35,6 +36,16 @@ class MaskedMetricAccumulator:
         selected = supervision_mask(target, mask, target_mask)
         diff_abs = (pred[selected].float() - target[selected].float()).abs()
         target_abs = target[selected].float().abs()
+        if self.pack_scalars:
+            totals=torch.stack((diff_abs.sum().double(), diff_abs.square().sum().double(),
+                (diff_abs / target_abs.clamp_min(self.eps)).sum().double(),
+                target_abs.sum().double(), selected.sum().double())).cpu().tolist()
+            self.absolute_error += totals[0]
+            self.squared_error += totals[1]
+            self.absolute_percentage_error += totals[2]
+            self.absolute_target += totals[3]
+            self.count += totals[4]
+            return
         self.absolute_error += float(diff_abs.sum().double().cpu())
         self.squared_error += float(diff_abs.square().sum().double().cpu())
         self.absolute_percentage_error += float(

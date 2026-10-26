@@ -1,6 +1,7 @@
 """v25 observations with the existing X05 prediction-history reader only."""
 import math
 import torch
+from ..performance import enabled as perf, diagnostics as collect_diagnostics
 
 from .observed_multiscale_coe import ObservedMultiScaleCoE
 from .history_plane_interaction_coe import HistoryReader
@@ -45,8 +46,8 @@ class ObservedHistoryCoE(ObservedMultiScaleCoE):
             if self.history_gain != 1.0:
                 delta = delta * self.history_gain
             corrected = corrected + delta
-            stats['pool_delta_abs'] = delta.detach().float().abs().mean()
-            for i in range(len(c['x_pool'])):
+            if collect_diagnostics(self):stats['pool_delta_abs'] = delta.detach().float().abs().mean()
+            for i in (range(len(c['x_pool'])) if collect_diagnostics(self) else ()):
                 stats[f'pool_weight_P{i+1}'] = weights[:, i].detach().mean()
         c['x_stats'] = stats
         return corrected, route, gate
@@ -54,8 +55,9 @@ class ObservedHistoryCoE(ObservedMultiScaleCoE):
     def _round(self, c, step, *args, **kwargs):
         new, row = super()._round(c, step, *args, **kwargs)
         self._x_stats.append(c['x_stats'])
-        pred = torch.where(c['mask'].bool(), c['x'], row['prediction']).detach()
-        new['x_pool'] = c['x_pool'] + [pred]
+        if not (perf(self,"skip_last_history") and step==3):
+            pred = torch.where(c['mask'].bool(), c['x'], row['prediction']).detach()
+            new['x_pool'] = c['x_pool'] + [pred]
         return new, row
 
     def forward(self, *args, **kwargs):
