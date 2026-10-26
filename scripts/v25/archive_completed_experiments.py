@@ -65,7 +65,7 @@ def export():
   index[batch]=dict(path=batch,original_suite=relative,new_trainings=len(list((suite/'results').glob('*.json'))),
    evaluated_models={g:len(v) for g,v in groups.items()},report=str(formal.relative_to(ROOT)))
   with (target/'summary.csv').open('w',newline='') as f:
-   writer=csv.writer(f);writer.writerow(['variant','id_mae','id_rmse','binary_mae','geometry_mae','triple_mae','ood_three_category_mean'])
+   writer=csv.writer(f,lineterminator="\n");writer.writerow(['variant','id_mae','id_rmse','binary_mae','geometry_mae','triple_mae','ood_three_category_mean'])
    for name,r in sorted(groups['evaluations'].items()):
     m=r['sets']['in_distribution']['metrics'];c=category_metrics(r,'mae');writer.writerow([name,m['mae'],m['rmse'],*c,sum(c)/3])
  write(destination/'index.json',dict(baseline='I37',decision_date='2026-10-26',batches=index))
