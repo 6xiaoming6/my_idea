@@ -1,6 +1,6 @@
 # I37：多尺度观测驱动的共享专家补全
 
-本分支为 **best-perf候选**：默认保留原计算，优化需显式启用，并通过严格逐位和性能验收。[优化说明](docs/performance.md)。原best提交及其源码另行保留。
+`best` 已整合通过完整100轮严格等价验收的可选性能优化。默认配置保留兼容路径；使用 `configs/i37_performance.json` 显式启用优化。原实现可通过提交 `6caef674` 追溯。[优化说明与实测结果](docs/performance.md)。
 
 这是 **I37 的独立复现发布版**，从实验冻结源码整理而来，提供数据准备、训练与断点恢复、六套缺失协议评估和独立推理。`best` 是发布分支名，不表示已经证明全局最优。
 
@@ -80,6 +80,16 @@ outputs/i37_seed7/
   result.json                   # 训练完成凭据
   evaluation.json, summary.md   # 六套统一测试及简表
 ```
+
+## 启用已验收的性能优化
+
+```bash
+python -u scripts/train.py \
+  --data-dir data/taxibj --run-dir outputs/i37_perf_seed7 \
+  --config configs/i37_performance.json --gpu 1 --threads 2 --evaluate
+```
+
+本机同条件下，完整100轮训练/验证累计耗时减少6.11%，峰值allocated显存减少11.66%；逐轮主指标、best/last权重、优化器及随机状态、六套ID/OOD结果均完全一致。训练诊断按首批、末批及每20批采集，主损失和指标仍完整统计，验证与测试完整。不要用新配置接管旧run；原配置和完整检查点继续保留。
 
 ## 单独评估和推理
 
