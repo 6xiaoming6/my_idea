@@ -1,0 +1,227 @@
+{
+  "verification": {
+    "status": "passed",
+    "base_commit": "6caef6740bc00013a65d70dd0a98083648e1f88d",
+    "candidate_commit": "d920258a744dc5074d781b7e4a1d4030f9e21146",
+    "epochs": 100,
+    "strict_primary_curves": true,
+    "checkpoints": {
+      "best": {
+        "model": true,
+        "optimizer": true,
+        "scheduler": true,
+        "scaler": true,
+        "rng_states": true
+      },
+      "last": {
+        "model": true,
+        "optimizer": true,
+        "scheduler": true,
+        "scaler": true,
+        "rng_states": true
+      }
+    },
+    "gpu_preflight_groups": [
+      {
+        "name": "gpu_cache_constants",
+        "cases": 8
+      },
+      {
+        "name": "gpu_combined",
+        "cases": 8
+      },
+      {
+        "name": "gpu_compact_outputs",
+        "cases": 8
+      },
+      {
+        "name": "gpu_diagnostics",
+        "cases": 8
+      },
+      {
+        "name": "gpu_no_grad_intermediate",
+        "cases": 8
+      },
+      {
+        "name": "gpu_pack_scalar_logs",
+        "cases": 8
+      },
+      {
+        "name": "gpu_reference",
+        "cases": 8
+      },
+      {
+        "name": "gpu_reuse_fine_support",
+        "cases": 8
+      },
+      {
+        "name": "gpu_skip_last_history",
+        "cases": 8
+      },
+      {
+        "name": "gpu_skip_redundant_init",
+        "cases": 8
+      }
+    ],
+    "full_training": {
+      "baseline_train_val_seconds": 4644.7336344579235,
+      "optimized_train_val_seconds": 4360.735007595911,
+      "time_reduction_percent": 6.11442225136678,
+      "baseline_train_seconds": 4582.836960747169,
+      "optimized_train_seconds": 4299.556348441285,
+      "baseline_peak_allocated_gib": 11.146291732788086,
+      "optimized_peak_allocated_gib": 9.846848011016846,
+      "memory_reduction_percent": 11.658081027511402,
+      "diagnostic_batches_per_epoch": 5,
+      "total_batches_per_epoch": 77
+    }
+  },
+  "benchmark": {
+    "step_time_ratio": 0.9427319032385043,
+    "allocated_ratio": 0.8674128662582398,
+    "meets_predeclared_benefit": true,
+    "baseline": {
+      "seconds_per_step": 0.612677758350037,
+      "peak_allocated_gib": 9.545609474182129,
+      "peak_reserved_gib": 10.337890625
+    },
+    "optimized": {
+      "seconds_per_step": 0.5775908692012308,
+      "peak_allocated_gib": 8.279984474182129,
+      "peak_reserved_gib": 8.822265625
+    }
+  },
+  "comparison": {
+    "status": "finished",
+    "verdict": "exact_reproduction",
+    "initialization_match": true,
+    "checkpoint_comparison": {
+      "best": {
+        "exact": true,
+        "max_abs_difference": 0.0,
+        "reference_epoch": 95,
+        "replay_epoch": 95
+      },
+      "last": {
+        "exact": true,
+        "max_abs_difference": 0.0,
+        "reference_epoch": 100,
+        "replay_epoch": 100
+      }
+    },
+    "curve_max_abs_difference": {
+      "train_loss": 0.0,
+      "train_mae": 0.0,
+      "train_rmse": 0.0,
+      "val_loss": 0.0,
+      "val_mae": 0.0,
+      "val_rmse": 0.0
+    },
+    "evaluation": [
+      {
+        "protocol": "in_distribution",
+        "reference_mae": 8.051041961938529,
+        "replay_mae": 8.051041961938529,
+        "reference_rmse": 14.660255818624048,
+        "replay_rmse": 14.660255818624048,
+        "mae_delta": 0.0,
+        "rmse_delta": 0.0
+      },
+      {
+        "protocol": "unseen_combinations",
+        "reference_mae": 8.310507159997899,
+        "replay_mae": 8.310507159997899,
+        "reference_rmse": 14.753400727042598,
+        "replay_rmse": 14.753400727042598,
+        "mae_delta": 0.0,
+        "rmse_delta": 0.0
+      },
+      {
+        "protocol": "unseen_geometry",
+        "reference_mae": 10.821156783422856,
+        "replay_mae": 10.821156783422856,
+        "reference_rmse": 18.4873839301614,
+        "replay_rmse": 18.4873839301614,
+        "mae_delta": 0.0,
+        "rmse_delta": 0.0
+      },
+      {
+        "protocol": "unseen_triple",
+        "reference_mae": 7.892074066143535,
+        "replay_mae": 7.892074066143535,
+        "reference_rmse": 13.917090116063457,
+        "replay_rmse": 13.917090116063457,
+        "mae_delta": 0.0,
+        "rmse_delta": 0.0
+      },
+      {
+        "protocol": "unseen_combinations_repeat",
+        "reference_mae": 8.284016608907294,
+        "replay_mae": 8.284016608907294,
+        "reference_rmse": 14.577802500124836,
+        "replay_rmse": 14.577802500124836,
+        "mae_delta": 0.0,
+        "rmse_delta": 0.0
+      },
+      {
+        "protocol": "unseen_geometry_repeat",
+        "reference_mae": 10.845945077994937,
+        "replay_mae": 10.845945077994937,
+        "reference_rmse": 18.49377020602803,
+        "replay_rmse": 18.49377020602803,
+        "mae_delta": 0.0,
+        "rmse_delta": 0.0
+      }
+    ],
+    "best_epoch_equal": true,
+    "tolerance": {
+      "metrics_absolute_tolerance": 0.0,
+      "rmse_absolute_tolerance": 0.0
+    },
+    "complete_training_state_equal": {
+      "best": {
+        "optimizer": true,
+        "scheduler": true,
+        "scaler": true,
+        "rng_states": true
+      },
+      "last": {
+        "optimizer": true,
+        "scheduler": true,
+        "scaler": true,
+        "rng_states": true
+      }
+    },
+    "performance": {
+      "step_time_ratio": 0.9427319032385043,
+      "allocated_ratio": 0.8674128662582398,
+      "meets_predeclared_benefit": true,
+      "baseline": {
+        "seconds_per_step": 0.612677758350037,
+        "peak_allocated_gib": 9.545609474182129,
+        "peak_reserved_gib": 10.337890625
+      },
+      "optimized": {
+        "seconds_per_step": 0.5775908692012308,
+        "peak_allocated_gib": 8.279984474182129,
+        "peak_reserved_gib": 8.822265625
+      }
+    },
+    "selection": {
+      "accepted": [
+        "skip_redundant_init",
+        "reuse_fine_support",
+        "no_grad_intermediate",
+        "compact_outputs",
+        "cache_constants",
+        "pack_scalar_logs",
+        "skip_last_history"
+      ],
+      "rejected": {},
+      "diagnostic_interval": 20,
+      "strict": true
+    }
+  },
+  "report": "/home/students/HuangMingYu/code/py/my_idea/my_idea/experments_report/20261026_v25_best-perf_I37严格等价与性能_核验报告.md",
+  "note": "Measured on one RTX3090/CUDA12.4/PyTorch2.6 environment; no cross-environment bitwise guarantee."
+}

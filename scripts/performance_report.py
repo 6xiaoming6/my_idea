@@ -34,9 +34,28 @@ def export_report(suite,plan,selection,benchmark):
  comparison['complete_training_state_equal']=extra;comparison['performance']=benchmark;comparison['selection']=selection;comparison['verdict']=verdict
  (suite/'comparison.json').write_text(json.dumps(comparison,ensure_ascii=False,indent=2)+'\n')
  text=report_path.read_text();text=text.replace('best分支I37同条件复跑','best-perf严格等价与性能复跑').replace('原I37','未优化best复跑')
+ text=text.replace(str(adapter),str(suite))
+ text=text.replace('--gpu 1 --threads 2 --evaluate',f'--config {suite/"selected_config.json"} --gpu 1 --threads 2 --evaluate',1)
+ text=text.replace('|best复跑|从Git提交原样导出独立源码，经发布版CLI从头训练，不加载原训练权重|检查发布模型、数据流、训练与评估等价性|','|best-perf优化复跑|从冻结候选源码启用已验收的执行优化，从未训练初始化独立训练100轮|严格等价与性能检查|')
+ old_description='发布默认配置与原配置逐项一致，仅移除experiment_plan/output_dir元数据。原三份数据哈希及全部测试families/rates/seeds一致；原模型、初始化及首批数据在隔离进程核对。发布源码69份Git blob原样校验，不修改best分支；预检产物不计正式训练。'
+ text=text.replace(old_description,f'模型、损失和训练数值设置保持I37；实际执行配置通过selected_config.json增加性能开关与诊断采样间隔。原源码与候选源码各自按plan的摘要校验（候选{len(plan.get("candidate_sha256",{}))}份文件）；不把执行优化源码称为未修改的原发布源码。数据与六套mask协议相同，预检权重不用于正式训练。')
+ base_result=load(parent/'run/result.json');opt_result=load(suite/'run/result.json')
+ history=lambda folder:[json.loads(line) for line in (folder/'logs/metrics.jsonl').read_text().splitlines() if line.strip()]
+ base_peak=max(row['perf']['peak_memory_gb'] for row in history(parent/'run'));opt_peak=max(row['perf']['peak_memory_gb'] for row in history(suite/'run'))
+ text=text.replace('### 性能与附加状态验收',f"""### 完整训练成本
+
+|口径|未优化best|优化版|减少|
+|---|---:|---:|---:|
+|100轮训练/验证累计时间|{base_result['total_time_sec']/60:.3f}分钟|{opt_result['total_time_sec']/60:.3f}分钟|{100*(1-opt_result['total_time_sec']/base_result['total_time_sec']):.3f}%|
+|100轮峰值allocated|{base_peak:.6f}GiB|{opt_peak:.6f}GiB|{100*(1-opt_peak/base_peak):.3f}%|
+
+时间不含检查点/审计写入及额外六套评价，不是完整进程墙钟；allocated/reserved不得混为nvidia-smi占用。短基准与完整100轮结果分开解释。
+
+### 性能与附加状态验收""",1)
+
  text=text.replace('## 3. 分析、边界及结论',f'''### 性能与附加状态验收
 
-训练诊断按首/末/每20批采集；验证及测试完整。源码/参数形状/训练任务不变，逐项检查后拒绝的选项没有纳入最终配置。
+训练诊断按首/末/每20批采集；验证及测试完整。参数形状、初始化及训练任务不变，源码加入可选执行优化，逐项检查后拒绝的选项没有纳入最终配置。
 
 ```json
 {json.dumps(dict(selection=selection,benchmark=benchmark,complete_state=extra),ensure_ascii=False,indent=2)}
@@ -53,5 +72,5 @@ def export_report(suite,plan,selection,benchmark):
  assets=path.parent/(path.stem+'_assets');assets.mkdir(exist_ok=True,parents=True)
  original_assets=report_path.parent/(report_path.stem+'_assets')
  for file in original_assets.iterdir():shutil.copy2(file,assets/file.name)
- text=text.replace(original_assets.name,assets.name)
+ text=text.replace(original_assets.name,assets.name).replace(original_assets.name.replace("best分支I37同条件复跑","best-perf严格等价与性能复跑"),assets.name)
  path.write_text(text);(suite/'report_path.txt').write_text(str(path)+'\n');return path,verdict

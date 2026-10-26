@@ -1,6 +1,6 @@
 # best-perf：保持数值结果的执行优化
 
-候选分支从原best提交`6caef6740bc00013a65d70dd0a98083648e1f88d`建立。原best和正在执行的复跑不改动。性能与完整100轮复现尚待GPU验证，不能把CPU通过写成最终结论。
+候选分支从原best提交`6caef6740bc00013a65d70dd0a98083648e1f88d`建立。原best和正在执行的复跑不改动。已完成本机GPU验证和独立100轮复跑：所有逐轮主指标、best/last模型及完整可恢复状态、六套MAE/RMSE均逐位一致。原best仍保持不变。
 
 ## 开关与兼容
 
@@ -34,3 +34,12 @@ python -m unittest discover -s tests -v
 # 仅供通过预检后的优化独立run；不要接管原run。
 python scripts/train.py --data-dir /path/to/taxibj --run-dir outputs/i37_perf --config configs/i37_performance.json --gpu 1 --threads 2 --evaluate
 ```
+
+## 已完成的实测验收（2026-10-26）
+
+- 七项优化全部通过逐项及组合GPU检查，无拒绝项；80个GPU场景含完整AMP恢复重放。
+- 优化版完整100轮与未优化best复跑完全一致，best仍为epoch95，ID MAE=8.051041961938529。
+- 100轮训练/验证累计时间77.412→72.679分钟，减少6.114%；allocated峰值11.146292→9.846848GiB，减少11.658%。
+- 短基准中位训练步612.678→577.591ms，减少5.727%；allocated中位峰值9.545609→8.279984GiB，减少13.259%。
+- 以上耗时不包含检查点及额外六套评价，不是整进程墙钟时间。
+- 小型完整证据见[performance_validation.json](performance_validation.json)。验证的执行源码提交为d920258a；后续文档更正不改变该冻结源码。
