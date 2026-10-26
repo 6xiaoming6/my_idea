@@ -45,7 +45,7 @@
   ],
   "reference_initialization_file_sha256": "767506aba67a870a0a509ea1492f62fde6669bc584c2c4fe0092d1dac4a43532",
   "reference_initialization_state_sha256": "2baf7361f1aa2308e5f2a55c07fd657e7d5feea87dd296ca071406aec3179f99",
-  "parameter_count": 347931,
+  "parameter_count": 347930,
   "performance_modified_source_sha256": {
     "src/stmoe_imputer/engine.py": {
       "reference_sha256": "c6901378b308c4e0f57c9700611427e9fedfacfa0f1d00d7a7ed1cd248e1abd2",
@@ -87,16 +87,5 @@
   "performance_added_source_sha256": {
     "src/stmoe_imputer/performance.py": "14052cc2ed425ba2d8bbc4b7726a709cf7e7523afc66c50651ed7f192e7b6163"
   },
-  "performance_base_commit": "6caef6740bc00013a65d70dd0a98083648e1f88d",
-  "reference_parameter_count": 347930,
-  "release_training_defaults": {
-    "loss_mix": "beta=sigmoid(x_loss_mix_logit); raw=beta; final=1-beta",
-    "initial_raw_weight": 0.5,
-    "initial_final_weight": 0.5,
-    "note": "The historical I37 results and performance validation used fixed 0.5/0.5 weights. The current defaults learn their mixture; no full-training results are claimed for this change.",
-    "config_sha256": {
-      "configs/i37_taxibj.json": "6b4b2f64abd0f910e0a9f44c50560067eff098a0fe9949d7e20edf98b3e01678",
-      "configs/i37_performance.json": "0b8b7833d31c9de2d5d1c89439e59a417033a68714199b11c900acf18fd23818"
-    }
-  }
+  "performance_base_commit": "6caef6740bc00013a65d70dd0a98083648e1f88d"
 }
