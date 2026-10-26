@@ -61,6 +61,11 @@ def main():
  try:
   for relative,stamp in p['candidate_sha256'].items():
    if sha(candidate/relative)!=stamp:raise RuntimeError('Candidate frozen source changed '+relative)
+  for relative,stamp in p['reference_source_sha256'].items():
+   if sha(reference/relative)!=stamp:raise RuntimeError('Original frozen source changed '+relative)
+  for item in p['data'].values():
+   if sha(item['path'])!=item['sha256']:raise RuntimeError('Dataset changed')
+  if sha(p['comparison_reporter'])!=p['comparison_reporter_sha256']:raise RuntimeError('Frozen comparison reporter changed')
   if load(suite/'acceptance/cpu.json')['status']!='passed':raise RuntimeError('CPU acceptance required')
   while True:
    parent=load(Path(p['reference_replay'])/'queue_state.json')
