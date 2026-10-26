@@ -1,0 +1,128 @@
+{
+  "taxibj_I42_seed7": {
+    "common_sha256": "2baf7361f1aa2308e5f2a55c07fd657e7d5feea87dd296ca071406aec3179f99",
+    "full_sha256": "2baf7361f1aa2308e5f2a55c07fd657e7d5feea87dd296ca071406aec3179f99",
+    "parameters": 347930,
+    "trainable_parameters": 288286
+  },
+  "taxibj_I43_seed7": {
+    "common_sha256": "2baf7361f1aa2308e5f2a55c07fd657e7d5feea87dd296ca071406aec3179f99",
+    "full_sha256": "2baf7361f1aa2308e5f2a55c07fd657e7d5feea87dd296ca071406aec3179f99",
+    "parameters": 347930,
+    "trainable_parameters": 333019
+  },
+  "taxibj_I44_seed7": {
+    "common_sha256": "2baf7361f1aa2308e5f2a55c07fd657e7d5feea87dd296ca071406aec3179f99",
+    "full_sha256": "2baf7361f1aa2308e5f2a55c07fd657e7d5feea87dd296ca071406aec3179f99",
+    "parameters": 347930,
+    "trainable_parameters": 333019
+  },
+  "taxibj_I45_seed7": {
+    "common_sha256": "2baf7361f1aa2308e5f2a55c07fd657e7d5feea87dd296ca071406aec3179f99",
+    "full_sha256": "eae5ac2b812214de6cc4c1ea7ad9b2879af1edbf2769e780f6556f6fece61ae0",
+    "parameters": 348405,
+    "trainable_parameters": 333494
+  },
+  "taxibj_I46_seed7": {
+    "common_sha256": "2baf7361f1aa2308e5f2a55c07fd657e7d5feea87dd296ca071406aec3179f99",
+    "full_sha256": "3f4184fc2db05d7a6115096f91664517c686e90f328187fd07df2086852b6783",
+    "parameters": 350202,
+    "trainable_parameters": 314171
+  },
+  "taxibj_I47_seed7": {
+    "common_sha256": "2baf7361f1aa2308e5f2a55c07fd657e7d5feea87dd296ca071406aec3179f99",
+    "full_sha256": "2baf7361f1aa2308e5f2a55c07fd657e7d5feea87dd296ca071406aec3179f99",
+    "parameters": 347930,
+    "trainable_parameters": 333019
+  },
+  "taxibj_I48_seed7": {
+    "common_sha256": "2baf7361f1aa2308e5f2a55c07fd657e7d5feea87dd296ca071406aec3179f99",
+    "full_sha256": "2baf7361f1aa2308e5f2a55c07fd657e7d5feea87dd296ca071406aec3179f99",
+    "parameters": 347930,
+    "trainable_parameters": 333019
+  },
+  "taxibj_I49_seed7": {
+    "common_sha256": "2baf7361f1aa2308e5f2a55c07fd657e7d5feea87dd296ca071406aec3179f99",
+    "full_sha256": "2baf7361f1aa2308e5f2a55c07fd657e7d5feea87dd296ca071406aec3179f99",
+    "parameters": 347930,
+    "trainable_parameters": 333019
+  },
+  "taxibj_I50_seed7": {
+    "common_sha256": "2baf7361f1aa2308e5f2a55c07fd657e7d5feea87dd296ca071406aec3179f99",
+    "full_sha256": "086ab2c63502332ec51204a39bb71c557d37c9b1243056ad95d94b8ee9d65e1e",
+    "parameters": 350677,
+    "trainable_parameters": 314646
+  },
+  "taxibj_I51_seed7": {
+    "common_sha256": "2baf7361f1aa2308e5f2a55c07fd657e7d5feea87dd296ca071406aec3179f99",
+    "full_sha256": "086ab2c63502332ec51204a39bb71c557d37c9b1243056ad95d94b8ee9d65e1e",
+    "parameters": 350677,
+    "trainable_parameters": 314646
+  },
+  "taxibj_I52_seed17": {
+    "common_sha256": "506c99f13a6eeca3e19392a751e178f2c383f2bcdae74b829bc069f9c1d62aea",
+    "full_sha256": "506c99f13a6eeca3e19392a751e178f2c383f2bcdae74b829bc069f9c1d62aea",
+    "parameters": 347930,
+    "trainable_parameters": 333019
+  },
+  "I53_from_I42": {
+    "common_sha256": "506c99f13a6eeca3e19392a751e178f2c383f2bcdae74b829bc069f9c1d62aea",
+    "full_sha256": "506c99f13a6eeca3e19392a751e178f2c383f2bcdae74b829bc069f9c1d62aea",
+    "parameters": 347930,
+    "trainable_parameters": 288286
+  },
+  "I53_from_I43": {
+    "common_sha256": "506c99f13a6eeca3e19392a751e178f2c383f2bcdae74b829bc069f9c1d62aea",
+    "full_sha256": "506c99f13a6eeca3e19392a751e178f2c383f2bcdae74b829bc069f9c1d62aea",
+    "parameters": 347930,
+    "trainable_parameters": 333019
+  },
+  "I53_from_I44": {
+    "common_sha256": "506c99f13a6eeca3e19392a751e178f2c383f2bcdae74b829bc069f9c1d62aea",
+    "full_sha256": "506c99f13a6eeca3e19392a751e178f2c383f2bcdae74b829bc069f9c1d62aea",
+    "parameters": 347930,
+    "trainable_parameters": 333019
+  },
+  "I53_from_I45": {
+    "common_sha256": "506c99f13a6eeca3e19392a751e178f2c383f2bcdae74b829bc069f9c1d62aea",
+    "full_sha256": "8fe730f766d855cf68867dc79ff6836aedd45efb0c4deb24cb5534b4268c368b",
+    "parameters": 348405,
+    "trainable_parameters": 333494
+  },
+  "I53_from_I46": {
+    "common_sha256": "506c99f13a6eeca3e19392a751e178f2c383f2bcdae74b829bc069f9c1d62aea",
+    "full_sha256": "41c2f8ba41cbcad4f0f37932928757bbbba1d0bccf014adb3848af035fdc0236",
+    "parameters": 350202,
+    "trainable_parameters": 314171
+  },
+  "I53_from_I47": {
+    "common_sha256": "506c99f13a6eeca3e19392a751e178f2c383f2bcdae74b829bc069f9c1d62aea",
+    "full_sha256": "506c99f13a6eeca3e19392a751e178f2c383f2bcdae74b829bc069f9c1d62aea",
+    "parameters": 347930,
+    "trainable_parameters": 333019
+  },
+  "I53_from_I48": {
+    "common_sha256": "506c99f13a6eeca3e19392a751e178f2c383f2bcdae74b829bc069f9c1d62aea",
+    "full_sha256": "506c99f13a6eeca3e19392a751e178f2c383f2bcdae74b829bc069f9c1d62aea",
+    "parameters": 347930,
+    "trainable_parameters": 333019
+  },
+  "I53_from_I49": {
+    "common_sha256": "506c99f13a6eeca3e19392a751e178f2c383f2bcdae74b829bc069f9c1d62aea",
+    "full_sha256": "506c99f13a6eeca3e19392a751e178f2c383f2bcdae74b829bc069f9c1d62aea",
+    "parameters": 347930,
+    "trainable_parameters": 333019
+  },
+  "I53_from_I50": {
+    "common_sha256": "506c99f13a6eeca3e19392a751e178f2c383f2bcdae74b829bc069f9c1d62aea",
+    "full_sha256": "9ad8bdcdb5b0b691b0d0535ce7b26bb9358f1572c35c4dd49642ab1c12b33ffa",
+    "parameters": 350677,
+    "trainable_parameters": 314646
+  },
+  "I53_from_I51": {
+    "common_sha256": "506c99f13a6eeca3e19392a751e178f2c383f2bcdae74b829bc069f9c1d62aea",
+    "full_sha256": "9ad8bdcdb5b0b691b0d0535ce7b26bb9358f1572c35c4dd49642ab1c12b33ffa",
+    "parameters": 350677,
+    "trainable_parameters": 314646
+  }
+}

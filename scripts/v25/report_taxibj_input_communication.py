@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Evidence-checked I01-I25 reports with read-only frozen comparison suites."""
+"""Evidence-checked I01-I27 reports with read-only frozen comparison suites."""
 import csv,json,math,sys
 from datetime import datetime
 from zoneinfo import ZoneInfo
@@ -68,12 +68,15 @@ def combination_ranking(evals, threshold=8.8709):
 
 
 def export_report(root,suite,js):
+    if js and all(j['method']=='I29' for j in js.values()):
+        from report_f_only import export_report as export_f_only
+        return export_f_only(root,suite,js)
     import matplotlib
     matplotlib.use('Agg')
     import matplotlib.pyplot as plt
     root,suite=Path(root),Path(suite);records=[];histories={};evals={};issues=[];sources=[]
-    allowed={f'taxibj_I{i:02d}_seed7' for i in range(1,26)}
-    if not js or not set(js).issubset(allowed):raise ValueError('Expected a nonempty subset of I01-I25')
+    allowed={f'taxibj_I{i:02d}_seed7' for i in list(range(1,28))+list(range(30,42))}
+    if not js or not set(js).issubset(allowed):raise ValueError('Expected registered I-series jobs')
     entries=comparison_jobs(suite,js)
     methods=[j['method'] for _,_,j,_ in entries]
     if len(set(methods))!=len(methods):issues.append('Duplicate configured method')
@@ -157,7 +160,7 @@ def export_report(root,suite,js):
         '### 共同协议、状态流与实现','',
         '复用TaxiBJ旧B2清理数据及四族混合mask0.4（不是纯random点缺失），seed7、100epoch、batch32、val每5轮、AdamW lr1e-3余弦到3e-4、weight_decay1e-4、clip1、AMP与严格确定性。仅ID验证MAE选best，last完整保存优化器/调度器/scaler/RNG，共同基础损失为F缺失位置L1＋0.01候选均衡；I04另加完整M/C目标监督，I06只增加可见M/C软损失；I05/I07/I08/I09不增加粗尺度损失。',
         'F/M/C分别为[B,2,12,32,32]、[B,2,12,16,16]、[B,2,12,8,8]；完整F先按区域求和构造M/C，各尺度独立生成观测mask，编码时M/C除已知面积4/16。模型读取可见值，隐藏占位被屏蔽；目标只用于损失/评估。最终补全保持F形状并保留已观测F。',
-        'H0之后四轮共享T/S/TD/SD/TA/ST/TL/SL八专家，每轮只执行原生Top2，共8次。CMFF是固定计算尺度与观测读取顺序，动态的是专家；I02/I09动态选尺度。各轮输出恢复F隐藏网格，首轮无历史差分，其余三轮以H当前−H前轮经detach比例RMS匹配、±0.1条件门修正专家输入；当轮路由读未修正状态。无中间轮监督，不能声称逐轮误差必降。',
+        '除I27采用四套独立专家池外，H0之后四轮共享T/S/TD/SD/TA/ST/TL/SL八专家，每轮只执行原生Top2，共8次。CMFF是固定计算尺度与观测读取顺序，动态的是专家；I02/I09动态选尺度。各轮输出恢复F隐藏网格，首轮无历史差分，其余三轮以H当前−H前轮经detach比例RMS匹配、±0.1条件门修正专家输入；当轮路由读未修正状态。无中间轮监督，不能声称逐轮误差必降。',
         'I01保留原1×1融合投影，用[EF,0,0]得到H0，而非移除投影。dataset仍提供F/M/C；C在第一轮、M在第二轮进入模型状态，之后两轮注入F。公共参数/初始化与B2一致，初始不编码M/C因此计算略变，M/C投影槽无数据梯度，但这些尺度的原始观测在对应轮仍有梯度。',
         'I02使用现有S01硬尺度选择和选中分支straight-through梯度，无软预热。每轮每样本只执行选中的一个尺度，H0仍含所有尺度；不是只有被选尺度才首次可见。',
         'I03复用X05 HistoryReader，自适应逐位置读取绝对预测历史，不加入Y12乘积差值分支。P每个forward初始为空，四轮读取0/1/2/3条；每轮写入以可见F覆盖的F网格预测并detach。评分输入为归一化旧预测、最近预测、绝对差、年龄、可见覆盖；softmax在历史条目间归一化。读取后经共享零初始化MLP、tanh与0.1×当前隐藏RMS限制，仅在F缺失区域修正专家输入；加在差分修正之后。池不跨batch、不读当前未来或真值。',
@@ -191,12 +194,32 @@ def export_report(root,suite,js):
             '两组都从公共初始化独立训练，沿用I14的FMC H0、前三轮自由末轮F、原生共享Top2、受控差分、历史池与学习投影。I23任务损失为0.9×最终F L1＋0.1×投影前F L1；I24为0.7×最终F L1＋0.3×投影前F L1。两项均使用原F缺失监督掩码；保留0.1×投影前可见M/C损失与原候选均衡。',
             'lambda_final_f默认1，旧I01–I22行为不变；新组仅重新分配两项F任务权重，权重和为1。I22则是在完整最终F任务上额外加0.1原始F，且采用固定CMFF；它不是I23的严格单因素对照。I23/I24主要对照I14及彼此。总参数、推理投影和每窗口8次专家执行不变，不载入I14训练权重。',
             '按用户要求在I18训练及六套评估完成后、I19开始前插入。边界控制器仅暂停原队列调度进程，保留原队列GPU1锁；I18评估子进程自然完成后才预检和训练I23/I24。新批结束后恢复原调度器运行I19–I22。前序I13–I18作为只读参考；尚未运行的I19–I22不属于新批报告完成条件。失败时记录原因并停留在边界，不无限重试。']
+    if any(f'I{i}' in methods for i in range(30,42)):
+        lines += ['', '### I30–I41：通信、尺度与原始预测能力', '',
+            'I30去历史，I31去差分，I32固定CMFF；I33同时去历史与差分。I38/I39/I40分别为I32去历史、去差分、两者都去掉。结合旧I25组成尺度自由/固定×历史开/关×差分开/关的2×2×2对照；各组从公共初始化独立训练，旧I25只读引用。',
+            '自由尺度无差分组同时设communication=none和delta_steps=[]，防止探索类构造器按delta_steps重新开启差分；差分门保留但冻结。去历史组移除历史读取器参数，固定CMFF冻结原有尺度头，不能称为完全等可训练参数对照。每轮仍只执行原生Top2。',
+            'I34固定0.5投影前F+0.5投影后F，I35固定0.8/0.2，两组均移除可学习β标量。I36为I25加0.1投影前可见F重建L1；I37为I34加同一项。可见F损失直接读取回填前x_hat_raw_consistency，对m_f可见位置与x_f_obs比较，独立按可见数归一化，空可见集为零，不读取隐藏真值；不修改推理。此为原始预测重建探索，并非完整复制SAITS的对角注意力或多阶段重建。',
+            'I41仅将历史注入gain设为0.5，参数、历史池内容、梯度截断与读写次序不变。所有组保留0.1可见M/C辅助和0.01候选均衡，继续记录投影前后、粗约束覆盖/未覆盖缺失误差、有效计数、路径、历史幅度、损失权重及成本。',
+            '初始保留参数逐项核验与冻结I25初始化一致；不是加载已训练I25权重微调。先按原门槛ID≤8.8709筛选，另展示相对I25的ID变化、三类等权OOD及最差类别；不隐去不合格结果。单seed且OOD已多次用于开发筛选，须另用新种子和未参与筛选条件确认。']
     if 'I25' in methods:
         lines += ['', '### I25：可学习的投影前后F损失分配', '',
-            '沿用I24模型与协议，从公共初始化独立训练。新增一个全局标量a，β=sigmoid(a)，初值log(0.3/0.7)。F任务为(1−β)×投影后缺失位置L1＋β×投影前同位置L1；两权重非负且和为1。保留0.1×投影前可见M/C损失及候选均衡，无额外熵正则或权重下界。',
+            '沿用I24模型与协议，从公共初始化独立训练。新增一个全局标量a，β=sigmoid(a)，a初值log(0.3/0.7)，β初值0.3。F任务为(1−β)×投影后缺失位置L1＋β×投影前同位置L1；两权重非负且和为1。保留0.1×投影前可见M/C损失及候选均衡，无额外熵正则或权重下界。',
             '标量和骨干通过同一训练损失联合优化，不detach；标量使用主学习率余弦调度且无weight decay。增加1个可训练参数，不改变推理预测和每窗口8次专家执行。完整检查点保存标量及优化器状态；日志记录β、1−β和前后加权损失。',
             '固定β=0.3的I24按用户要求在完成第2轮后暂停，尚未验证，没有best检查点或六套最终结果，不能作为已完成的等预算对照。I25不续接其两轮权重。I14和I23为已完成参考；不因训练总损失下降就认定泛化改善，因为权重本身可以偏向数值较小的损失。',
             f'I24暂停记录：`{suite/"references/I24/paused.json"}`；实际暂停轮数以该记录为准。']
+    if 'I26' in methods:
+        lines += ['', '### I26：移除最终投影的完整骨干对照', '',
+            '从公共初始化独立训练100轮，保留I25的F/M/C融合H0、逐轮对应观测注入、前三轮自由尺度且允许重复、第四轮固定F、共享八专家原生Top2、受控差分及因果历史池。移除最终投影及其分配头，直接使用第四轮预测。',
+            '无投影后前后F预测相同，(1−β)L_F＋βL_F严格合并为单项L_F，β无有效梯度，因此移除该冗余标量。保留0.1×仅可见M/C面积归一化L1，source=prediction；先回填可见F后聚合，不读取完整粗尺度真值。均衡系数仍0.01，F任务掩码不变。参数减少如实披露，不宣称等容量。',
+            'I26对I25检验移除投影及其相关监督分解后的整体影响；I26对I14为更直接的有无投影对照，I26对I16仅改变固定CMFF为前三轮自由、末轮F。不能由单seed比较证明投影或路由在所有数据条件下有效。',
+            '按用户要求暂停I19，完成I26训练、六套评估和正式报告后从完整last恢复I19并继续I20–I22。原I19暂停记录保存在references/I19/paused.json；本报告不将未完成的I19–I22计作已完成对照。',
+            '无投影模型的raw/post分区诊断读取同一预测，二者相等、修正量为零是预期结果；不会再强制满足可见M/C总量或未知区域非负约束，软损失不等价于硬约束。']
+    if 'I27' in methods:
+        lines += ['', '### I27：I25共享专家池的独立池对照', '',
+            'I27仅将I25的expert_sharing由shared改为per_step：每轮独立持有T/S/TD/SD/TA/ST/TL/SL八专家，共四套；每轮仍执行原生Top2，每窗口8次调用。路由器原本就分轮独立，此处不改路由器、不新增跨轮FFN或乘性交互。',
+            '保留FMC融合H0、逐轮观测注入、前三轮自由尺度且可重复、第四轮F、受控差分、历史池、I05学习投影、0.1可见M/C损失及0.01均衡。保留I25全局可学习β，初始0.3/0.7，从公共初始化独立训练100轮；不加载I25或I26训练权重。',
+            '每套专家逐项复制公共共享池初值，参数存储独立，后续独立优化；其余参数初值相同。初始前向与I25一致，但独立池增加三套专家参数及优化器状态，不能称为等参数对照；实际时长、峰值显存及MAE/RMSE一并报告。',
+            '本组检验共享专家复用与分轮专门化的影响，不能单独把差异归因于CoE/MoE名称。I26完成训练、六套评估和报告后执行I27，再释放原控制器恢复I19–I22。I26训练不中断，冻结源码不修改。']
     lines += ['','## 2. 实验结果','','|组|状态|epoch/best|val MAE|累计训练分钟|总/可训参数|峰值GiB|','|---|---|---|---|---|---|---|']
     lines += [f'|{r["method"]}|{r["state"]}|{r["epochs"]}/{r["best_epoch"]}|{fmt(r["val_mae"])}|{fmt(r["minutes"])}|{r["params"]}/{r["trainable"]}|{fmt(r["peak_gib"])}|' for r in records]
     lines += ['','|组|协议|MAE|RMSE|ms/窗口|专家执行数|面积代理|','|---|---|---|---|---|---|---|']
@@ -221,7 +244,7 @@ def export_report(root,suite,js):
                 weights='/'.join(fmt(m.get('coe_v25_consistency_weight_'+k)) for k in ('min','max'))
                 lines.append(f'|{method}|{label}|{after}|{before}|{fmt(m.get("coe_v25_consistency_constrained_fraction"))}|{fmt(m.get("coe_v25_consistency_correction_abs"))}|{weights}|')
         lines+=['','只有聚合残差下降不能证明细粒度MAE改善。I05的校正位于最终读出之后，不能将校正后输出与前几轮读出当作未经处理的逐轮修复轨迹。全量训练损失分量与约束组数见curves.json、evaluations.json；缺失诊断显示为“—”，不补造。']
-    if any(m in evals for m in [f'I{i:02}' for i in range(13,26)]):
+    if any(m in evals for m in [f'I{i:02}' for i in range(13,28)]):
         lines += ['', '### 原始预测与分区域诊断', '',
                   '|组|协议|区域|有效F缺失数|原始MAE/RMSE|最终MAE/RMSE|', '|---|---|---|---|---|---|']
         diagnostics = []
@@ -235,7 +258,7 @@ def export_report(root,suite,js):
                               if count else '—' for stage in ('raw','post')]
                     lines.append(f'|{method}|{label}|{area}|{int(count)}|{values[0]}|{values[1]}|')
                 diagnostics.append({'method':method, 'protocol':label,
-                    **{k:v for k,v in metrics.items() if k.startswith(('combination_', 'l_visible_consistency', 'l_raw_f'))}})
+                    **{k:v for k,v in metrics.items() if k.startswith(('combination_', 'l_visible_consistency', 'l_raw_f', 'l_visible_raw_f', 'visible_raw_f_count'))}})
         write(assets/'combination_diagnostics.json', diagnostics)
         lines += ['', '|组|协议|可见M原始/最终残差|可见C原始/最终残差|辅助损失/加权|raw F损失/加权|', '|---|---|---|---|---|---|']
         for d in diagnostics:
@@ -243,9 +266,23 @@ def export_report(root,suite,js):
             aux = '/'.join(fmt(d.get(k)) for k in ('l_visible_consistency_aux','l_visible_consistency_aux_weighted'))
             raw = '/'.join(fmt(d.get(k)) for k in ('l_raw_f','l_raw_f_weighted'))
             lines.append(f'|{d["method"]}|{d["protocol"]}|{residuals[0]}|{residuals[1]}|{aux}|{raw}|')
+    if any(f'I{i}' in methods for i in range(30,42)):
+        lines += ['', '### 新组原始预测监督与可见F重建轨迹', '',
+            '|组|epoch|投影前F损失|投影后F损失|β（固定/可学习）|可见F重建|加权可见F重建|', '|---|---|---|---|---|---|---|']
+        for method in (f'I{i}' for i in range(30,42)):
+            for row in histories.get(method,[]):
+                if row['epoch'] != 1 and row['epoch'] % 5: continue
+                v=row['train']
+                beta=v.get('f_loss_raw_weight', .8 if method=='I35' else .5 if method in ('I34','I37') else None)
+                lines.append(f'|{method}|{row["epoch"]}|{fmt(v.get("l_raw_f"))}|{fmt(v.get("l_final"))}|{fmt(beta)}|{fmt(v.get("l_visible_raw_f"))}|{fmt(v.get("l_visible_raw_f_weighted"))}|')
     if 'I25' in methods:
         lines += ['', '### 学习权重轨迹', '', '|epoch|训练平均投影前权重β|训练平均投影后权重|验证时β|', '|---|---|---|---|']
         for row in histories.get('I25',[]):
+            if row['epoch']==1 or row['epoch']%5==0:
+                lines.append(f'|{row["epoch"]}|{fmt(row["train"].get("f_loss_raw_weight"))}|{fmt(row["train"].get("f_loss_final_weight"))}|{fmt((row.get("val") or {}).get("f_loss_raw_weight"))}|')
+    if 'I27' in methods:
+        lines += ['', '### I27学习权重轨迹', '', '|epoch|训练平均β|训练平均1−β|验证β|', '|---|---|---|---|']
+        for row in histories.get('I27',[]):
             if row['epoch']==1 or row['epoch']%5==0:
                 lines.append(f'|{row["epoch"]}|{fmt(row["train"].get("f_loss_raw_weight"))}|{fmt(row["train"].get("f_loss_final_weight"))}|{fmt((row.get("val") or {}).get("f_loss_raw_weight"))}|')
     lines+=['','### 完成与失败审计' ,'',('；'.join(issues) if issues else '已有凭据/配置/检查点/主指标未发现核验异常；未完成组以上表为准。')]
@@ -262,6 +299,12 @@ def export_report(root,suite,js):
     pairs += [('I13','I08'),('I14','I10'),('I14','I13'),('I15','I05'),('I15','I13'),('I16','I03'),('I16','I13')] + [(f'I{i:02}','I13') for i in range(17,23)]
     pairs += [('I23','I14'),('I24','I14'),('I24','I23'),('I23','I06'),('I24','I06'),('I23','I16'),('I24','I16')]
     pairs += [('I25','I14'),('I25','I23'),('I25','I06'),('I25','I16')]
+    pairs += [('I26','I25'),('I26','I14'),('I26','I16'),('I26','I06')]
+    pairs += [('I27','I25')]
+    pairs += [(f'I{i}','I25') for i in range(30,42)]
+    pairs += [('I33','I30'),('I33','I31'),('I37','I34'),('I37','I36'),
+              ('I38','I32'),('I39','I32'),('I40','I32'),
+              ('I38','I30'),('I39','I31'),('I40','I33')]
     for a,b in pairs:
         ea,eb=evals.get(a,{}).get('sets',{}),evals.get(b,{}).get('sets',{})
         for lab in protocol['evaluations']:
@@ -274,7 +317,7 @@ def export_report(root,suite,js):
             if all(sets):
                 values=[sum(sign*row['metrics'][key] for sign,row in zip((1,-1,-1,1),sets)) for key in ('mae','rmse')]
                 lines.append(f'|{label}|{fmt(values[0])}|{fmt(values[1])}|')
-    if any(m in evals for m in [f'I{i:02}' for i in range(13,26)]):
+    if any(m in evals for m in [f'I{i:02}' for i in range(13,28)]):
         ranking = combination_ranking(evals)
         write(assets/'combination_ranking.json', ranking)
         lines += ['', '### 预设 ID 门槛与三类 OOD 等权排序', '',
@@ -287,7 +330,7 @@ def export_report(root,suite,js):
         if candidates and final:
             best = candidates[0]
             lines += ['', f'按预设规则，当前合格模型中排序第一为{best["method"]}，OOD MAE比{best["mae_score"]:.6f}、ID MAE {best["id_mae"]:.6f}。']
-            if best['method'] not in {f'I{i:02}' for i in range(13,26)}:
+            if best['method'] not in {j['method'] for j in js.values()}:
                 lines += ['本批新增组未超过既有合格参考的该项折中，保留既有参考，不强行推荐新组。']
         elif final:
             lines += ['', '没有模型通过预设ID门槛，不推荐本批新模型。']

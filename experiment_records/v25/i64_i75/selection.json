@@ -1,0 +1,133 @@
+{
+  "selected": "I65",
+  "rows": [
+    {
+      "method": "I65",
+      "id_mae": 8.51387687916808,
+      "id_ratio": 1.0002711455680084,
+      "eligible": true,
+      "ood_mae_ratio": 1.3756741413983278,
+      "ood_rmse_ratio": 1.531054726235664,
+      "parameters": 347930
+    },
+    {
+      "method": "I74",
+      "id_mae": 9.462255864313208,
+      "id_ratio": 1.1116934913884986,
+      "eligible": false,
+      "ood_mae_ratio": 1.453921252931116,
+      "ood_rmse_ratio": 1.4654836204790342,
+      "parameters": 347930
+    },
+    {
+      "method": "I73",
+      "id_mae": 9.06610503560529,
+      "id_ratio": 1.0651508588283594,
+      "eligible": false,
+      "ood_mae_ratio": 1.658810849529598,
+      "ood_rmse_ratio": 1.7215344384292102,
+      "parameters": 347930
+    },
+    {
+      "method": "I72",
+      "id_mae": 9.377215514625831,
+      "id_ratio": 1.1017023429130688,
+      "eligible": false,
+      "ood_mae_ratio": 1.9934415361584328,
+      "ood_rmse_ratio": 2.241722063610777,
+      "parameters": 347930
+    },
+    {
+      "method": "I66",
+      "id_mae": 8.720856423229998,
+      "id_ratio": 1.0245885826869943,
+      "eligible": true,
+      "ood_mae_ratio": 2.0200457953576,
+      "ood_rmse_ratio": 2.2979926427669124,
+      "parameters": 347930
+    },
+    {
+      "method": "I64",
+      "id_mae": 8.542173789211924,
+      "id_ratio": 1.0035956689346601,
+      "eligible": true,
+      "ood_mae_ratio": 2.24652802838496,
+      "ood_rmse_ratio": 2.6608024604095317,
+      "parameters": 347930
+    },
+    {
+      "method": "I67",
+      "id_mae": 9.029045305277435,
+      "id_ratio": 1.0607968166645376,
+      "eligible": false,
+      "ood_mae_ratio": 2.2878821007909966,
+      "ood_rmse_ratio": 2.703041659579243,
+      "parameters": 347930
+    },
+    {
+      "method": "I70",
+      "id_mae": 12.09317907348908,
+      "id_ratio": 1.4207931659190232,
+      "eligible": false,
+      "ood_mae_ratio": 2.3821642448488625,
+      "ood_rmse_ratio": 2.5860713736191783,
+      "parameters": 347930
+    },
+    {
+      "method": "I71",
+      "id_mae": 9.313336739186045,
+      "id_ratio": 1.0941974075242358,
+      "eligible": false,
+      "ood_mae_ratio": 2.455968826272048,
+      "ood_rmse_ratio": 2.9494552511085317,
+      "parameters": 347930
+    },
+    {
+      "method": "I68",
+      "id_mae": 9.58636610388297,
+      "id_ratio": 1.1262748499485364,
+      "eligible": false,
+      "ood_mae_ratio": 2.573825929872985,
+      "ood_rmse_ratio": 2.818632717109793,
+      "parameters": 347930
+    },
+    {
+      "method": "I75",
+      "id_mae": 11.80897709898687,
+      "id_ratio": 1.3874030853901873,
+      "eligible": false,
+      "ood_mae_ratio": 2.724469002028643,
+      "ood_rmse_ratio": 3.0767519011474733,
+      "parameters": 347930
+    },
+    {
+      "method": "I69",
+      "id_mae": 9.06247620364917,
+      "id_ratio": 1.0647245176973639,
+      "eligible": false,
+      "ood_mae_ratio": 3.478666082632854,
+      "ood_rmse_ratio": 4.235781439963433,
+      "parameters": 347930
+    }
+  ],
+  "selection_split": "val",
+  "reference_id_mae": 8.51156900495559,
+  "id_limit": 8.766916075104257,
+  "qualified_by_development_id": true,
+  "no_extra_training": true,
+  "evidence_sha256": {
+    "I64": "e241fdd622bdfc50b597180e1fc0ac59bbf3c6b54daa0bf25eab1a4db4176c05",
+    "I65": "7195377f20d492f618be752316071ac2739e15ad024bc8c2af7b5ae0b284159f",
+    "I66": "a6f782d7970e3a2ac324be53fece97f9f12560b73518406b29bacacd78571f77",
+    "I67": "39d8425db17f773d7aab80db050d769ec9f66cbb60afa26550289d4a0509284c",
+    "I68": "9bfe9f41edd8f3e591450cc0c811e01eb977a9aeea0cff8c17aa155753e8fb06",
+    "I69": "aea986e190a0b672bc3e40a1248f51ab2198c20dd680b4934643eff4c65d46d0",
+    "I70": "15c8af1b1c17b95fb45c1c4d8ab852b45a36e5bb7d33c94107d8d2f66c0e57bf",
+    "I71": "04a21e6c78a30f67d6345dfe3f32e337cc220776af967d97128b9e4deb822b03",
+    "I72": "0dc41479a8201959405e72f98cd3655fa359c1def8301e7e593cbabc7e49da83",
+    "I73": "536ba2943aa6d669da8f7be075eaec6d4c4440dfd00ff1d311d71a6590331024",
+    "I74": "9c3bb406736656eebc65301c31e56fe086a7e95393135fb08f7af998678bf85e",
+    "I75": "b24451c5b33a40e10c43fd452924093f161b6108e34333cfa1ae448ae2b01fd4"
+  },
+  "reference_sha256": "2b9ef11e982d90dd16b5b99b9a3a312f1ab2a46ff30e8b54368c5f4d4e9fdcfe"
+}

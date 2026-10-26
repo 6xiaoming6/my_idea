@@ -120,9 +120,11 @@ def _train(job,run_dir,result_file,device='cuda',stop_after=None):
     best_file=cp/'best.pth'
     if not best_file.exists() or torch.load(best_file,map_location='cpu',weights_only=False)['epoch']!=best_epoch:
         save_checkpoint(best_file,model,None,best_epoch,{'mae':best},cfg)
-    test=evaluate(model,loaders['test'],d,cfg,epoch=best_epoch,show_progress=False)
-    write(log/'test.json',test)  # Full final distribution is written once, outside text logs.
-    write(log/'test.log',{k:test[k] for k in ('loss','mae','rmse') if k in test})
+    # Adaptive method selection must complete before any test evaluation.
+    test={} if job.get('defer_test',False) else evaluate(model,loaders['test'],d,cfg,epoch=best_epoch,show_progress=False)
+    if not job.get('defer_test',False):
+        write(log/'test.json',test)
+        write(log/'test.log',{k:test[k] for k in ('loss','mae','rmse') if k in test})
     receipt={'status':'finished','variant':job['variant'],'run_dir':str(run.resolve()),'config_sha256':digest(cfg),
              'completed_epochs':cfg['train']['epochs'],'best_epoch':best_epoch,'best_val_mae':best,'total_time_sec':elapsed,'test':compact_metrics(test),'test_diagnostics':str((log/'test.json').resolve())}
     write(result_file,receipt);return receipt

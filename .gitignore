@@ -154,3 +154,9 @@ requirements-freeze.txt
 /experments_report/**
 !/experments_report/*.md
 
+
+# Portable experiment evidence: explicit small figure artifacts only.
+!/experiment_records/v25/**/figures/*.png
+!/experiment_records/v25/**/figures/*.pdf
+# External dependency installations are local runtime artifacts.
+/imputation_benchmark/.native_baseline_deps/

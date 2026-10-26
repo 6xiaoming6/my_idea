@@ -1,0 +1,112 @@
+{
+  "taxibj_I54_seed7": {
+    "sha256": "2baf7361f1aa2308e5f2a55c07fd657e7d5feea87dd296ca071406aec3179f99",
+    "parameters": 347930,
+    "trainable_parameters": 333019
+  },
+  "taxibj_I55_seed7": {
+    "sha256": "2baf7361f1aa2308e5f2a55c07fd657e7d5feea87dd296ca071406aec3179f99",
+    "parameters": 347930,
+    "trainable_parameters": 333019
+  },
+  "taxibj_I56_seed7": {
+    "sha256": "2baf7361f1aa2308e5f2a55c07fd657e7d5feea87dd296ca071406aec3179f99",
+    "parameters": 347930,
+    "trainable_parameters": 333019
+  },
+  "taxibj_I57_seed7": {
+    "sha256": "2baf7361f1aa2308e5f2a55c07fd657e7d5feea87dd296ca071406aec3179f99",
+    "parameters": 347930,
+    "trainable_parameters": 333019
+  },
+  "taxibj_I58_seed7": {
+    "sha256": "2baf7361f1aa2308e5f2a55c07fd657e7d5feea87dd296ca071406aec3179f99",
+    "parameters": 347930,
+    "trainable_parameters": 333019
+  },
+  "taxibj_I59_seed7": {
+    "sha256": "2baf7361f1aa2308e5f2a55c07fd657e7d5feea87dd296ca071406aec3179f99",
+    "parameters": 347930,
+    "trainable_parameters": 333019
+  },
+  "taxibj_I60_seed7": {
+    "sha256": "2baf7361f1aa2308e5f2a55c07fd657e7d5feea87dd296ca071406aec3179f99",
+    "parameters": 347930,
+    "trainable_parameters": 333019
+  },
+  "taxibj_I61_seed27": {
+    "sha256": "eeef0e2163f8a628841996b0f31fde5fa4dbb30af0662a82709f219e5650dd25",
+    "parameters": 347930,
+    "trainable_parameters": 333019
+  },
+  "I62_from_I54": {
+    "sha256": "506c99f13a6eeca3e19392a751e178f2c383f2bcdae74b829bc069f9c1d62aea",
+    "parameters": 347930,
+    "trainable_parameters": 333019
+  },
+  "I62_from_I55": {
+    "sha256": "506c99f13a6eeca3e19392a751e178f2c383f2bcdae74b829bc069f9c1d62aea",
+    "parameters": 347930,
+    "trainable_parameters": 333019
+  },
+  "I62_from_I56": {
+    "sha256": "506c99f13a6eeca3e19392a751e178f2c383f2bcdae74b829bc069f9c1d62aea",
+    "parameters": 347930,
+    "trainable_parameters": 333019
+  },
+  "I62_from_I57": {
+    "sha256": "506c99f13a6eeca3e19392a751e178f2c383f2bcdae74b829bc069f9c1d62aea",
+    "parameters": 347930,
+    "trainable_parameters": 333019
+  },
+  "I62_from_I58": {
+    "sha256": "506c99f13a6eeca3e19392a751e178f2c383f2bcdae74b829bc069f9c1d62aea",
+    "parameters": 347930,
+    "trainable_parameters": 333019
+  },
+  "I62_from_I59": {
+    "sha256": "506c99f13a6eeca3e19392a751e178f2c383f2bcdae74b829bc069f9c1d62aea",
+    "parameters": 347930,
+    "trainable_parameters": 333019
+  },
+  "I62_from_I60": {
+    "sha256": "506c99f13a6eeca3e19392a751e178f2c383f2bcdae74b829bc069f9c1d62aea",
+    "parameters": 347930,
+    "trainable_parameters": 333019
+  },
+  "I63_from_I54": {
+    "sha256": "eeef0e2163f8a628841996b0f31fde5fa4dbb30af0662a82709f219e5650dd25",
+    "parameters": 347930,
+    "trainable_parameters": 333019
+  },
+  "I63_from_I55": {
+    "sha256": "eeef0e2163f8a628841996b0f31fde5fa4dbb30af0662a82709f219e5650dd25",
+    "parameters": 347930,
+    "trainable_parameters": 333019
+  },
+  "I63_from_I56": {
+    "sha256": "eeef0e2163f8a628841996b0f31fde5fa4dbb30af0662a82709f219e5650dd25",
+    "parameters": 347930,
+    "trainable_parameters": 333019
+  },
+  "I63_from_I57": {
+    "sha256": "eeef0e2163f8a628841996b0f31fde5fa4dbb30af0662a82709f219e5650dd25",
+    "parameters": 347930,
+    "trainable_parameters": 333019
+  },
+  "I63_from_I58": {
+    "sha256": "eeef0e2163f8a628841996b0f31fde5fa4dbb30af0662a82709f219e5650dd25",
+    "parameters": 347930,
+    "trainable_parameters": 333019
+  },
+  "I63_from_I59": {
+    "sha256": "eeef0e2163f8a628841996b0f31fde5fa4dbb30af0662a82709f219e5650dd25",
+    "parameters": 347930,
+    "trainable_parameters": 333019
+  },
+  "I63_from_I60": {
+    "sha256": "eeef0e2163f8a628841996b0f31fde5fa4dbb30af0662a82709f219e5650dd25",
+    "parameters": 347930,
+    "trainable_parameters": 333019
+  }
+}

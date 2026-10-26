@@ -1,0 +1,39 @@
+{
+  "baseline": "I37",
+  "decision_date": "2026-10-26",
+  "batches": {
+    "i42_i53": {
+      "path": "i42_i53",
+      "original_suite": "observation_iteration/1d6eb79a66c77e49",
+      "new_trainings": 12,
+      "evaluated_models": {
+        "development": 11,
+        "evaluations": 13,
+        "confirmation": 4
+      },
+      "report": "experments_report/20261022_v25_I42-I53观测驱动多轮优化_完整分析报告.md"
+    },
+    "i54_i63": {
+      "path": "i54_i63",
+      "original_suite": "input_refinement/ad274d0529acb794",
+      "new_trainings": 10,
+      "evaluated_models": {
+        "development": 12,
+        "evaluations": 12,
+        "confirmation": 12
+      },
+      "report": "experments_report/20261022_v25_I54-I63输入整理与三种子复验_完整分析报告.md"
+    },
+    "i64_i75": {
+      "path": "i64_i75",
+      "original_suite": "final_input/a14c08aae45f4052",
+      "new_trainings": 12,
+      "evaluated_models": {
+        "development": 15,
+        "evaluations": 15,
+        "confirmation": 15
+      },
+      "report": "experments_report/20261025_v25_I64-I75最后一轮seed7输入优化_复核分析报告.md"
+    }
+  }
+}

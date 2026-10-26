@@ -1,0 +1,12 @@
+{
+  "status": "finished",
+  "variant": "taxibj_I49_seed7",
+  "run_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v25/TaxiBJ/custom/20261021_172553_i49_v25_observation_iteration_seed7/random/rate0.4/20261021_172553_seed7_bs32",
+  "config_sha256": "fd83405bdea234e22e2c778bbf0469926e1d0a4640eff26d7b4443c3e16b9f00",
+  "completed_epochs": 100,
+  "best_epoch": 100,
+  "best_val_mae": 10.042860128024367,
+  "total_time_sec": 5906.696487767003,
+  "test": {},
+  "test_diagnostics": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v25/TaxiBJ/custom/20261021_172553_i49_v25_observation_iteration_seed7/random/rate0.4/20261021_172553_seed7_bs32/logs/test.json"
+}

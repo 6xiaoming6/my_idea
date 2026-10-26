@@ -1,0 +1,40 @@
+{
+  "note": "External original source trees and installed dependencies remain local. Clone the listed repositories and check out the exact commit before running native adapters. Existing legacy gitlinks are not modified by this sync.",
+  "repositories": {
+    "SAITS": {
+      "remote": "https://github.com/WenjieDu/SAITS.git",
+      "commit": "660b87f19c1277065f314f24134f646229e89ca9",
+      "models_modified": false
+    },
+    "grin": {
+      "remote": "https://github.com/Graph-Machine-Learning-Group/grin.git",
+      "commit": "4a28afbb092600b6e6abeeabaaf67e87dbd1ed6e",
+      "models_modified": false
+    },
+    "PAST": {
+      "remote": "https://github.com/Hanwen-Hu/PAST.git",
+      "commit": "0eca526a0216453438ca6af5e96990e5cf9b2f8b",
+      "models_modified": false
+    },
+    "STAMImupter": {
+      "remote": "https://github.com/RingBDStack/STAMImupter.git",
+      "commit": "4c5376328c65452ba6b09dfa5d25d8ffbd7f75e5",
+      "models_modified": false
+    },
+    "T1_official": {
+      "remote": "https://github.com/Oppenheimerdinger/T1.git",
+      "commit": "823b76aab57a2e60eb5029caab06fdfec8b19256",
+      "models_modified": false
+    },
+    "ImputeFormer_official": {
+      "remote": "https://github.com/tongnie/ImputeFormer.git",
+      "commit": "1c3868cf499951ac43b4fc7280593fbb745f58c7",
+      "models_modified": false
+    },
+    "SPIN_official": {
+      "remote": "https://github.com/Graph-Machine-Learning-Group/spin.git",
+      "commit": "7349ba31da7306e7e96c13668a3f1f0a4df90902",
+      "models_modified": false
+    }
+  }
+}

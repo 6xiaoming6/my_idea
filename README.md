@@ -1,3 +1,19 @@
+# 多尺度时空数据补全研究（v25）
+
+当前固定实验基线为 **I37**（2026-10-26确认）。它使用真实F/M/C观测、四轮共享八专家、原生Top-2、受控差分、历史预测池和可学习分配投影；前三轮自由选尺度，第四轮固定F。seed7学到的常见MMFF路径不是预设固定尺度调度。
+
+I37固定投影前/后缺失F损失为0.5/0.5，另含可见F重建0.1、可见M/C一致性0.1、候选均衡0.01。原配置共347,930参数。实验不保证误差逐轮下降，`best`分支名也不表示全局最优。
+
+- [当前I37基线说明](scripts/v25/README_I37_BASELINE.md)：模型、设置、参考指标与复现入口。
+- [已完成实验档案](experiment_records/v25/README.md)：I42–I75配置、完成记录、ID/OOD、曲线和选择证据。
+- [最新I64–I75复核报告](experments_report/20261025_v25_I64-I75最后一轮seed7输入优化_复核分析报告.md)：本轮没有综合优于I37的新配置。
+- [独立I37发布分支](https://github.com/6xiaoming6/my_idea/tree/best)：供新机器直接准备数据、训练、恢复和六套协议评估。当前v25保留研究历史和批次入口，部分历史脚本依赖原冻结套件，不能直接当作独立发布入口。
+
+数据、模型权重和完整运行日志不纳入本次Git同步。归档中的原机器绝对路径用于溯源，不表示这些路径在新机器上存在。
+
+<details>
+<summary>历史v24说明（保留供追溯，不是当前基线）</summary>
+
 # 时空数据补全实验项目（v24-COE）
 
 当前 `v24-COE` 分支研究 **Temporal-Spatial Chain-of-Experts（TS-CoE）**：在原始时空网格上逐层更新补全状态，每层路由器按当前观测和状态从共享专家池中选择专家。`top_k` 表示**每层同时激活的专家数**；被选专家的权重归一化后融合。当前 v24 模型只使用 fine 尺度，不构造 mid/coarse 特征。早期多尺度模型和 v14-single 实验代码仍在仓库中，但它们不是 v24 训练入口的默认架构。
@@ -138,3 +154,5 @@ outputs/v24-COE/TaxiBJ/custom/<YYYYMMDD_HHMMSS_核心名_seedN>/random/rate0.4/<
 - [scripts/train.py](scripts/train.py)：统一训练、验证、最佳轮次测试和结果记录。
 - [scripts/v24/](scripts/v24/) 与 [configs/v24/](configs/v24/)：v24 顺序实验入口与配置。
 - [experments_report/](experments_report/)：已有实验分析报告；[scripts/v14-exploration/](scripts/v14-exploration/) 与 [configs/v14-single/](configs/v14-single/) 保留历史实验。
+
+</details>

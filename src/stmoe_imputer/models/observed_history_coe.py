@@ -70,3 +70,23 @@ class ObservedHistoryCoE(ObservedMultiScaleCoE):
             return out
         finally:
             del self._x_stats
+
+
+from .scale_delta_exploration_coe import ScaleDeltaExplorationCoE
+
+
+class FreeScaleObservedHistoryCoE(ObservedHistoryCoE, ScaleDeltaExplorationCoE):
+    """I26: the same causal history/free-scale backbone, without projection."""
+
+    with_free_scales = True
+
+    @classmethod
+    def from_config(cls, cfg):
+        coe = cfg['model']['coe']
+        if coe.get('observation_consistency', {}).get('enabled', False):
+            raise ValueError('Unprojected history backbone excludes output projection')
+        if cfg['data'].get('return_multiscale_targets', False):
+            raise ValueError('Observed-only I26 excludes full coarse targets')
+        if cfg.get('loss', {}).get('learnable_f_mix', {}).get('enabled', False):
+            raise ValueError('Unprojected prediction has no distinct pre/post F losses')
+        return super().from_config(cfg)

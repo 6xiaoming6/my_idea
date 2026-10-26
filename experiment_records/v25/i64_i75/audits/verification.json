@@ -1,0 +1,20 @@
+{
+  "status": "passed",
+  "review_date": "2026-10-25",
+  "training_jobs": 12,
+  "epochs_each": 100,
+  "source_files": 552,
+  "data_files": 4,
+  "evaluated_models": 15,
+  "protocols_per_model": 6,
+  "evaluation_groups": 3,
+  "evaluation_sets": 270,
+  "checkpoint_files": 24,
+  "common_initialization": "2baf7361f1aa2308e5f2a55c07fd657e7d5feea87dd296ca071406aec3179f99",
+  "queue_status": {
+    "status": "finished",
+    "report": "/home/students/HuangMingYu/code/py/my_idea/my_idea/experments_report/20261024_v25_I64-I75最后一轮seed7输入优化_完整分析报告.md",
+    "time": 1792808674.5756931
+  },
+  "launcher_exit": "0"
+}

@@ -1,0 +1,32 @@
+{
+  "in_distribution": {
+    "mae": 8.051041961938529,
+    "rmse": 14.660255818624048,
+    "metric_missing_count": 6949810.0
+  },
+  "unseen_combinations": {
+    "mae": 8.310507159997899,
+    "rmse": 14.753400727042598,
+    "metric_missing_count": 6949810.0
+  },
+  "unseen_geometry": {
+    "mae": 10.821156783422856,
+    "rmse": 18.4873839301614,
+    "metric_missing_count": 6949810.0
+  },
+  "unseen_triple": {
+    "mae": 7.892074066143535,
+    "rmse": 13.917090116063457,
+    "metric_missing_count": 6949810.0
+  },
+  "unseen_combinations_repeat": {
+    "mae": 8.284016608907294,
+    "rmse": 14.577802500124836,
+    "metric_missing_count": 6949810.0
+  },
+  "unseen_geometry_repeat": {
+    "mae": 10.845945077994937,
+    "rmse": 18.49377020602803,
+    "metric_missing_count": 6949810.0
+  }
+}

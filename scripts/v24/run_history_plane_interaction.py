@@ -51,7 +51,19 @@ def prepare_initialization(suite, all_jobs, reference_initialization):
         for k,v in old['model'].items():
             if not torch.equal(state[k],v):raise RuntimeError('Common mismatch '+k)
         added=set(state)-set(common)
-        if any(not (k.startswith('main_branch.x_') or k.startswith('main_branch.pattern_experts.ST.plane.')) for k in added):
+        independent=set()
+        if j['config']['model']['coe'].get('expert_sharing')=='per_step':
+            prefix='main_branch.step_pattern_experts.'
+            independent={k for k in added if k.startswith(prefix)}
+            for k in independent:
+                step,suffix=k[len(prefix):].split('.',1)
+                source='main_branch.pattern_experts.'+suffix
+                if step not in ('0','1','2') or source not in common or not torch.equal(state[k],common[source]):
+                    raise RuntimeError('Independent expert initialization differs from shared pool: '+k)
+            expected={prefix+str(i)+'.'+k[len('main_branch.pattern_experts.'):]
+                      for i in range(3) for k in common if k.startswith('main_branch.pattern_experts.')}
+            if independent!=expected:raise RuntimeError('Incomplete independent expert pools')
+        if any(not (k.startswith('main_branch.x_') or k.startswith('main_branch.pattern_experts.ST.plane.')) for k in added-independent):
             raise RuntimeError('Unexpected model extension')
         sha=state_hash(state);path=suite/'initialization'/f'{name}.pth'
         if path.exists():

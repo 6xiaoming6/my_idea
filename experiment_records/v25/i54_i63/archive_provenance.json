@@ -1,0 +1,38 @@
+{
+  "original_suite": "outputs/v25/experiments/input_refinement/ad274d0529acb794",
+  "original_files_sha256": {
+    "plan.json": "18503e817380844564083a64e08e5d67d99e87be31eb37491d0bfc4aadcf4d0a",
+    "resolved_jobs.json": "85cced7046d35f8a63c866005991b163011a3798d654927f4844c27efab6e852",
+    "resolved_templates.json": "a1b091b61642d822dc6fb3457f12c18419e51b6dbd8f808d4d807f2e2a0a8206",
+    "selection.json": "5a9dacef1ff1b3bf8d538bc1b10381a61453d26c89577fa82ee32db41c8a6090",
+    "initialization_audit.json": "0ac64a32cfc4758c859f7c2aa6a4d507914e462de83306c6d60c9b76c37aca03",
+    "queue_state.json": "f4c8ff4ab0baf92ff99510a3cf7da142120a394c1fd1c90424e2d27286867dd5",
+    "jobs/taxibj_I54_seed7.json": "59544fa639ad99ec2805b5f6b257693c6e4301465462348e61367ebd8f9fe596",
+    "jobs/taxibj_I57_seed7.json": "dd36e757ccf01e65b1a1b0144bb5167a3005f595f4b17c6aa86d86458d9b2487",
+    "jobs/taxibj_I56_seed7.json": "fe9528614d0a9680ac63239df4abf891e1f2c4b37f0270e1960325cedd5030b9",
+    "jobs/taxibj_I58_seed7.json": "82f76c97c7cc7e0902621734e57d6ddc29d29193da31644ed038410a03b69e53",
+    "jobs/taxibj_I61_seed27.json": "bcf45009415dca9ec8e747e636c80553992691f9f5b4edee39996d5a3d2c5691",
+    "jobs/taxibj_I59_seed7.json": "331fcef26237f016f4d38c82d19d7f250b220545ef61fd56abf14719be9e2801",
+    "jobs/taxibj_I63_seed27.json": "e38b7f3ed9578b7fa424ec57508ced0fac794c1ac01115c9ed5d27940f46bba7",
+    "jobs/taxibj_I62_seed17.json": "ff90349462ea126e963bc15ebe0b14e66c070c086dec272b2425f4ac51caf04f",
+    "jobs/taxibj_I55_seed7.json": "5cecab6013e3be14f86c5800463a4018ca0b73f624af82c3d751093b634e74b7",
+    "jobs/taxibj_I60_seed7.json": "4b2727c4044a36d6e787b29c91e837343819eba3d81c1ba6f46f956a5fee31e2",
+    "results/taxibj_I54_seed7.json": "894abcb2f5b22a7b02e368924fcb8f2e5ac3c32544a5f83f95b61193014af771",
+    "results/taxibj_I57_seed7.json": "a9a971e4e0091cc3772e0b7866565ae2855118a4ada0a40335410a55b112bd80",
+    "results/taxibj_I56_seed7.json": "eb8e68ebba367c9c17eb60038ba5c4cc78c1532b470f24d164c1068d9bd54c0a",
+    "results/taxibj_I58_seed7.json": "417b264c471ea33f4f83767bb1fd1122656559abd41c9e13b75c40f961f2c0db",
+    "results/taxibj_I61_seed27.json": "be44d4dffa881f66f585a13d8cab0462c9b16448809c3280f0d7ee3e097b39e5",
+    "results/taxibj_I59_seed7.json": "6683ecfcd62f5ac269d085180f2d065d8ea48ed7f733d5bf82d8849d24500767",
+    "results/taxibj_I63_seed27.json": "9ff3dc8db8fcb4a73133da172db7492aaa6510cc747562feddaff76610ffdc57",
+    "results/taxibj_I62_seed17.json": "a181e3197ce0edf7c27b0709070cc53c24b5d9fc847834832431f628339d2a6c",
+    "results/taxibj_I55_seed7.json": "91bf634e0a0708f998cb648f2bcf5e1766cc1b4b3dab2898297b7da76604411b",
+    "results/taxibj_I60_seed7.json": "bc05050aa76a81e48e9cc7460b2fbd4db490a29032d119e6093f8aa4880963ef"
+  },
+  "evaluation_groups": {
+    "development": 12,
+    "evaluations": 12,
+    "confirmation": 12
+  },
+  "metric_archive_is_reduced": true,
+  "checkpoints_included": false
+}

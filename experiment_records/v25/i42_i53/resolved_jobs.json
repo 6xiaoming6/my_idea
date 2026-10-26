@@ -1,0 +1,3438 @@
+{
+  "taxibj_I42_seed7": {
+    "variant": "taxibj_I42_seed7",
+    "name": "i42_v25_observation_iteration",
+    "method": "I42",
+    "dataset": "taxibj",
+    "reference": "I37",
+    "config": {
+      "seed": 7,
+      "output_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v25",
+      "device": "cuda",
+      "data": {
+        "dataset_name": "TaxiBJ",
+        "batch_size": 32,
+        "num_workers": 0,
+        "pin_memory": true,
+        "drop_last": false,
+        "mask": {
+          "pattern": "random",
+          "missing_rate": 0.4
+        },
+        "synthetic": {
+          "num_train": 128,
+          "num_val": 32,
+          "t": 12,
+          "h": 32,
+          "w": 32
+        },
+        "multiscale": true,
+        "loader_seed": 7,
+        "train_mask_diversity": {
+          "families": [
+            "random_point",
+            "node_outage",
+            "temporal_gap",
+            "spatial_region"
+          ],
+          "rates": [
+            0.4
+          ],
+          "seed": 20260917,
+          "resample_each_epoch": true
+        },
+        "eval_mask_diversity": {
+          "families": [
+            "random_point",
+            "node_outage",
+            "temporal_gap",
+            "spatial_region"
+          ],
+          "rates": [
+            0.4
+          ],
+          "seed": 20260917,
+          "resample_each_epoch": false
+        },
+        "input_scales": "FMC",
+        "scales": {
+          "fine_to_mid": 2,
+          "fine_to_coarse": 4,
+          "pooling_mode": "sum"
+        }
+      },
+      "model": {
+        "architecture": "v25_observed_multiscale_coe",
+        "c_in": 2,
+        "main": {
+          "dim": 64,
+          "max_t": 12,
+          "h": 32,
+          "w": 32,
+          "scale_mode": "fine_mid_coarse",
+          "use_multiscale": true
+        },
+        "coe": {
+          "num_steps": 4,
+          "expert_pool": [
+            "T",
+            "S",
+            "TD",
+            "SD",
+            "TA",
+            "ST",
+            "TL",
+            "SL"
+          ],
+          "routing_mode": "hard",
+          "fixed_path": null,
+          "fixed_expert_steps": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "router_state": "dynamic",
+          "expert_state": "dynamic",
+          "use_shared": false,
+          "use_routed": true,
+          "temperature": 1.0,
+          "temporal_kernel": 3,
+          "spatial_kernel": 3,
+          "temporal_dilation": 2,
+          "spatial_dilation": 2,
+          "attention_heads": 4,
+          "residual_init": 0.1,
+          "routing_warmup_epochs": 0,
+          "routing_transition_epochs": 0,
+          "uniform_mix_start": 0.5,
+          "sampling_temperature_start": 2.0,
+          "top_k": 2,
+          "router_hidden_dim": 64,
+          "pair_mode": "native",
+          "acceptance": "none",
+          "expert_sharing": "shared",
+          "previous_expert_context": false,
+          "global_route_weights": false,
+          "router_input_noise_std": 0.0,
+          "router_input_noise_steps": 0,
+          "completion_feedback": false,
+          "repair_acceptance": "none",
+          "fusion_mode": "original",
+          "partner_fusion": "individual",
+          "partner_aux_head_only": false,
+          "pair_dense_warmup_steps": 0,
+          "state_update_mode": "direct",
+          "router_features": "legacy",
+          "local_routing": {
+            "enabled": false
+          },
+          "four_direction": {
+            "enabled": true,
+            "scale": "fixed"
+          },
+          "id_priority": {
+            "enabled": true,
+            "communication": "delta",
+            "bound": 0.1,
+            "scale_policy": "fixed",
+            "fixed_epochs": 0,
+            "scale_soft_warmup_epochs": 0,
+            "scale_soft_transition_epochs": 0
+          },
+          "backbone_exploration": {
+            "enabled": true
+          },
+          "core_validation": {
+            "enabled": true,
+            "path": "CMFF",
+            "communication": "conditional"
+          },
+          "initial_observation_scales": "FMC",
+          "scale_delta_exploration": {
+            "enabled": true,
+            "path": "free",
+            "top_k_per_step": [
+              2,
+              2,
+              2,
+              2
+            ],
+            "delta_steps": [
+              2,
+              3,
+              4
+            ],
+            "same_scale_only": false,
+            "scale_gradient": "selected_branch_st",
+            "top1_gradient": "selected_probability_st",
+            "last_round_fine": true
+          },
+          "observed_history": {
+            "enabled": true,
+            "mode": "adaptive"
+          },
+          "observation_consistency": {
+            "enabled": true,
+            "mode": "residual_projection",
+            "weight_bound": 2.0
+          },
+          "observation_iteration": {
+            "enabled": true,
+            "fixed_path": "MMFF"
+          }
+        },
+        "aux": {
+          "enabled": false,
+          "alpha_init": 0.0
+        }
+      },
+      "loss": {
+        "type": "l1",
+        "lambda_coe_mid": 0.0,
+        "lambda_coe_balance": 0.01,
+        "lambda_coe_z": 0.0,
+        "balance_importance": "candidate",
+        "visible_consistency_aux": {
+          "weight": 0.1,
+          "source": "pre_projection"
+        },
+        "lambda_raw_f": 0.5,
+        "lambda_final_f": 0.5,
+        "lambda_visible_raw_f": 0.1
+      },
+      "train": {
+        "epochs": 100,
+        "val_epoch": 5,
+        "lr_main": 0.001,
+        "weight_decay": 0.0001,
+        "grad_clip_norm": 1.0,
+        "amp": true,
+        "save_every": 10,
+        "scheduler": {
+          "type": "cosine",
+          "total_epochs": 100,
+          "eta_min": 0.0003,
+          "reach_min_at_last_epoch": true
+        },
+        "early_stopping": {
+          "enabled": false
+        },
+        "save_best_checkpoint": true,
+        "router_grad_diagnostic_every": 0,
+        "full_checkpoint": true,
+        "measure_forward_latency": true,
+        "oracle_last_step_samples": 0,
+        "best_checkpoint_name": "best.pth",
+        "save_last_checkpoint": true,
+        "optimizer": "AdamW",
+        "strict_replay": true,
+        "logging": {
+          "diagnostic_every": 5,
+          "path_top_k": 10
+        }
+      },
+      "experiment_plan": {
+        "suite": "observation_iteration",
+        "variant": "taxibj_I42_seed7",
+        "method": "固定MMFF；原数据流和通信",
+        "protocol": {
+          "train_families": [
+            "random_point",
+            "node_outage",
+            "temporal_gap",
+            "spatial_region"
+          ],
+          "rate": 0.4,
+          "mask_seed": 20260917,
+          "evaluations": {
+            "in_distribution": {
+              "families": [
+                "random_point",
+                "node_outage",
+                "temporal_gap",
+                "spatial_region"
+              ],
+              "seed": 20260917
+            },
+            "unseen_combinations": {
+              "families": [
+                "node_plus_space",
+                "time_plus_space",
+                "node_plus_time"
+              ],
+              "seed": 20260918
+            },
+            "unseen_geometry": {
+              "families": [
+                "moving_region",
+                "multi_block"
+              ],
+              "seed": 20260919
+            },
+            "unseen_triple": {
+              "families": [
+                "node_plus_time_plus_space"
+              ],
+              "seed": 20260930
+            },
+            "unseen_combinations_repeat": {
+              "families": [
+                "node_plus_space",
+                "time_plus_space",
+                "node_plus_time"
+              ],
+              "seed": 20261001
+            },
+            "unseen_geometry_repeat": {
+              "families": [
+                "moving_region",
+                "multi_block"
+              ],
+              "seed": 20261002
+            }
+          },
+          "checkpoint_selection": "in_distribution_validation_only",
+          "note": "Same test windows across sets; masks are fixed and identical across models. New family/combination names never reach the model.",
+          "scale_protocol": "same family and missing rate at all scales; independent RNG; A masks M/C to zero"
+        },
+        "selection": "ID validation MAE only",
+        "scope": "Observed-only iteration; independent initialization; development-only I53 selection",
+        "reference": "I37"
+      }
+    },
+    "sources": {
+      "train": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v25_observed_multiscale/73fe84df49ca05de/taxibj_train.npz",
+      "val": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v25_observed_multiscale/73fe84df49ca05de/taxibj_val.npz",
+      "test": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v25_observed_multiscale/73fe84df49ca05de/taxibj_test.npz"
+    },
+    "defer_test": true,
+    "common_initialization": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v25/experiments/observation_iteration/1d6eb79a66c77e49/initialization/taxibj_I42_seed7.pth"
+  },
+  "taxibj_I43_seed7": {
+    "variant": "taxibj_I43_seed7",
+    "name": "i43_v25_observation_iteration",
+    "method": "I43",
+    "dataset": "taxibj",
+    "reference": "I37",
+    "config": {
+      "seed": 7,
+      "output_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v25",
+      "device": "cuda",
+      "data": {
+        "dataset_name": "TaxiBJ",
+        "batch_size": 32,
+        "num_workers": 0,
+        "pin_memory": true,
+        "drop_last": false,
+        "mask": {
+          "pattern": "random",
+          "missing_rate": 0.4
+        },
+        "synthetic": {
+          "num_train": 128,
+          "num_val": 32,
+          "t": 12,
+          "h": 32,
+          "w": 32
+        },
+        "multiscale": true,
+        "loader_seed": 7,
+        "train_mask_diversity": {
+          "families": [
+            "random_point",
+            "node_outage",
+            "temporal_gap",
+            "spatial_region"
+          ],
+          "rates": [
+            0.4
+          ],
+          "seed": 20260917,
+          "resample_each_epoch": true
+        },
+        "eval_mask_diversity": {
+          "families": [
+            "random_point",
+            "node_outage",
+            "temporal_gap",
+            "spatial_region"
+          ],
+          "rates": [
+            0.4
+          ],
+          "seed": 20260917,
+          "resample_each_epoch": false
+        },
+        "input_scales": "FMC",
+        "scales": {
+          "fine_to_mid": 2,
+          "fine_to_coarse": 4,
+          "pooling_mode": "sum"
+        }
+      },
+      "model": {
+        "architecture": "v25_observed_multiscale_coe",
+        "c_in": 2,
+        "main": {
+          "dim": 64,
+          "max_t": 12,
+          "h": 32,
+          "w": 32,
+          "scale_mode": "fine_mid_coarse",
+          "use_multiscale": true
+        },
+        "coe": {
+          "num_steps": 4,
+          "expert_pool": [
+            "T",
+            "S",
+            "TD",
+            "SD",
+            "TA",
+            "ST",
+            "TL",
+            "SL"
+          ],
+          "routing_mode": "hard",
+          "fixed_path": null,
+          "fixed_expert_steps": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "router_state": "dynamic",
+          "expert_state": "dynamic",
+          "use_shared": false,
+          "use_routed": true,
+          "temperature": 1.0,
+          "temporal_kernel": 3,
+          "spatial_kernel": 3,
+          "temporal_dilation": 2,
+          "spatial_dilation": 2,
+          "attention_heads": 4,
+          "residual_init": 0.1,
+          "routing_warmup_epochs": 0,
+          "routing_transition_epochs": 0,
+          "uniform_mix_start": 0.5,
+          "sampling_temperature_start": 2.0,
+          "top_k": 2,
+          "router_hidden_dim": 64,
+          "pair_mode": "native",
+          "acceptance": "none",
+          "expert_sharing": "shared",
+          "previous_expert_context": false,
+          "global_route_weights": false,
+          "router_input_noise_std": 0.0,
+          "router_input_noise_steps": 0,
+          "completion_feedback": false,
+          "repair_acceptance": "none",
+          "fusion_mode": "original",
+          "partner_fusion": "individual",
+          "partner_aux_head_only": false,
+          "pair_dense_warmup_steps": 0,
+          "state_update_mode": "direct",
+          "router_features": "legacy",
+          "local_routing": {
+            "enabled": false
+          },
+          "four_direction": {
+            "enabled": true,
+            "scale": "fixed"
+          },
+          "id_priority": {
+            "enabled": true,
+            "communication": "delta",
+            "bound": 0.1,
+            "scale_policy": "fixed",
+            "fixed_epochs": 0,
+            "scale_soft_warmup_epochs": 0,
+            "scale_soft_transition_epochs": 0
+          },
+          "backbone_exploration": {
+            "enabled": true
+          },
+          "core_validation": {
+            "enabled": true,
+            "path": "CMFF",
+            "communication": "conditional"
+          },
+          "initial_observation_scales": "FMC",
+          "scale_delta_exploration": {
+            "enabled": true,
+            "path": "free",
+            "top_k_per_step": [
+              2,
+              2,
+              2,
+              2
+            ],
+            "delta_steps": [
+              2,
+              3,
+              4
+            ],
+            "same_scale_only": false,
+            "scale_gradient": "selected_branch_st",
+            "top1_gradient": "selected_probability_st",
+            "last_round_fine": true
+          },
+          "observed_history": {
+            "enabled": true,
+            "mode": "adaptive"
+          },
+          "observation_consistency": {
+            "enabled": true,
+            "mode": "residual_projection",
+            "weight_bound": 2.0
+          },
+          "observation_iteration": {
+            "enabled": true,
+            "refresh_completion": true,
+            "expert_router_input": "native"
+          }
+        },
+        "aux": {
+          "enabled": false,
+          "alpha_init": 0.0
+        }
+      },
+      "loss": {
+        "type": "l1",
+        "lambda_coe_mid": 0.0,
+        "lambda_coe_balance": 0.01,
+        "lambda_coe_z": 0.0,
+        "balance_importance": "candidate",
+        "visible_consistency_aux": {
+          "weight": 0.1,
+          "source": "pre_projection"
+        },
+        "lambda_raw_f": 0.5,
+        "lambda_final_f": 0.5,
+        "lambda_visible_raw_f": 0.1
+      },
+      "train": {
+        "epochs": 100,
+        "val_epoch": 5,
+        "lr_main": 0.001,
+        "weight_decay": 0.0001,
+        "grad_clip_norm": 1.0,
+        "amp": true,
+        "save_every": 10,
+        "scheduler": {
+          "type": "cosine",
+          "total_epochs": 100,
+          "eta_min": 0.0003,
+          "reach_min_at_last_epoch": true
+        },
+        "early_stopping": {
+          "enabled": false
+        },
+        "save_best_checkpoint": true,
+        "router_grad_diagnostic_every": 0,
+        "full_checkpoint": true,
+        "measure_forward_latency": true,
+        "oracle_last_step_samples": 0,
+        "best_checkpoint_name": "best.pth",
+        "save_last_checkpoint": true,
+        "optimizer": "AdamW",
+        "strict_replay": true,
+        "logging": {
+          "diagnostic_every": 5,
+          "path_top_k": 10
+        }
+      },
+      "experiment_plan": {
+        "suite": "observation_iteration",
+        "variant": "taxibj_I43_seed7",
+        "method": "逐轮刷新补位；专家路由读取所选尺度融合输入",
+        "protocol": {
+          "train_families": [
+            "random_point",
+            "node_outage",
+            "temporal_gap",
+            "spatial_region"
+          ],
+          "rate": 0.4,
+          "mask_seed": 20260917,
+          "evaluations": {
+            "in_distribution": {
+              "families": [
+                "random_point",
+                "node_outage",
+                "temporal_gap",
+                "spatial_region"
+              ],
+              "seed": 20260917
+            },
+            "unseen_combinations": {
+              "families": [
+                "node_plus_space",
+                "time_plus_space",
+                "node_plus_time"
+              ],
+              "seed": 20260918
+            },
+            "unseen_geometry": {
+              "families": [
+                "moving_region",
+                "multi_block"
+              ],
+              "seed": 20260919
+            },
+            "unseen_triple": {
+              "families": [
+                "node_plus_time_plus_space"
+              ],
+              "seed": 20260930
+            },
+            "unseen_combinations_repeat": {
+              "families": [
+                "node_plus_space",
+                "time_plus_space",
+                "node_plus_time"
+              ],
+              "seed": 20261001
+            },
+            "unseen_geometry_repeat": {
+              "families": [
+                "moving_region",
+                "multi_block"
+              ],
+              "seed": 20261002
+            }
+          },
+          "checkpoint_selection": "in_distribution_validation_only",
+          "note": "Same test windows across sets; masks are fixed and identical across models. New family/combination names never reach the model.",
+          "scale_protocol": "same family and missing rate at all scales; independent RNG; A masks M/C to zero"
+        },
+        "selection": "ID validation MAE only",
+        "scope": "Observed-only iteration; independent initialization; development-only I53 selection",
+        "reference": "I37"
+      }
+    },
+    "sources": {
+      "train": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v25_observed_multiscale/73fe84df49ca05de/taxibj_train.npz",
+      "val": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v25_observed_multiscale/73fe84df49ca05de/taxibj_val.npz",
+      "test": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v25_observed_multiscale/73fe84df49ca05de/taxibj_test.npz"
+    },
+    "defer_test": true,
+    "common_initialization": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v25/experiments/observation_iteration/1d6eb79a66c77e49/initialization/taxibj_I43_seed7.pth"
+  },
+  "taxibj_I44_seed7": {
+    "variant": "taxibj_I44_seed7",
+    "name": "i44_v25_observation_iteration",
+    "method": "I44",
+    "dataset": "taxibj",
+    "reference": "I43",
+    "config": {
+      "seed": 7,
+      "output_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v25",
+      "device": "cuda",
+      "data": {
+        "dataset_name": "TaxiBJ",
+        "batch_size": 32,
+        "num_workers": 0,
+        "pin_memory": true,
+        "drop_last": false,
+        "mask": {
+          "pattern": "random",
+          "missing_rate": 0.4
+        },
+        "synthetic": {
+          "num_train": 128,
+          "num_val": 32,
+          "t": 12,
+          "h": 32,
+          "w": 32
+        },
+        "multiscale": true,
+        "loader_seed": 7,
+        "train_mask_diversity": {
+          "families": [
+            "random_point",
+            "node_outage",
+            "temporal_gap",
+            "spatial_region"
+          ],
+          "rates": [
+            0.4
+          ],
+          "seed": 20260917,
+          "resample_each_epoch": true
+        },
+        "eval_mask_diversity": {
+          "families": [
+            "random_point",
+            "node_outage",
+            "temporal_gap",
+            "spatial_region"
+          ],
+          "rates": [
+            0.4
+          ],
+          "seed": 20260917,
+          "resample_each_epoch": false
+        },
+        "input_scales": "FMC",
+        "scales": {
+          "fine_to_mid": 2,
+          "fine_to_coarse": 4,
+          "pooling_mode": "sum"
+        }
+      },
+      "model": {
+        "architecture": "v25_observed_multiscale_coe",
+        "c_in": 2,
+        "main": {
+          "dim": 64,
+          "max_t": 12,
+          "h": 32,
+          "w": 32,
+          "scale_mode": "fine_mid_coarse",
+          "use_multiscale": true
+        },
+        "coe": {
+          "num_steps": 4,
+          "expert_pool": [
+            "T",
+            "S",
+            "TD",
+            "SD",
+            "TA",
+            "ST",
+            "TL",
+            "SL"
+          ],
+          "routing_mode": "hard",
+          "fixed_path": null,
+          "fixed_expert_steps": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "router_state": "dynamic",
+          "expert_state": "dynamic",
+          "use_shared": false,
+          "use_routed": true,
+          "temperature": 1.0,
+          "temporal_kernel": 3,
+          "spatial_kernel": 3,
+          "temporal_dilation": 2,
+          "spatial_dilation": 2,
+          "attention_heads": 4,
+          "residual_init": 0.1,
+          "routing_warmup_epochs": 0,
+          "routing_transition_epochs": 0,
+          "uniform_mix_start": 0.5,
+          "sampling_temperature_start": 2.0,
+          "top_k": 2,
+          "router_hidden_dim": 64,
+          "pair_mode": "native",
+          "acceptance": "none",
+          "expert_sharing": "shared",
+          "previous_expert_context": false,
+          "global_route_weights": false,
+          "router_input_noise_std": 0.0,
+          "router_input_noise_steps": 0,
+          "completion_feedback": false,
+          "repair_acceptance": "none",
+          "fusion_mode": "original",
+          "partner_fusion": "individual",
+          "partner_aux_head_only": false,
+          "pair_dense_warmup_steps": 0,
+          "state_update_mode": "direct",
+          "router_features": "legacy",
+          "local_routing": {
+            "enabled": false
+          },
+          "four_direction": {
+            "enabled": true,
+            "scale": "fixed"
+          },
+          "id_priority": {
+            "enabled": true,
+            "communication": "delta",
+            "bound": 0.1,
+            "scale_policy": "fixed",
+            "fixed_epochs": 0,
+            "scale_soft_warmup_epochs": 0,
+            "scale_soft_transition_epochs": 0
+          },
+          "backbone_exploration": {
+            "enabled": true
+          },
+          "core_validation": {
+            "enabled": true,
+            "path": "CMFF",
+            "communication": "conditional"
+          },
+          "initial_observation_scales": "FMC",
+          "scale_delta_exploration": {
+            "enabled": true,
+            "path": "free",
+            "top_k_per_step": [
+              2,
+              2,
+              2,
+              2
+            ],
+            "delta_steps": [
+              2,
+              3,
+              4
+            ],
+            "same_scale_only": false,
+            "scale_gradient": "selected_branch_st",
+            "top1_gradient": "selected_probability_st",
+            "last_round_fine": true
+          },
+          "observed_history": {
+            "enabled": true,
+            "mode": "adaptive"
+          },
+          "observation_consistency": {
+            "enabled": true,
+            "mode": "residual_projection",
+            "weight_bound": 2.0
+          },
+          "observation_iteration": {
+            "enabled": true,
+            "refresh_completion": true,
+            "expert_router_input": "native",
+            "round_input": "remaining_residual"
+          }
+        },
+        "aux": {
+          "enabled": false,
+          "alpha_init": 0.0
+        }
+      },
+      "loss": {
+        "type": "l1",
+        "lambda_coe_mid": 0.0,
+        "lambda_coe_balance": 0.01,
+        "lambda_coe_z": 0.0,
+        "balance_importance": "candidate",
+        "visible_consistency_aux": {
+          "weight": 0.1,
+          "source": "pre_projection"
+        },
+        "lambda_raw_f": 0.5,
+        "lambda_final_f": 0.5,
+        "lambda_visible_raw_f": 0.1
+      },
+      "train": {
+        "epochs": 100,
+        "val_epoch": 5,
+        "lr_main": 0.001,
+        "weight_decay": 0.0001,
+        "grad_clip_norm": 1.0,
+        "amp": true,
+        "save_every": 10,
+        "scheduler": {
+          "type": "cosine",
+          "total_epochs": 100,
+          "eta_min": 0.0003,
+          "reach_min_at_last_epoch": true
+        },
+        "early_stopping": {
+          "enabled": false
+        },
+        "save_best_checkpoint": true,
+        "router_grad_diagnostic_every": 0,
+        "full_checkpoint": true,
+        "measure_forward_latency": true,
+        "oracle_last_step_samples": 0,
+        "best_checkpoint_name": "best.pth",
+        "save_last_checkpoint": true,
+        "optimizer": "AdamW",
+        "strict_replay": true,
+        "logging": {
+          "diagnostic_every": 5,
+          "path_top_k": 10
+        }
+      },
+      "experiment_plan": {
+        "suite": "observation_iteration",
+        "variant": "taxibj_I44_seed7",
+        "method": "去重的剩余观测差异替代绝对观测注入",
+        "protocol": {
+          "train_families": [
+            "random_point",
+            "node_outage",
+            "temporal_gap",
+            "spatial_region"
+          ],
+          "rate": 0.4,
+          "mask_seed": 20260917,
+          "evaluations": {
+            "in_distribution": {
+              "families": [
+                "random_point",
+                "node_outage",
+                "temporal_gap",
+                "spatial_region"
+              ],
+              "seed": 20260917
+            },
+            "unseen_combinations": {
+              "families": [
+                "node_plus_space",
+                "time_plus_space",
+                "node_plus_time"
+              ],
+              "seed": 20260918
+            },
+            "unseen_geometry": {
+              "families": [
+                "moving_region",
+                "multi_block"
+              ],
+              "seed": 20260919
+            },
+            "unseen_triple": {
+              "families": [
+                "node_plus_time_plus_space"
+              ],
+              "seed": 20260930
+            },
+            "unseen_combinations_repeat": {
+              "families": [
+                "node_plus_space",
+                "time_plus_space",
+                "node_plus_time"
+              ],
+              "seed": 20261001
+            },
+            "unseen_geometry_repeat": {
+              "families": [
+                "moving_region",
+                "multi_block"
+              ],
+              "seed": 20261002
+            }
+          },
+          "checkpoint_selection": "in_distribution_validation_only",
+          "note": "Same test windows across sets; masks are fixed and identical across models. New family/combination names never reach the model.",
+          "scale_protocol": "same family and missing rate at all scales; independent RNG; A masks M/C to zero"
+        },
+        "selection": "ID validation MAE only",
+        "scope": "Observed-only iteration; independent initialization; development-only I53 selection",
+        "reference": "I43"
+      }
+    },
+    "sources": {
+      "train": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v25_observed_multiscale/73fe84df49ca05de/taxibj_train.npz",
+      "val": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v25_observed_multiscale/73fe84df49ca05de/taxibj_val.npz",
+      "test": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v25_observed_multiscale/73fe84df49ca05de/taxibj_test.npz"
+    },
+    "defer_test": true,
+    "common_initialization": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v25/experiments/observation_iteration/1d6eb79a66c77e49/initialization/taxibj_I44_seed7.pth"
+  },
+  "taxibj_I45_seed7": {
+    "variant": "taxibj_I45_seed7",
+    "name": "i45_v25_observation_iteration",
+    "method": "I45",
+    "dataset": "taxibj",
+    "reference": "I44",
+    "config": {
+      "seed": 7,
+      "output_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v25",
+      "device": "cuda",
+      "data": {
+        "dataset_name": "TaxiBJ",
+        "batch_size": 32,
+        "num_workers": 0,
+        "pin_memory": true,
+        "drop_last": false,
+        "mask": {
+          "pattern": "random",
+          "missing_rate": 0.4
+        },
+        "synthetic": {
+          "num_train": 128,
+          "num_val": 32,
+          "t": 12,
+          "h": 32,
+          "w": 32
+        },
+        "multiscale": true,
+        "loader_seed": 7,
+        "train_mask_diversity": {
+          "families": [
+            "random_point",
+            "node_outage",
+            "temporal_gap",
+            "spatial_region"
+          ],
+          "rates": [
+            0.4
+          ],
+          "seed": 20260917,
+          "resample_each_epoch": true
+        },
+        "eval_mask_diversity": {
+          "families": [
+            "random_point",
+            "node_outage",
+            "temporal_gap",
+            "spatial_region"
+          ],
+          "rates": [
+            0.4
+          ],
+          "seed": 20260917,
+          "resample_each_epoch": false
+        },
+        "input_scales": "FMC",
+        "scales": {
+          "fine_to_mid": 2,
+          "fine_to_coarse": 4,
+          "pooling_mode": "sum"
+        }
+      },
+      "model": {
+        "architecture": "v25_observed_multiscale_coe",
+        "c_in": 2,
+        "main": {
+          "dim": 64,
+          "max_t": 12,
+          "h": 32,
+          "w": 32,
+          "scale_mode": "fine_mid_coarse",
+          "use_multiscale": true
+        },
+        "coe": {
+          "num_steps": 4,
+          "expert_pool": [
+            "T",
+            "S",
+            "TD",
+            "SD",
+            "TA",
+            "ST",
+            "TL",
+            "SL"
+          ],
+          "routing_mode": "hard",
+          "fixed_path": null,
+          "fixed_expert_steps": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "router_state": "dynamic",
+          "expert_state": "dynamic",
+          "use_shared": false,
+          "use_routed": true,
+          "temperature": 1.0,
+          "temporal_kernel": 3,
+          "spatial_kernel": 3,
+          "temporal_dilation": 2,
+          "spatial_dilation": 2,
+          "attention_heads": 4,
+          "residual_init": 0.1,
+          "routing_warmup_epochs": 0,
+          "routing_transition_epochs": 0,
+          "uniform_mix_start": 0.5,
+          "sampling_temperature_start": 2.0,
+          "top_k": 2,
+          "router_hidden_dim": 64,
+          "pair_mode": "native",
+          "acceptance": "none",
+          "expert_sharing": "shared",
+          "previous_expert_context": false,
+          "global_route_weights": false,
+          "router_input_noise_std": 0.0,
+          "router_input_noise_steps": 0,
+          "completion_feedback": false,
+          "repair_acceptance": "none",
+          "fusion_mode": "original",
+          "partner_fusion": "individual",
+          "partner_aux_head_only": false,
+          "pair_dense_warmup_steps": 0,
+          "state_update_mode": "direct",
+          "router_features": "legacy",
+          "local_routing": {
+            "enabled": false
+          },
+          "four_direction": {
+            "enabled": true,
+            "scale": "fixed"
+          },
+          "id_priority": {
+            "enabled": true,
+            "communication": "delta",
+            "bound": 0.1,
+            "scale_policy": "fixed",
+            "fixed_epochs": 0,
+            "scale_soft_warmup_epochs": 0,
+            "scale_soft_transition_epochs": 0
+          },
+          "backbone_exploration": {
+            "enabled": true
+          },
+          "core_validation": {
+            "enabled": true,
+            "path": "CMFF",
+            "communication": "conditional"
+          },
+          "initial_observation_scales": "FMC",
+          "scale_delta_exploration": {
+            "enabled": true,
+            "path": "free",
+            "top_k_per_step": [
+              2,
+              2,
+              2,
+              2
+            ],
+            "delta_steps": [
+              2,
+              3,
+              4
+            ],
+            "same_scale_only": false,
+            "scale_gradient": "selected_branch_st",
+            "top1_gradient": "selected_probability_st",
+            "last_round_fine": true
+          },
+          "observed_history": {
+            "enabled": true,
+            "mode": "adaptive"
+          },
+          "observation_consistency": {
+            "enabled": true,
+            "mode": "residual_projection",
+            "weight_bound": 2.0
+          },
+          "observation_iteration": {
+            "enabled": true,
+            "refresh_completion": true,
+            "expert_router_input": "native",
+            "round_input": "remaining_residual",
+            "routing_evidence": true
+          }
+        },
+        "aux": {
+          "enabled": false,
+          "alpha_init": 0.0
+        }
+      },
+      "loss": {
+        "type": "l1",
+        "lambda_coe_mid": 0.0,
+        "lambda_coe_balance": 0.01,
+        "lambda_coe_z": 0.0,
+        "balance_importance": "candidate",
+        "visible_consistency_aux": {
+          "weight": 0.1,
+          "source": "pre_projection"
+        },
+        "lambda_raw_f": 0.5,
+        "lambda_final_f": 0.5,
+        "lambda_visible_raw_f": 0.1
+      },
+      "train": {
+        "epochs": 100,
+        "val_epoch": 5,
+        "lr_main": 0.001,
+        "weight_decay": 0.0001,
+        "grad_clip_norm": 1.0,
+        "amp": true,
+        "save_every": 10,
+        "scheduler": {
+          "type": "cosine",
+          "total_epochs": 100,
+          "eta_min": 0.0003,
+          "reach_min_at_last_epoch": true
+        },
+        "early_stopping": {
+          "enabled": false
+        },
+        "save_best_checkpoint": true,
+        "router_grad_diagnostic_every": 0,
+        "full_checkpoint": true,
+        "measure_forward_latency": true,
+        "oracle_last_step_samples": 0,
+        "best_checkpoint_name": "best.pth",
+        "save_last_checkpoint": true,
+        "optimizer": "AdamW",
+        "strict_replay": true,
+        "logging": {
+          "diagnostic_every": 5,
+          "path_top_k": 10
+        }
+      },
+      "experiment_plan": {
+        "suite": "observation_iteration",
+        "variant": "taxibj_I45_seed7",
+        "method": "剩余观测差异驱动的尺度与专家路由偏置",
+        "protocol": {
+          "train_families": [
+            "random_point",
+            "node_outage",
+            "temporal_gap",
+            "spatial_region"
+          ],
+          "rate": 0.4,
+          "mask_seed": 20260917,
+          "evaluations": {
+            "in_distribution": {
+              "families": [
+                "random_point",
+                "node_outage",
+                "temporal_gap",
+                "spatial_region"
+              ],
+              "seed": 20260917
+            },
+            "unseen_combinations": {
+              "families": [
+                "node_plus_space",
+                "time_plus_space",
+                "node_plus_time"
+              ],
+              "seed": 20260918
+            },
+            "unseen_geometry": {
+              "families": [
+                "moving_region",
+                "multi_block"
+              ],
+              "seed": 20260919
+            },
+            "unseen_triple": {
+              "families": [
+                "node_plus_time_plus_space"
+              ],
+              "seed": 20260930
+            },
+            "unseen_combinations_repeat": {
+              "families": [
+                "node_plus_space",
+                "time_plus_space",
+                "node_plus_time"
+              ],
+              "seed": 20261001
+            },
+            "unseen_geometry_repeat": {
+              "families": [
+                "moving_region",
+                "multi_block"
+              ],
+              "seed": 20261002
+            }
+          },
+          "checkpoint_selection": "in_distribution_validation_only",
+          "note": "Same test windows across sets; masks are fixed and identical across models. New family/combination names never reach the model.",
+          "scale_protocol": "same family and missing rate at all scales; independent RNG; A masks M/C to zero"
+        },
+        "selection": "ID validation MAE only",
+        "scope": "Observed-only iteration; independent initialization; development-only I53 selection",
+        "reference": "I44"
+      }
+    },
+    "sources": {
+      "train": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v25_observed_multiscale/73fe84df49ca05de/taxibj_train.npz",
+      "val": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v25_observed_multiscale/73fe84df49ca05de/taxibj_val.npz",
+      "test": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v25_observed_multiscale/73fe84df49ca05de/taxibj_test.npz"
+    },
+    "defer_test": true,
+    "common_initialization": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v25/experiments/observation_iteration/1d6eb79a66c77e49/initialization/taxibj_I45_seed7.pth"
+  },
+  "taxibj_I46_seed7": {
+    "variant": "taxibj_I46_seed7",
+    "name": "i46_v25_observation_iteration",
+    "method": "I46",
+    "dataset": "taxibj",
+    "reference": "I44",
+    "config": {
+      "seed": 7,
+      "output_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v25",
+      "device": "cuda",
+      "data": {
+        "dataset_name": "TaxiBJ",
+        "batch_size": 32,
+        "num_workers": 0,
+        "pin_memory": true,
+        "drop_last": false,
+        "mask": {
+          "pattern": "random",
+          "missing_rate": 0.4
+        },
+        "synthetic": {
+          "num_train": 128,
+          "num_val": 32,
+          "t": 12,
+          "h": 32,
+          "w": 32
+        },
+        "multiscale": true,
+        "loader_seed": 7,
+        "train_mask_diversity": {
+          "families": [
+            "random_point",
+            "node_outage",
+            "temporal_gap",
+            "spatial_region"
+          ],
+          "rates": [
+            0.4
+          ],
+          "seed": 20260917,
+          "resample_each_epoch": true
+        },
+        "eval_mask_diversity": {
+          "families": [
+            "random_point",
+            "node_outage",
+            "temporal_gap",
+            "spatial_region"
+          ],
+          "rates": [
+            0.4
+          ],
+          "seed": 20260917,
+          "resample_each_epoch": false
+        },
+        "input_scales": "FMC",
+        "scales": {
+          "fine_to_mid": 2,
+          "fine_to_coarse": 4,
+          "pooling_mode": "sum"
+        }
+      },
+      "model": {
+        "architecture": "v25_observed_multiscale_coe",
+        "c_in": 2,
+        "main": {
+          "dim": 64,
+          "max_t": 12,
+          "h": 32,
+          "w": 32,
+          "scale_mode": "fine_mid_coarse",
+          "use_multiscale": true
+        },
+        "coe": {
+          "num_steps": 4,
+          "expert_pool": [
+            "T",
+            "S",
+            "TD",
+            "SD",
+            "TA",
+            "ST",
+            "TL",
+            "SL"
+          ],
+          "routing_mode": "hard",
+          "fixed_path": null,
+          "fixed_expert_steps": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "router_state": "dynamic",
+          "expert_state": "dynamic",
+          "use_shared": false,
+          "use_routed": true,
+          "temperature": 1.0,
+          "temporal_kernel": 3,
+          "spatial_kernel": 3,
+          "temporal_dilation": 2,
+          "spatial_dilation": 2,
+          "attention_heads": 4,
+          "residual_init": 0.1,
+          "routing_warmup_epochs": 0,
+          "routing_transition_epochs": 0,
+          "uniform_mix_start": 0.5,
+          "sampling_temperature_start": 2.0,
+          "top_k": 2,
+          "router_hidden_dim": 64,
+          "pair_mode": "native",
+          "acceptance": "none",
+          "expert_sharing": "shared",
+          "previous_expert_context": false,
+          "global_route_weights": false,
+          "router_input_noise_std": 0.0,
+          "router_input_noise_steps": 0,
+          "completion_feedback": false,
+          "repair_acceptance": "none",
+          "fusion_mode": "original",
+          "partner_fusion": "individual",
+          "partner_aux_head_only": false,
+          "pair_dense_warmup_steps": 0,
+          "state_update_mode": "direct",
+          "router_features": "legacy",
+          "local_routing": {
+            "enabled": false
+          },
+          "four_direction": {
+            "enabled": true,
+            "scale": "fixed"
+          },
+          "id_priority": {
+            "enabled": true,
+            "communication": "delta",
+            "bound": 0.1,
+            "scale_policy": "fixed",
+            "fixed_epochs": 0,
+            "scale_soft_warmup_epochs": 0,
+            "scale_soft_transition_epochs": 0
+          },
+          "backbone_exploration": {
+            "enabled": true
+          },
+          "core_validation": {
+            "enabled": true,
+            "path": "CMFF",
+            "communication": "conditional"
+          },
+          "initial_observation_scales": "FMC",
+          "scale_delta_exploration": {
+            "enabled": true,
+            "path": "free",
+            "top_k_per_step": [
+              2,
+              2,
+              2,
+              2
+            ],
+            "delta_steps": [
+              2,
+              3,
+              4
+            ],
+            "same_scale_only": false,
+            "scale_gradient": "selected_branch_st",
+            "top1_gradient": "selected_probability_st",
+            "last_round_fine": true
+          },
+          "observed_history": {
+            "enabled": true,
+            "mode": "adaptive"
+          },
+          "observation_consistency": {
+            "enabled": true,
+            "mode": "residual_projection",
+            "weight_bound": 2.0
+          },
+          "observation_iteration": {
+            "enabled": true,
+            "refresh_completion": true,
+            "expert_router_input": "native",
+            "round_input": "remaining_residual",
+            "delta": "physical_split"
+          }
+        },
+        "aux": {
+          "enabled": false,
+          "alpha_init": 0.0
+        }
+      },
+      "loss": {
+        "type": "l1",
+        "lambda_coe_mid": 0.0,
+        "lambda_coe_balance": 0.01,
+        "lambda_coe_z": 0.0,
+        "balance_importance": "candidate",
+        "visible_consistency_aux": {
+          "weight": 0.1,
+          "source": "pre_projection"
+        },
+        "lambda_raw_f": 0.5,
+        "lambda_final_f": 0.5,
+        "lambda_visible_raw_f": 0.1
+      },
+      "train": {
+        "epochs": 100,
+        "val_epoch": 5,
+        "lr_main": 0.001,
+        "weight_decay": 0.0001,
+        "grad_clip_norm": 1.0,
+        "amp": true,
+        "save_every": 10,
+        "scheduler": {
+          "type": "cosine",
+          "total_epochs": 100,
+          "eta_min": 0.0003,
+          "reach_min_at_last_epoch": true
+        },
+        "early_stopping": {
+          "enabled": false
+        },
+        "save_best_checkpoint": true,
+        "router_grad_diagnostic_every": 0,
+        "full_checkpoint": true,
+        "measure_forward_latency": true,
+        "oracle_last_step_samples": 0,
+        "best_checkpoint_name": "best.pth",
+        "save_last_checkpoint": true,
+        "optimizer": "AdamW",
+        "strict_replay": true,
+        "logging": {
+          "diagnostic_every": 5,
+          "path_top_k": 10
+        }
+      },
+      "experiment_plan": {
+        "suite": "observation_iteration",
+        "variant": "taxibj_I46_seed7",
+        "method": "预测空间总量/细节差分替代隐藏差分",
+        "protocol": {
+          "train_families": [
+            "random_point",
+            "node_outage",
+            "temporal_gap",
+            "spatial_region"
+          ],
+          "rate": 0.4,
+          "mask_seed": 20260917,
+          "evaluations": {
+            "in_distribution": {
+              "families": [
+                "random_point",
+                "node_outage",
+                "temporal_gap",
+                "spatial_region"
+              ],
+              "seed": 20260917
+            },
+            "unseen_combinations": {
+              "families": [
+                "node_plus_space",
+                "time_plus_space",
+                "node_plus_time"
+              ],
+              "seed": 20260918
+            },
+            "unseen_geometry": {
+              "families": [
+                "moving_region",
+                "multi_block"
+              ],
+              "seed": 20260919
+            },
+            "unseen_triple": {
+              "families": [
+                "node_plus_time_plus_space"
+              ],
+              "seed": 20260930
+            },
+            "unseen_combinations_repeat": {
+              "families": [
+                "node_plus_space",
+                "time_plus_space",
+                "node_plus_time"
+              ],
+              "seed": 20261001
+            },
+            "unseen_geometry_repeat": {
+              "families": [
+                "moving_region",
+                "multi_block"
+              ],
+              "seed": 20261002
+            }
+          },
+          "checkpoint_selection": "in_distribution_validation_only",
+          "note": "Same test windows across sets; masks are fixed and identical across models. New family/combination names never reach the model.",
+          "scale_protocol": "same family and missing rate at all scales; independent RNG; A masks M/C to zero"
+        },
+        "selection": "ID validation MAE only",
+        "scope": "Observed-only iteration; independent initialization; development-only I53 selection",
+        "reference": "I44"
+      }
+    },
+    "sources": {
+      "train": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v25_observed_multiscale/73fe84df49ca05de/taxibj_train.npz",
+      "val": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v25_observed_multiscale/73fe84df49ca05de/taxibj_val.npz",
+      "test": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v25_observed_multiscale/73fe84df49ca05de/taxibj_test.npz"
+    },
+    "defer_test": true,
+    "common_initialization": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v25/experiments/observation_iteration/1d6eb79a66c77e49/initialization/taxibj_I46_seed7.pth"
+  },
+  "taxibj_I47_seed7": {
+    "variant": "taxibj_I47_seed7",
+    "name": "i47_v25_observation_iteration",
+    "method": "I47",
+    "dataset": "taxibj",
+    "reference": "I44",
+    "config": {
+      "seed": 7,
+      "output_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v25",
+      "device": "cuda",
+      "data": {
+        "dataset_name": "TaxiBJ",
+        "batch_size": 32,
+        "num_workers": 0,
+        "pin_memory": true,
+        "drop_last": false,
+        "mask": {
+          "pattern": "random",
+          "missing_rate": 0.4
+        },
+        "synthetic": {
+          "num_train": 128,
+          "num_val": 32,
+          "t": 12,
+          "h": 32,
+          "w": 32
+        },
+        "multiscale": true,
+        "loader_seed": 7,
+        "train_mask_diversity": {
+          "families": [
+            "random_point",
+            "node_outage",
+            "temporal_gap",
+            "spatial_region"
+          ],
+          "rates": [
+            0.4
+          ],
+          "seed": 20260917,
+          "resample_each_epoch": true
+        },
+        "eval_mask_diversity": {
+          "families": [
+            "random_point",
+            "node_outage",
+            "temporal_gap",
+            "spatial_region"
+          ],
+          "rates": [
+            0.4
+          ],
+          "seed": 20260917,
+          "resample_each_epoch": false
+        },
+        "input_scales": "FMC",
+        "scales": {
+          "fine_to_mid": 2,
+          "fine_to_coarse": 4,
+          "pooling_mode": "sum"
+        }
+      },
+      "model": {
+        "architecture": "v25_observed_multiscale_coe",
+        "c_in": 2,
+        "main": {
+          "dim": 64,
+          "max_t": 12,
+          "h": 32,
+          "w": 32,
+          "scale_mode": "fine_mid_coarse",
+          "use_multiscale": true
+        },
+        "coe": {
+          "num_steps": 4,
+          "expert_pool": [
+            "T",
+            "S",
+            "TD",
+            "SD",
+            "TA",
+            "ST",
+            "TL",
+            "SL"
+          ],
+          "routing_mode": "hard",
+          "fixed_path": null,
+          "fixed_expert_steps": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "router_state": "dynamic",
+          "expert_state": "dynamic",
+          "use_shared": false,
+          "use_routed": true,
+          "temperature": 1.0,
+          "temporal_kernel": 3,
+          "spatial_kernel": 3,
+          "temporal_dilation": 2,
+          "spatial_dilation": 2,
+          "attention_heads": 4,
+          "residual_init": 0.1,
+          "routing_warmup_epochs": 0,
+          "routing_transition_epochs": 0,
+          "uniform_mix_start": 0.5,
+          "sampling_temperature_start": 2.0,
+          "top_k": 2,
+          "router_hidden_dim": 64,
+          "pair_mode": "native",
+          "acceptance": "none",
+          "expert_sharing": "shared",
+          "previous_expert_context": false,
+          "global_route_weights": false,
+          "router_input_noise_std": 0.0,
+          "router_input_noise_steps": 0,
+          "completion_feedback": false,
+          "repair_acceptance": "none",
+          "fusion_mode": "original",
+          "partner_fusion": "individual",
+          "partner_aux_head_only": false,
+          "pair_dense_warmup_steps": 0,
+          "state_update_mode": "direct",
+          "router_features": "legacy",
+          "local_routing": {
+            "enabled": false
+          },
+          "four_direction": {
+            "enabled": true,
+            "scale": "fixed"
+          },
+          "id_priority": {
+            "enabled": true,
+            "communication": "delta",
+            "bound": 0.1,
+            "scale_policy": "fixed",
+            "fixed_epochs": 0,
+            "scale_soft_warmup_epochs": 0,
+            "scale_soft_transition_epochs": 0
+          },
+          "backbone_exploration": {
+            "enabled": true
+          },
+          "core_validation": {
+            "enabled": true,
+            "path": "CMFF",
+            "communication": "conditional"
+          },
+          "initial_observation_scales": "FMC",
+          "scale_delta_exploration": {
+            "enabled": true,
+            "path": "free",
+            "top_k_per_step": [
+              2,
+              2,
+              2,
+              2
+            ],
+            "delta_steps": [
+              2,
+              3,
+              4
+            ],
+            "same_scale_only": false,
+            "scale_gradient": "selected_branch_st",
+            "top1_gradient": "selected_probability_st",
+            "last_round_fine": true
+          },
+          "observed_history": {
+            "enabled": true,
+            "mode": "adaptive"
+          },
+          "observation_consistency": {
+            "enabled": true,
+            "mode": "residual_projection",
+            "weight_bound": 2.0
+          },
+          "observation_iteration": {
+            "enabled": true,
+            "refresh_completion": true,
+            "expert_router_input": "native",
+            "round_input": "remaining_residual",
+            "history": "orthogonal_innovation"
+          }
+        },
+        "aux": {
+          "enabled": false,
+          "alpha_init": 0.0
+        }
+      },
+      "loss": {
+        "type": "l1",
+        "lambda_coe_mid": 0.0,
+        "lambda_coe_balance": 0.01,
+        "lambda_coe_z": 0.0,
+        "balance_importance": "candidate",
+        "visible_consistency_aux": {
+          "weight": 0.1,
+          "source": "pre_projection"
+        },
+        "lambda_raw_f": 0.5,
+        "lambda_final_f": 0.5,
+        "lambda_visible_raw_f": 0.1
+      },
+      "train": {
+        "epochs": 100,
+        "val_epoch": 5,
+        "lr_main": 0.001,
+        "weight_decay": 0.0001,
+        "grad_clip_norm": 1.0,
+        "amp": true,
+        "save_every": 10,
+        "scheduler": {
+          "type": "cosine",
+          "total_epochs": 100,
+          "eta_min": 0.0003,
+          "reach_min_at_last_epoch": true
+        },
+        "early_stopping": {
+          "enabled": false
+        },
+        "save_best_checkpoint": true,
+        "router_grad_diagnostic_every": 0,
+        "full_checkpoint": true,
+        "measure_forward_latency": true,
+        "oracle_last_step_samples": 0,
+        "best_checkpoint_name": "best.pth",
+        "save_last_checkpoint": true,
+        "optimizer": "AdamW",
+        "strict_replay": true,
+        "logging": {
+          "diagnostic_every": 5,
+          "path_top_k": 10
+        }
+      },
+      "experiment_plan": {
+        "suite": "observation_iteration",
+        "variant": "taxibj_I47_seed7",
+        "method": "去总量、去最近变化的历史创新",
+        "protocol": {
+          "train_families": [
+            "random_point",
+            "node_outage",
+            "temporal_gap",
+            "spatial_region"
+          ],
+          "rate": 0.4,
+          "mask_seed": 20260917,
+          "evaluations": {
+            "in_distribution": {
+              "families": [
+                "random_point",
+                "node_outage",
+                "temporal_gap",
+                "spatial_region"
+              ],
+              "seed": 20260917
+            },
+            "unseen_combinations": {
+              "families": [
+                "node_plus_space",
+                "time_plus_space",
+                "node_plus_time"
+              ],
+              "seed": 20260918
+            },
+            "unseen_geometry": {
+              "families": [
+                "moving_region",
+                "multi_block"
+              ],
+              "seed": 20260919
+            },
+            "unseen_triple": {
+              "families": [
+                "node_plus_time_plus_space"
+              ],
+              "seed": 20260930
+            },
+            "unseen_combinations_repeat": {
+              "families": [
+                "node_plus_space",
+                "time_plus_space",
+                "node_plus_time"
+              ],
+              "seed": 20261001
+            },
+            "unseen_geometry_repeat": {
+              "families": [
+                "moving_region",
+                "multi_block"
+              ],
+              "seed": 20261002
+            }
+          },
+          "checkpoint_selection": "in_distribution_validation_only",
+          "note": "Same test windows across sets; masks are fixed and identical across models. New family/combination names never reach the model.",
+          "scale_protocol": "same family and missing rate at all scales; independent RNG; A masks M/C to zero"
+        },
+        "selection": "ID validation MAE only",
+        "scope": "Observed-only iteration; independent initialization; development-only I53 selection",
+        "reference": "I44"
+      }
+    },
+    "sources": {
+      "train": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v25_observed_multiscale/73fe84df49ca05de/taxibj_train.npz",
+      "val": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v25_observed_multiscale/73fe84df49ca05de/taxibj_val.npz",
+      "test": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v25_observed_multiscale/73fe84df49ca05de/taxibj_test.npz"
+    },
+    "defer_test": true,
+    "common_initialization": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v25/experiments/observation_iteration/1d6eb79a66c77e49/initialization/taxibj_I47_seed7.pth"
+  },
+  "taxibj_I48_seed7": {
+    "variant": "taxibj_I48_seed7",
+    "name": "i48_v25_observation_iteration",
+    "method": "I48",
+    "dataset": "taxibj",
+    "reference": "I44",
+    "config": {
+      "seed": 7,
+      "output_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v25",
+      "device": "cuda",
+      "data": {
+        "dataset_name": "TaxiBJ",
+        "batch_size": 32,
+        "num_workers": 0,
+        "pin_memory": true,
+        "drop_last": false,
+        "mask": {
+          "pattern": "random",
+          "missing_rate": 0.4
+        },
+        "synthetic": {
+          "num_train": 128,
+          "num_val": 32,
+          "t": 12,
+          "h": 32,
+          "w": 32
+        },
+        "multiscale": true,
+        "loader_seed": 7,
+        "train_mask_diversity": {
+          "families": [
+            "random_point",
+            "node_outage",
+            "temporal_gap",
+            "spatial_region"
+          ],
+          "rates": [
+            0.4
+          ],
+          "seed": 20260917,
+          "resample_each_epoch": true
+        },
+        "eval_mask_diversity": {
+          "families": [
+            "random_point",
+            "node_outage",
+            "temporal_gap",
+            "spatial_region"
+          ],
+          "rates": [
+            0.4
+          ],
+          "seed": 20260917,
+          "resample_each_epoch": false
+        },
+        "input_scales": "FMC",
+        "scales": {
+          "fine_to_mid": 2,
+          "fine_to_coarse": 4,
+          "pooling_mode": "sum"
+        }
+      },
+      "model": {
+        "architecture": "v25_observed_multiscale_coe",
+        "c_in": 2,
+        "main": {
+          "dim": 64,
+          "max_t": 12,
+          "h": 32,
+          "w": 32,
+          "scale_mode": "fine_mid_coarse",
+          "use_multiscale": true
+        },
+        "coe": {
+          "num_steps": 4,
+          "expert_pool": [
+            "T",
+            "S",
+            "TD",
+            "SD",
+            "TA",
+            "ST",
+            "TL",
+            "SL"
+          ],
+          "routing_mode": "hard",
+          "fixed_path": null,
+          "fixed_expert_steps": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "router_state": "dynamic",
+          "expert_state": "dynamic",
+          "use_shared": false,
+          "use_routed": true,
+          "temperature": 1.0,
+          "temporal_kernel": 3,
+          "spatial_kernel": 3,
+          "temporal_dilation": 2,
+          "spatial_dilation": 2,
+          "attention_heads": 4,
+          "residual_init": 0.1,
+          "routing_warmup_epochs": 0,
+          "routing_transition_epochs": 0,
+          "uniform_mix_start": 0.5,
+          "sampling_temperature_start": 2.0,
+          "top_k": 2,
+          "router_hidden_dim": 64,
+          "pair_mode": "native",
+          "acceptance": "none",
+          "expert_sharing": "shared",
+          "previous_expert_context": false,
+          "global_route_weights": false,
+          "router_input_noise_std": 0.0,
+          "router_input_noise_steps": 0,
+          "completion_feedback": false,
+          "repair_acceptance": "none",
+          "fusion_mode": "original",
+          "partner_fusion": "individual",
+          "partner_aux_head_only": false,
+          "pair_dense_warmup_steps": 0,
+          "state_update_mode": "direct",
+          "router_features": "legacy",
+          "local_routing": {
+            "enabled": false
+          },
+          "four_direction": {
+            "enabled": true,
+            "scale": "fixed"
+          },
+          "id_priority": {
+            "enabled": true,
+            "communication": "delta",
+            "bound": 0.1,
+            "scale_policy": "fixed",
+            "fixed_epochs": 0,
+            "scale_soft_warmup_epochs": 0,
+            "scale_soft_transition_epochs": 0
+          },
+          "backbone_exploration": {
+            "enabled": true
+          },
+          "core_validation": {
+            "enabled": true,
+            "path": "CMFF",
+            "communication": "conditional"
+          },
+          "initial_observation_scales": "FMC",
+          "scale_delta_exploration": {
+            "enabled": true,
+            "path": "free",
+            "top_k_per_step": [
+              2,
+              2,
+              2,
+              2
+            ],
+            "delta_steps": [
+              2,
+              3,
+              4
+            ],
+            "same_scale_only": false,
+            "scale_gradient": "selected_branch_st",
+            "top1_gradient": "selected_probability_st",
+            "last_round_fine": true
+          },
+          "observed_history": {
+            "enabled": true,
+            "mode": "adaptive"
+          },
+          "observation_consistency": {
+            "enabled": true,
+            "mode": "residual_projection",
+            "weight_bound": 2.0
+          },
+          "observation_iteration": {
+            "enabled": true,
+            "refresh_completion": true,
+            "expert_router_input": "native",
+            "round_input": "remaining_residual",
+            "pair": "residual_relay"
+          }
+        },
+        "aux": {
+          "enabled": false,
+          "alpha_init": 0.0
+        }
+      },
+      "loss": {
+        "type": "l1",
+        "lambda_coe_mid": 0.0,
+        "lambda_coe_balance": 0.01,
+        "lambda_coe_z": 0.0,
+        "balance_importance": "candidate",
+        "visible_consistency_aux": {
+          "weight": 0.1,
+          "source": "pre_projection"
+        },
+        "lambda_raw_f": 0.5,
+        "lambda_final_f": 0.5,
+        "lambda_visible_raw_f": 0.1
+      },
+      "train": {
+        "epochs": 100,
+        "val_epoch": 5,
+        "lr_main": 0.001,
+        "weight_decay": 0.0001,
+        "grad_clip_norm": 1.0,
+        "amp": true,
+        "save_every": 10,
+        "scheduler": {
+          "type": "cosine",
+          "total_epochs": 100,
+          "eta_min": 0.0003,
+          "reach_min_at_last_epoch": true
+        },
+        "early_stopping": {
+          "enabled": false
+        },
+        "save_best_checkpoint": true,
+        "router_grad_diagnostic_every": 0,
+        "full_checkpoint": true,
+        "measure_forward_latency": true,
+        "oracle_last_step_samples": 0,
+        "best_checkpoint_name": "best.pth",
+        "save_last_checkpoint": true,
+        "optimizer": "AdamW",
+        "strict_replay": true,
+        "logging": {
+          "diagnostic_every": 5,
+          "path_top_k": 10
+        }
+      },
+      "experiment_plan": {
+        "suite": "observation_iteration",
+        "variant": "taxibj_I48_seed7",
+        "method": "已选Top2按分数串行传递剩余观测差异",
+        "protocol": {
+          "train_families": [
+            "random_point",
+            "node_outage",
+            "temporal_gap",
+            "spatial_region"
+          ],
+          "rate": 0.4,
+          "mask_seed": 20260917,
+          "evaluations": {
+            "in_distribution": {
+              "families": [
+                "random_point",
+                "node_outage",
+                "temporal_gap",
+                "spatial_region"
+              ],
+              "seed": 20260917
+            },
+            "unseen_combinations": {
+              "families": [
+                "node_plus_space",
+                "time_plus_space",
+                "node_plus_time"
+              ],
+              "seed": 20260918
+            },
+            "unseen_geometry": {
+              "families": [
+                "moving_region",
+                "multi_block"
+              ],
+              "seed": 20260919
+            },
+            "unseen_triple": {
+              "families": [
+                "node_plus_time_plus_space"
+              ],
+              "seed": 20260930
+            },
+            "unseen_combinations_repeat": {
+              "families": [
+                "node_plus_space",
+                "time_plus_space",
+                "node_plus_time"
+              ],
+              "seed": 20261001
+            },
+            "unseen_geometry_repeat": {
+              "families": [
+                "moving_region",
+                "multi_block"
+              ],
+              "seed": 20261002
+            }
+          },
+          "checkpoint_selection": "in_distribution_validation_only",
+          "note": "Same test windows across sets; masks are fixed and identical across models. New family/combination names never reach the model.",
+          "scale_protocol": "same family and missing rate at all scales; independent RNG; A masks M/C to zero"
+        },
+        "selection": "ID validation MAE only",
+        "scope": "Observed-only iteration; independent initialization; development-only I53 selection",
+        "reference": "I44"
+      }
+    },
+    "sources": {
+      "train": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v25_observed_multiscale/73fe84df49ca05de/taxibj_train.npz",
+      "val": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v25_observed_multiscale/73fe84df49ca05de/taxibj_val.npz",
+      "test": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v25_observed_multiscale/73fe84df49ca05de/taxibj_test.npz"
+    },
+    "defer_test": true,
+    "common_initialization": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v25/experiments/observation_iteration/1d6eb79a66c77e49/initialization/taxibj_I48_seed7.pth"
+  },
+  "taxibj_I49_seed7": {
+    "variant": "taxibj_I49_seed7",
+    "name": "i49_v25_observation_iteration",
+    "method": "I49",
+    "dataset": "taxibj",
+    "reference": "I44",
+    "config": {
+      "seed": 7,
+      "output_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v25",
+      "device": "cuda",
+      "data": {
+        "dataset_name": "TaxiBJ",
+        "batch_size": 32,
+        "num_workers": 0,
+        "pin_memory": true,
+        "drop_last": false,
+        "mask": {
+          "pattern": "random",
+          "missing_rate": 0.4
+        },
+        "synthetic": {
+          "num_train": 128,
+          "num_val": 32,
+          "t": 12,
+          "h": 32,
+          "w": 32
+        },
+        "multiscale": true,
+        "loader_seed": 7,
+        "train_mask_diversity": {
+          "families": [
+            "random_point",
+            "node_outage",
+            "temporal_gap",
+            "spatial_region"
+          ],
+          "rates": [
+            0.4
+          ],
+          "seed": 20260917,
+          "resample_each_epoch": true
+        },
+        "eval_mask_diversity": {
+          "families": [
+            "random_point",
+            "node_outage",
+            "temporal_gap",
+            "spatial_region"
+          ],
+          "rates": [
+            0.4
+          ],
+          "seed": 20260917,
+          "resample_each_epoch": false
+        },
+        "input_scales": "FMC",
+        "scales": {
+          "fine_to_mid": 2,
+          "fine_to_coarse": 4,
+          "pooling_mode": "sum"
+        }
+      },
+      "model": {
+        "architecture": "v25_observed_multiscale_coe",
+        "c_in": 2,
+        "main": {
+          "dim": 64,
+          "max_t": 12,
+          "h": 32,
+          "w": 32,
+          "scale_mode": "fine_mid_coarse",
+          "use_multiscale": true
+        },
+        "coe": {
+          "num_steps": 4,
+          "expert_pool": [
+            "T",
+            "S",
+            "TD",
+            "SD",
+            "TA",
+            "ST",
+            "TL",
+            "SL"
+          ],
+          "routing_mode": "hard",
+          "fixed_path": null,
+          "fixed_expert_steps": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "router_state": "dynamic",
+          "expert_state": "dynamic",
+          "use_shared": false,
+          "use_routed": true,
+          "temperature": 1.0,
+          "temporal_kernel": 3,
+          "spatial_kernel": 3,
+          "temporal_dilation": 2,
+          "spatial_dilation": 2,
+          "attention_heads": 4,
+          "residual_init": 0.1,
+          "routing_warmup_epochs": 0,
+          "routing_transition_epochs": 0,
+          "uniform_mix_start": 0.5,
+          "sampling_temperature_start": 2.0,
+          "top_k": 2,
+          "router_hidden_dim": 64,
+          "pair_mode": "native",
+          "acceptance": "none",
+          "expert_sharing": "shared",
+          "previous_expert_context": false,
+          "global_route_weights": false,
+          "router_input_noise_std": 0.0,
+          "router_input_noise_steps": 0,
+          "completion_feedback": false,
+          "repair_acceptance": "none",
+          "fusion_mode": "original",
+          "partner_fusion": "individual",
+          "partner_aux_head_only": false,
+          "pair_dense_warmup_steps": 0,
+          "state_update_mode": "direct",
+          "router_features": "legacy",
+          "local_routing": {
+            "enabled": false
+          },
+          "four_direction": {
+            "enabled": true,
+            "scale": "fixed"
+          },
+          "id_priority": {
+            "enabled": true,
+            "communication": "delta",
+            "bound": 0.1,
+            "scale_policy": "fixed",
+            "fixed_epochs": 0,
+            "scale_soft_warmup_epochs": 0,
+            "scale_soft_transition_epochs": 0
+          },
+          "backbone_exploration": {
+            "enabled": true
+          },
+          "core_validation": {
+            "enabled": true,
+            "path": "CMFF",
+            "communication": "conditional"
+          },
+          "initial_observation_scales": "FMC",
+          "scale_delta_exploration": {
+            "enabled": true,
+            "path": "free",
+            "top_k_per_step": [
+              2,
+              2,
+              2,
+              2
+            ],
+            "delta_steps": [
+              2,
+              3,
+              4
+            ],
+            "same_scale_only": false,
+            "scale_gradient": "selected_branch_st",
+            "top1_gradient": "selected_probability_st",
+            "last_round_fine": true
+          },
+          "observed_history": {
+            "enabled": true,
+            "mode": "adaptive"
+          },
+          "observation_consistency": {
+            "enabled": true,
+            "mode": "residual_projection",
+            "weight_bound": 2.0
+          },
+          "observation_iteration": {
+            "enabled": true,
+            "refresh_completion": true,
+            "expert_router_input": "native",
+            "round_input": "remaining_residual",
+            "state_update": "ownership_correction"
+          }
+        },
+        "aux": {
+          "enabled": false,
+          "alpha_init": 0.0
+        }
+      },
+      "loss": {
+        "type": "l1",
+        "lambda_coe_mid": 0.0,
+        "lambda_coe_balance": 0.01,
+        "lambda_coe_z": 0.0,
+        "balance_importance": "candidate",
+        "visible_consistency_aux": {
+          "weight": 0.1,
+          "source": "pre_projection"
+        },
+        "lambda_raw_f": 0.5,
+        "lambda_final_f": 0.5,
+        "lambda_visible_raw_f": 0.1
+      },
+      "train": {
+        "epochs": 100,
+        "val_epoch": 5,
+        "lr_main": 0.001,
+        "weight_decay": 0.0001,
+        "grad_clip_norm": 1.0,
+        "amp": true,
+        "save_every": 10,
+        "scheduler": {
+          "type": "cosine",
+          "total_epochs": 100,
+          "eta_min": 0.0003,
+          "reach_min_at_last_epoch": true
+        },
+        "early_stopping": {
+          "enabled": false
+        },
+        "save_best_checkpoint": true,
+        "router_grad_diagnostic_every": 0,
+        "full_checkpoint": true,
+        "measure_forward_latency": true,
+        "oracle_last_step_samples": 0,
+        "best_checkpoint_name": "best.pth",
+        "save_last_checkpoint": true,
+        "optimizer": "AdamW",
+        "strict_replay": true,
+        "logging": {
+          "diagnostic_every": 5,
+          "path_top_k": 10
+        }
+      },
+      "experiment_plan": {
+        "suite": "observation_iteration",
+        "variant": "taxibj_I49_seed7",
+        "method": "观测区域归属限制粗尺度状态更新",
+        "protocol": {
+          "train_families": [
+            "random_point",
+            "node_outage",
+            "temporal_gap",
+            "spatial_region"
+          ],
+          "rate": 0.4,
+          "mask_seed": 20260917,
+          "evaluations": {
+            "in_distribution": {
+              "families": [
+                "random_point",
+                "node_outage",
+                "temporal_gap",
+                "spatial_region"
+              ],
+              "seed": 20260917
+            },
+            "unseen_combinations": {
+              "families": [
+                "node_plus_space",
+                "time_plus_space",
+                "node_plus_time"
+              ],
+              "seed": 20260918
+            },
+            "unseen_geometry": {
+              "families": [
+                "moving_region",
+                "multi_block"
+              ],
+              "seed": 20260919
+            },
+            "unseen_triple": {
+              "families": [
+                "node_plus_time_plus_space"
+              ],
+              "seed": 20260930
+            },
+            "unseen_combinations_repeat": {
+              "families": [
+                "node_plus_space",
+                "time_plus_space",
+                "node_plus_time"
+              ],
+              "seed": 20261001
+            },
+            "unseen_geometry_repeat": {
+              "families": [
+                "moving_region",
+                "multi_block"
+              ],
+              "seed": 20261002
+            }
+          },
+          "checkpoint_selection": "in_distribution_validation_only",
+          "note": "Same test windows across sets; masks are fixed and identical across models. New family/combination names never reach the model.",
+          "scale_protocol": "same family and missing rate at all scales; independent RNG; A masks M/C to zero"
+        },
+        "selection": "ID validation MAE only",
+        "scope": "Observed-only iteration; independent initialization; development-only I53 selection",
+        "reference": "I44"
+      }
+    },
+    "sources": {
+      "train": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v25_observed_multiscale/73fe84df49ca05de/taxibj_train.npz",
+      "val": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v25_observed_multiscale/73fe84df49ca05de/taxibj_val.npz",
+      "test": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v25_observed_multiscale/73fe84df49ca05de/taxibj_test.npz"
+    },
+    "defer_test": true,
+    "common_initialization": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v25/experiments/observation_iteration/1d6eb79a66c77e49/initialization/taxibj_I49_seed7.pth"
+  },
+  "taxibj_I50_seed7": {
+    "variant": "taxibj_I50_seed7",
+    "name": "i50_v25_observation_iteration",
+    "method": "I50",
+    "dataset": "taxibj",
+    "reference": "I45",
+    "config": {
+      "seed": 7,
+      "output_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v25",
+      "device": "cuda",
+      "data": {
+        "dataset_name": "TaxiBJ",
+        "batch_size": 32,
+        "num_workers": 0,
+        "pin_memory": true,
+        "drop_last": false,
+        "mask": {
+          "pattern": "random",
+          "missing_rate": 0.4
+        },
+        "synthetic": {
+          "num_train": 128,
+          "num_val": 32,
+          "t": 12,
+          "h": 32,
+          "w": 32
+        },
+        "multiscale": true,
+        "loader_seed": 7,
+        "train_mask_diversity": {
+          "families": [
+            "random_point",
+            "node_outage",
+            "temporal_gap",
+            "spatial_region"
+          ],
+          "rates": [
+            0.4
+          ],
+          "seed": 20260917,
+          "resample_each_epoch": true
+        },
+        "eval_mask_diversity": {
+          "families": [
+            "random_point",
+            "node_outage",
+            "temporal_gap",
+            "spatial_region"
+          ],
+          "rates": [
+            0.4
+          ],
+          "seed": 20260917,
+          "resample_each_epoch": false
+        },
+        "input_scales": "FMC",
+        "scales": {
+          "fine_to_mid": 2,
+          "fine_to_coarse": 4,
+          "pooling_mode": "sum"
+        }
+      },
+      "model": {
+        "architecture": "v25_observed_multiscale_coe",
+        "c_in": 2,
+        "main": {
+          "dim": 64,
+          "max_t": 12,
+          "h": 32,
+          "w": 32,
+          "scale_mode": "fine_mid_coarse",
+          "use_multiscale": true
+        },
+        "coe": {
+          "num_steps": 4,
+          "expert_pool": [
+            "T",
+            "S",
+            "TD",
+            "SD",
+            "TA",
+            "ST",
+            "TL",
+            "SL"
+          ],
+          "routing_mode": "hard",
+          "fixed_path": null,
+          "fixed_expert_steps": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "router_state": "dynamic",
+          "expert_state": "dynamic",
+          "use_shared": false,
+          "use_routed": true,
+          "temperature": 1.0,
+          "temporal_kernel": 3,
+          "spatial_kernel": 3,
+          "temporal_dilation": 2,
+          "spatial_dilation": 2,
+          "attention_heads": 4,
+          "residual_init": 0.1,
+          "routing_warmup_epochs": 0,
+          "routing_transition_epochs": 0,
+          "uniform_mix_start": 0.5,
+          "sampling_temperature_start": 2.0,
+          "top_k": 2,
+          "router_hidden_dim": 64,
+          "pair_mode": "native",
+          "acceptance": "none",
+          "expert_sharing": "shared",
+          "previous_expert_context": false,
+          "global_route_weights": false,
+          "router_input_noise_std": 0.0,
+          "router_input_noise_steps": 0,
+          "completion_feedback": false,
+          "repair_acceptance": "none",
+          "fusion_mode": "original",
+          "partner_fusion": "individual",
+          "partner_aux_head_only": false,
+          "pair_dense_warmup_steps": 0,
+          "state_update_mode": "direct",
+          "router_features": "legacy",
+          "local_routing": {
+            "enabled": false
+          },
+          "four_direction": {
+            "enabled": true,
+            "scale": "fixed"
+          },
+          "id_priority": {
+            "enabled": true,
+            "communication": "delta",
+            "bound": 0.1,
+            "scale_policy": "fixed",
+            "fixed_epochs": 0,
+            "scale_soft_warmup_epochs": 0,
+            "scale_soft_transition_epochs": 0
+          },
+          "backbone_exploration": {
+            "enabled": true
+          },
+          "core_validation": {
+            "enabled": true,
+            "path": "CMFF",
+            "communication": "conditional"
+          },
+          "initial_observation_scales": "FMC",
+          "scale_delta_exploration": {
+            "enabled": true,
+            "path": "free",
+            "top_k_per_step": [
+              2,
+              2,
+              2,
+              2
+            ],
+            "delta_steps": [
+              2,
+              3,
+              4
+            ],
+            "same_scale_only": false,
+            "scale_gradient": "selected_branch_st",
+            "top1_gradient": "selected_probability_st",
+            "last_round_fine": true
+          },
+          "observed_history": {
+            "enabled": true,
+            "mode": "adaptive"
+          },
+          "observation_consistency": {
+            "enabled": true,
+            "mode": "residual_projection",
+            "weight_bound": 2.0
+          },
+          "observation_iteration": {
+            "enabled": true,
+            "refresh_completion": true,
+            "expert_router_input": "native",
+            "round_input": "remaining_residual",
+            "routing_evidence": true,
+            "delta": "physical_split",
+            "history": "orthogonal_innovation"
+          }
+        },
+        "aux": {
+          "enabled": false,
+          "alpha_init": 0.0
+        }
+      },
+      "loss": {
+        "type": "l1",
+        "lambda_coe_mid": 0.0,
+        "lambda_coe_balance": 0.01,
+        "lambda_coe_z": 0.0,
+        "balance_importance": "candidate",
+        "visible_consistency_aux": {
+          "weight": 0.1,
+          "source": "pre_projection"
+        },
+        "lambda_raw_f": 0.5,
+        "lambda_final_f": 0.5,
+        "lambda_visible_raw_f": 0.1
+      },
+      "train": {
+        "epochs": 100,
+        "val_epoch": 5,
+        "lr_main": 0.001,
+        "weight_decay": 0.0001,
+        "grad_clip_norm": 1.0,
+        "amp": true,
+        "save_every": 10,
+        "scheduler": {
+          "type": "cosine",
+          "total_epochs": 100,
+          "eta_min": 0.0003,
+          "reach_min_at_last_epoch": true
+        },
+        "early_stopping": {
+          "enabled": false
+        },
+        "save_best_checkpoint": true,
+        "router_grad_diagnostic_every": 0,
+        "full_checkpoint": true,
+        "measure_forward_latency": true,
+        "oracle_last_step_samples": 0,
+        "best_checkpoint_name": "best.pth",
+        "save_last_checkpoint": true,
+        "optimizer": "AdamW",
+        "strict_replay": true,
+        "logging": {
+          "diagnostic_every": 5,
+          "path_top_k": 10
+        }
+      },
+      "experiment_plan": {
+        "suite": "observation_iteration",
+        "variant": "taxibj_I50_seed7",
+        "method": "新差分＋新历史",
+        "protocol": {
+          "train_families": [
+            "random_point",
+            "node_outage",
+            "temporal_gap",
+            "spatial_region"
+          ],
+          "rate": 0.4,
+          "mask_seed": 20260917,
+          "evaluations": {
+            "in_distribution": {
+              "families": [
+                "random_point",
+                "node_outage",
+                "temporal_gap",
+                "spatial_region"
+              ],
+              "seed": 20260917
+            },
+            "unseen_combinations": {
+              "families": [
+                "node_plus_space",
+                "time_plus_space",
+                "node_plus_time"
+              ],
+              "seed": 20260918
+            },
+            "unseen_geometry": {
+              "families": [
+                "moving_region",
+                "multi_block"
+              ],
+              "seed": 20260919
+            },
+            "unseen_triple": {
+              "families": [
+                "node_plus_time_plus_space"
+              ],
+              "seed": 20260930
+            },
+            "unseen_combinations_repeat": {
+              "families": [
+                "node_plus_space",
+                "time_plus_space",
+                "node_plus_time"
+              ],
+              "seed": 20261001
+            },
+            "unseen_geometry_repeat": {
+              "families": [
+                "moving_region",
+                "multi_block"
+              ],
+              "seed": 20261002
+            }
+          },
+          "checkpoint_selection": "in_distribution_validation_only",
+          "note": "Same test windows across sets; masks are fixed and identical across models. New family/combination names never reach the model.",
+          "scale_protocol": "same family and missing rate at all scales; independent RNG; A masks M/C to zero"
+        },
+        "selection": "ID validation MAE only",
+        "scope": "Observed-only iteration; independent initialization; development-only I53 selection",
+        "reference": "I45"
+      }
+    },
+    "sources": {
+      "train": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v25_observed_multiscale/73fe84df49ca05de/taxibj_train.npz",
+      "val": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v25_observed_multiscale/73fe84df49ca05de/taxibj_val.npz",
+      "test": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v25_observed_multiscale/73fe84df49ca05de/taxibj_test.npz"
+    },
+    "defer_test": true,
+    "common_initialization": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v25/experiments/observation_iteration/1d6eb79a66c77e49/initialization/taxibj_I50_seed7.pth"
+  },
+  "taxibj_I51_seed7": {
+    "variant": "taxibj_I51_seed7",
+    "name": "i51_v25_observation_iteration",
+    "method": "I51",
+    "dataset": "taxibj",
+    "reference": "I50",
+    "config": {
+      "seed": 7,
+      "output_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v25",
+      "device": "cuda",
+      "data": {
+        "dataset_name": "TaxiBJ",
+        "batch_size": 32,
+        "num_workers": 0,
+        "pin_memory": true,
+        "drop_last": false,
+        "mask": {
+          "pattern": "random",
+          "missing_rate": 0.4
+        },
+        "synthetic": {
+          "num_train": 128,
+          "num_val": 32,
+          "t": 12,
+          "h": 32,
+          "w": 32
+        },
+        "multiscale": true,
+        "loader_seed": 7,
+        "train_mask_diversity": {
+          "families": [
+            "random_point",
+            "node_outage",
+            "temporal_gap",
+            "spatial_region"
+          ],
+          "rates": [
+            0.4
+          ],
+          "seed": 20260917,
+          "resample_each_epoch": true
+        },
+        "eval_mask_diversity": {
+          "families": [
+            "random_point",
+            "node_outage",
+            "temporal_gap",
+            "spatial_region"
+          ],
+          "rates": [
+            0.4
+          ],
+          "seed": 20260917,
+          "resample_each_epoch": false
+        },
+        "input_scales": "FMC",
+        "scales": {
+          "fine_to_mid": 2,
+          "fine_to_coarse": 4,
+          "pooling_mode": "sum"
+        }
+      },
+      "model": {
+        "architecture": "v25_observed_multiscale_coe",
+        "c_in": 2,
+        "main": {
+          "dim": 64,
+          "max_t": 12,
+          "h": 32,
+          "w": 32,
+          "scale_mode": "fine_mid_coarse",
+          "use_multiscale": true
+        },
+        "coe": {
+          "num_steps": 4,
+          "expert_pool": [
+            "T",
+            "S",
+            "TD",
+            "SD",
+            "TA",
+            "ST",
+            "TL",
+            "SL"
+          ],
+          "routing_mode": "hard",
+          "fixed_path": null,
+          "fixed_expert_steps": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "router_state": "dynamic",
+          "expert_state": "dynamic",
+          "use_shared": false,
+          "use_routed": true,
+          "temperature": 1.0,
+          "temporal_kernel": 3,
+          "spatial_kernel": 3,
+          "temporal_dilation": 2,
+          "spatial_dilation": 2,
+          "attention_heads": 4,
+          "residual_init": 0.1,
+          "routing_warmup_epochs": 0,
+          "routing_transition_epochs": 0,
+          "uniform_mix_start": 0.5,
+          "sampling_temperature_start": 2.0,
+          "top_k": 2,
+          "router_hidden_dim": 64,
+          "pair_mode": "native",
+          "acceptance": "none",
+          "expert_sharing": "shared",
+          "previous_expert_context": false,
+          "global_route_weights": false,
+          "router_input_noise_std": 0.0,
+          "router_input_noise_steps": 0,
+          "completion_feedback": false,
+          "repair_acceptance": "none",
+          "fusion_mode": "original",
+          "partner_fusion": "individual",
+          "partner_aux_head_only": false,
+          "pair_dense_warmup_steps": 0,
+          "state_update_mode": "direct",
+          "router_features": "legacy",
+          "local_routing": {
+            "enabled": false
+          },
+          "four_direction": {
+            "enabled": true,
+            "scale": "fixed"
+          },
+          "id_priority": {
+            "enabled": true,
+            "communication": "delta",
+            "bound": 0.1,
+            "scale_policy": "fixed",
+            "fixed_epochs": 0,
+            "scale_soft_warmup_epochs": 0,
+            "scale_soft_transition_epochs": 0
+          },
+          "backbone_exploration": {
+            "enabled": true
+          },
+          "core_validation": {
+            "enabled": true,
+            "path": "CMFF",
+            "communication": "conditional"
+          },
+          "initial_observation_scales": "FMC",
+          "scale_delta_exploration": {
+            "enabled": true,
+            "path": "free",
+            "top_k_per_step": [
+              2,
+              2,
+              2,
+              2
+            ],
+            "delta_steps": [
+              2,
+              3,
+              4
+            ],
+            "same_scale_only": false,
+            "scale_gradient": "selected_branch_st",
+            "top1_gradient": "selected_probability_st",
+            "last_round_fine": true
+          },
+          "observed_history": {
+            "enabled": true,
+            "mode": "adaptive"
+          },
+          "observation_consistency": {
+            "enabled": true,
+            "mode": "residual_projection",
+            "weight_bound": 2.0
+          },
+          "observation_iteration": {
+            "enabled": true,
+            "refresh_completion": true,
+            "expert_router_input": "native",
+            "round_input": "remaining_residual",
+            "routing_evidence": true,
+            "delta": "physical_split",
+            "history": "orthogonal_innovation",
+            "pair": "residual_relay",
+            "state_update": "ownership_correction"
+          }
+        },
+        "aux": {
+          "enabled": false,
+          "alpha_init": 0.0
+        }
+      },
+      "loss": {
+        "type": "l1",
+        "lambda_coe_mid": 0.0,
+        "lambda_coe_balance": 0.01,
+        "lambda_coe_z": 0.0,
+        "balance_importance": "candidate",
+        "visible_consistency_aux": {
+          "weight": 0.1,
+          "source": "pre_projection"
+        },
+        "lambda_raw_f": 0.5,
+        "lambda_final_f": 0.5,
+        "lambda_visible_raw_f": 0.1
+      },
+      "train": {
+        "epochs": 100,
+        "val_epoch": 5,
+        "lr_main": 0.001,
+        "weight_decay": 0.0001,
+        "grad_clip_norm": 1.0,
+        "amp": true,
+        "save_every": 10,
+        "scheduler": {
+          "type": "cosine",
+          "total_epochs": 100,
+          "eta_min": 0.0003,
+          "reach_min_at_last_epoch": true
+        },
+        "early_stopping": {
+          "enabled": false
+        },
+        "save_best_checkpoint": true,
+        "router_grad_diagnostic_every": 0,
+        "full_checkpoint": true,
+        "measure_forward_latency": true,
+        "oracle_last_step_samples": 0,
+        "best_checkpoint_name": "best.pth",
+        "save_last_checkpoint": true,
+        "optimizer": "AdamW",
+        "strict_replay": true,
+        "logging": {
+          "diagnostic_every": 5,
+          "path_top_k": 10
+        }
+      },
+      "experiment_plan": {
+        "suite": "observation_iteration",
+        "variant": "taxibj_I51_seed7",
+        "method": "专家残差传递＋区域状态更新",
+        "protocol": {
+          "train_families": [
+            "random_point",
+            "node_outage",
+            "temporal_gap",
+            "spatial_region"
+          ],
+          "rate": 0.4,
+          "mask_seed": 20260917,
+          "evaluations": {
+            "in_distribution": {
+              "families": [
+                "random_point",
+                "node_outage",
+                "temporal_gap",
+                "spatial_region"
+              ],
+              "seed": 20260917
+            },
+            "unseen_combinations": {
+              "families": [
+                "node_plus_space",
+                "time_plus_space",
+                "node_plus_time"
+              ],
+              "seed": 20260918
+            },
+            "unseen_geometry": {
+              "families": [
+                "moving_region",
+                "multi_block"
+              ],
+              "seed": 20260919
+            },
+            "unseen_triple": {
+              "families": [
+                "node_plus_time_plus_space"
+              ],
+              "seed": 20260930
+            },
+            "unseen_combinations_repeat": {
+              "families": [
+                "node_plus_space",
+                "time_plus_space",
+                "node_plus_time"
+              ],
+              "seed": 20261001
+            },
+            "unseen_geometry_repeat": {
+              "families": [
+                "moving_region",
+                "multi_block"
+              ],
+              "seed": 20261002
+            }
+          },
+          "checkpoint_selection": "in_distribution_validation_only",
+          "note": "Same test windows across sets; masks are fixed and identical across models. New family/combination names never reach the model.",
+          "scale_protocol": "same family and missing rate at all scales; independent RNG; A masks M/C to zero"
+        },
+        "selection": "ID validation MAE only",
+        "scope": "Observed-only iteration; independent initialization; development-only I53 selection",
+        "reference": "I50"
+      }
+    },
+    "sources": {
+      "train": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v25_observed_multiscale/73fe84df49ca05de/taxibj_train.npz",
+      "val": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v25_observed_multiscale/73fe84df49ca05de/taxibj_val.npz",
+      "test": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v25_observed_multiscale/73fe84df49ca05de/taxibj_test.npz"
+    },
+    "defer_test": true,
+    "common_initialization": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v25/experiments/observation_iteration/1d6eb79a66c77e49/initialization/taxibj_I51_seed7.pth"
+  },
+  "taxibj_I52_seed17": {
+    "variant": "taxibj_I52_seed17",
+    "name": "i52_v25_observation_iteration",
+    "method": "I52",
+    "dataset": "taxibj",
+    "reference": "I37",
+    "config": {
+      "seed": 17,
+      "output_dir": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v25",
+      "device": "cuda",
+      "data": {
+        "dataset_name": "TaxiBJ",
+        "batch_size": 32,
+        "num_workers": 0,
+        "pin_memory": true,
+        "drop_last": false,
+        "mask": {
+          "pattern": "random",
+          "missing_rate": 0.4
+        },
+        "synthetic": {
+          "num_train": 128,
+          "num_val": 32,
+          "t": 12,
+          "h": 32,
+          "w": 32
+        },
+        "multiscale": true,
+        "loader_seed": 17,
+        "train_mask_diversity": {
+          "families": [
+            "random_point",
+            "node_outage",
+            "temporal_gap",
+            "spatial_region"
+          ],
+          "rates": [
+            0.4
+          ],
+          "seed": 20260917,
+          "resample_each_epoch": true
+        },
+        "eval_mask_diversity": {
+          "families": [
+            "random_point",
+            "node_outage",
+            "temporal_gap",
+            "spatial_region"
+          ],
+          "rates": [
+            0.4
+          ],
+          "seed": 20260917,
+          "resample_each_epoch": false
+        },
+        "input_scales": "FMC",
+        "scales": {
+          "fine_to_mid": 2,
+          "fine_to_coarse": 4,
+          "pooling_mode": "sum"
+        }
+      },
+      "model": {
+        "architecture": "v25_observed_multiscale_coe",
+        "c_in": 2,
+        "main": {
+          "dim": 64,
+          "max_t": 12,
+          "h": 32,
+          "w": 32,
+          "scale_mode": "fine_mid_coarse",
+          "use_multiscale": true
+        },
+        "coe": {
+          "num_steps": 4,
+          "expert_pool": [
+            "T",
+            "S",
+            "TD",
+            "SD",
+            "TA",
+            "ST",
+            "TL",
+            "SL"
+          ],
+          "routing_mode": "hard",
+          "fixed_path": null,
+          "fixed_expert_steps": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "router_state": "dynamic",
+          "expert_state": "dynamic",
+          "use_shared": false,
+          "use_routed": true,
+          "temperature": 1.0,
+          "temporal_kernel": 3,
+          "spatial_kernel": 3,
+          "temporal_dilation": 2,
+          "spatial_dilation": 2,
+          "attention_heads": 4,
+          "residual_init": 0.1,
+          "routing_warmup_epochs": 0,
+          "routing_transition_epochs": 0,
+          "uniform_mix_start": 0.5,
+          "sampling_temperature_start": 2.0,
+          "top_k": 2,
+          "router_hidden_dim": 64,
+          "pair_mode": "native",
+          "acceptance": "none",
+          "expert_sharing": "shared",
+          "previous_expert_context": false,
+          "global_route_weights": false,
+          "router_input_noise_std": 0.0,
+          "router_input_noise_steps": 0,
+          "completion_feedback": false,
+          "repair_acceptance": "none",
+          "fusion_mode": "original",
+          "partner_fusion": "individual",
+          "partner_aux_head_only": false,
+          "pair_dense_warmup_steps": 0,
+          "state_update_mode": "direct",
+          "router_features": "legacy",
+          "local_routing": {
+            "enabled": false
+          },
+          "four_direction": {
+            "enabled": true,
+            "scale": "fixed"
+          },
+          "id_priority": {
+            "enabled": true,
+            "communication": "delta",
+            "bound": 0.1,
+            "scale_policy": "fixed",
+            "fixed_epochs": 0,
+            "scale_soft_warmup_epochs": 0,
+            "scale_soft_transition_epochs": 0
+          },
+          "backbone_exploration": {
+            "enabled": true
+          },
+          "core_validation": {
+            "enabled": true,
+            "path": "CMFF",
+            "communication": "conditional"
+          },
+          "initial_observation_scales": "FMC",
+          "scale_delta_exploration": {
+            "enabled": true,
+            "path": "free",
+            "top_k_per_step": [
+              2,
+              2,
+              2,
+              2
+            ],
+            "delta_steps": [
+              2,
+              3,
+              4
+            ],
+            "same_scale_only": false,
+            "scale_gradient": "selected_branch_st",
+            "top1_gradient": "selected_probability_st",
+            "last_round_fine": true
+          },
+          "observed_history": {
+            "enabled": true,
+            "mode": "adaptive"
+          },
+          "observation_consistency": {
+            "enabled": true,
+            "mode": "residual_projection",
+            "weight_bound": 2.0
+          }
+        },
+        "aux": {
+          "enabled": false,
+          "alpha_init": 0.0
+        }
+      },
+      "loss": {
+        "type": "l1",
+        "lambda_coe_mid": 0.0,
+        "lambda_coe_balance": 0.01,
+        "lambda_coe_z": 0.0,
+        "balance_importance": "candidate",
+        "visible_consistency_aux": {
+          "weight": 0.1,
+          "source": "pre_projection"
+        },
+        "lambda_raw_f": 0.5,
+        "lambda_final_f": 0.5,
+        "lambda_visible_raw_f": 0.1
+      },
+      "train": {
+        "epochs": 100,
+        "val_epoch": 5,
+        "lr_main": 0.001,
+        "weight_decay": 0.0001,
+        "grad_clip_norm": 1.0,
+        "amp": true,
+        "save_every": 10,
+        "scheduler": {
+          "type": "cosine",
+          "total_epochs": 100,
+          "eta_min": 0.0003,
+          "reach_min_at_last_epoch": true
+        },
+        "early_stopping": {
+          "enabled": false
+        },
+        "save_best_checkpoint": true,
+        "router_grad_diagnostic_every": 0,
+        "full_checkpoint": true,
+        "measure_forward_latency": true,
+        "oracle_last_step_samples": 0,
+        "best_checkpoint_name": "best.pth",
+        "save_last_checkpoint": true,
+        "optimizer": "AdamW",
+        "strict_replay": true,
+        "logging": {
+          "diagnostic_every": 5,
+          "path_top_k": 10
+        }
+      },
+      "experiment_plan": {
+        "suite": "observation_iteration",
+        "variant": "taxibj_I52_seed17",
+        "method": "原I37独立训练seed17",
+        "protocol": {
+          "train_families": [
+            "random_point",
+            "node_outage",
+            "temporal_gap",
+            "spatial_region"
+          ],
+          "rate": 0.4,
+          "mask_seed": 20260917,
+          "evaluations": {
+            "in_distribution": {
+              "families": [
+                "random_point",
+                "node_outage",
+                "temporal_gap",
+                "spatial_region"
+              ],
+              "seed": 20260917
+            },
+            "unseen_combinations": {
+              "families": [
+                "node_plus_space",
+                "time_plus_space",
+                "node_plus_time"
+              ],
+              "seed": 20260918
+            },
+            "unseen_geometry": {
+              "families": [
+                "moving_region",
+                "multi_block"
+              ],
+              "seed": 20260919
+            },
+            "unseen_triple": {
+              "families": [
+                "node_plus_time_plus_space"
+              ],
+              "seed": 20260930
+            },
+            "unseen_combinations_repeat": {
+              "families": [
+                "node_plus_space",
+                "time_plus_space",
+                "node_plus_time"
+              ],
+              "seed": 20261001
+            },
+            "unseen_geometry_repeat": {
+              "families": [
+                "moving_region",
+                "multi_block"
+              ],
+              "seed": 20261002
+            }
+          },
+          "checkpoint_selection": "in_distribution_validation_only",
+          "note": "Same test windows across sets; masks are fixed and identical across models. New family/combination names never reach the model.",
+          "scale_protocol": "same family and missing rate at all scales; independent RNG; A masks M/C to zero"
+        },
+        "selection": "ID validation MAE only",
+        "scope": "Observed-only iteration; independent initialization; development-only I53 selection",
+        "reference": "I37"
+      }
+    },
+    "sources": {
+      "train": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v25_observed_multiscale/73fe84df49ca05de/taxibj_train.npz",
+      "val": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v25_observed_multiscale/73fe84df49ca05de/taxibj_val.npz",
+      "test": "/home/students/HuangMingYu/code/py/my_idea/my_idea/data/TaxiBJ/v25_observed_multiscale/73fe84df49ca05de/taxibj_test.npz"
+    },
+    "defer_test": true,
+    "common_initialization": "/home/students/HuangMingYu/code/py/my_idea/my_idea/outputs/v25/experiments/observation_iteration/1d6eb79a66c77e49/initialization/taxibj_I52_seed17.pth"
+  }
+}

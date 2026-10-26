@@ -280,6 +280,12 @@ class ObservedHistoryConsistencyCoE(ObservedConsistencyCoE, ObservedHistoryCoE):
 from .scale_delta_exploration_coe import ScaleDeltaExplorationCoE
 
 
+class FreeScaleConsistencyCoE(ObservedConsistencyCoE, ScaleDeltaExplorationCoE):
+    """Free scales and observed projection, without a prediction-history pool."""
+
+    with_free_scales = True
+
+
 class FreeScaleHistoryConsistencyCoE(ObservedConsistencyCoE, ObservedHistoryCoE,
                                      ScaleDeltaExplorationCoE):
     """I09/I10/I11: I08 with native single-scale ST execution.
@@ -293,8 +299,9 @@ class FreeScaleHistoryConsistencyCoE(ObservedConsistencyCoE, ObservedHistoryCoE,
     @classmethod
     def from_config(cls, cfg):
         coe = cfg['model']['coe']
+        communication = coe.get('core_validation', {}).get('communication')
         expected = {'enabled': True, 'path': 'free', 'top_k_per_step': [2]*4,
-                    'delta_steps': [2,3,4], 'same_scale_only': False,
+                    'delta_steps': [] if communication == 'none' else [2,3,4], 'same_scale_only': False,
                     'scale_gradient': 'selected_branch_st',
                     'top1_gradient': 'selected_probability_st'}
         exploration = dict(coe.get('scale_delta_exploration', {}))

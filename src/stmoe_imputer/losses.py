@@ -281,7 +281,23 @@ def compute_coe_loss(outputs: dict, batch: dict, cfg: dict) -> tuple[torch.Tenso
         weighted_raw = (beta if learnable_mix else raw_weight) * raw_loss
         total = total + weighted_raw
         logs.update(l_raw_f=raw_loss.detach(), l_raw_f_weighted=weighted_raw.detach())
-    if weight or raw_weight or learnable_mix:
+    visible_f_weight = float(loss_cfg.get('lambda_visible_raw_f', 0.0))
+    if not math.isfinite(visible_f_weight) or visible_f_weight < 0:
+        raise ValueError('lambda_visible_raw_f must be finite and nonnegative')
+    if visible_f_weight:
+        if 'x_hat_raw_consistency' not in outputs:
+            raise ValueError('lambda_visible_raw_f requires x_hat_raw_consistency')
+        # Use the unfilled decoder prediction and visible observations only.
+        # Index before subtraction so hidden placeholders never enter the loss.
+        raw = outputs['x_hat_raw_consistency'].float()
+        observed = batch['x_f_obs'].float()
+        visible = expand_mask_as(batch['m_f'], raw).bool()
+        visible_f_loss = _selected_loss(raw, observed, visible, 'l1')
+        total = total + visible_f_weight * visible_f_loss
+        logs.update(l_visible_raw_f=visible_f_loss.detach(),
+                    l_visible_raw_f_weighted=(visible_f_weight * visible_f_loss).detach(),
+                    visible_raw_f_count=visible.sum().detach())
+    if weight or raw_weight or learnable_mix or visible_f_weight:
         outputs['_combination_diagnostics'] = cfg['data']['scales']['pooling_mode']
         logs['loss'] = total.detach()
     return total, logs

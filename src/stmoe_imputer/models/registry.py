@@ -29,11 +29,26 @@ def resolve_architecture(cfg: dict) -> str:
 
 def build_model_backbone(cfg: dict) -> nn.Module:
     architecture = resolve_architecture(cfg)
+    if cfg['model'].get('coe', {}).get('input_refinement', {}).get('enabled', False):
+        if architecture != 'v25_observed_multiscale_coe':
+            raise ValueError('Input refinement requires v25')
+        from .input_refinement_coe import InputRefinementCoE
+        return InputRefinementCoE.from_config(cfg)
+    if cfg['model'].get('coe', {}).get('observation_iteration', {}).get('enabled', False):
+        if architecture != 'v25_observed_multiscale_coe':
+            raise ValueError('Observation iteration requires v25')
+        from .observation_iteration_coe import ObservationIterationCoE
+        return ObservationIterationCoE.from_config(cfg)
     consistency = cfg['model'].get('coe', {}).get('observation_consistency', {})
     if consistency.get('enabled', False):
         if architecture != 'v25_observed_multiscale_coe':
             raise ValueError('Observation consistency requires v25 observed multi-scale input')
         coe = cfg['model']['coe']
+        if (coe.get('scale_delta_exploration', {}).get('enabled', False)
+                and not coe.get('observed_history', {}).get('enabled', False)
+                and consistency.get('mode') == 'residual_projection'):
+            from .observed_consistency_coe import FreeScaleConsistencyCoE
+            return FreeScaleConsistencyCoE.from_config(cfg)
         if (coe.get('scale_delta_exploration', {}).get('enabled', False)
                 and coe.get('observed_history', {}).get('enabled', False)
                 and consistency.get('mode') == 'residual_projection'):
@@ -59,6 +74,9 @@ def build_model_backbone(cfg: dict) -> nn.Module:
         if consistency['mode'] == 'observed_loss' and cfg['data'].get('return_multiscale_targets', False):
             raise ValueError('Observed-only loss excludes full coarse target labels')
     if architecture == 'v25_observed_multiscale_coe' and cfg['model'].get('coe', {}).get('observed_history', {}).get('enabled', False):
+        if cfg['model']['coe'].get('scale_delta_exploration', {}).get('enabled', False):
+            from .observed_history_coe import FreeScaleObservedHistoryCoE
+            return FreeScaleObservedHistoryCoE.from_config(cfg)
         from .observed_history_coe import ObservedHistoryCoE
         return ObservedHistoryCoE.from_config(cfg)
     if architecture == 'v25_observed_multiscale_coe' and cfg['model'].get('coe', {}).get('scale_delta_exploration', {}).get('enabled', False):

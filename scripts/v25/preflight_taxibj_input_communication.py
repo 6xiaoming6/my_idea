@@ -99,7 +99,8 @@ def run(suite):
                     for attempt in range(24):
                         optimizer.zero_grad(set_to_none=True)
                         for name in ['m','c']:batch['x_'+name+'_obs'].grad=None
-                        calls=[];hooks=[e.register_forward_pre_hook(lambda e,a:calls.append(len(a[0]))) for e in model.main_branch.routed_experts()]
+                        experts={id(e):e for step in range(4) for e in model.main_branch.routed_experts(step)}
+                        calls=[];hooks=[e.register_forward_pre_hook(lambda e,a:calls.append(len(a[0]))) for e in experts.values()]
                         try:
                             with torch.autocast('cuda',dtype=torch.float16):out=model(batch);loss,_=compute_coe_loss(out,batch,cfg)
                         finally:
@@ -117,8 +118,19 @@ def run(suite):
                         torch.nn.utils.clip_grad_norm_(model.parameters(),1.);scaler.step(optimizer);scaler.update()
                         if scaler.get_scale()>=old:
                             if not finite:raise RuntimeError('Nonfinite accepted gradient')
+                            if model.main_branch.expert_sharing == 'per_step':
+                                for step in range(4):
+                                    grads=[p.grad for e in model.main_branch.routed_experts(step) for p in e.parameters() if p.grad is not None]
+                                    if not any(bool(g.abs().sum()>0) for g in grads):
+                                        raise RuntimeError('Independent round expert pool unused: '+str(step+1))
                             gate=[p.grad for p in model.main_branch.history_gate.parameters() if p.grad is not None]
-                            if cfg['model']['coe']['core_validation']['communication'] == 'none':
+                            observation=cfg['model']['coe'].get('observation_iteration',{})
+                            if observation.get('delta')=='physical_split':
+                                if gate or any(p.requires_grad for p in model.main_branch.history_gate.parameters()):
+                                    raise RuntimeError('Replaced hidden gate must be frozen')
+                                if not any(p.grad is not None and bool(p.grad.abs().sum()>0) for p in model.main_branch.x_observation_delta.parameters()):
+                                    raise RuntimeError('Prediction delta unused')
+                            elif cfg['model']['coe']['core_validation']['communication'] == 'none':
                                 if gate or any(p.requires_grad for p in model.main_branch.history_gate.parameters()):
                                     raise RuntimeError('Disabled difference gate must remain frozen')
                             elif not gate or not any(bool(g.abs().sum()>0) for g in gate):raise RuntimeError('Difference gate unused')
@@ -129,13 +141,18 @@ def run(suite):
                             elif not all(bool(fusion[:,i*dim:(i+1)*dim].abs().sum()>0) for i in [1,2]):raise RuntimeError('FMC initialization unused')
                             for name in ['m','c']:
                                 grad=batch['x_'+name+'_obs'].grad
+                                if cfg['data']['input_scales']=='F':
+                                    if bool(batch['m_'+name].any()) or bool(batch['x_'+name+'_obs'].any()):
+                                        raise RuntimeError('F-only batch exposed coarse observations')
+                                    if grad is not None and bool(grad.any()):raise RuntimeError('Coarse gradient leaked into F-only run')
+                                    continue
                                 if grad is None or not bool(grad[batch['m_'+name].bool()].abs().sum()>0):raise RuntimeError('Real scale unused '+name)
                                 if bool(grad[~batch['m_'+name].bool()].any()):raise RuntimeError('Hidden input leaked '+name)
                             if hasattr(model.main_branch,'x_history'):
                                 d=out['coe']['diagnostics']
                                 if [float(d[f'x_step{i}_pool_size']) for i in range(1,5)]!=[0,1,2,3]:raise RuntimeError('Noncausal history pool')
                                 if not bool(model.main_branch.x_history.inject[-1].weight.grad.abs().sum()>0):raise RuntimeError('History injection unused')
-                            if hasattr(model.main_branch,'exploration'):
+                            if hasattr(model.main_branch,'exploration') and not observation.get('fixed_path'):
                                 if not any(p.grad is not None and bool(p.grad.abs().sum()>0) for p in model.main_branch.scale_heads.parameters()):raise RuntimeError('Free scale heads unused')
                             if hasattr(model.main_branch,'x_consistency'):
                                 grads=[p.grad for p in model.main_branch.x_consistency.parameters() if p.requires_grad and p.grad is not None]
@@ -151,7 +168,7 @@ def run(suite):
                         if updates>=3:break
                     if updates<3:raise RuntimeError('Insufficient AMP updates')
                     replay = None
-                    if not heavy and cfg.get('loss', {}).get('visible_consistency_aux', {}).get('weight', 0):
+                    if not heavy and (cfg.get('loss', {}).get('visible_consistency_aux', {}).get('weight', 0) or cfg['data']['input_scales']=='F'):
                         replay = check_amp_resume(model, optimizer, scaler, batch, cfg,
                                                  suite/'acceptance'/label/'resume.pth')
                     torch.cuda.synchronize();row={'case':label,'status':'passed','attempts':attempt+1,'updates':updates,'calls_per_window':8,'peak_gib':torch.cuda.max_memory_allocated()/2**30,'seconds':time.monotonic()-start};row['resume_check']=replay;result['cases'].append(row);print(row,flush=True)

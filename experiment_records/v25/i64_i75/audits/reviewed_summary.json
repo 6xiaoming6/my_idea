@@ -1,0 +1,1506 @@
+[
+  {
+    "method": "I73",
+    "id_mae": 8.514157878057098,
+    "id_rmse": 15.03062240044393,
+    "ood_category_mae": [
+      14.177227963336408,
+      18.009920608441092,
+      13.26360196357886
+    ],
+    "ood_mean": 15.15025017845212,
+    "ood_category_rmse": [
+      26.21701682438724,
+      32.63311125639814,
+      24.474290863613717
+    ],
+    "id_ratio": 1.0575224819728875,
+    "ood_ratio": 1.6839024492845194,
+    "worst_ratio": 1.70866343147511,
+    "protocols": {
+      "in_distribution": {
+        "mae": 8.514157878057098,
+        "rmse": 15.03062240044393
+      },
+      "unseen_combinations": {
+        "mae": 14.271525534511015,
+        "rmse": 26.514845790081374
+      },
+      "unseen_geometry": {
+        "mae": 18.029255332160158,
+        "rmse": 32.49917779003305
+      },
+      "unseen_triple": {
+        "mae": 13.26360196357886,
+        "rmse": 24.474290863613717
+      },
+      "unseen_combinations_repeat": {
+        "mae": 14.082930392161801,
+        "rmse": 25.919187858693107
+      },
+      "unseen_geometry_repeat": {
+        "mae": 17.99058588472203,
+        "rmse": 32.76704472276322
+      }
+    },
+    "path_diagnostics": {
+      "in_distribution": {
+        "paths": [
+          [
+            "CMCF",
+            1.0
+          ]
+        ],
+        "grid_equivalents": 2.75,
+        "raw_mae": 11.599273927992275,
+        "post_mae": 8.514157878057098,
+        "unconstrained_mae": 14.395194899367441,
+        "unconstrained_count": 1291580.0,
+        "residual_m": 3.998951569883502e-06,
+        "residual_c": 1.0978001643272126e-05
+      },
+      "unseen_geometry": {
+        "paths": [
+          [
+            "CMCF",
+            1.0
+          ]
+        ],
+        "grid_equivalents": 2.75,
+        "raw_mae": 22.102669137717434,
+        "post_mae": 18.029255332160158,
+        "unconstrained_mae": 33.76910891973959,
+        "unconstrained_count": 1486100.0,
+        "residual_m": 6.259476618731202e-06,
+        "residual_c": 1.88447999157095e-05
+      },
+      "unseen_triple": {
+        "paths": [
+          [
+            "CMCF",
+            1.0
+          ]
+        ],
+        "grid_equivalents": 2.75,
+        "raw_mae": 19.16569368443166,
+        "post_mae": 13.26360196357886,
+        "unconstrained_mae": 25.89396890848479,
+        "unconstrained_count": 1140488.0,
+        "residual_m": 5.3963415211910615e-06,
+        "residual_c": 1.4563469132712191e-05
+      }
+    }
+  },
+  {
+    "method": "I65",
+    "id_mae": 7.885393968953828,
+    "id_rmse": 14.068412042133183,
+    "ood_category_mae": [
+      11.701053192011724,
+      14.835309772632273,
+      10.703403006700903
+    ],
+    "ood_mean": 12.413255323781634,
+    "ood_category_rmse": [
+      23.45692958398369,
+      27.765750450420253,
+      21.597993693236727
+    ],
+    "id_ratio": 0.9794252726829887,
+    "ood_ratio": 1.3786127297169368,
+    "worst_ratio": 1.4102306706670487,
+    "protocols": {
+      "in_distribution": {
+        "mae": 7.885393968953828,
+        "rmse": 14.068412042133183
+      },
+      "unseen_combinations": {
+        "mae": 11.82312460250712,
+        "rmse": 23.76123429271824
+      },
+      "unseen_geometry": {
+        "mae": 14.849530731325748,
+        "rmse": 27.920916972184255
+      },
+      "unseen_triple": {
+        "mae": 10.703403006700903,
+        "rmse": 21.597993693236727
+      },
+      "unseen_combinations_repeat": {
+        "mae": 11.57898178151633,
+        "rmse": 23.152624875249142
+      },
+      "unseen_geometry_repeat": {
+        "mae": 14.821088813938799,
+        "rmse": 27.61058392865625
+      }
+    },
+    "path_diagnostics": {
+      "in_distribution": {
+        "paths": [
+          [
+            "FCFF",
+            0.7906647807637907
+          ],
+          [
+            "CCFF",
+            0.20933521923620935
+          ]
+        ],
+        "grid_equivalents": 5.732496463932107,
+        "raw_mae": 10.853565744962811,
+        "post_mae": 7.885393968953828,
+        "unconstrained_mae": 13.533149795816945,
+        "unconstrained_count": 1291580.0,
+        "residual_m": 3.7169852871359224e-06,
+        "residual_c": 9.562692758149554e-06
+      },
+      "unseen_geometry": {
+        "paths": [
+          [
+            "FCFF",
+            0.8939179632248939
+          ],
+          [
+            "CCFF",
+            0.10608203677510608
+          ]
+        ],
+        "grid_equivalents": 5.926096181046676,
+        "raw_mae": 19.110854316520882,
+        "post_mae": 14.849530731325748,
+        "unconstrained_mae": 29.439808385833725,
+        "unconstrained_count": 1486100.0,
+        "residual_m": 5.03544550195764e-06,
+        "residual_c": 1.3884220686083173e-05
+      },
+      "unseen_triple": {
+        "paths": [
+          [
+            "FCFF",
+            1.0
+          ]
+        ],
+        "grid_equivalents": 6.125,
+        "raw_mae": 15.951561117318315,
+        "post_mae": 10.703403006700903,
+        "unconstrained_mae": 22.404950638454768,
+        "unconstrained_count": 1140488.0,
+        "residual_m": 4.276824216978402e-06,
+        "residual_c": 1.0371020202317437e-05
+      }
+    }
+  },
+  {
+    "method": "I72",
+    "id_mae": 8.705907108431742,
+    "id_rmse": 15.512609076701803,
+    "ood_category_mae": [
+      16.828033230404863,
+      20.8615068163734,
+      16.058720337318576
+    ],
+    "ood_mean": 17.916086794698945,
+    "ood_category_rmse": [
+      33.31032159943566,
+      42.869923725206455,
+      31.418577472232904
+    ],
+    "id_ratio": 1.0813391793992755,
+    "ood_ratio": 1.9961909029052698,
+    "worst_ratio": 2.0347908804111965,
+    "protocols": {
+      "in_distribution": {
+        "mae": 8.705907108431742,
+        "rmse": 15.512609076701803
+      },
+      "unseen_combinations": {
+        "mae": 16.96042823472872,
+        "rmse": 33.705071257839386
+      },
+      "unseen_geometry": {
+        "mae": 20.8808058421741,
+        "rmse": 43.02075722061654
+      },
+      "unseen_triple": {
+        "mae": 16.058720337318576,
+        "rmse": 31.418577472232904
+      },
+      "unseen_combinations_repeat": {
+        "mae": 16.695638226081,
+        "rmse": 32.915571941031935
+      },
+      "unseen_geometry_repeat": {
+        "mae": 20.842207790572694,
+        "rmse": 42.71909022979637
+      }
+    },
+    "path_diagnostics": {
+      "in_distribution": {
+        "paths": [
+          [
+            "FMFF",
+            1.0
+          ]
+        ],
+        "grid_equivalents": 6.5,
+        "raw_mae": 11.384870557612366,
+        "post_mae": 8.705907108431742,
+        "unconstrained_mae": 14.649779337008741,
+        "unconstrained_count": 1291580.0,
+        "residual_m": 3.6679819350351664e-06,
+        "residual_c": 8.913100798409964e-06
+      },
+      "unseen_geometry": {
+        "paths": [
+          [
+            "FMFF",
+            1.0
+          ]
+        ],
+        "grid_equivalents": 6.5,
+        "raw_mae": 26.947138325544152,
+        "post_mae": 20.8808058421741,
+        "unconstrained_mae": 41.94499686154195,
+        "unconstrained_count": 1486100.0,
+        "residual_m": 4.8382880480779065e-06,
+        "residual_c": 1.2402588175103554e-05
+      },
+      "unseen_triple": {
+        "paths": [
+          [
+            "FMFF",
+            1.0
+          ]
+        ],
+        "grid_equivalents": 6.5,
+        "raw_mae": 23.58375469976877,
+        "post_mae": 16.058720337318576,
+        "unconstrained_mae": 31.441184949447077,
+        "unconstrained_count": 1140488.0,
+        "residual_m": 4.100376189774619e-06,
+        "residual_c": 9.425319505048126e-06
+      }
+    }
+  },
+  {
+    "method": "I71",
+    "id_mae": 8.61654347834689,
+    "id_rmse": 15.237945711391355,
+    "ood_category_mae": [
+      21.662546694172214,
+      19.875738977036782,
+      21.048851596302633
+    ],
+    "ood_mean": 20.862379089170542,
+    "ood_category_rmse": [
+      46.8659200449547,
+      41.80183372199923,
+      44.66606021123758
+    ],
+    "id_ratio": 1.0702395440343972,
+    "ood_ratio": 2.370846952497565,
+    "worst_ratio": 2.6670874373316877,
+    "protocols": {
+      "in_distribution": {
+        "mae": 8.61654347834689,
+        "rmse": 15.237945711391355
+      },
+      "unseen_combinations": {
+        "mae": 21.585560306684645,
+        "rmse": 46.78857251862592
+      },
+      "unseen_geometry": {
+        "mae": 19.803909801131255,
+        "rmse": 41.717895117733676
+      },
+      "unseen_triple": {
+        "mae": 21.048851596302633,
+        "rmse": 44.66606021123758
+      },
+      "unseen_combinations_repeat": {
+        "mae": 21.739533081659786,
+        "rmse": 46.94326757128348
+      },
+      "unseen_geometry_repeat": {
+        "mae": 19.94756815294231,
+        "rmse": 41.885772326264785
+      }
+    },
+    "path_diagnostics": {
+      "in_distribution": {
+        "paths": [
+          [
+            "FMCF",
+            1.0
+          ]
+        ],
+        "grid_equivalents": 4.625,
+        "raw_mae": 11.903190541360123,
+        "post_mae": 8.61654347834689,
+        "unconstrained_mae": 14.41140897014219,
+        "unconstrained_count": 1291580.0,
+        "residual_m": 3.6050678219275456e-06,
+        "residual_c": 8.935949450539699e-06
+      },
+      "unseen_geometry": {
+        "paths": [
+          [
+            "FMCF",
+            1.0
+          ]
+        ],
+        "grid_equivalents": 4.625,
+        "raw_mae": 25.60217877359237,
+        "post_mae": 19.803909801131255,
+        "unconstrained_mae": 34.385107611785884,
+        "unconstrained_count": 1486100.0,
+        "residual_m": 4.909729202905589e-06,
+        "residual_c": 1.3375255469366929e-05
+      },
+      "unseen_triple": {
+        "paths": [
+          [
+            "FMCF",
+            1.0
+          ]
+        ],
+        "grid_equivalents": 4.625,
+        "raw_mae": 31.860392604258244,
+        "post_mae": 21.048851596302633,
+        "unconstrained_mae": 35.48969237839416,
+        "unconstrained_count": 1140488.0,
+        "residual_m": 4.033382641983221e-06,
+        "residual_c": 9.538115057733629e-06
+      }
+    }
+  },
+  {
+    "method": "I75",
+    "id_mae": 10.984406790437436,
+    "id_rmse": 19.7702761399824,
+    "ood_category_mae": [
+      23.97855022745226,
+      23.481615178598407,
+      22.84500782215629
+    ],
+    "ood_mean": 23.43505774273565,
+    "ood_category_rmse": [
+      47.81487838205143,
+      47.30916473423056,
+      45.5054152254382
+    ],
+    "id_ratio": 1.36434598681344,
+    "ood_ratio": 2.6507009401713417,
+    "worst_ratio": 2.8946773219171664,
+    "protocols": {
+      "in_distribution": {
+        "mae": 10.984406790437436,
+        "rmse": 19.7702761399824
+      },
+      "unseen_combinations": {
+        "mae": 24.195773166820388,
+        "rmse": 48.200714124504735
+      },
+      "unseen_geometry": {
+        "mae": 23.286128002060487,
+        "rmse": 47.03591531122143
+      },
+      "unseen_triple": {
+        "mae": 22.84500782215629,
+        "rmse": 45.5054152254382
+      },
+      "unseen_combinations_repeat": {
+        "mae": 23.761327288084136,
+        "rmse": 47.42904263959814
+      },
+      "unseen_geometry_repeat": {
+        "mae": 23.677102355136327,
+        "rmse": 47.5824141572397
+      }
+    },
+    "path_diagnostics": {
+      "in_distribution": {
+        "paths": [
+          [
+            "MFFF",
+            0.5007072135785007
+          ],
+          [
+            "MFMF",
+            0.49929278642149927
+          ]
+        ],
+        "grid_equivalents": 5.751060820367751,
+        "raw_mae": 15.243813329069427,
+        "post_mae": 10.984406790437436,
+        "unconstrained_mae": 17.898655516644343,
+        "unconstrained_count": 1291580.0,
+        "residual_m": 3.720354579459324e-06,
+        "residual_c": 9.127419359530272e-06
+      },
+      "unseen_geometry": {
+        "paths": [
+          [
+            "MFFF",
+            0.7468175388967468
+          ],
+          [
+            "MFMF",
+            0.2531824611032532
+          ]
+        ],
+        "grid_equivalents": 6.12022630834512,
+        "raw_mae": 30.65111203579666,
+        "post_mae": 23.286128002060487,
+        "unconstrained_mae": 40.92006005652379,
+        "unconstrained_count": 1486100.0,
+        "residual_m": 4.790490868839223e-06,
+        "residual_c": 1.2219749489462549e-05
+      },
+      "unseen_triple": {
+        "paths": [
+          [
+            "MFMF",
+            0.8910891089108911
+          ],
+          [
+            "MFFF",
+            0.10891089108910891
+          ]
+        ],
+        "grid_equivalents": 5.163366336633663,
+        "raw_mae": 34.08218373056242,
+        "post_mae": 22.84500782215629,
+        "unconstrained_mae": 43.30670338596285,
+        "unconstrained_count": 1140488.0,
+        "residual_m": 4.1871896339374794e-06,
+        "residual_c": 9.22337787177758e-06
+      }
+    }
+  },
+  {
+    "method": "I57",
+    "id_mae": 8.399249102673311,
+    "id_rmse": 15.00833020248939,
+    "ood_category_mae": [
+      8.991531096038957,
+      12.961215320095082,
+      8.532077050487711
+    ],
+    "ood_mean": 10.16160782220725,
+    "ood_category_rmse": [
+      15.819763231735724,
+      24.233197373430443,
+      14.96727838511688
+    ],
+    "id_ratio": 1.0432499473212211,
+    "ood_ratio": 1.1203882460777104,
+    "worst_ratio": 1.1963958449999148,
+    "protocols": {
+      "in_distribution": {
+        "mae": 8.399249102673311,
+        "rmse": 15.00833020248939
+      },
+      "unseen_combinations": {
+        "mae": 8.978732024238791,
+        "rmse": 15.803426568949988
+      },
+      "unseen_geometry": {
+        "mae": 12.994492133597896,
+        "rmse": 24.434768712126868
+      },
+      "unseen_triple": {
+        "mae": 8.532077050487711,
+        "rmse": 14.96727838511688
+      },
+      "unseen_combinations_repeat": {
+        "mae": 9.004330167839122,
+        "rmse": 15.83609989452146
+      },
+      "unseen_geometry_repeat": {
+        "mae": 12.927938506592266,
+        "rmse": 24.031626034734018
+      }
+    },
+    "path_diagnostics": {
+      "in_distribution": {
+        "paths": [
+          [
+            "FMFF",
+            0.9900990099009901
+          ],
+          [
+            "FMCF",
+            0.005657708628005658
+          ],
+          [
+            "FMMF",
+            0.004243281471004243
+          ]
+        ],
+        "grid_equivalents": 6.483026874115983,
+        "raw_mae": 11.245258107775609,
+        "post_mae": 8.399249102673311,
+        "unconstrained_mae": 14.672877360601937,
+        "unconstrained_count": 1291580.0,
+        "residual_m": 3.74723022698321e-06,
+        "residual_c": 9.315868648785829e-06
+      },
+      "unseen_geometry": {
+        "paths": [
+          [
+            "FMFF",
+            0.983026874115983
+          ],
+          [
+            "FMMF",
+            0.01272984441301273
+          ],
+          [
+            "FMCF",
+            0.004243281471004243
+          ]
+        ],
+        "grid_equivalents": 6.472949080622348,
+        "raw_mae": 15.266884328492434,
+        "post_mae": 12.994492133597896,
+        "unconstrained_mae": 25.555634304976113,
+        "unconstrained_count": 1486100.0,
+        "residual_m": 4.984330565133385e-06,
+        "residual_c": 1.3281022782631107e-05
+      },
+      "unseen_triple": {
+        "paths": [
+          [
+            "FMFF",
+            0.9900990099009901
+          ],
+          [
+            "FMMF",
+            0.007072135785007072
+          ],
+          [
+            "FMCF",
+            0.002828854314002829
+          ]
+        ],
+        "grid_equivalents": 6.484087694483734,
+        "raw_mae": 11.830871833186807,
+        "post_mae": 8.532077050487711,
+        "unconstrained_mae": 14.940946756454254,
+        "unconstrained_count": 1140488.0,
+        "residual_m": 4.227818724599353e-06,
+        "residual_c": 1.0105814592110539e-05
+      }
+    }
+  },
+  {
+    "method": "I56",
+    "id_mae": 10.296717023558918,
+    "id_rmse": 18.05075724380234,
+    "ood_category_mae": [
+      16.239553909567313,
+      18.11982234046686,
+      16.292943219850613
+    ],
+    "ood_mean": 16.884106489961596,
+    "ood_category_rmse": [
+      28.016301991185173,
+      32.810097566300186,
+      27.66079585440671
+    ],
+    "id_ratio": 1.2789297425397688,
+    "ood_ratio": 1.89808431540201,
+    "worst_ratio": 2.0644691222230467,
+    "protocols": {
+      "in_distribution": {
+        "mae": 10.296717023558918,
+        "rmse": 18.05075724380234
+      },
+      "unseen_combinations": {
+        "mae": 16.248368462591063,
+        "rmse": 27.974420227128252
+      },
+      "unseen_geometry": {
+        "mae": 18.079501445003533,
+        "rmse": 32.74547446036359
+      },
+      "unseen_triple": {
+        "mae": 16.292943219850613,
+        "rmse": 27.66079585440671
+      },
+      "unseen_combinations_repeat": {
+        "mae": 16.23073935654356,
+        "rmse": 28.05818375524209
+      },
+      "unseen_geometry_repeat": {
+        "mae": 18.160143235930192,
+        "rmse": 32.874720672236776
+      }
+    },
+    "path_diagnostics": {
+      "in_distribution": {
+        "paths": [
+          [
+            "CMFF",
+            1.0
+          ]
+        ],
+        "grid_equivalents": 4.625,
+        "raw_mae": 13.577005643859328,
+        "post_mae": 10.296717023558918,
+        "unconstrained_mae": 16.728472509203844,
+        "unconstrained_count": 1291580.0,
+        "residual_m": 3.7616473639940047e-06,
+        "residual_c": 9.393551606436908e-06
+      },
+      "unseen_geometry": {
+        "paths": [
+          [
+            "CMFF",
+            1.0
+          ]
+        ],
+        "grid_equivalents": 4.625,
+        "raw_mae": 21.980162115043434,
+        "post_mae": 18.079501445003533,
+        "unconstrained_mae": 31.099993891309467,
+        "unconstrained_count": 1486100.0,
+        "residual_m": 4.909320286179022e-06,
+        "residual_c": 1.269294070089413e-05
+      },
+      "unseen_triple": {
+        "paths": [
+          [
+            "CMFF",
+            1.0
+          ]
+        ],
+        "grid_equivalents": 4.625,
+        "raw_mae": 22.24052345495776,
+        "post_mae": 16.292943219850613,
+        "unconstrained_mae": 26.686415623180604,
+        "unconstrained_count": 1140488.0,
+        "residual_m": 4.293688947575942e-06,
+        "residual_c": 1.0404195306720162e-05
+      }
+    }
+  },
+  {
+    "method": "I68",
+    "id_mae": 9.013286296226084,
+    "id_rmse": 16.145296757814645,
+    "ood_category_mae": [
+      20.02582556213767,
+      21.364098478951224,
+      25.637663151942284
+    ],
+    "ood_mean": 22.342529064343722,
+    "ood_category_rmse": [
+      39.803153509250706,
+      43.53675565319598,
+      47.40290020669382
+    ],
+    "id_ratio": 1.1195179877134644,
+    "ood_ratio": 2.5447034378293654,
+    "worst_ratio": 3.2485330138912567,
+    "protocols": {
+      "in_distribution": {
+        "mae": 9.013286296226084,
+        "rmse": 16.145296757814645
+      },
+      "unseen_combinations": {
+        "mae": 20.030126776847137,
+        "rmse": 39.836587660497926
+      },
+      "unseen_geometry": {
+        "mae": 21.215332937159435,
+        "rmse": 43.59482280104565
+      },
+      "unseen_triple": {
+        "mae": 25.637663151942284,
+        "rmse": 47.40290020669382
+      },
+      "unseen_combinations_repeat": {
+        "mae": 20.021524347428205,
+        "rmse": 39.76971935800349
+      },
+      "unseen_geometry_repeat": {
+        "mae": 21.512864020743013,
+        "rmse": 43.47868850534631
+      }
+    },
+    "path_diagnostics": {
+      "in_distribution": {
+        "paths": [
+          [
+            "FMFF",
+            0.9759547383309759
+          ],
+          [
+            "FCFF",
+            0.024045261669024046
+          ]
+        ],
+        "grid_equivalents": 6.490983026874116,
+        "raw_mae": 11.859008906358591,
+        "post_mae": 9.013286296226084,
+        "unconstrained_mae": 15.472856477144273,
+        "unconstrained_count": 1291580.0,
+        "residual_m": 3.6105760876165256e-06,
+        "residual_c": 8.883060386126644e-06
+      },
+      "unseen_geometry": {
+        "paths": [
+          [
+            "FMFF",
+            0.9816124469589816
+          ],
+          [
+            "FCFF",
+            0.018387553041018388
+          ]
+        ],
+        "grid_equivalents": 6.493104667609618,
+        "raw_mae": 27.097169499957552,
+        "post_mae": 21.215332937159435,
+        "unconstrained_mae": 35.74831433786421,
+        "unconstrained_count": 1486100.0,
+        "residual_m": 4.780597118556414e-06,
+        "residual_c": 1.2372894003498875e-05
+      },
+      "unseen_triple": {
+        "paths": [
+          [
+            "FMFF",
+            1.0
+          ]
+        ],
+        "grid_equivalents": 6.5,
+        "raw_mae": 42.330297051286294,
+        "post_mae": 25.637663151942284,
+        "unconstrained_mae": 45.912162573170434,
+        "unconstrained_count": 1140488.0,
+        "residual_m": 4.345235775753795e-06,
+        "residual_c": 1.0626312241188513e-05
+      }
+    }
+  },
+  {
+    "method": "I69",
+    "id_mae": 8.432461950848296,
+    "id_rmse": 14.830132789682475,
+    "ood_category_mae": [
+      27.00636955812461,
+      24.167720823932598,
+      37.65782562760709
+    ],
+    "ood_mean": 29.6106386698881,
+    "ood_category_rmse": [
+      62.796147183553074,
+      57.11185110248982,
+      74.28846838632396
+    ],
+    "id_ratio": 1.0473752330087134,
+    "ood_ratio": 3.419091861444455,
+    "worst_ratio": 4.771600635269836,
+    "protocols": {
+      "in_distribution": {
+        "mae": 8.432461950848296,
+        "rmse": 14.830132789682475
+      },
+      "unseen_combinations": {
+        "mae": 26.960956351684434,
+        "rmse": 62.84471438548653
+      },
+      "unseen_geometry": {
+        "mae": 24.19961824945574,
+        "rmse": 57.52766490455092
+      },
+      "unseen_triple": {
+        "mae": 37.65782562760709,
+        "rmse": 74.28846838632396
+      },
+      "unseen_combinations_repeat": {
+        "mae": 27.051782764564788,
+        "rmse": 62.74757998161962
+      },
+      "unseen_geometry_repeat": {
+        "mae": 24.135823398409453,
+        "rmse": 56.69603730042873
+      }
+    },
+    "path_diagnostics": {
+      "in_distribution": {
+        "paths": [
+          [
+            "MFCF",
+            1.0
+          ]
+        ],
+        "grid_equivalents": 4.625,
+        "raw_mae": 11.66560093009737,
+        "post_mae": 8.432461950848296,
+        "unconstrained_mae": 13.93316955419912,
+        "unconstrained_count": 1291580.0,
+        "residual_m": 3.7420904549356275e-06,
+        "residual_c": 9.782563685566066e-06
+      },
+      "unseen_geometry": {
+        "paths": [
+          [
+            "MFCF",
+            1.0
+          ]
+        ],
+        "grid_equivalents": 4.625,
+        "raw_mae": 30.52639072147296,
+        "post_mae": 24.19961824945574,
+        "unconstrained_mae": 38.03555285226432,
+        "unconstrained_count": 1486100.0,
+        "residual_m": 4.799297130375635e-06,
+        "residual_c": 1.3074213830291031e-05
+      },
+      "unseen_triple": {
+        "paths": [
+          [
+            "MFCF",
+            0.9886845827439887
+          ],
+          [
+            "MFMF",
+            0.011315417256011316
+          ]
+        ],
+        "grid_equivalents": 4.6292432814710045,
+        "raw_mae": 61.997977750470874,
+        "post_mae": 37.65782562760709,
+        "unconstrained_mae": 65.20652159974502,
+        "unconstrained_count": 1140488.0,
+        "residual_m": 4.211669005124587e-06,
+        "residual_c": 1.0535120015012343e-05
+      }
+    }
+  },
+  {
+    "method": "I37",
+    "id_mae": 8.051041961938529,
+    "id_rmse": 14.660255818624048,
+    "ood_category_mae": [
+      8.297261884452595,
+      10.833550930708896,
+      7.892074066143535
+    ],
+    "ood_mean": 9.007628960435008,
+    "ood_category_rmse": [
+      14.665601613583718,
+      18.490577068094716,
+      13.917090116063457
+    ],
+    "id_ratio": 1.0,
+    "ood_ratio": 1.0,
+    "worst_ratio": 1.0,
+    "protocols": {
+      "in_distribution": {
+        "mae": 8.051041961938529,
+        "rmse": 14.660255818624048
+      },
+      "unseen_combinations": {
+        "mae": 8.310507159997899,
+        "rmse": 14.753400727042598
+      },
+      "unseen_geometry": {
+        "mae": 10.821156783422856,
+        "rmse": 18.4873839301614
+      },
+      "unseen_triple": {
+        "mae": 7.892074066143535,
+        "rmse": 13.917090116063457
+      },
+      "unseen_combinations_repeat": {
+        "mae": 8.284016608907294,
+        "rmse": 14.577802500124836
+      },
+      "unseen_geometry_repeat": {
+        "mae": 10.845945077994937,
+        "rmse": 18.49377020602803
+      }
+    },
+    "path_diagnostics": {
+      "in_distribution": {
+        "paths": [
+          [
+            "MMFF",
+            1.0
+          ]
+        ],
+        "grid_equivalents": 5.0,
+        "raw_mae": 11.095431210529496,
+        "post_mae": 8.051041961938529,
+        "unconstrained_mae": 14.176451383673486,
+        "unconstrained_count": 1291580.0,
+        "residual_m": 3.7524936408811733e-06,
+        "residual_c": 9.30468775589796e-06
+      },
+      "unseen_geometry": {
+        "paths": [
+          [
+            "MMFF",
+            1.0
+          ]
+        ],
+        "grid_equivalents": 5.0,
+        "raw_mae": 13.491706652771802,
+        "post_mae": 10.821156783422856,
+        "unconstrained_mae": 18.97256028783393,
+        "unconstrained_count": 1486100.0,
+        "residual_m": 5.116126767066105e-06,
+        "residual_c": 1.3690068439957585e-05
+      },
+      "unseen_triple": {
+        "paths": [
+          [
+            "MMFF",
+            1.0
+          ]
+        ],
+        "grid_equivalents": 5.0,
+        "raw_mae": 11.076176704830779,
+        "post_mae": 7.892074066143535,
+        "unconstrained_mae": 13.863363424253478,
+        "unconstrained_count": 1140488.0,
+        "residual_m": 4.241080442506759e-06,
+        "residual_c": 9.995994846774366e-06
+      }
+    }
+  },
+  {
+    "method": "I64",
+    "id_mae": 8.082592487240658,
+    "id_rmse": 14.657872002257445,
+    "ood_category_mae": [
+      19.844104431901734,
+      22.197178866220803,
+      18.257918193087292
+    ],
+    "ood_mean": 20.099733830403277,
+    "ood_category_rmse": [
+      41.094291887359766,
+      45.8196804609577,
+      39.56901319494856
+    ],
+    "id_ratio": 1.0039188126768295,
+    "ood_ratio": 2.251341358515044,
+    "worst_ratio": 2.391644943627199,
+    "protocols": {
+      "in_distribution": {
+        "mae": 8.082592487240658,
+        "rmse": 14.657872002257445
+      },
+      "unseen_combinations": {
+        "mae": 19.994881348374992,
+        "rmse": 41.29744183718234
+      },
+      "unseen_geometry": {
+        "mae": 22.042077975872722,
+        "rmse": 45.382029331544004
+      },
+      "unseen_triple": {
+        "mae": 18.257918193087292,
+        "rmse": 39.56901319494856
+      },
+      "unseen_combinations_repeat": {
+        "mae": 19.69332751542848,
+        "rmse": 40.89114193753719
+      },
+      "unseen_geometry_repeat": {
+        "mae": 22.352279756568883,
+        "rmse": 46.257331590371386
+      }
+    },
+    "path_diagnostics": {
+      "in_distribution": {
+        "paths": [
+          [
+            "CMFF",
+            0.4908062234794908
+          ],
+          [
+            "FMCF",
+            0.4794908062234795
+          ],
+          [
+            "CMCF",
+            0.015558698727015558
+          ],
+          [
+            "MMCF",
+            0.014144271570014143
+          ]
+        ],
+        "grid_equivalents": 4.574611032531824,
+        "raw_mae": 10.973056842111511,
+        "post_mae": 8.082592487240658,
+        "unconstrained_mae": 14.108512572174197,
+        "unconstrained_count": 1291580.0,
+        "residual_m": 3.714432419537448e-06,
+        "residual_c": 9.245868963973962e-06
+      },
+      "unseen_geometry": {
+        "paths": [
+          [
+            "FMCF",
+            0.5502121640735502
+          ],
+          [
+            "CMFF",
+            0.27864214992927866
+          ],
+          [
+            "CMCF",
+            0.16973125884016974
+          ],
+          [
+            "MMCF",
+            0.0014144271570014145
+          ]
+        ],
+        "grid_equivalents": 4.304632248939179,
+        "raw_mae": 28.12739360860225,
+        "post_mae": 22.042077975872722,
+        "unconstrained_mae": 43.749197227642824,
+        "unconstrained_count": 1486100.0,
+        "residual_m": 4.872159509076205e-06,
+        "residual_c": 1.2678629129526518e-05
+      },
+      "unseen_triple": {
+        "paths": [
+          [
+            "CMFF",
+            0.9080622347949081
+          ],
+          [
+            "CMCF",
+            0.07213578500707214
+          ],
+          [
+            "FMCF",
+            0.019801980198019802
+          ]
+        ],
+        "grid_equivalents": 4.48974540311174,
+        "raw_mae": 28.246881200709083,
+        "post_mae": 18.257918193087292,
+        "unconstrained_mae": 34.843968176890066,
+        "unconstrained_count": 1140488.0,
+        "residual_m": 4.000659694848645e-06,
+        "residual_c": 9.059946774947964e-06
+      }
+    }
+  },
+  {
+    "method": "I67",
+    "id_mae": 8.526790408658654,
+    "id_rmse": 15.055946831694063,
+    "ood_category_mae": [
+      19.200656690614565,
+      20.777182667583716,
+      20.660745203825716
+    ],
+    "ood_mean": 20.212861520674664,
+    "ood_category_rmse": [
+      42.893628621528535,
+      43.48220529528285,
+      41.46949640265645
+    ],
+    "id_ratio": 1.0590915373400407,
+    "ood_ratio": 2.2832871689591285,
+    "worst_ratio": 2.6179107077135675,
+    "protocols": {
+      "in_distribution": {
+        "mae": 8.526790408658654,
+        "rmse": 15.055946831694063
+      },
+      "unseen_combinations": {
+        "mae": 19.32516084072802,
+        "rmse": 43.344557916241506
+      },
+      "unseen_geometry": {
+        "mae": 20.643018559140465,
+        "rmse": 43.079533338114594
+      },
+      "unseen_triple": {
+        "mae": 20.660745203825716,
+        "rmse": 41.46949640265645
+      },
+      "unseen_combinations_repeat": {
+        "mae": 19.076152540501106,
+        "rmse": 42.442699326815564
+      },
+      "unseen_geometry_repeat": {
+        "mae": 20.91134677602697,
+        "rmse": 43.88487725245112
+      }
+    },
+    "path_diagnostics": {
+      "in_distribution": {
+        "paths": [
+          [
+            "CFFF",
+            1.0
+          ]
+        ],
+        "grid_equivalents": 6.125,
+        "raw_mae": 12.262365661795071,
+        "post_mae": 8.526790408658654,
+        "unconstrained_mae": 14.451875812352894,
+        "unconstrained_count": 1291580.0,
+        "residual_m": 3.6789951299515846e-06,
+        "residual_c": 9.212421802025663e-06
+      },
+      "unseen_geometry": {
+        "paths": [
+          [
+            "CFFF",
+            1.0
+          ]
+        ],
+        "grid_equivalents": 6.125,
+        "raw_mae": 27.78616831791085,
+        "post_mae": 20.643018559140465,
+        "unconstrained_mae": 40.602574655347894,
+        "unconstrained_count": 1486100.0,
+        "residual_m": 4.85261353866878e-06,
+        "residual_c": 1.3371106690655047e-05
+      },
+      "unseen_triple": {
+        "paths": [
+          [
+            "CFFF",
+            1.0
+          ]
+        ],
+        "grid_equivalents": 6.125,
+        "raw_mae": 33.619092392453894,
+        "post_mae": 20.660745203825716,
+        "unconstrained_mae": 40.012647354685015,
+        "unconstrained_count": 1140488.0,
+        "residual_m": 3.978747006682249e-06,
+        "residual_c": 9.183997897945e-06
+      }
+    }
+  },
+  {
+    "method": "I66",
+    "id_mae": 8.153697286328692,
+    "id_rmse": 14.647411922392182,
+    "ood_category_mae": [
+      18.015165929446276,
+      19.62465946910779,
+      16.494890849534016
+    ],
+    "ood_mean": 18.044905416029362,
+    "ood_category_rmse": [
+      36.2949162045734,
+      39.4358947032906,
+      33.472697440874896
+    ],
+    "id_ratio": 1.0127505638245917,
+    "ood_ratio": 2.0242488729042933,
+    "worst_ratio": 2.1712181898468317,
+    "protocols": {
+      "in_distribution": {
+        "mae": 8.153697286328692,
+        "rmse": 14.647411922392182
+      },
+      "unseen_combinations": {
+        "mae": 18.09595608549011,
+        "rmse": 36.30624541326395
+      },
+      "unseen_geometry": {
+        "mae": 19.61220568889653,
+        "rmse": 39.417630719921696
+      },
+      "unseen_triple": {
+        "mae": 16.494890849534016,
+        "rmse": 33.472697440874896
+      },
+      "unseen_combinations_repeat": {
+        "mae": 17.93437577340244,
+        "rmse": 36.28358699588285
+      },
+      "unseen_geometry_repeat": {
+        "mae": 19.637113249319047,
+        "rmse": 39.4541586866595
+      }
+    },
+    "path_diagnostics": {
+      "in_distribution": {
+        "paths": [
+          [
+            "CFFF",
+            0.8189533239038189
+          ],
+          [
+            "CMFF",
+            0.173974540311174
+          ],
+          [
+            "CMMF",
+            0.007072135785007072
+          ]
+        ],
+        "grid_equivalents": 5.842821782178218,
+        "raw_mae": 11.32048011924067,
+        "post_mae": 8.153697286328692,
+        "unconstrained_mae": 14.181366971558091,
+        "unconstrained_count": 1291580.0,
+        "residual_m": 3.6986435717430455e-06,
+        "residual_c": 9.194163122510476e-06
+      },
+      "unseen_geometry": {
+        "paths": [
+          [
+            "CFFF",
+            0.7623762376237624
+          ],
+          [
+            "CMFF",
+            0.2263083451202263
+          ],
+          [
+            "CMMF",
+            0.011315417256011316
+          ]
+        ],
+        "grid_equivalents": 5.751591230551627,
+        "raw_mae": 25.92672821271373,
+        "post_mae": 19.61220568889653,
+        "unconstrained_mae": 39.33309162825516,
+        "unconstrained_count": 1486100.0,
+        "residual_m": 4.944846444271642e-06,
+        "residual_c": 1.3316736326289728e-05
+      },
+      "unseen_triple": {
+        "paths": [
+          [
+            "CFFF",
+            0.9943422913719944
+          ],
+          [
+            "CMFF",
+            0.005657708628005658
+          ]
+        ],
+        "grid_equivalents": 6.116513437057992,
+        "raw_mae": 25.07274575671853,
+        "post_mae": 16.494890849534016,
+        "unconstrained_mae": 31.529579600738895,
+        "unconstrained_count": 1140488.0,
+        "residual_m": 4.260476267201897e-06,
+        "residual_c": 1.0345786746335722e-05
+      }
+    }
+  },
+  {
+    "method": "I70",
+    "id_mae": 11.278833841320841,
+    "id_rmse": 20.035905615452307,
+    "ood_category_mae": [
+      24.021870827224053,
+      20.20598587857078,
+      18.054398762340266
+    ],
+    "ood_mean": 20.7607518227117,
+    "ood_category_rmse": [
+      46.41704865744775,
+      40.548996935511866,
+      32.86916347306472
+    ],
+    "id_ratio": 1.400916042251645,
+    "ood_ratio": 2.3493163219667292,
+    "worst_ratio": 2.8951563975865606,
+    "protocols": {
+      "in_distribution": {
+        "mae": 11.278833841320841,
+        "rmse": 20.035905615452307
+      },
+      "unseen_combinations": {
+        "mae": 24.015072552343156,
+        "rmse": 46.337317009235605
+      },
+      "unseen_geometry": {
+        "mae": 20.10284130969048,
+        "rmse": 40.52053147321572
+      },
+      "unseen_triple": {
+        "mae": 18.054398762340266,
+        "rmse": 32.86916347306472
+      },
+      "unseen_combinations_repeat": {
+        "mae": 24.02866910210495,
+        "rmse": 46.49678030565989
+      },
+      "unseen_geometry_repeat": {
+        "mae": 20.309130447451082,
+        "rmse": 40.577462397808006
+      }
+    },
+    "path_diagnostics": {
+      "in_distribution": {
+        "paths": [
+          [
+            "FMCF",
+            0.9971711456859972
+          ],
+          [
+            "CMCF",
+            0.002828854314002829
+          ]
+        ],
+        "grid_equivalents": 4.619695898161245,
+        "raw_mae": 15.057323230778971,
+        "post_mae": 11.278833841320841,
+        "unconstrained_mae": 18.056679905861426,
+        "unconstrained_count": 1291580.0,
+        "residual_m": 3.951574527767978e-06,
+        "residual_c": 1.0324559199311214e-05
+      },
+      "unseen_geometry": {
+        "paths": [
+          [
+            "FMCF",
+            1.0
+          ]
+        ],
+        "grid_equivalents": 4.625,
+        "raw_mae": 26.74475479365623,
+        "post_mae": 20.10284130969048,
+        "unconstrained_mae": 37.935528322875314,
+        "unconstrained_count": 1486100.0,
+        "residual_m": 5.2628909978248766e-06,
+        "residual_c": 1.500444046620902e-05
+      },
+      "unseen_triple": {
+        "paths": [
+          [
+            "FMCF",
+            1.0
+          ]
+        ],
+        "grid_equivalents": 4.625,
+        "raw_mae": 26.909829369436,
+        "post_mae": 18.054398762340266,
+        "unconstrained_mae": 33.950609903392234,
+        "unconstrained_count": 1140488.0,
+        "residual_m": 4.629173081807296e-06,
+        "residual_c": 1.190716254669773e-05
+      }
+    }
+  },
+  {
+    "method": "I74",
+    "id_mae": 8.92018323612444,
+    "id_rmse": 15.826327008810088,
+    "ood_category_mae": [
+      12.654928817298604,
+      15.378203183342421,
+      11.500835634355472
+    ],
+    "ood_mean": 13.1779892116655,
+    "ood_category_rmse": [
+      22.25581969629861,
+      28.10479995894467,
+      19.813536392728846
+    ],
+    "id_ratio": 1.107953886999322,
+    "ood_ratio": 1.467318444312821,
+    "worst_ratio": 1.5251933702383678,
+    "protocols": {
+      "in_distribution": {
+        "mae": 8.92018323612444,
+        "rmse": 15.826327008810088
+      },
+      "unseen_combinations": {
+        "mae": 12.634234739870587,
+        "rmse": 22.254035424199493
+      },
+      "unseen_geometry": {
+        "mae": 15.346774511641325,
+        "rmse": 28.22797349360692
+      },
+      "unseen_triple": {
+        "mae": 11.500835634355472,
+        "rmse": 19.813536392728846
+      },
+      "unseen_combinations_repeat": {
+        "mae": 12.675622894726619,
+        "rmse": 22.257603968397728
+      },
+      "unseen_geometry_repeat": {
+        "mae": 15.40963185504352,
+        "rmse": 27.98162642428242
+      }
+    },
+    "path_diagnostics": {
+      "in_distribution": {
+        "paths": [
+          [
+            "MCFF",
+            0.9745403111739745
+          ],
+          [
+            "MFFF",
+            0.02545968882602546
+          ]
+        ],
+        "grid_equivalents": 4.672736916548797,
+        "raw_mae": 12.125753455849873,
+        "post_mae": 8.92018323612444,
+        "unconstrained_mae": 14.886553545366915,
+        "unconstrained_count": 1291580.0,
+        "residual_m": 3.638852747470715e-06,
+        "residual_c": 8.883321420991864e-06
+      },
+      "unseen_geometry": {
+        "paths": [
+          [
+            "MCFF",
+            0.9844413012729845
+          ],
+          [
+            "MFFF",
+            0.015558698727015558
+          ]
+        ],
+        "grid_equivalents": 4.654172560113154,
+        "raw_mae": 19.020619484561447,
+        "post_mae": 15.346774511641325,
+        "unconstrained_mae": 26.906072763861786,
+        "unconstrained_count": 1486100.0,
+        "residual_m": 4.758610014940369e-06,
+        "residual_c": 1.253998913813595e-05
+      },
+      "unseen_triple": {
+        "paths": [
+          [
+            "MCFF",
+            0.983026874115983
+          ],
+          [
+            "MFFF",
+            0.016973125884016973
+          ]
+        ],
+        "grid_equivalents": 4.6568246110325315,
+        "raw_mae": 16.401438802823385,
+        "post_mae": 11.500835634355472,
+        "unconstrained_mae": 19.456352826049024,
+        "unconstrained_count": 1140488.0,
+        "residual_m": 4.080620086547835e-06,
+        "residual_c": 9.561080649133226e-06
+      }
+    }
+  }
+]

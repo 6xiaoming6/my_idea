@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Selectable TaxiBJ I01-I25 jobs; frozen previous suites stay immutable."""
+"""Selectable TaxiBJ I01-I27 jobs; frozen previous suites stay immutable."""
 import argparse,copy,fcntl,os,shutil,subprocess,sys,time
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[2]
@@ -38,14 +38,32 @@ COMBINATIONS = {
     'I23': ('I14', 'I14双重监督β=0.1：0.9最终F＋0.1原始F；保留0.1可见M/C损失'),
     'I24': ('I14', 'I14双重监督β=0.3：0.7最终F＋0.3原始F；保留0.1可见M/C损失'),
     'I25': ('I24', 'I24的F前后损失权重可学习：β=sigmoid(a)，初始0.3/0.7，始终和为1'),
+    'I26': ('I25', 'I25去掉最终投影；保留前三轮自由末轮F、差分、历史、可见M/C损失；F损失合并为单项'),
+    'I27': ('I25', 'I25将四轮共享专家池改为四套独立专家池；每轮八选二，其他结构和损失不变'),
+    'I29': ('I25', 'I25全程仅F观测；保留自由尺度末轮F、共享Top2、差分与历史；移除M/C投影及相关损失'),
 }
+EXPLORATION = {
+    'I30': ('I25', 'I25只去掉历史池；自由尺度、差分、学习投影和损失不变'),
+    'I31': ('I25', 'I25只去掉差分；历史池正常读取，保留顺序状态传递'),
+    'I32': ('I25', 'I25只将尺度路由改为固定CMFF；其余不变'),
+    'I33': ('I25', 'I25同时去掉历史池和差分；补齐自由尺度通信2×2对照'),
+    'I34': ('I25', '固定投影前后F损失权重0.5/0.5，移除可学习混合标量'),
+    'I35': ('I25', '固定投影前后F损失权重0.8/0.2，移除可学习混合标量'),
+    'I36': ('I25', 'I25增加投影前可见F重建L1，系数0.1，不增加隐藏标签'),
+    'I37': ('I34', 'I34增加投影前可见F重建L1，系数0.1'),
+    'I38': ('I32', '固定CMFF基础只去历史池；对照I30检验尺度与历史交互'),
+    'I39': ('I32', '固定CMFF基础只去差分；对照I31检验尺度与差分交互'),
+    'I40': ('I32', '固定CMFF基础同时去历史池和差分；对照I33'),
+    'I41': ('I25', 'I25历史读取注入gain=0.5，保留池内容、参数和读写顺序'),
+}
+COMBINATIONS.update(EXPLORATION)
 METHODS.update({name: description for name, (_, description) in COMBINATIONS.items()})
 
 
 def jobs(reference=REFERENCE, methods=None):
     selected=[f'I{i:02}' for i in range(1,9)] if methods is None else list(methods)
     if not selected or len(set(selected))!=len(selected) or any(m not in METHODS for m in selected):
-        raise ValueError('Select distinct methods from I01-I25')
+        raise ValueError('Select distinct methods from registered METHODS')
     origin=load(reference/'jobs/taxibj_B2_seed7.json');result={}
     for method in selected:
         description=METHODS[method]
@@ -66,13 +84,48 @@ def jobs(reference=REFERENCE, methods=None):
             if method == 'I25':
                 c['loss'].pop('lambda_final_f');c['loss'].pop('lambda_raw_f')
                 c['loss']['learnable_f_mix']={'enabled': True, 'initial_raw_weight': 0.3}
+            if method == 'I26':
+                coe.pop('observation_consistency')
+                c['loss'].pop('learnable_f_mix')
+                c['loss']['visible_consistency_aux']['source']='prediction'
+            if method == 'I27': coe['expert_sharing']='per_step'
+            if method in EXPLORATION:
+                if method in ('I30','I33','I38','I40'):
+                    coe.pop('observed_history')
+                if method in ('I31','I33','I39','I40'):
+                    coe['core_validation']['communication']='none'
+                    if 'scale_delta_exploration' in coe:
+                        coe['scale_delta_exploration']['delta_steps']=[]
+                if method == 'I32': coe.pop('scale_delta_exploration')
+                if method in ('I34','I35'):
+                    c['loss'].pop('learnable_f_mix')
+                    beta = 0.5 if method == 'I34' else 0.8
+                    c['loss'].update(lambda_raw_f=beta, lambda_final_f=1.0-beta)
+                if method in ('I36','I37'): c['loss']['lambda_visible_raw_f']=0.1
+                if method == 'I41': coe['observed_history']['gain']=0.5
+            if method == 'I29':
+                c['data']['input_scales']='F'
+                coe['initial_observation_scales']='F'
+                coe.pop('observation_consistency')
+                c['loss'].pop('learnable_f_mix')
+                c['loss'].pop('visible_consistency_aux')
+                c['data']['return_multiscale_targets']=False
             c['experiment_plan'].update(variant=name, method=description,
-                reference=parent if method in ('I13','I14','I15','I16','I23','I24','I25') else 'I13',
+                reference=parent if method in ('I13','I14','I15','I16','I23','I24','I25','I26','I27','I29') else 'I13',
                 scope='I13-I22 combination exploration; observed-only auxiliaries; single seed; ID threshold 8.8709')
             if method in ('I23','I24'):
                 c['experiment_plan']['scope']='I14 normalized pre/post projection F supervision; common initialization; insert after I18 before I19; same six protocols'
             if method=='I25':
                 c['experiment_plan']['scope']='learnable convex F loss weights from 0.3 raw/0.7 final; replaces user-paused I24; common initialization, no checkpoint warm start'
+            if method=='I26':
+                c['experiment_plan']['scope']='I25 minus output projection; identical F losses collapse to one and remove redundant beta; observed-only M/C auxiliary; common initialization; priority before resuming I19-I22'
+            if method=='I27':
+                c['experiment_plan']['scope']='I25 independent per-round expert pools cloned from common shared initialization; native Top2, original learned projection and beta retained; after I26 before I19-I22'
+            if method=='I29':
+                c['experiment_plan']['scope']='Strict F-only observations for baseline comparison; internal feature scales retained; no M/C supervision/projection; no warm start; same F masks and six protocols'
+            if method in EXPLORATION:
+                c['experiment_plan'].update(reference=parent,
+                    scope='I30-I41 I25 robustness exploration; 2x2x2 scale/history/delta controls and raw reconstruction supervision; independent common initialization; 100 epochs, same six protocols')
             j.update(variant=name, method=method, name=method.lower()+'_v25_taxibj_input_communication',
                      reference=c['experiment_plan']['reference'])
             result[name] = j
@@ -127,6 +180,10 @@ def freeze(methods=None):
     files += [ROOT/'tests/test_v25_combination_aux.py', ROOT/'scripts/v25/README_COMBINATION_EXPLORATION.md']
     files += [ROOT/'tests/test_v25_dual_supervision.py']
     files += [ROOT/'tests/test_v25_learnable_loss_mix.py']
+    files += [ROOT/'tests/test_v25_no_projection.py']
+    files += [ROOT/'tests/test_v25_independent_experts.py',ROOT/'tests/test_v25_f_only.py',ROOT/'scripts/v25/README_F_ONLY.md']
+    if any(j['method'] in EXPLORATION for j in js.values()):
+        files += [ROOT/'tests/test_v25_robustness_exploration.py',ROOT/'scripts/v25/README_ROBUSTNESS_EXPLORATION.md']
     sources={str(p.relative_to(ROOT)):sha(p) for p in sorted(set(files))};refs={}
     for method in ['A2','B1','B2']:
         n=f'taxibj_{method}_seed7';r=load(REFERENCE/'results'/f'{n}.json');run=Path(r['run_dir'])
@@ -183,6 +240,61 @@ def freeze(methods=None):
         payload['comparison_methods'][str(paused)]=['I23']
         for label,p in [('paused',paused/'paused.json'),('job',paused/'jobs/taxibj_I24_seed7.json')]:
             refs[f'I24/{label}.json']={'path':str(p),'sha256':sha(p)}
+    if any(j['method']=='I26' for j in js.values()):
+        previous=ROOT/'outputs/v25/experiments/taxibj_input_communication'
+        old_queue=previous/'22d4ae99d3e86986'
+        pause=old_queue/'paused_for_i26.json'
+        if load(pause).get('status')!='paused_by_user' or load(old_queue/'state.json').get('phase')!='paused_by_user':
+            raise RuntimeError('I19 must be paused before freezing the priority I26 queue')
+        payload['resume_after_priority']={'path':str(old_queue),'plan_sha256':sha(old_queue/'plan.json'),
+            'pause_path':str(pause),'pause_sha256':sha(pause)}
+        payload['comparison_methods']={str(old_queue):[f'I{i:02}' for i in range(13,19)],
+            str(previous/'37ae81a02eea687f'):['I23']}
+        for name in ('22d4ae99d3e86986','37ae81a02eea687f','2c07a1e3f7f177b7'):
+            payload['comparison_suites'][str(previous/name)]=sha(previous/name/'plan.json')
+        for label,p in [('I19/paused.json',pause),('I24/paused.json',previous/'37ae81a02eea687f/paused.json')]:
+            refs[label]={'path':str(p),'sha256':sha(p)}
+    if any(j['method']=='I27' for j in js.values()):
+        previous=ROOT/'outputs/v25/experiments/taxibj_input_communication'
+        dependency=previous/'8f67d8cc2cbf072e'
+        hold=dependency/'hold_resume_for_i27.json'
+        payload['insert_before_resume']={'path':str(dependency),'plan_sha256':sha(dependency/'plan.json'),
+            'controller_hold':str(hold),'controller_hold_sha256':sha(hold)}
+        payload['comparison_methods']={str(previous/'22d4ae99d3e86986'):[f'I{i:02}' for i in range(13,19)],
+            str(previous/'37ae81a02eea687f'):['I23']}
+        for name in ('22d4ae99d3e86986','37ae81a02eea687f','2c07a1e3f7f177b7','8f67d8cc2cbf072e'):
+            payload['comparison_suites'][str(previous/name)]=sha(previous/name/'plan.json')
+        for label,p in [('I26/controller_hold.json',hold),('I24/paused.json',previous/'37ae81a02eea687f/paused.json'),
+                        ('I19/paused.json',previous/'22d4ae99d3e86986/paused_for_i26.json')]:
+            refs[label]={'path':str(p),'sha256':sha(p)}
+    if any(j['method']=='I29' for j in js.values()):
+        if len(js)!=1:raise ValueError('I29 must run as an isolated F-only suite')
+        payload.pop('selection',None)
+        payload.pop('comparison_suites',None)
+        parent=ROOT/'outputs/v25/experiments/taxibj_input_communication/2c07a1e3f7f177b7'
+        for kind in ('jobs','results','evaluations','configs'):
+            path=parent/kind/'taxibj_I25_seed7.json'
+            refs[f'I25/{kind}.json']={'path':str(path),'sha256':sha(path)}
+        path=parent/'initialization/taxibj_I25_seed7.pth'
+        refs['I25/initialization.pth']={'path':str(path),'sha256':sha(path)}
+        baseline=ROOT/'outputs/v25/experiments/simple_baselines/20261015_161454'
+        for method in ('ChannelMean','NodeMean','TemporalLinear','SpatialMean','SoftImpute'):
+            path=baseline/'results'/f'{method}.json'
+            refs[f'baselines/{method}.json']={'path':str(path),'sha256':sha(path)}
+    if any(j['method'] in EXPLORATION for j in js.values()):
+        if not all(j['method'] in EXPLORATION for j in js.values()):
+            raise ValueError('Keep I30-I41 isolated from older queues')
+        previous=ROOT/'outputs/v25/experiments/taxibj_input_communication'
+        parent=previous/'2c07a1e3f7f177b7'
+        payload['comparison_suites'][str(parent)]=sha(parent/'plan.json')
+        payload['selection']['id_mae_max']=8.8709
+        payload['selection']['secondary_id_i25_10pct']=load(parent/'evaluations/taxibj_I25_seed7.json')['sets']['in_distribution']['metrics']['mae']*1.1
+        payload['exploration_reference']='I25'
+        for kind in ('jobs','results','evaluations','configs'):
+            path=parent/kind/'taxibj_I25_seed7.json'
+            refs[f'I25/{kind}.json']={'path':str(path),'sha256':sha(path)}
+        path=parent/'initialization/taxibj_I25_seed7.pth'
+        refs['I25/initialization.pth']={'path':str(path),'sha256':sha(path)}
     suite=ROOT/'outputs/v25/experiments/taxibj_input_communication'/digest(payload)[:16];suite.mkdir(parents=True,exist_ok=True);base.frozen(suite/'plan.json',payload)
     for name,stamp in sources.items():
         target=suite/'source_snapshot'/name;target.parent.mkdir(parents=True,exist_ok=True)
@@ -203,6 +315,29 @@ def worker(suite,payload):
     from report_taxibj_input_communication import export_report
     base.check_gpu_idle=gpu1_only
     js=copy.deepcopy(payload['jobs']);prepare_initialization(suite,js,suite/'references/initialization.pth')
+    if any(j['method'] in EXPLORATION for j in js.values()):
+        import torch
+        original=torch.load(suite/'references/I25/initialization.pth',map_location='cpu',weights_only=False)['model']
+        audit={}
+        for name,j in js.items():
+            current=torch.load(j['common_initialization'],map_location='cpu',weights_only=False)['model']
+            if any(k not in original or not torch.equal(v,original[k]) for k,v in current.items()):
+                raise RuntimeError('Exploration retained parameter differs from I25 initialization: '+name)
+            removed=sorted(set(original)-set(current))
+            if any(not (k.startswith('main_branch.x_history.') or k=='main_branch.x_loss_mix_logit') for k in removed):
+                raise RuntimeError('Unexpected removed parameters: '+name)
+            audit[name]={'status':'passed','retained_tensors':len(current),'removed_keys':removed}
+        write(suite/'i25_initialization_parity.json',audit)
+    if any(j['method']=='I29' for j in js.values()):
+        import torch
+        original=torch.load(suite/'references/I25/initialization.pth',map_location='cpu',weights_only=False)['model']
+        current=torch.load(js['taxibj_I29_seed7']['common_initialization'],map_location='cpu',weights_only=False)['model']
+        removed=set(original)-set(current)
+        if any(not (k.startswith('main_branch.x_consistency.') or k=='main_branch.x_loss_mix_logit') for k in removed):
+            raise RuntimeError('Unexpected removed I25 parameters')
+        if any(k not in original or not torch.equal(v,original[k]) for k,v in current.items()):
+            raise RuntimeError('I29 common initialization differs from I25')
+        write(suite/'i25_initialization_parity.json',{'status':'passed','shared_tensors':len(current),'removed_keys':sorted(removed)})
     base.frozen(suite/'resolved_jobs.json',js)
     for n,j in js.items():base.frozen(suite/'jobs'/f'{n}.json',j);base.frozen(suite/'configs'/f'{n}.json',j['config'])
     if not (suite/'started.json').exists():write(suite/'started.json',{'gpu':1,'time':time.time(),'order':list(js)})
@@ -231,6 +366,12 @@ def worker(suite,payload):
 
 
 def main():
+    # New adaptive-selection suite has its own controller; never use the legacy
+    # train-then-test loop before I53 has been selected on validation evidence.
+    if '--observation-iteration' in sys.argv:
+        sys.argv.remove('--observation-iteration')
+        from run_observation_iteration import main as observation_main
+        return observation_main()
     p=argparse.ArgumentParser();p.add_argument('--suite',type=Path);p.add_argument('--methods',nargs='+',choices=list(METHODS),help='Select new jobs only; I11 must wait for the frozen I10 suite');p.add_argument('--prepare-only',action='store_true');p.add_argument('--worker',action='store_true');p.add_argument('--summary-only',action='store_true');a=p.parse_args()
     if a.suite and a.methods:p.error('--methods cannot modify an existing --suite')
     suite=a.suite.resolve() if a.suite else freeze(a.methods);payload=load(suite/'plan.json');verify(suite,payload)
@@ -240,6 +381,9 @@ def main():
     if a.summary_only:
         from report_taxibj_input_communication import export_report
         print(export_report(Path(payload['project_root']),suite,load(suite/'resolved_jobs.json')));return
+    if payload.get('insert_before_resume'):
+        from run_before_priority_resume import validate_launch
+        validate_launch(payload)
     if payload.get('run_after_suite'):
         from run_after_suite import dependency_status
         status,detail=dependency_status(payload['run_after_suite'])
