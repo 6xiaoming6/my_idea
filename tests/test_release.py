@@ -14,6 +14,7 @@ from stmoe_imputer.models import DualBranchSTImputer
 from stmoe_imputer.data import build_datasets
 from stmoe_imputer.data.observed_multiscale import aggregate_sum
 from stmoe_imputer.losses import compute_main_stage_loss
+from stmoe_imputer.engine import build_optimizer
 from stmoe_imputer.utils.deterministic import configure, state_hash
 from release_utils import load
 
@@ -24,6 +25,14 @@ def small_config():
     cfg['data'].update(batch_size=2, pin_memory=False)
     cfg['train'].update(epochs=2, val_epoch=1, amp=False, measure_forward_latency=False)
     cfg['train']['scheduler']['total_epochs'] = 2
+    return cfg
+
+
+def fixed_loss_config(cfg):
+    """Reconstruct the original I37 loss without altering published defaults."""
+    cfg = copy.deepcopy(cfg)
+    cfg['loss'].pop('learnable_f_mix', None)
+    cfg['loss'].update(lambda_raw_f=0.5, lambda_final_f=0.5)
     return cfg
 
 
@@ -52,7 +61,7 @@ class ReleaseContract(unittest.TestCase):
     def batch(self): return {k: v.unsqueeze(0) for k, v in self.ds[0].items()}
 
     def test_frozen_initialization(self):
-        cfg = load(ROOT / 'configs/i37_taxibj.json')
+        cfg = fixed_loss_config(load(ROOT / 'configs/i37_taxibj.json'))
         torch.manual_seed(7)
         model = DualBranchSTImputer.from_config(cfg)
         self.assertEqual(state_hash(model.state_dict()), '2baf7361f1aa2308e5f2a55c07fd657e7d5feea87dd296ca071406aec3179f99')
@@ -110,16 +119,74 @@ class ReleaseContract(unittest.TestCase):
             with self.assertRaises(FileExistsError): prepare(source, target)
 
     def test_fixed_loss_weights_and_gradient(self):
+        cfg = fixed_loss_config(self.cfg)
         torch.manual_seed(7)
-        model = DualBranchSTImputer.from_config(self.cfg)
-        out = model(self.batch()); loss, logs = compute_main_stage_loss(out, self.batch(), self.cfg)
+        model = DualBranchSTImputer.from_config(cfg)
+        out = model(self.batch()); loss, logs = compute_main_stage_loss(out, self.batch(), cfg)
         loss.backward()
         self.assertTrue(torch.isfinite(loss))
         self.assertTrue(all(torch.isfinite(p.grad).all() for p in model.parameters() if p.grad is not None))
         self.assertGreater(model.main_branch.observation_fusion.weight.grad.abs().sum().item(), 0)
-        self.assertEqual(self.cfg['loss']['lambda_raw_f'], .5)
-        self.assertEqual(self.cfg['loss']['lambda_final_f'], .5)
-        self.assertFalse(any('beta' in n for n, _ in model.named_parameters()))
+        self.assertEqual(cfg['loss']['lambda_raw_f'], .5)
+        self.assertEqual(cfg['loss']['lambda_final_f'], .5)
+        self.assertNotIn('main_branch.x_loss_mix_logit', dict(model.named_parameters()))
+
+    def test_learnable_loss_weights_and_gradient(self):
+        # Both public configurations use the same trainable, complementary mix.
+        for name in ('i37_taxibj.json', 'i37_performance.json'):
+            loss_cfg = load(ROOT / 'configs' / name)['loss']
+            self.assertEqual(loss_cfg['learnable_f_mix'],
+                             {'enabled': True, 'initial_raw_weight': .5})
+            self.assertNotIn('lambda_raw_f', loss_cfg)
+            self.assertNotIn('lambda_final_f', loss_cfg)
+        torch.manual_seed(7)
+        model = DualBranchSTImputer.from_config(self.cfg)
+        optimizer = build_optimizer(model, self.cfg)
+        scalar = model.main_branch.x_loss_mix_logit
+        group = next(g for g in optimizer.param_groups if any(p is scalar for p in g['params']))
+        self.assertEqual(group['lr'], self.cfg['train']['lr_main'])
+        self.assertEqual(group['weight_decay'], 0.)
+        out = model(self.batch())
+        loss, logs = compute_main_stage_loss(out, self.batch(), self.cfg)
+        beta = out['f_loss_raw_weight']
+        self.assertEqual(beta.item(), .5)
+        self.assertEqual((logs['f_loss_raw_weight'] + logs['f_loss_final_weight']).item(), 1.)
+        expected_grad = beta.detach() * (1-beta.detach()) * (logs['l_raw_f'] - logs['l_final'])
+        loss.backward()
+        torch.testing.assert_close(scalar.grad, expected_grad, rtol=1e-6, atol=1e-7)
+        self.assertNotEqual(scalar.grad.item(), 0.)
+        self.assertGreater(model.main_branch.observation_fusion.weight.grad.abs().sum().item(), 0)
+        before = scalar.detach().clone()
+        optimizer.step()
+        self.assertFalse(torch.equal(before, scalar.detach()))
+        with torch.no_grad():
+            _, updated = compute_main_stage_loss(model(self.batch()), self.batch(), self.cfg)
+        self.assertGreater(updated['f_loss_raw_weight'].item(), 0.)
+        self.assertLess(updated['f_loss_raw_weight'].item(), 1.)
+        self.assertEqual((updated['f_loss_raw_weight'] + updated['f_loss_final_weight']).item(), 1.)
+
+    def test_learnable_mix_preserves_initial_predictions_and_fixed_checkpoints(self):
+        fixed = fixed_loss_config(self.cfg)
+        torch.manual_seed(7)
+        old = DualBranchSTImputer.from_config(fixed)
+        torch.manual_seed(7)
+        new = DualBranchSTImputer.from_config(self.cfg)
+        shared = {k: v for k, v in new.state_dict().items()
+                  if k != 'main_branch.x_loss_mix_logit'}
+        self.assertEqual(state_hash(old.state_dict()), state_hash(shared))
+        self.assertEqual(sum(p.numel() for p in new.parameters()),
+                         sum(p.numel() for p in old.parameters()) + 1)
+        batch = self.batch()
+        a, b = old(batch), new(batch)
+        for key in ('x_hat_main', 'x_hat_raw_consistency', 'x_comp'):
+            torch.testing.assert_close(a[key], b[key], rtol=0, atol=0)
+        fixed_loss, _ = compute_main_stage_loss(a, batch, fixed)
+        learned_loss, _ = compute_main_stage_loss(b, batch, self.cfg)
+        torch.testing.assert_close(fixed_loss, learned_loss, rtol=0, atol=0)
+        # Old checkpoints continue to construct from their saved fixed config.
+        restored = DualBranchSTImputer.from_config(fixed)
+        restored.load_state_dict(old.state_dict(), strict=True)
+        self.assertEqual(state_hash(restored.state_dict()), state_hash(old.state_dict()))
 
 
 if __name__ == '__main__': unittest.main()

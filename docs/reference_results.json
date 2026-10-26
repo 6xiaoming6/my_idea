@@ -29,5 +29,11 @@
       "rmse": 18.49377020602803
     }
   },
-  "note": "Historical frozen experiment; not retrained as part of this release. Mask repeats are not independent training seeds."
+  "note": "Historical frozen experiment; not retrained as part of this release. Mask repeats are not independent training seeds.",
+  "training_loss_mix": {
+    "mode": "fixed",
+    "raw_weight": 0.5,
+    "final_weight": 0.5,
+    "note": "Historical I37 reference; not a result for the current learnable-weight defaults."
+  }
 }

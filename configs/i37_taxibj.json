@@ -185,9 +185,11 @@
       "weight": 0.1,
       "source": "pre_projection"
     },
-    "lambda_raw_f": 0.5,
-    "lambda_final_f": 0.5,
-    "lambda_visible_raw_f": 0.1
+    "lambda_visible_raw_f": 0.1,
+    "learnable_f_mix": {
+      "enabled": true,
+      "initial_raw_weight": 0.5
+    }
   },
   "train": {
     "epochs": 100,
