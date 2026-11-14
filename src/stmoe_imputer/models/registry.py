@@ -7,6 +7,9 @@ def resolve_architecture(cfg):
 
 
 def build_model_backbone(cfg):
+    if resolve_architecture(cfg) == "v25_latent_token_coe":
+        from .latent_token_coe import LatentTokenCoE
+        return LatentTokenCoE.from_config(cfg)
     if resolve_architecture(cfg) == "v25_latent_space_coe":
         from .latent_space_coe import LatentSpaceCoE
         return LatentSpaceCoE.from_config(cfg)

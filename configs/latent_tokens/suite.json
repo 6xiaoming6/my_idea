@@ -1,0 +1,142 @@
+[
+  {
+    "name": "LT01",
+    "control": "I37",
+    "description": "128个无网格空间token/时间步，共享双向交叉注意力，直接写回",
+    "config": "configs/latent_tokens/LT01.json",
+    "spec": {
+      "count": 128,
+      "mapping": "shared",
+      "return_mode": "replace",
+      "delta": true,
+      "history": true,
+      "path": "free_last_f"
+    }
+  },
+  {
+    "name": "LT02",
+    "control": "LT01",
+    "description": "仅将每时间步token数量减为64",
+    "config": "configs/latent_tokens/LT02.json",
+    "spec": {
+      "count": 64,
+      "mapping": "shared",
+      "return_mode": "replace",
+      "delta": true,
+      "history": true,
+      "path": "free_last_f"
+    }
+  },
+  {
+    "name": "LT03",
+    "control": "LT01",
+    "description": "仅将每时间步token数量增为256",
+    "config": "configs/latent_tokens/LT03.json",
+    "spec": {
+      "count": 256,
+      "mapping": "shared",
+      "return_mode": "replace",
+      "delta": true,
+      "history": true,
+      "path": "free_last_f"
+    }
+  },
+  {
+    "name": "LT04",
+    "control": "LT01",
+    "description": "F/M/C各自独立双向投影，初始参数复制相同，跨轮共享",
+    "config": "configs/latent_tokens/LT04.json",
+    "spec": {
+      "count": 128,
+      "mapping": "per_scale",
+      "return_mode": "replace",
+      "delta": true,
+      "history": true,
+      "path": "free_last_f"
+    }
+  },
+  {
+    "name": "LT05",
+    "control": "LT01",
+    "description": "将原生尺度状态增量写回token，保留输入token残差",
+    "config": "configs/latent_tokens/LT05.json",
+    "spec": {
+      "count": 128,
+      "mapping": "shared",
+      "return_mode": "residual",
+      "delta": true,
+      "history": true,
+      "path": "free_last_f"
+    }
+  },
+  {
+    "name": "LT06",
+    "control": "LT01",
+    "description": "仅关闭token空间受控差分",
+    "config": "configs/latent_tokens/LT06.json",
+    "spec": {
+      "count": 128,
+      "mapping": "shared",
+      "return_mode": "replace",
+      "delta": false,
+      "history": true,
+      "path": "free_last_f"
+    }
+  },
+  {
+    "name": "LT07",
+    "control": "LT01",
+    "description": "仅关闭历史池读写",
+    "config": "configs/latent_tokens/LT07.json",
+    "spec": {
+      "count": 128,
+      "mapping": "shared",
+      "return_mode": "replace",
+      "delta": true,
+      "history": false,
+      "path": "free_last_f"
+    }
+  },
+  {
+    "name": "LT08",
+    "control": "LT06/LT07",
+    "description": "同时关闭差分与历史，仅顺序传递tokens",
+    "config": "configs/latent_tokens/LT08.json",
+    "spec": {
+      "count": 128,
+      "mapping": "shared",
+      "return_mode": "replace",
+      "delta": false,
+      "history": false,
+      "path": "free_last_f"
+    }
+  },
+  {
+    "name": "LT09",
+    "control": "LT01",
+    "description": "仅固定尺度路径CMFF",
+    "config": "configs/latent_tokens/LT09.json",
+    "spec": {
+      "count": 128,
+      "mapping": "shared",
+      "return_mode": "replace",
+      "delta": true,
+      "history": true,
+      "path": "CMFF"
+    }
+  },
+  {
+    "name": "LT10",
+    "control": "LT04/LT05",
+    "description": "预定组合：尺度独立投影与残差写回",
+    "config": "configs/latent_tokens/LT10.json",
+    "spec": {
+      "count": 128,
+      "mapping": "per_scale",
+      "return_mode": "residual",
+      "delta": true,
+      "history": true,
+      "path": "free_last_f"
+    }
+  }
+]
