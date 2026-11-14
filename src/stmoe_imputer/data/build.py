@@ -17,7 +17,7 @@ def build_datasets(
     val_npz: str | None = None,
     synthetic: bool = False,
 ):
-    if cfg['model'].get('architecture') == 'v25_observed_multiscale_coe':
+    if cfg['model'].get('architecture') in ('v25_observed_multiscale_coe','v25_latent_space_coe'):
         from .observed_multiscale import build_observed_dataset
         if synthetic:
             raise ValueError('v25 requires preconstructed physical multi-scale data')
@@ -126,7 +126,7 @@ def build_datasets(
 
 
 def build_test_dataset(cfg: dict, test_npz: str | None = None, synthetic: bool = False):
-    if cfg['model'].get('architecture') == 'v25_observed_multiscale_coe':
+    if cfg['model'].get('architecture') in ('v25_observed_multiscale_coe','v25_latent_space_coe'):
         from .observed_multiscale import build_observed_dataset
         if synthetic:
             raise ValueError('v25 requires preconstructed physical multi-scale data')

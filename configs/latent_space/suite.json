@@ -1,0 +1,142 @@
+[
+  {
+    "name": "L01",
+    "control": "I37",
+    "description": "M网格基础版：统一16×16 latent，线性尺度映射、直接回写",
+    "config": "configs/latent_space/L01.json",
+    "spec": {
+      "factor": 2,
+      "mapping": "linear",
+      "return_mode": "replace",
+      "delta": true,
+      "history": true,
+      "path": "free_last_f"
+    }
+  },
+  {
+    "name": "L02",
+    "control": "L01",
+    "description": "仅将latent缩小到C网格8×8，检验压缩代价",
+    "config": "configs/latent_space/L02.json",
+    "spec": {
+      "factor": 4,
+      "mapping": "linear",
+      "return_mode": "replace",
+      "delta": true,
+      "history": true,
+      "path": "free_last_f"
+    }
+  },
+  {
+    "name": "L03",
+    "control": "L01",
+    "description": "双向尺度映射增加共享于各轮的零初始化残差1×1通道映射",
+    "config": "configs/latent_space/L03.json",
+    "spec": {
+      "factor": 2,
+      "mapping": "learned",
+      "return_mode": "replace",
+      "delta": true,
+      "history": true,
+      "path": "free_last_f"
+    }
+  },
+  {
+    "name": "L04",
+    "control": "L01",
+    "description": "双向映射改为空间子格重排与可学习通道压缩/展开",
+    "config": "configs/latent_space/L04.json",
+    "spec": {
+      "factor": 2,
+      "mapping": "subcell",
+      "return_mode": "replace",
+      "delta": true,
+      "history": true,
+      "path": "free_last_f"
+    }
+  },
+  {
+    "name": "L05",
+    "control": "L01",
+    "description": "回写改为latent输入加映射后的原生尺度状态增量",
+    "config": "configs/latent_space/L05.json",
+    "spec": {
+      "factor": 2,
+      "mapping": "linear",
+      "return_mode": "residual",
+      "delta": true,
+      "history": true,
+      "path": "free_last_f"
+    }
+  },
+  {
+    "name": "L06",
+    "control": "L01",
+    "description": "仅关闭受控差分，保留顺序状态与历史读取",
+    "config": "configs/latent_space/L06.json",
+    "spec": {
+      "factor": 2,
+      "mapping": "linear",
+      "return_mode": "replace",
+      "delta": false,
+      "history": true,
+      "path": "free_last_f"
+    }
+  },
+  {
+    "name": "L07",
+    "control": "L01",
+    "description": "仅关闭历史读取及写入，保留受控差分",
+    "config": "configs/latent_space/L07.json",
+    "spec": {
+      "factor": 2,
+      "mapping": "linear",
+      "return_mode": "replace",
+      "delta": true,
+      "history": false,
+      "path": "free_last_f"
+    }
+  },
+  {
+    "name": "L08",
+    "control": "L06/L07",
+    "description": "同时关闭差分与历史，只保留顺序latent传递",
+    "config": "configs/latent_space/L08.json",
+    "spec": {
+      "factor": 2,
+      "mapping": "linear",
+      "return_mode": "replace",
+      "delta": false,
+      "history": false,
+      "path": "free_last_f"
+    }
+  },
+  {
+    "name": "L09",
+    "control": "L01",
+    "description": "仅将前三轮自由、末轮F改为固定CMFF",
+    "config": "configs/latent_space/L09.json",
+    "spec": {
+      "factor": 2,
+      "mapping": "linear",
+      "return_mode": "replace",
+      "delta": true,
+      "history": true,
+      "path": "CMFF"
+    }
+  },
+  {
+    "name": "L10",
+    "control": "L03/L05",
+    "description": "预先确定的组合：可学习尺度映射与残差回写",
+    "config": "configs/latent_space/L10.json",
+    "spec": {
+      "factor": 2,
+      "mapping": "learned",
+      "return_mode": "residual",
+      "delta": true,
+      "history": true,
+      "path": "free_last_f"
+    }
+  }
+]

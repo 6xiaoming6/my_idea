@@ -15,6 +15,7 @@ def main():
     p.add_argument('--data-dir', type=Path, required=True)
     p.add_argument('--run-dir', type=Path, required=True)
     p.add_argument('--config', type=Path, default=ROOT / 'configs/i37_taxibj.json')
+    p.add_argument('--name', default='I37', help='Experiment identifier only')
     p.add_argument('--device', choices=['cuda', 'cpu'], default='cuda')
     p.add_argument('--gpu', type=int, default=1, help='Physical GPU index, CUDA mode only; defaults to GPU1')
     p.add_argument('--threads', type=int, default=4)
@@ -44,7 +45,7 @@ def main():
         if frozen.exists() and load(frozen) != provenance:
             raise ValueError('Run source/data changed; restore the original files before resuming')
         write(frozen, provenance)
-        job = {'variant': f'I37_seed{cfg["seed"]}', 'config': cfg, 'sources': sources}
+        job = {'variant': f'{a.name}_seed{cfg["seed"]}', 'config': cfg, 'sources': sources}
         write(a.run_dir / 'job.json', job)
         result = train(job, a.run_dir, a.run_dir / 'result.json', a.device, a.stop_after)
         print(result['status'], flush=True)

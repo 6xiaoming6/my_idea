@@ -266,6 +266,12 @@ class FourDirectionCoE(TemporalSpatialCoE):
             out=out.index_add(0,selected,(restored*scale_weights[selected,sid,None,None,None,None].to(restored.dtype)).to(out.dtype))
         return out,response,bank
 
+    def decode_state(self, h):
+        return self.decoder(h)
+
+    def output_hidden(self, h):
+        return h
+
     def _round(self,c,step,force_scale=None,force_pair=None,probe=False):
         h=c['h'];miss=1-c['mask']
         features=self._router_features(h,c['completion'],c['ss'],torch.zeros_like(c['initial_prediction']),miss,None)
@@ -278,8 +284,8 @@ class FourDirectionCoE(TemporalSpatialCoE):
             keep=self.keep_logits[step].sigmoid();next_h=keep*h+(1-keep)*next_h
         # Only P0 and P4 feed the I37 task gradient; P1-P3 are detached history.
         if self.training and step<3 and perf(self,'no_grad_intermediate'):
-            with torch.no_grad():pred=self.decoder(next_h)
-        else:pred=self.decoder(next_h)
+            with torch.no_grad():pred=self.decode_state(next_h)
+        else:pred=self.decode_state(next_h)
         change=(torch.where(c['mask'].bool(),torch.zeros_like(pred),(pred-c['last_prediction']).abs())
                 if collect_diagnostics(self) else torch.empty(0,device=pred.device,dtype=pred.dtype))
         new=dict(c);new.update(h=next_h,prev=h,has_prev=True,last_prediction=pred,
@@ -327,7 +333,7 @@ class FourDirectionCoE(TemporalSpatialCoE):
              'observation_mask':ctx['mask'],'diagnostics':diagnostics,
              'triscale_choices':stack('scale_weights').detach().argmax(2),'triscale_probabilities':stack('scale_probs'),
              'triscale_executed':stack('active'),'triscale_weights':stack('scale_weights')}
-        output={'x_hat_main':predictions[-1],'h_st_aux':ctx['h'],'coe':coe,'diagnostics':{'coe':diagnostics}}
+        output={'x_hat_main':predictions[-1],'h_st_aux':self.output_hidden(ctx['h']),'coe':coe,'diagnostics':{'coe':diagnostics}}
         if perf(self,'compact_outputs') and not collect_diagnostics(self):
             for key in ('candidate_completions','completions','candidate_changes','changes','acceptance_weights'):
                 coe.pop(key,None)

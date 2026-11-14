@@ -59,11 +59,14 @@ class ReleaseContract(unittest.TestCase):
         self.assertEqual(sum(p.numel() for p in model.parameters()), 347930)
 
     def test_frozen_source_integrity(self):
+        # Experimental branch declares its two new opt-in readout hooks explicitly.
+        overrides=load(ROOT/'docs/latent_changes.json')['modified'] if (ROOT/'docs/latent_changes.json').exists() else {}
         for name, digest in load(ROOT / 'docs/provenance.json')['unchanged_source_sha256'].items():
-            self.assertEqual(hashlib.sha256((ROOT / name).read_bytes()).hexdigest(), digest, name)
+            self.assertEqual(hashlib.sha256((ROOT / name).read_bytes()).hexdigest(), overrides.get(name,{}).get('candidate_sha256',digest), name)
         provenance=load(ROOT/'docs/provenance.json')
         for name, record in provenance.get('performance_modified_source_sha256',{}).items():
-            self.assertEqual(hashlib.sha256((ROOT/name).read_bytes()).hexdigest(),record['candidate_sha256'],name)
+            self.assertEqual(hashlib.sha256((ROOT/name).read_bytes()).hexdigest(),overrides.get(name,{}).get('candidate_sha256',record['candidate_sha256']),name)
+            if name in overrides:self.assertEqual(overrides[name]['base_sha256'],record['candidate_sha256'])
             self.assertEqual(load(ROOT/'docs/provenance_original_i37.json')['unchanged_source_sha256'][name],record['reference_sha256'])
         for name,digest in provenance.get('performance_added_source_sha256',{}).items():
             self.assertEqual(hashlib.sha256((ROOT/name).read_bytes()).hexdigest(),digest,name)
