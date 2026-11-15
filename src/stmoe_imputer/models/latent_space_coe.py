@@ -105,6 +105,10 @@ class LatentSpaceCoE(FreeScaleHistoryConsistencyCoE):
                 head.requires_grad_(False)
         return m
 
+    @staticmethod
+    def _map_spatial(x,size):
+        return grid_map(x,size)
+
     def output_hidden(self,h):
         return self.to_native[0](h)
 
@@ -112,12 +116,12 @@ class LatentSpaceCoE(FreeScaleHistoryConsistencyCoE):
         return self.decoder(self.output_hidden(h))
 
     def summary(self,h,mask):
-        return FourDirectionCoE.summary(self,h,grid_map(mask,h.shape[-2:]))
+        return FourDirectionCoE.summary(self,h,self._map_spatial(mask,h.shape[-2:]))
 
     def _router_features(self,hidden,values,support_summary,change,missing,pattern_summary=None):
         # Only the hidden-state missing-weighted summary needs a new grid.
         # F value summaries and global support statistics retain I37 semantics.
-        point_missing = grid_map(missing.mean(1,keepdim=True),hidden.shape[-2:])
+        point_missing = self._map_spatial(missing.mean(1,keepdim=True),hidden.shape[-2:])
         fraction = missing.mean((1,2,3,4)).unsqueeze(1)
         return torch.cat((hidden.mean((2,3,4)), self._missing_pool(hidden,point_missing),
             values.mean((2,3,4)),self._missing_pool(values,missing),support_summary,
@@ -154,8 +158,8 @@ class LatentSpaceCoE(FreeScaleHistoryConsistencyCoE):
             ('feedback_abs','feedback_route_abs','visible_residual_abs','feedback_coverage')}
         stats = {'pool_size':c['h'].new_tensor(len(c['x_pool'])), 'pool_delta_abs':c['h'].new_zeros(())}
         if c['x_pool'] and self.latent_spec['history']:
-            history = [grid_map(p,self.latent_size) for p in c['x_pool']]
-            delta,weights = self.x_history(c['h'],history,grid_map(c['mask'],self.latent_size),c['x_scale'])
+            history = [self._map_spatial(p,self.latent_size) for p in c['x_pool']]
+            delta,weights = self.x_history(c['h'],history,self._map_spatial(c['mask'],self.latent_size),c['x_scale'])
             delta = delta*self.history_gain if self.history_gain != 1 else delta
             corrected = corrected+delta
             if collect_diagnostics(self):

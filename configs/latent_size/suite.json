@@ -1,0 +1,112 @@
+[
+  {
+    "name": "GS01",
+    "control": "I37 (32×32)",
+    "description": "隐藏网格8×8；空间映射fixed；通道64、时间12及其他模块固定",
+    "config": "configs/latent_size/GS01.json",
+    "spec": {
+      "lh": 8,
+      "lw": 8,
+      "projection": "fixed"
+    }
+  },
+  {
+    "name": "GS02",
+    "control": "I37 (32×32)",
+    "description": "隐藏网格12×12；空间映射fixed；通道64、时间12及其他模块固定",
+    "config": "configs/latent_size/GS02.json",
+    "spec": {
+      "lh": 12,
+      "lw": 12,
+      "projection": "fixed"
+    }
+  },
+  {
+    "name": "GS03",
+    "control": "I37 (32×32)",
+    "description": "隐藏网格16×16；空间映射fixed；通道64、时间12及其他模块固定",
+    "config": "configs/latent_size/GS03.json",
+    "spec": {
+      "lh": 16,
+      "lw": 16,
+      "projection": "fixed"
+    }
+  },
+  {
+    "name": "GS04",
+    "control": "I37 (32×32)",
+    "description": "隐藏网格20×20；空间映射fixed；通道64、时间12及其他模块固定",
+    "config": "configs/latent_size/GS04.json",
+    "spec": {
+      "lh": 20,
+      "lw": 20,
+      "projection": "fixed"
+    }
+  },
+  {
+    "name": "GS05",
+    "control": "I37 (32×32)",
+    "description": "隐藏网格24×24；空间映射fixed；通道64、时间12及其他模块固定",
+    "config": "configs/latent_size/GS05.json",
+    "spec": {
+      "lh": 24,
+      "lw": 24,
+      "projection": "fixed"
+    }
+  },
+  {
+    "name": "GS06",
+    "control": "I37 (32×32)",
+    "description": "隐藏网格40×40；空间映射fixed；通道64、时间12及其他模块固定",
+    "config": "configs/latent_size/GS06.json",
+    "spec": {
+      "lh": 40,
+      "lw": 40,
+      "projection": "fixed"
+    }
+  },
+  {
+    "name": "GS07",
+    "control": "GS03 (16×16)",
+    "description": "隐藏网格16×16；空间映射linear_in；通道64、时间12及其他模块固定",
+    "config": "configs/latent_size/GS07.json",
+    "spec": {
+      "lh": 16,
+      "lw": 16,
+      "projection": "linear_in"
+    }
+  },
+  {
+    "name": "GS08",
+    "control": "GS03 (16×16)",
+    "description": "隐藏网格16×16；空间映射linear_out；通道64、时间12及其他模块固定",
+    "config": "configs/latent_size/GS08.json",
+    "spec": {
+      "lh": 16,
+      "lw": 16,
+      "projection": "linear_out"
+    }
+  },
+  {
+    "name": "GS09",
+    "control": "GS03 (16×16)",
+    "description": "隐藏网格16×16；空间映射linear_both；通道64、时间12及其他模块固定",
+    "config": "configs/latent_size/GS09.json",
+    "spec": {
+      "lh": 16,
+      "lw": 16,
+      "projection": "linear_both"
+    }
+  },
+  {
+    "name": "GS10",
+    "control": "GS05 (24×24)",
+    "description": "隐藏网格24×24；空间映射linear_both；通道64、时间12及其他模块固定",
+    "config": "configs/latent_size/GS10.json",
+    "spec": {
+      "lh": 24,
+      "lw": 24,
+      "projection": "linear_both"
+    }
+  }
+]

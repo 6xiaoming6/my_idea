@@ -7,6 +7,9 @@ def resolve_architecture(cfg):
 
 
 def build_model_backbone(cfg):
+    if resolve_architecture(cfg) == "v25_spatial_size_coe":
+        from .spatial_size_coe import SpatialSizeCoE
+        return SpatialSizeCoE.from_config(cfg)
     if resolve_architecture(cfg) == "v25_latent_space_coe":
         from .latent_space_coe import LatentSpaceCoE
         return LatentSpaceCoE.from_config(cfg)
