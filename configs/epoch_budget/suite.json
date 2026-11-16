@@ -1,0 +1,68 @@
+[
+  {
+    "name": "E100_L",
+    "epochs": 100,
+    "eta_min": 1e-05,
+    "config": "configs/epoch_budget/E100_L.json"
+  },
+  {
+    "name": "E120_H",
+    "epochs": 120,
+    "eta_min": 0.0003,
+    "config": "configs/epoch_budget/E120_H.json"
+  },
+  {
+    "name": "E120_L",
+    "epochs": 120,
+    "eta_min": 1e-05,
+    "config": "configs/epoch_budget/E120_L.json"
+  },
+  {
+    "name": "E140_H",
+    "epochs": 140,
+    "eta_min": 0.0003,
+    "config": "configs/epoch_budget/E140_H.json"
+  },
+  {
+    "name": "E140_L",
+    "epochs": 140,
+    "eta_min": 1e-05,
+    "config": "configs/epoch_budget/E140_L.json"
+  },
+  {
+    "name": "E160_H",
+    "epochs": 160,
+    "eta_min": 0.0003,
+    "config": "configs/epoch_budget/E160_H.json"
+  },
+  {
+    "name": "E160_L",
+    "epochs": 160,
+    "eta_min": 1e-05,
+    "config": "configs/epoch_budget/E160_L.json"
+  },
+  {
+    "name": "E180_H",
+    "epochs": 180,
+    "eta_min": 0.0003,
+    "config": "configs/epoch_budget/E180_H.json"
+  },
+  {
+    "name": "E180_L",
+    "epochs": 180,
+    "eta_min": 1e-05,
+    "config": "configs/epoch_budget/E180_L.json"
+  },
+  {
+    "name": "E200_H",
+    "epochs": 200,
+    "eta_min": 0.0003,
+    "config": "configs/epoch_budget/E200_H.json"
+  },
+  {
+    "name": "E200_L",
+    "epochs": 200,
+    "eta_min": 1e-05,
+    "config": "configs/epoch_budget/E200_L.json"
+  }
+]
